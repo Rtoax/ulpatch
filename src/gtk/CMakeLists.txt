@@ -1,9 +1,4 @@
 
-add_subdirectory(utils)
-add_subdirectory(elf)
-add_subdirectory(cli)
-add_subdirectory(gtk)
-
 find_package(PkgConfig REQUIRED)
 
 include_directories(.)
@@ -15,21 +10,17 @@ include_directories(.)
 
 #include_directories(${GTK_3_0_INCLUDE_DIRS})
 
-find_library(ELF elf /usr/lib64)
-find_library(RT rt /usr/lib64)
-find_library(PTHREAD pthread /usr/lib64)
 
 link_libraries(${ELF} ${RT} ${PTHREAD}
 	elfview_utils
 	elfview_elf
 	elfview_cli
-	elfview_gtk
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
-add_executable(elfview
-	main.c
-)
+aux_source_directory(. LIB_SOURCES)
 
-target_compile_definitions(elfview PRIVATE ${UTILS_FLAGS})
+add_library(elfview_gtk STATIC ${LIB_SOURCES})
+
+target_compile_definitions(elfview_gtk PRIVATE ${UTILS_FLAGS})
