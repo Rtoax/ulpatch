@@ -14,16 +14,7 @@ link_libraries(${ELF} ${PTHREAD} ${JSON_C} elfview_utils)
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
-file( GLOB LIB_SOURCES
-	elf_main.c
-	elf_client.c
-	elf_open.c
-	elf_get.c
-	ehdr.c
-	phdr.c
-	shdr.c
-	test.c
-)
+aux_source_directory(. LIB_SOURCES)
 
 add_library(elfview_elf STATIC ${LIB_SOURCES})
 

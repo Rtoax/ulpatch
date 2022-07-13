@@ -3,7 +3,7 @@
 #include <string.h>
 #include "linenoise.h"
 
-
+#if defined(LINENOISE_EXAMPLE)
 void completion(const char *buf, linenoiseCompletions *lc) {
     if (buf[0] == 'h') {
         linenoiseAddCompletion(lc,"hello");
@@ -77,3 +77,4 @@ int main(int argc, char **argv) {
     }
     return 0;
 }
+#endif
