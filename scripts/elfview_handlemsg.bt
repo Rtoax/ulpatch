@@ -1,0 +1,43 @@
+#!/bin/env bpftrace
+/**
+ * Tracing elfview background handle msg latency.
+ *
+ * Copyright (C) Rong Tao
+ *
+ * 2022-07-09	Rong Tao	Create this
+ */
+BEGIN
+{
+	// See elf_api.h
+	@cmds[0] = "Unknown";
+	@cmds[1] = "LOAD ELF";
+	@cmds[2] = "DELETE ELF";
+	@cmds[3] = "LIST ELF";
+	@cmds[4] = "SELETE ELF";
+	@cmds[5] = "GET EHDR";
+	@cmds[6] = "GET PHDR";
+	@cmds[7] = "GET SHDR";
+	@cmds[8] = "TEST SERVER";
+
+	printf("Tracing elfview msg handle latency, hit ctrl-c to end.\n");
+}
+
+usdt:../build/src/elfview:handle_msg_start
+{
+	@start[pid] = nsecs;
+	$cmd = arg0;
+	printf("Handle %s command\n", @cmds[$cmd]);
+}
+
+usdt:../build/src/elfview:handle_msg_end
+/@start[pid]/
+{
+	@lantency_us = hist((nsecs - @start[pid]) / 1000);
+	delete(@start[pid]);
+}
+
+END
+{
+	clear(@start);
+	clear(@cmds);
+}

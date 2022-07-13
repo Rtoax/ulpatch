@@ -1,0 +1,33 @@
+
+add_subdirectory(utils)
+add_subdirectory(elf)
+add_subdirectory(cli)
+
+find_package(PkgConfig REQUIRED)
+
+include_directories(.)
+
+#pkg_search_module(GTK_3_0 REQUIRED gtk+-3.0)
+
+#message(STATUS "=== GTK_3_0_LIBRARIES: ${GTK_3_0_LIBRARIES}")
+#message(STATUS "=== GTK_3_0_INCLUDE_DIRS: ${GTK_3_0_INCLUDE_DIRS}")
+
+#include_directories(${GTK_3_0_INCLUDE_DIRS})
+
+find_library(ELF elf /usr/lib64)
+find_library(RT rt /usr/lib64)
+find_library(PTHREAD pthread /usr/lib64)
+
+link_libraries(${ELF} ${RT} ${PTHREAD}
+	elfview_utils
+	elfview_elf
+	elfview_cli
+)
+add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
+	-Wuninitialized -Wreturn-type -pg)
+
+add_executable(elfview
+	main.c
+)
+
+target_compile_definitions(elfview PRIVATE ${UTILS_FLAGS})

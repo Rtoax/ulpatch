@@ -1,0 +1,28 @@
+#!/usr/bin/bpftrace --unsafe
+/**
+ * Tracing test usdt tests.
+ *
+ * Copyright (C) Rong Tao
+ *
+ * 2022-07-09	Rong Tao	Create this
+ */
+BEGIN
+{
+	printf("Tracing , hit ctrl-c to end.\n");
+}
+
+usdt:../build/tests/elfview_test:*
+{
+	//printf("Handle %s\n", probe);
+	@pcount[probe] = count();
+}
+
+interval:s:1
+{
+	system("clear");
+	print(@pcount);
+}
+
+END
+{
+}

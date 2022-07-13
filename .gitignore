@@ -1,0 +1,11 @@
+build
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+Makefile
+
+# elf
+*.a
+*.o
+*.d
+*.out
