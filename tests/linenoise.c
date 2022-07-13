@@ -7,7 +7,7 @@
 #ifdef HAVE_LINENOISE
 #include <linenoise.h>
 #else
-#include <utils/linenoise.h>
+#include <utils/linenoise/linenoise.h>
 #endif
 
 #include "test_api.h"
@@ -31,3 +31,4 @@ TEST(Linenoise,	init_1,	0)
 
 	return 0;
 }
+

@@ -9,7 +9,7 @@
 #ifdef HAVE_LINENOISE
 #include <linenoise.h>
 #else
-#include <utils/linenoise.h>
+#include <utils/linenoise/linenoise.h>
 #endif
 
 #include <elf/elf_api.h>

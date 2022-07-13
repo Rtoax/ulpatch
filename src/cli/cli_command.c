@@ -11,7 +11,7 @@
 #ifdef HAVE_LINENOISE
 #include <linenoise.h>
 #else
-#include <utils/linenoise.h>
+#include <utils/linenoise/linenoise.h>
 #endif
 
 #include <cli/cli_api.h>
