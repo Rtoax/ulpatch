@@ -75,6 +75,7 @@ static __unused int handle_sections(struct elf_file *elf)
 		}
 			break;
 
+		// readelf --section-groups
 		case SHT_GROUP:
 		default:
 			break;
