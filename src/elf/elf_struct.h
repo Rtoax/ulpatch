@@ -37,7 +37,6 @@ struct elf_file {
 	 *  GElf_Shdr *dynsym_shdr = elf->shdrs[elf->dynsym];
 	 */
 	unsigned int dynsym_shdr_idx;	// SHT_DYNSYM
-	const char *dynsym_strtab;
 
 	/* List all elf files */
 	struct list_head node;

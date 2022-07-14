@@ -16,6 +16,43 @@
 static uint16_t elf_files_number = 0;
 static LIST_HEAD(elf_file_list);
 
+
+static __unused int handle_dynsym(struct elf_file *elf, Elf_Scn *scn)
+{
+	int isym;
+	Elf_Data *data = elf_getdata(scn, NULL);
+	size_t ndx = elf_ndxscn(scn);
+	GElf_Shdr *shdr = &elf->shdrs[ndx];
+
+	size_t nsyms = (data->d_size
+		/ gelf_fsize(elf->elf, ELF_T_SYM, 1, EV_CURRENT));
+
+	for (isym = 0; isym < nsyms; isym++) {
+
+		GElf_Sym sym;
+
+		if (gelf_getsym(data, isym, &sym) == NULL) {
+			lerror("Couldn't get symbol\n");
+			return -ENOENT;
+		}
+
+		if (GELF_ST_TYPE(sym.st_info) == STT_SECTION
+			&& sym.st_shndx == elf->shdrstrndx) {
+
+			lwarning("WARNING:"
+			" symbol table [%zd] contains section symbol %zd"
+			" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
+		}
+
+		ldebug("%s\n",
+			elf_strptr(elf->elf, shdr->sh_link, sym.st_name));
+
+		// TODO
+	}
+
+	return 0;
+}
+
 static __unused int handle_sections(struct elf_file *elf)
 {
 	int i;
@@ -23,8 +60,6 @@ static __unused int handle_sections(struct elf_file *elf)
 	for (i = 0; i < elf->shdrnum; i++) {
 		GElf_Shdr *shdr = &elf->shdrs[i];
 		Elf_Scn *scn = elf_getscn(elf->elf, i);
-		size_t ndx = elf_ndxscn(scn);
-		Elf_Data *data = elf_getdata(scn, NULL);
 
 		if (gelf_getshdr(scn, shdr) == NULL) {
 			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
@@ -56,32 +91,8 @@ static __unused int handle_sections(struct elf_file *elf)
 		// readelf --symbols
 		// readelf --dyn-sym
 		case SHT_DYNSYM:
-		{
-			int isym;
-			size_t nsyms = (data->d_size
-				/ gelf_fsize(elf->elf, ELF_T_SYM, 1, EV_CURRENT));
-
-			for (isym = 0; isym < nsyms; isym++) {
-
-				GElf_Sym sym;
-
-				if (gelf_getsym(data, isym, &sym) == NULL) {
-					lerror("Couldn't get symbol %d\n", i);
-					return -ENOENT;
-				}
-
-				if (GELF_ST_TYPE(sym.st_info) == STT_SECTION
-					&& sym.st_shndx == elf->shdrstrndx) {
-
-					lwarning("WARNING:"
-					" symbol table [%zd] contains section symbol %zd"
-					" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
-				}
-			}
-
+			handle_dynsym(elf, scn);
 			elf->dynsym_shdr_idx = i;
-			// elf->dynsym_strtab = file_map + shdr->sh_offset;
-		}
 			break;
 
 		// readelf --section-groups
