@@ -16,6 +16,74 @@
 static uint16_t elf_files_number = 0;
 static LIST_HEAD(elf_file_list);
 
+static __unused int handle_sections(struct elf_file *elf)
+{
+	int i;
+
+	for (i = 0; i < elf->shdrnum; i++) {
+		GElf_Shdr *shdr = &elf->shdrs[i];
+		Elf_Scn *scn = elf_getscn(elf->elf, i);
+		size_t ndx = elf_ndxscn(scn);
+		Elf_Data *data = elf_getdata(scn, NULL);
+
+		if (gelf_getshdr(scn, shdr) == NULL) {
+			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
+			return -ENOENT;
+		}
+
+		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
+			// TODO
+
+		} else {
+			elf->shdrnames[i] =
+				elf_strptr(elf->elf, elf->shdrstrndx, shdr->sh_name);
+
+			if (elf->shdrnames[i] == NULL) {
+				lerror("couldn't get section name: %s\n", elf_errmsg(-1));
+				return -ENOENT;
+			}
+			ldebug("section name: %s\n", elf->shdrnames[i]);
+		}
+
+		// Handle section header by type
+		switch (shdr->sh_type) {
+		case SHT_DYNSYM:
+		{
+			int isym;
+			size_t nsyms = (data->d_size
+				/ gelf_fsize(elf->elf, ELF_T_SYM, 1, EV_CURRENT));
+
+			for (isym = 0; isym < nsyms; isym++) {
+
+				GElf_Sym sym;
+
+				if (gelf_getsym(data, isym, &sym) == NULL) {
+					lerror("Couldn't get symbol %d\n", i);
+					return -ENOENT;
+				}
+
+				if (GELF_ST_TYPE(sym.st_info) == STT_SECTION
+					&& sym.st_shndx == elf->shdrstrndx) {
+
+					lwarning("WARNING:"
+					" symbol table [%zd] contains section symbol %zd"
+					" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
+				}
+			}
+
+			elf->dynsym_shdr_idx = i;
+		}
+			break;
+
+		case SHT_GROUP:
+		default:
+			break;
+		}
+	}
+	return 0;
+
+}
+
 static __unused struct elf_file *elf_file_load(const char *filepath)
 {
 	int fd, i;
@@ -100,68 +168,10 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 		lerror("elf_getshdrstrnd failed %s\n", elf_errmsg(-1));
 		goto free_phdrs;
 	}
-	for (i = 0; i < elf->shdrnum; i++) {
-		GElf_Shdr *shdr = &elf->shdrs[i];
-		Elf_Scn *scn = elf_getscn(__elf, i);
-		size_t ndx = elf_ndxscn(scn);
-		Elf_Data *data = elf_getdata(scn, NULL);
 
-		if (gelf_getshdr(scn, shdr) == NULL) {
-			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
-			goto free_phdrs;
-		}
+	if (handle_sections(elf) != 0)
+		goto free_shdrs;
 
-		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
-			// TODO
-
-		} else {
-			elf->shdrnames[i] =
-				elf_strptr(__elf, elf->shdrstrndx, shdr->sh_name);
-
-			if (elf->shdrnames[i] == NULL) {
-				lerror("couldn't get section name: %s\n", elf_errmsg(-1));
-				goto free_shdrs;
-			}
-			ldebug("section name: %s\n", elf->shdrnames[i]);
-		}
-
-		// Handle section header by type
-		switch (shdr->sh_type) {
-		case SHT_DYNSYM:
-		{
-			int isym;
-			size_t nsyms = (data->d_size
-				/ gelf_fsize(__elf, ELF_T_SYM, 1, EV_CURRENT));
-
-			for (isym = 0; isym < nsyms; isym++) {
-
-				GElf_Sym sym;
-
-				if (gelf_getsym(data, isym, &sym) == NULL) {
-					lerror("Couldn't get symbol %d\n", i);
-					goto free_shdrs;
-				}
-
-				if (GELF_ST_TYPE(sym.st_info) == STT_SECTION
-					&& sym.st_shndx == elf->shdrstrndx) {
-
-					lwarning("WARNING:"
-					" symbol table [%zd] contains section symbol %zd"
-					" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
-				}
-			}
-
-			elf->dynsym_shdr_idx = i;
-		}
-			break;
-
-		case SHT_GROUP:
-		default:
-			break;
-		}
-	}
-
-	ldebug("LOAD ELF.\n");
 	/* Save it to ELF list */
 	list_add(&elf->node, &elf_file_list);
 	elf_files_number++;
