@@ -30,6 +30,15 @@ struct elf_file {
 	GElf_Shdr *shdrs;
 	char **shdrnames;
 
+	/**
+	 * Useful section header index in "shdrs[]".
+	 *
+	 * for example:
+	 *  GElf_Shdr *dynsym_shdr = elf->shdrs[elf->dynsym];
+	 */
+	unsigned int dynsym_shdr_idx;	// SHT_DYNSYM
+
+
 	/* List all elf files */
 	struct list_head node;
 };
