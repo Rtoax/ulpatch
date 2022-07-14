@@ -47,6 +47,14 @@ static __unused int handle_sections(struct elf_file *elf)
 
 		// Handle section header by type
 		switch (shdr->sh_type) {
+		// .dynstr
+		// .shstrtab
+		case SHT_STRTAB:
+		{
+		}
+			break;
+		// readelf --symbols
+		// readelf --dyn-sym
 		case SHT_DYNSYM:
 		{
 			int isym;
@@ -72,6 +80,7 @@ static __unused int handle_sections(struct elf_file *elf)
 			}
 
 			elf->dynsym_shdr_idx = i;
+			// elf->dynsym_strtab = file_map + shdr->sh_offset;
 		}
 			break;
 
