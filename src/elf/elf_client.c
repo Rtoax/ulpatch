@@ -12,6 +12,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/time.h>
 
 #include <elf/elf_api.h>
 #include <utils/log.h>
@@ -238,6 +239,49 @@ int client_get_elf_shdr(int connfd,
 	}
 
 	return client_recv_acks(connfd, ack_handler);
+}
+
+int register_client_handler(struct client *client, struct cmd_elf *cmd)
+{
+	struct client_info *info = cmd_data(cmd);
+
+	struct client_info *dst_info = &client->info;
+	int serverfd = dst_info->connfd;
+
+	*dst_info = *info;
+
+	dst_info->connfd = serverfd;
+
+	return 0;
+}
+
+int client_register(int connfd, enum client_type type, int (*handler)(void))
+{
+	assert(handler && "must have handler()");
+
+	char buffer[BUFFER_SIZE];
+	struct cmd_elf *cmd = (struct cmd_elf *)buffer;
+
+	cmd->cmd = CMD_REGISTER_CLIENT;
+	cmd->is_ack = 0;
+	cmd->has_next = 0;
+	cmd->data_len = sizeof(struct client_info);
+
+	struct client_info *info = cmd_data(cmd);
+
+	info->type = type;
+	info->clientfd = connfd;
+	gettimeofday(&info->start, NULL);
+
+	write(connfd, cmd, cmd_len(cmd));
+
+	int ack_handler(struct cmd_elf *msg_ack) {
+		return handler();
+	}
+
+	client_recv_acks(connfd, ack_handler);
+
+	return 0;
 }
 
 int client_test_server(int connfd, int (*handler)(const char *str, int str_len))

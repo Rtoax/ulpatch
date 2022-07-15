@@ -40,12 +40,13 @@ int elf_get_phdr_handler(struct client*, struct cmd_elf *);
 int elf_get_phdr_handler_ack(struct client*, struct cmd_elf *);
 int elf_get_shdr_handler(struct client*, struct cmd_elf *);
 int elf_get_shdr_handler_ack(struct client*, struct cmd_elf *);
+int register_client_handler(struct client*, struct cmd_elf *);
 int test_server_handler(struct client*, struct cmd_elf *);
 int test_server_handler_ack(struct client*, struct cmd_elf *);
 
 int send_one_ack(struct client *client, struct cmd_elf *cmd_ack)
 {
-	int ret =  write(client->connfd, cmd_ack, cmd_len(cmd_ack));
+	int ret =  write(client->info.connfd, cmd_ack, cmd_len(cmd_ack));
 
 	memset(cmd_ack, 0x0, cmd_len(cmd_ack));
 
@@ -157,6 +158,7 @@ static struct cmd_handler cmd_handlers[CMD_MAX__] = {
 	[CMD_ELF_GET_EHDR] = {CMD_ELF_GET_EHDR, elf_get_ehdr_handler, elf_get_ehdr_handler_ack},
 	[CMD_ELF_GET_PHDR] = {CMD_ELF_GET_PHDR, elf_get_phdr_handler, elf_get_phdr_handler_ack},
 	[CMD_ELF_GET_SHDR] = {CMD_ELF_GET_SHDR, elf_get_shdr_handler, elf_get_shdr_handler_ack},
+	[CMD_REGISTER_CLIENT] = {CMD_REGISTER_CLIENT, register_client_handler, NULL},
 	[CMD_TEST_SERVER] = {CMD_TEST_SERVER, test_server_handler, test_server_handler_ack},
 };
 
@@ -171,7 +173,7 @@ void handle_client_msg(struct client *client)
 	int ret = -1;
 
 	/* Recv request */
-	size = read(client->connfd, buffer, sizeof(buffer));
+	size = read(client->info.connfd, buffer, sizeof(buffer));
 	cmd_msg = (struct cmd_elf *)buffer;
 	cmd = cmd_msg->cmd;
 
@@ -233,15 +235,15 @@ void *elf_thread(void *arg)
 
 				memset(client, 0x0, sizeof(struct client));
 
-				client->connfd = accept(listenfd,
+				client->info.connfd = accept(listenfd,
 					(struct sockaddr*)&client->addr, &len);
 
 				/* Add new client to epoll */
 				event.events = EPOLLIN;
-				event.data.fd = client->connfd;
+				event.data.fd = client->info.connfd;
 
 				ret = epoll_ctl(main_epollfd, EPOLL_CTL_ADD,
-							client->connfd, &event);
+							client->info.connfd, &event);
 				if (ret == -1) {
 					lerror("cannot add fd to epoll, %s\n", strerror(errno));
 					free(client);
@@ -254,13 +256,13 @@ void *elf_thread(void *arg)
 				struct client *client;
 
 				list_for_each_entry(client, &client_list, node) {
-					if (client->connfd == event->data.fd) {
+					if (client->info.connfd == event->data.fd) {
 						/* Client close */
 						if (event->events & EPOLLHUP) {
-							close(client->connfd);
+							close(client->info.connfd);
 
 							epoll_ctl(main_epollfd, EPOLL_CTL_DEL,
-								client->connfd, NULL);
+								client->info.connfd, NULL);
 
 							list_del(&client->node);
 							free(client);

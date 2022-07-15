@@ -259,6 +259,9 @@ void cli_main(int argc, char *argv[])
 	cli_init_help();
 	cli.elf_client_fd = create_elf_client();
 
+	int handler_ack(void) { return 0; }
+	client_register(cli.elf_client_fd, CLIENT_CLI, handler_ack);
+
 	if (isatty(fileno(stdin))) {
 		history = 1;
 		if (historyfile != NULL) {

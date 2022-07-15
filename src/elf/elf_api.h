@@ -29,6 +29,7 @@ enum cmd_type {
 	CMD_ELF_GET_EHDR,	/* Get elf header */
 	CMD_ELF_GET_PHDR,	/* Get elf program header */
 	CMD_ELF_GET_SHDR,	/* Get elf section header */
+	CMD_REGISTER_CLIENT,/* Tell server client information */
 	CMD_TEST_SERVER,	/* Test UNIX socket is OK? */
 	CMD_ELF_ACK,	/* All msg's ack */
 	CMD_MAX__
@@ -42,6 +43,7 @@ enum cmd_type {
  * CMD_ELF_GET_EHDR struct cmd_elf_empty      struct
  * CMD_ELF_GET_PHDR struct cmd_elf_empty      struct
  * CMD_ELF_GET_SHDR struct cmd_elf_empty      struct
+ * CMD_REGISTER_CLIENT  struct client_info    struct
  * CMD_TEST_SERVER  struct cmd_elf_empty      struct
  * CMD_ELF_ACK      struct cmd_elf_ack        struct + data
  */
@@ -125,8 +127,27 @@ struct cmd_handler {
 	int (*ack)(struct client*, struct cmd_elf *);
 };
 
+enum client_type {
+	CLIENT_NONE,
+	CLIENT_CLI,
+	CLIENT_GTK,
+};
+
+struct client_info {
+#define CMD_REGISTER_CLIENT CMD_REGISTER_CLIENT
+	enum client_type type;
+
+	// Record start time
+	// write: gettimeofday(&start, NULL)
+	// read: strftime(buffer, 40, "%m-%d-%Y/%T", localtime(&start.tv_sec));
+	struct timeval start;
+
+	int clientfd; // = connect(2)
+	int connfd; // = accept(2)
+};
+
 struct client {
-	int connfd;
+	struct client_info info;
 	struct sockaddr_un addr;
 	/* client list node */
 	struct list_head node;
@@ -165,6 +186,7 @@ int client_get_elf_ehdr(int connfd, int (*handler)(const GElf_Ehdr *ehdr));
 int client_get_elf_phdr(int connfd, int (*handler)(const GElf_Phdr *phdr));
 int client_get_elf_shdr(int connfd,
 		int (*handler)(const GElf_Shdr *shdr, const char *secname));
+int client_register(int connfd, enum client_type type, int (*handler)(void));
 int client_test_server(int connfd, int (*handler)(const char *str, int len));
 
 
