@@ -55,6 +55,20 @@ TEST(Cli_cmd,	elf_list,	0)
 	return cli_cmd_list(&cli, argc, argv);
 }
 
+TEST(Cli_cmd,	list_client,	0)
+{
+	struct cli_struct cli = {
+		.elf_client_fd = test_client_fd
+	};
+	int argc = 2;
+	char *argv[] = {
+		"LIST",
+		"CLIENT",
+		NULL
+	};
+	return cli_cmd_list(&cli, argc, argv);
+}
+
 TEST(Cli_cmd,	elf_select,	0)
 {
 	int ret;
