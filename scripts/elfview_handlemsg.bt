@@ -1,6 +1,6 @@
 #!/bin/env bpftrace
 /**
- * Tracing elfview background handle msg latency.
+ * Tracing elftools background handle msg latency.
  *
  * Copyright (C) Rong Tao
  *
@@ -19,17 +19,17 @@ BEGIN
 	@cmds[7] = "GET SHDR";
 	@cmds[8] = "TEST SERVER";
 
-	printf("Tracing elfview msg handle latency, hit ctrl-c to end.\n");
+	printf("Tracing elftools msg handle latency, hit ctrl-c to end.\n");
 }
 
-usdt:../build/src/elfview:handle_msg_start
+usdt:../build/src/elftools:handle_msg_start
 {
 	@start[pid] = nsecs;
 	$cmd = arg0;
 	printf("Handle %s command\n", @cmds[$cmd]);
 }
 
-usdt:../build/src/elfview:handle_msg_end
+usdt:../build/src/elftools:handle_msg_end
 /@start[pid]/
 {
 	@lantency_us = hist((nsecs - @start[pid]) / 1000);

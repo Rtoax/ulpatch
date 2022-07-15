@@ -11,7 +11,7 @@ BEGIN
 	printf("Tracing , hit ctrl-c to end.\n");
 }
 
-usdt:../build/tests/elfview_test:*
+usdt:../build/tests/elftools_test:*
 {
 	//printf("Handle %s\n", probe);
 	@pcount[probe] = count();

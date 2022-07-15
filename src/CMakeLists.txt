@@ -28,8 +28,8 @@ link_libraries(${ELF} ${RT} ${PTHREAD}
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
-add_executable(elfview
-	elfview.c
+add_executable(elftools
+	elftools.c
 )
 
-target_compile_definitions(elfview PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(elftools PRIVATE ${UTILS_FLAGS})

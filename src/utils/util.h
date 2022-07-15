@@ -43,7 +43,7 @@ typedef enum {
         FILE_ELF,
 } file_type;
 
-// elfview arguments configuration
+// elftools arguments configuration
 struct config {
 	int log_level;
 	enum {
@@ -64,7 +64,7 @@ struct nr_idx_bool {
 // Global configuration
 extern struct config config;
 
-const char *elfview_version(void);
+const char *elftools_version(void);
 void daemonize(void);
 
 int memshow(void *data, int data_len);

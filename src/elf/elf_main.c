@@ -337,7 +337,7 @@ int elf_main(int argc, char *argv[])
 		exit(1);
 	}
 	pthread_setname_np(thread, "elf-main");
-	pthread_setname_np(pthread_self(), "elfview-server");
+	pthread_setname_np(pthread_self(), "elftools-server");
 
 	return 0;
 }

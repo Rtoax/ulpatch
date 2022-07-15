@@ -91,7 +91,7 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	"Usage: elfview [OPTION]... [FILE]...\n"
+	"Usage: elftools [OPTION]... [FILE]...\n"
 	"\n"
 	"View ELF files\n"
 	"\n"
@@ -107,7 +107,7 @@ static void print_help(void)
 	"\n"
 	" -i, --input-files   input files to pre-load, auto filter out non exist\n"
 	"                     files.\n"
-	"                     for example: -i /bin/ls,/bin/cat,elfview,\n"
+	"                     for example: -i /bin/ls,/bin/cat,elftools,\n"
 	"\n"
 	" -l, --log-level     set log level, default(%d)\n"
 	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
@@ -119,14 +119,14 @@ static void print_help(void)
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
 	"\n"
-	"elfview %s\n",
+	"elftools %s\n",
 	ELF_UNIX_PATH,
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
 	config.mode,
 	MODE_SLEEP, MODE_CLI, MODE_GTK,
-	elfview_version()
+	elftools_version()
 	);
 	exit(0);
 }
@@ -153,7 +153,7 @@ static int parse_config(int argc, char *argv[])
 		}
 		switch (c) {
 		case 'v':
-			printf("version %s\n", elfview_version());
+			printf("version %s\n", elftools_version());
 			exit(0);
 		case 'h':
 			print_help();

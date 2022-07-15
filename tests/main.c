@@ -57,9 +57,9 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	"Usage: elfview_test [OPTION]... \n"
+	"Usage: elftools_test [OPTION]... \n"
 	"\n"
-	"Test elfview\n"
+	"Test elftools\n"
 	"\n"
 	"Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
@@ -69,8 +69,8 @@ static void print_help(void)
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
 	"\n"
-	"elfview_test %s\n",
-	elfview_version()
+	"elftools_test %s\n",
+	elftools_version()
 	);
 	exit(0);
 }
@@ -104,7 +104,7 @@ static int parse_config(int argc, char *argv[])
 			verbose = true;
 			break;
 		case 'v':
-			printf("version %s\n", elfview_version());
+			printf("version %s\n", elftools_version());
 			exit(0);
 		case 'h':
 			print_help();

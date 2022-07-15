@@ -124,7 +124,7 @@ json_object *json_phdr(const GElf_Phdr *phdr)
 
 	/* Foot */
 	json_object_object_add(foot,
-		"Version", json_object_new_string(elfview_version()));
+		"Version", json_object_new_string(elftools_version()));
 
 	return root;
 }

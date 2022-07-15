@@ -236,7 +236,7 @@ json_object *json_ehdr(const GElf_Ehdr *ehdr)
 
 	/* Foot */
 	json_object_object_add(foot,
-		"Version", json_object_new_string(elfview_version()));
+		"Version", json_object_new_string(elftools_version()));
 
 	return root;
 }

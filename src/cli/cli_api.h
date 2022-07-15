@@ -8,7 +8,7 @@ extern "C" {
 #include <json-c/json.h>
 #endif
 
-#define CLI_HISTORY_FILE	"elfview_cli_history.txt"
+#define CLI_HISTORY_FILE	"elftools_cli_history.txt"
 
 struct cli_struct {
 	int elf_client_fd;

@@ -1,6 +1,6 @@
 #include "util.h"
 
-const char *elfview_version(void)
+const char *elftools_version(void)
 {
-	return "elfview-0.0.1";
+	return "elftools-0.0.1";
 }

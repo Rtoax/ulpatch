@@ -4,9 +4,9 @@
 #include "test_api.h"
 
 
-TEST(Utils,	elfview_version,	0)
+TEST(Utils,	elftools_version,	0)
 {
-	printf("%s\n", elfview_version());
+	printf("%s\n", elftools_version());
 	return 0;
 }
 
