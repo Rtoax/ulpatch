@@ -5,7 +5,7 @@
 ###################################
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
-PROJECT(elfview)
+PROJECT(elftools)
 
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")

@@ -12,6 +12,6 @@ endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(elfview_utils STATIC ${LIB_SOURCES} ${LINENOISE_SRC})
+add_library(elftools_utils STATIC ${LIB_SOURCES} ${LINENOISE_SRC})
 
-target_compile_definitions(elfview_utils PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(elftools_utils PRIVATE ${UTILS_FLAGS})

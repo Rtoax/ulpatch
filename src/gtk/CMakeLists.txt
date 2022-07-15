@@ -12,15 +12,15 @@ include_directories(.)
 
 
 link_libraries(${ELF} ${RT} ${PTHREAD}
-	elfview_utils
-	elfview_elf
-	elfview_cli
+	elftools_utils
+	elftools_elf
+	elftools_cli
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(elfview_gtk STATIC ${LIB_SOURCES})
+add_library(elftools_gtk STATIC ${LIB_SOURCES})
 
-target_compile_definitions(elfview_gtk PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(elftools_gtk PRIVATE ${UTILS_FLAGS})
