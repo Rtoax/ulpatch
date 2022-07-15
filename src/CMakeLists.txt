@@ -29,7 +29,7 @@ add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
 add_executable(elfview
-	main.c
+	elfview.c
 )
 
 target_compile_definitions(elfview PRIVATE ${UTILS_FLAGS})
