@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 
 #include <cli/cli_api.h>
 #include <elf/elf_api.h>
@@ -24,6 +25,23 @@ static void cli_elf_list_handler(struct file_info *info)
 		printf(" %s ELF %s\n", info->client_select?"> ":"  ", info->name);
 }
 
+static void
+cli_client_list_handler(struct nr_idx_bool *nib, struct client_info *info)
+{
+	char buffer[64];
+
+	strftime(buffer, sizeof(buffer) - 1,
+		"%m-%d-%Y/%T", localtime(&info->start.tv_sec));
+
+	printf(" %s CLIENT %2d/%2d %-32s %2d\n",
+		nib->is?"> ":"  ",
+		nib->idx,
+		nib->nr,
+		buffer,
+		info->connfd
+	);
+}
+
 int cli_cmd_list(const struct cli_struct *cli, int argc, char *argv[])
 {
 	if (argc < 2) {
@@ -35,6 +53,14 @@ int cli_cmd_list(const struct cli_struct *cli, int argc, char *argv[])
 			trace_cli_elf_list();
 
 			return client_list_elf(cli->elf_client_fd, cli_elf_list_handler);
+
+		// LIST CLIENT
+		} else if (strcasecmp(argv[1], "client") == 0) {
+
+			trace_cli_client_list();
+
+			return client_list_client(cli->elf_client_fd,
+					cli_client_list_handler);
 		}
 	}
 

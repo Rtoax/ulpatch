@@ -284,6 +284,132 @@ int client_register(int connfd, enum client_type type, int (*handler)(void))
 	return 0;
 }
 
+int client_list_client(int connfd,
+		void (*handler)(struct nr_idx_bool *nib, struct client_info *info))
+{
+	assert(handler && "must have handler()");
+
+	struct cmd_elf cmd = {
+		.cmd = CMD_LIST_CLIENT,
+		.is_ack = 0,
+		.has_next = 0,
+		.data_len = sizeof(struct cmd_elf_empty),
+	};
+	write(connfd, &cmd, cmd_len(&cmd));
+
+	int ack_handler(struct cmd_elf *msg_ack) {
+
+		char *data = ack_data(cmd_data(msg_ack));
+
+		uint32_t __unused nr_clis = *(uint32_t *)data;
+		if (nr_clis == 0) {
+			printf("No client connected.\n");
+			return 0;
+		}
+		data += sizeof(uint32_t);
+		uint32_t __unused idx = *(uint32_t *)data;
+		data += sizeof(uint32_t);
+		uint32_t __unused is_me = *(uint32_t *)data;
+		data += sizeof(uint32_t);
+
+		struct nr_idx_bool nib = {
+			.nr = nr_clis,
+			.idx = idx,
+			.is = is_me,
+		};
+
+		struct client_info *info = (void *)data;
+		handler(&nib, info);
+
+		return 0;
+	}
+
+	client_recv_acks(connfd, ack_handler);
+
+	return 0;
+}
+
+int list_client_handler(struct client *client, struct cmd_elf *cmd)
+{
+	return 0;
+}
+
+int list_client_handler_ack(struct client *client, struct cmd_elf *msg_ack)
+{
+	struct client *iclient = NULL;
+
+	uint32_t count = 0;
+	uint32_t init_len = msg_ack->data_len;
+	struct cmd_elf_ack *ack = cmd_data(msg_ack);
+
+	/* No elf loaded, return */
+	if (nr_clients <= 0) {
+		char *data = ack_data(ack);
+		/* Number of clients */
+		uint32_t *nr = (uint32_t *)data;
+		*nr = nr_clients;
+		msg_ack->data_len += sizeof(uint32_t);
+		send_one_ack(client, msg_ack);
+		return 0;
+	}
+
+	list_for_each_entry(iclient, &client_list, node) {
+		uint16_t add_len = 0;
+		// see struct cmd_elf_ack.data
+		char *data = ack_data(ack);
+		int32_t data_left_len = BUFFER_SIZE -
+				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
+
+		/* Number of Clients */
+		uint32_t *nr = (uint32_t *)data;
+		*nr = nr_clients;
+		add_len += sizeof(uint32_t);
+		data_left_len -= sizeof(uint32_t);
+		data += sizeof(uint32_t);
+
+		/* Index of client */
+		uint32_t *idx = (uint32_t *)data;
+		*idx = ++count;
+		add_len += sizeof(uint32_t);
+		data_left_len -= sizeof(uint32_t);
+		data += sizeof(uint32_t);
+
+		/* It's me? */
+		uint32_t *is_me = (uint32_t *)data;
+		// 0 - isn't me
+		*is_me = (client == iclient)?1:0;
+		add_len += sizeof(uint32_t);
+		data_left_len -= sizeof(uint32_t);
+		data += sizeof(uint32_t);
+
+		uint16_t len = sizeof(struct client_info);
+		if (data_left_len < len + 1) {
+			lerror("no space left on buffer.\n");
+			break;
+		}
+
+		memcpy(data, &iclient->info, len);
+		data[len] = '\0';
+		add_len += len + 1;
+		data_left_len -= len + 1;
+		data += len + 1;
+
+		if (data_left_len < 0) {
+			lerror("struct client_info too long\n");
+			return -EINVAL; /* Invalid argument */
+		}
+
+		msg_ack->cmd = CMD_LIST_CLIENT;
+		msg_ack->data_len = init_len + add_len;
+		msg_ack->is_ack = 1;
+		msg_ack->has_next = (count == nr_clients)?0:1;
+
+		send_one_ack(client, msg_ack);
+	}
+
+	return 0;
+}
+
 int client_test_server(int connfd, int (*handler)(const char *str, int str_len))
 {
 	assert(handler && "must have handler()");

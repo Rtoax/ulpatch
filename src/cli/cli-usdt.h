@@ -21,6 +21,9 @@
 #define trace_cli_elf_list() \
 	__trace_cli_probe0(cli, elf_list)
 
+#define trace_cli_client_list() \
+	__trace_cli_probe0(cli, client_list)
+
 // sudo bpftrace -e 'usdt:./src/elfview:cli:shell{printf("%s %s\n", probe, str(arg0));}'
 #define trace_cli_shell(command) \
 	__trace_cli_probe_s1(cli, shell, command)

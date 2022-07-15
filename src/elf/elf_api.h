@@ -29,7 +29,8 @@ enum cmd_type {
 	CMD_ELF_GET_EHDR,	/* Get elf header */
 	CMD_ELF_GET_PHDR,	/* Get elf program header */
 	CMD_ELF_GET_SHDR,	/* Get elf section header */
-	CMD_REGISTER_CLIENT,/* Tell server client information */
+	CMD_REGISTER_CLIENT,/* Register client information */
+	CMD_LIST_CLIENT,	/* List clients information */
 	CMD_TEST_SERVER,	/* Test UNIX socket is OK? */
 	CMD_ELF_ACK,	/* All msg's ack */
 	CMD_MAX__
@@ -44,6 +45,7 @@ enum cmd_type {
  * CMD_ELF_GET_PHDR struct cmd_elf_empty      struct
  * CMD_ELF_GET_SHDR struct cmd_elf_empty      struct
  * CMD_REGISTER_CLIENT  struct client_info    struct
+ * CMD_LIST_CLIENT  struct cmd_elf_empty      struct
  * CMD_TEST_SERVER  struct cmd_elf_empty      struct
  * CMD_ELF_ACK      struct cmd_elf_ack        struct + data
  */
@@ -72,6 +74,7 @@ struct cmd_elf_empty {
 #define CMD_ELF_GET_PHDR CMD_ELF_GET_PHDR
 #define CMD_ELF_GET_SHDR CMD_ELF_GET_SHDR
 #define CMD_TEST_SERVER	CMD_TEST_SERVER
+#define CMD_LIST_CLIENT CMD_LIST_CLIENT
 };
 
 struct cmd_elf_ack {
@@ -103,6 +106,13 @@ struct cmd_elf_ack {
 	 *   +(GElf_Shdr shdr)
 	 *   +(1 byte)
 	 *   +shdrname\0
+	 *
+	 *  CMD_LIST_CLIENT:
+	 *   +(uint32_t total_number)
+	 *   +(uint32_t index_number, start from 1)
+	 *   +(uint32_t is_me, boolean, 0-not me)
+	 *   +(struct client_info)
+	 *   +(1 byte)
 	 *
 	 *  CMD_TEST_SERVER:
 	 *   +(char string[unknown length]:
@@ -187,6 +197,8 @@ int client_get_elf_phdr(int connfd, int (*handler)(const GElf_Phdr *phdr));
 int client_get_elf_shdr(int connfd,
 		int (*handler)(const GElf_Shdr *shdr, const char *secname));
 int client_register(int connfd, enum client_type type, int (*handler)(void));
+int client_list_client(int connfd,
+		void (*handler)(struct nr_idx_bool *, struct client_info *info));
 int client_test_server(int connfd, int (*handler)(const char *str, int len));
 
 

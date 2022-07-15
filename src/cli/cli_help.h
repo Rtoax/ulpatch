@@ -53,6 +53,11 @@ struct command_help commands_help[] = {
 		.summary = "List loaded ELF file",
 	},
 	{
+		.name = "LIST CLIENT",
+		.params = "",
+		.summary = "List all connected Clients",
+	},
+	{
 		.name = "SELECT",
 		.params = "",
 		.summary = "Select something",

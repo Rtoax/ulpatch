@@ -12,6 +12,7 @@
 #define _UTIL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +53,12 @@ struct config {
 		MODE_SLEEP, MODE_CLI, MODE_GTK,
 	} mode;
 	bool daemon;
+};
+
+struct nr_idx_bool {
+	uint32_t nr;
+	uint32_t idx;
+	uint32_t is;
 };
 
 // Global configuration

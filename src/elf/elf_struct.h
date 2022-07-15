@@ -43,6 +43,7 @@ struct elf_file {
 };
 
 extern struct list_head client_list;
+extern unsigned int nr_clients;
 
 #ifdef __cplusplus
 }

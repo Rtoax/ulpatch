@@ -28,6 +28,7 @@ static pthread_mutex_t epoll_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* client list head */
 LIST_HEAD(client_list);
+unsigned int nr_clients = 0;
 
 int elf_load_handler(struct client*, struct cmd_elf *);
 int elf_delete_handler(struct client*, struct cmd_elf *);
@@ -41,6 +42,8 @@ int elf_get_phdr_handler_ack(struct client*, struct cmd_elf *);
 int elf_get_shdr_handler(struct client*, struct cmd_elf *);
 int elf_get_shdr_handler_ack(struct client*, struct cmd_elf *);
 int register_client_handler(struct client*, struct cmd_elf *);
+int list_client_handler(struct client*, struct cmd_elf *);
+int list_client_handler_ack(struct client*, struct cmd_elf *);
 int test_server_handler(struct client*, struct cmd_elf *);
 int test_server_handler_ack(struct client*, struct cmd_elf *);
 
@@ -159,6 +162,7 @@ static struct cmd_handler cmd_handlers[CMD_MAX__] = {
 	[CMD_ELF_GET_PHDR] = {CMD_ELF_GET_PHDR, elf_get_phdr_handler, elf_get_phdr_handler_ack},
 	[CMD_ELF_GET_SHDR] = {CMD_ELF_GET_SHDR, elf_get_shdr_handler, elf_get_shdr_handler_ack},
 	[CMD_REGISTER_CLIENT] = {CMD_REGISTER_CLIENT, register_client_handler, NULL},
+	[CMD_LIST_CLIENT] = {CMD_LIST_CLIENT, list_client_handler, list_client_handler_ack},
 	[CMD_TEST_SERVER] = {CMD_TEST_SERVER, test_server_handler, test_server_handler_ack},
 };
 
@@ -250,6 +254,7 @@ void *elf_thread(void *arg)
 					continue;
 				}
 				list_add(&client->node, &client_list);
+				nr_clients++;
 
 			/* Handle all client */
 			} else {
@@ -266,6 +271,7 @@ void *elf_thread(void *arg)
 
 							list_del(&client->node);
 							free(client);
+							nr_clients--;
 
 						/* Handle a client */
 						} else if (event->events & EPOLLIN) {
