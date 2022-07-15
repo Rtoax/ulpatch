@@ -2,12 +2,23 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include <elf/elf_api.h>
 #include <cli/cli_api.h>
 
 #include <utils/log.h>
+#include <utils/list.h>
 #include <utils/compiler.h>
+
+struct str_node {
+	// list: pre_load_files
+	struct list_head node;
+	char *str; // malloc, strdup
+};
+
+// node: struct str_node.node
+static LIST_HEAD(pre_load_files);
 
 struct config config = {
 	.log_level = LOG_DEBUG,
@@ -15,6 +26,66 @@ struct config config = {
 	.mode = -1,	// test, cli, gtk, sleep ...
 	.daemon = false,
 };
+
+static void add_pre_list(const char *name)
+{
+	// Must exist
+	if (access(name, F_OK) != 0) {
+		fprintf(stderr, "%s not exist.\n", name);
+		return;
+	}
+
+	struct str_node *file = malloc(sizeof(struct str_node));
+	assert(file && "malloc failed");
+
+	file->str = strdup(name);
+	list_add(&file->node, &pre_load_files);
+}
+
+static void load_pre_list_elf(void)
+{
+	struct str_node *file = NULL, *tmp;
+
+	int tmp_client_fd = create_elf_client();
+
+	list_for_each_entry_safe(file, tmp, &pre_load_files, node) {
+		ldebug("name = %s\n", file->str);
+		client_open_elf_file(tmp_client_fd, file->str);
+	}
+
+	close_elf_client(tmp_client_fd);
+}
+
+static void parse_pre_list(char *str)
+{
+	assert(str && "NULL pointer");
+
+	char *newstr = strdup(str);
+	char *p = newstr;
+
+	// a,b,c,,d,e,,,
+	// >>
+	// a b c d e
+	while (*p) {
+		char *name = p;
+
+		while (p && *p && *p != ',') {
+			p++;
+		}
+
+		if (*p == ',' || *p == '\0') {
+			if (*p == ',') {
+				p[0] = '\0';
+				p++;
+			}
+
+			if (name[0] != '\0') {
+				add_pre_list(name);
+			}
+		} else break;
+	}
+	free(newstr);
+}
 
 static void print_help(void)
 {
@@ -33,6 +104,11 @@ static void print_help(void)
 	" -c, --client        run in client mode, connecting to <server>\n"
 	"\n"
 	"Server or Client:\n"
+	"\n"
+	" -i, --input-files   input files to pre-load, auto filter out non exist\n"
+	"                     files.\n"
+	"                     for example: -i /bin/ls,/bin/cat,elfview,\n"
+	"\n"
 	" -l, --log-level     set log level, default(%d)\n"
 	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
@@ -63,6 +139,7 @@ static int parse_config(int argc, char *argv[])
 		{"server",	no_argument,	0,	's'},
 		{"client",	no_argument,	0,	'c'},
 		{"daemon",	no_argument,	0,	'd'},
+		{"input-files",		required_argument,	0,	'i'},
 		{"log-level",		required_argument,	0,	'l'},
 		{"mode",		required_argument,	0,	'm'},
 	};
@@ -70,7 +147,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "vhl:m:scd", options, &option_index);
+		c = getopt_long(argc, argv, "vhl:m:scdi:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -94,6 +171,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case 'd':
 			config.daemon = true;
+			break;
+		case 'i':
+			parse_pre_list((char *)optarg);
 			break;
 		default:
 			print_help();
@@ -165,6 +245,8 @@ int main(int argc, char *argv[])
 	case ROLE_CLIENT:
 		break;
 	}
+
+	load_pre_list_elf();
 
 	/* Run mode */
 	switch (config.mode) {
