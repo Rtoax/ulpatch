@@ -35,6 +35,13 @@ static void print_elf(struct file_info *info)
 		printf(" %s ELF %s\n", info->client_select?"> ":"  ", info->name);
 }
 
+static int register_handler(void) {
+	return 0;
+}
+TEST(Elf_client,	client_register,	0)
+{
+	return client_register(test_client_fd, CLIENT_CLI, register_handler);
+}
 
 TEST(Elf_client,	open_delete,	0)
 {
