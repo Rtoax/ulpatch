@@ -36,7 +36,17 @@ struct elf_file {
 	 * for example:
 	 *  GElf_Shdr *dynsym_shdr = elf->shdrs[elf->dynsym];
 	 */
-	unsigned int dynsym_shdr_idx;	// SHT_DYNSYM
+	GElf_Word dynsym_shdr_idx;	// SHT_DYNSYM
+	GElf_Word symtab_shdr_idx;	// SHT_SYMTAB
+
+	Elf_Data *dynsym_data;
+	Elf_Data *symtab_data;
+	Elf_Data *versym_data;
+	Elf_Data *verneed_data;
+	Elf_Data *verdef_data;
+	Elf_Data *xndx_data;
+	GElf_Word verneed_stridx;
+	GElf_Word verdef_stridx;
 
 	/* List all elf files */
 	struct list_head node;

@@ -235,6 +235,8 @@ json_object *json_shdr(const GElf_Shdr *shdr, const char *secname);
 #endif
 int print_json_shdr(const GElf_Shdr *shdr, const char *secname);
 
+int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type);
+
 
 #ifdef __cplusplus
 }

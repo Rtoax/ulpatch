@@ -17,42 +17,6 @@ static uint16_t elf_files_number = 0;
 static LIST_HEAD(elf_file_list);
 
 
-static __unused int handle_dynsym(struct elf_file *elf, Elf_Scn *scn)
-{
-	int isym;
-	Elf_Data *data = elf_getdata(scn, NULL);
-	size_t ndx = elf_ndxscn(scn);
-	GElf_Shdr *shdr = &elf->shdrs[ndx];
-
-	size_t nsyms = (data->d_size
-		/ gelf_fsize(elf->elf, ELF_T_SYM, 1, EV_CURRENT));
-
-	for (isym = 0; isym < nsyms; isym++) {
-
-		GElf_Sym sym;
-
-		if (gelf_getsym(data, isym, &sym) == NULL) {
-			lerror("Couldn't get symbol\n");
-			return -ENOENT;
-		}
-
-		if (GELF_ST_TYPE(sym.st_info) == STT_SECTION
-			&& sym.st_shndx == elf->shdrstrndx) {
-
-			lwarning("WARNING:"
-			" symbol table [%zd] contains section symbol %zd"
-			" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
-		}
-
-		ldebug("%s\n",
-			elf_strptr(elf->elf, shdr->sh_link, sym.st_name));
-
-		// TODO
-	}
-
-	return 0;
-}
-
 static __unused int handle_sections(struct elf_file *elf)
 {
 	int i;
@@ -67,40 +31,82 @@ static __unused int handle_sections(struct elf_file *elf)
 		}
 
 		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
-			// TODO
 
-		} else {
-			elf->shdrnames[i] =
-				elf_strptr(elf->elf, elf->shdrstrndx, shdr->sh_name);
+			if (elf_compress (scn, 0, 0) < 0)
+				lwarning("WARNING: %s [%zd]\n",
+					"Couldn't uncompress section",
+					elf_ndxscn(scn));
 
-			if (elf->shdrnames[i] == NULL) {
-				lerror("couldn't get section name: %s\n", elf_errmsg(-1));
-				return -ENOENT;
+			GElf_Shdr shdr_mem;
+			shdr = gelf_getshdr(scn, &shdr_mem);
+
+			if (unlikely (shdr == NULL)) {
+				lerror("cannot get section [%zd] header: %s",
+					elf_ndxscn(scn), elf_errmsg (-1));
+
+				continue;
 			}
-			ldebug("section name: %s\n", elf->shdrnames[i]);
 		}
+
+		elf->shdrnames[i] =
+			elf_strptr(elf->elf, elf->shdrstrndx, shdr->sh_name);
+
+		if (elf->shdrnames[i] == NULL) {
+			lerror("couldn't get section name: %s\n", elf_errmsg(-1));
+			return -ENOENT;
+		}
+
+		ldebug("section name: %s, %lx\n", elf->shdrnames[i], shdr->sh_type);
 
 		// Handle section header by type
 		switch (shdr->sh_type) {
-		// .dynstr
-		// .shstrtab
-		case SHT_STRTAB:
-		{
-		}
+		case SHT_SYMTAB:
+			elf->symtab_data = elf_getdata(scn, NULL);
+			elf->symtab_shdr_idx = i;
 			break;
-		// readelf --symbols
-		// readelf --dyn-sym
 		case SHT_DYNSYM:
-			handle_dynsym(elf, scn);
+			elf->dynsym_data = elf_getdata(scn, NULL);
 			elf->dynsym_shdr_idx = i;
 			break;
 
+		case SHT_GNU_versym: // .gnu.version
+			if (shdr->sh_link == elf_ndxscn(scn)) {
+				elf->versym_data = elf_getdata(scn, NULL);
+			}
+		case SHT_GNU_verneed: // .gnu.version_r
+			if (shdr->sh_link == elf_ndxscn(scn)) {
+				elf->verneed_data = elf_getdata(scn, NULL);
+				elf->verneed_stridx = shdr->sh_link;
+			}
+		case SHT_GNU_verdef:
+			if (shdr->sh_link == elf_ndxscn(scn)) {
+				elf->verdef_data = elf_getdata(scn, NULL);
+				elf->verdef_stridx = shdr->sh_link;
+			}
+			break;
+		case SHT_SYMTAB_SHNDX:
+			if (shdr->sh_link == elf_ndxscn(scn)) {
+				elf->xndx_data = elf_getdata(scn, NULL);
+			}
+			break;
+
+		case SHT_GNU_ATTRIBUTES:
+		case SHT_GNU_LIBLIST:
 		// readelf --section-groups
 		case SHT_GROUP:
 		default:
 			break;
 		}
 	}
+
+	if (elf->symtab_shdr_idx)
+		handle_symtab(elf,
+			elf_getscn(elf->elf, elf->symtab_shdr_idx), SHT_SYMTAB);
+
+	if (elf->dynsym_shdr_idx)
+		handle_symtab(elf,
+			elf_getscn(elf->elf, elf->dynsym_shdr_idx), SHT_DYNSYM);
+
 	return 0;
 
 }

@@ -261,3 +261,54 @@ int print_json_shdr(const GElf_Shdr *shdr, const char *secname)
 	return 0;
 }
 
+int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type)
+{
+	int isym;
+	Elf_Data *data = elf_getdata(scn, NULL);
+	size_t ndx = elf_ndxscn(scn);
+	GElf_Shdr *shdr = &elf->shdrs[ndx];
+
+	size_t nsyms = (data->d_size
+		/ gelf_fsize(elf->elf, ELF_T_SYM, 1, EV_CURRENT));
+
+	for (isym = 0; isym < nsyms; isym++) {
+
+		Elf32_Word xndx;
+		GElf_Sym sym_mem;
+		GElf_Sym *sym = gelf_getsymshndx (data,
+			elf->xndx_data, isym, &sym_mem, &xndx);
+
+		if (unlikely(sym == NULL))
+			continue;
+
+		/* Determine the real section index.  */
+		if (likely(sym->st_shndx != SHN_XINDEX))
+			xndx = sym->st_shndx;
+
+		if (GELF_ST_TYPE(sym->st_info) == STT_SECTION
+			&& sym->st_shndx == elf->shdrstrndx) {
+
+			lwarning("WARNING:"
+			" symbol table [%zd] contains section symbol %zd"
+			" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
+		}
+
+		ldebug("%s %s\n", sh_type_string(shdr),
+			elf_strptr(elf->elf, shdr->sh_link, sym->st_name));
+
+		if (elf->versym_data != NULL) {
+			/* Get the version information.  */
+			GElf_Versym versym_mem;
+			GElf_Versym *versym =
+				gelf_getversym(elf->versym_data, isym, &versym_mem);
+
+			if (versym != NULL && ((*versym & 0x8000) != 0 || *versym > 1)) {
+				lerror("Ver.\n");
+				// TODO
+			}
+		}
+		// TODO
+	}
+
+	return 0;
+}
