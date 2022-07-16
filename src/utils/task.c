@@ -117,6 +117,7 @@ static int read_task_vmas(struct task *task)
 		vma->min = min;
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
+		vma->type = get_vma_type(task->comm, name_);
 
 		insert_vma(task, vma);
 	} while (1);
@@ -124,6 +125,27 @@ static int read_task_vmas(struct task *task)
 	fclose(mapsfp);
 
 	return 0;
+}
+
+void print_vma(struct vma_struct *vma)
+{
+	if (!vma) {
+		lerror("Invalide pointer.\n");
+		return;
+	}
+	printf("%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s\n",
+			VMA_TYPE_NAME(vma->type),
+			vma->start, vma->end, vma->perms, vma->offset,
+			vma->maj, vma->min, vma->inode, vma->name_);
+}
+
+void dump_task_vmas(struct task *task)
+{
+	struct vma_struct *vma;
+
+	list_for_each_entry(vma, &task->vmas, node) {
+		print_vma(vma);
+	}
 }
 
 static int free_task_vmas(struct task *task)
@@ -134,6 +156,23 @@ static int free_task_vmas(struct task *task)
 		list_del(&vma->node);
 		free_vma(vma);
 	}
+
+	return 0;
+}
+
+static int __get_comm(struct task *task)
+{
+	char path[128], realpath[128];
+	ssize_t ret;
+
+	snprintf(path, sizeof(path), "/proc/%d/exe", task->pid);
+	ret = readlink(path, realpath, sizeof(realpath));
+	if (ret < 0) {
+		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		return -errno;
+	}
+	realpath[ret] = '\0';
+	task->comm = strdup(realpath);
 
 	return 0;
 }
@@ -158,6 +197,8 @@ struct task *open_task(pid_t pid)
 
 	list_init(&task->vmas);
 
+	task->pid = pid;
+	__get_comm(task);
 	task->proc_mem_fd = memfd;
 	task->proc_maps_fd = mapsfd;
 	lseek(mapsfd, 0, SEEK_SET);
@@ -176,6 +217,7 @@ int free_task(struct task *task)
 	close(task->proc_maps_fd);
 
 	free_task_vmas(task);
+	free(task->comm);
 
 	free(task);
 

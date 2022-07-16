@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string.h>
 #include <sys/types.h>
 
 #include "list.h"
@@ -9,6 +10,7 @@ enum vma_type {
 	VMA_NONE,   /* None */
 	VMA_SELF,   /* /usr/bin/ls, ... */
 	VMA_LIBC,   /* /usr/lib64/libc.so.x */
+	VMA_LIBELF, /* /usr/lib64/libelf... */
 	VMA_HEAP,   /* [heap] */
 	VMA_LD,     /* /usr/lib64/ld-linux-xxxxx */
 	VMA_STACK,  /* [stack] */
@@ -17,8 +19,6 @@ enum vma_type {
 	VMA_VSYSCALL, /* [vsyscall] */
 	VMA_LIB_DONT_KNOWN, /* Unknown Library */
 	VMA_ANON,   /* No name */
-	VMA_FTRACE_TRAMPOLINE,  /* ftrace trampoline */
-	VMA_PATCH_OBJ, /* User space patch object file */
 	VMA_TYPE_NUM,
 };
 
@@ -27,6 +27,7 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	"Unknown",
 	"Self",
 	"libc",
+	"libelf",
 	"heap",
 	"ld",
 	"stack",
@@ -35,8 +36,6 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	"vsyscall",
 	"UnknownLib",
 	"Anon",
-	"Trampoline",
-	"PatchObj",
 	NULL
 };
 
@@ -59,8 +58,46 @@ struct vma_struct {
 	struct list_head node;
 };
 
+static __unused enum vma_type
+get_vma_type(const char *comm, const char *name)
+{
+	enum vma_type type = VMA_NONE;
+
+	if (!strcmp(name, comm)) {
+		type = VMA_SELF;
+	} else if (!strncmp(basename(name), "libc", 4)
+		|| !strncmp(basename(name), "libssp", 6)) {
+		type = VMA_LIBC;
+	} else if (!strncmp(basename(name), "libelf", 6)) {
+		type = VMA_LIBELF;
+	} else if (!strcmp(name, "[heap]")) {
+		type = VMA_HEAP;
+	} else if (!strncmp(basename(name), "ld-linux", 8)) {
+		type = VMA_LD;
+	} else if (!strcmp(name, "[stack]")) {
+		type = VMA_STACK;
+	} else if (!strcmp(name, "[vvar]")) {
+		type = VMA_VVAR;
+	} else if (!strcmp(name, "[vdso]")) {
+		type = VMA_VDSO;
+	} else if (!strcmp(name, "[vsyscall]")) {
+		type = VMA_VSYSCALL;
+	} else if (!strncmp(basename(name), "lib", 3)) {
+		type = VMA_LIB_DONT_KNOWN;
+	} else if (strlen(name) == 0) {
+		type = VMA_ANON;
+	} else {
+		type = VMA_NONE;
+	}
+
+	return type;
+}
+
 struct task {
 	pid_t pid;
+
+	// /proc/PID/exe
+	char *comm;
 
 	// open(2) /proc/PID/mem
 	int proc_mem_fd;
@@ -76,6 +113,9 @@ struct task {
 
 int open_pid_maps(pid_t pid);
 int open_pid_mem(pid_t pid);
+
+void print_vma(struct vma_struct *vma);
+void dump_task_vmas(struct task *task);
 
 struct task *open_task(pid_t pid);
 int free_task(struct task *task);
