@@ -62,3 +62,5 @@ extern struct list_head test_list[TEST_PRIO_NUM];
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 	int expect_ret);
+void release_tests(void);
+

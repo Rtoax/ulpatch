@@ -254,5 +254,7 @@ print_stat:
 		}
 	}
 
+	release_tests();
+
 	return 0;
 }

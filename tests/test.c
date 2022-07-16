@@ -18,3 +18,21 @@ create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 
 	return test;
 }
+
+void release_tests(void)
+{
+	int i;
+	struct test *test, *tmp;
+
+	// for each priority
+	for (i = 0; i < TEST_PRIO_NUM; i++) {
+		// for each test entry
+		list_for_each_entry_safe(test, tmp, &test_list[i], node) {
+			list_del(&test->node);
+			free(test->category);
+			free(test->name);
+			free(test);
+		}
+	}
+}
+

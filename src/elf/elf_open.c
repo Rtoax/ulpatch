@@ -254,6 +254,7 @@ elf_file_delete(struct client *client, const char *filepath)
 		}
 	}
 
+	elf_end(elf->elf);
 	free(elf);
 
 	return 0;
