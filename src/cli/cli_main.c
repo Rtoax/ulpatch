@@ -230,17 +230,21 @@ static void print_cli_logo(void)
 #define ANSI "\033[1;32m"
 #define END	"\033[m"
 	printf(
-	ANSI" ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄▄▄▄▄  "END"  ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄ \n"
-	ANSI"█       █   █   █       █ "END" █       █   █   █   █\n"
-	ANSI"█    ▄▄▄█   █   █    ▄▄▄█ "END" █       █   █   █   █\n"
-	ANSI"█   █▄▄▄█   █   █   █▄▄▄  "END" █     ▄▄█   █   █   █\n"
-	ANSI"█    ▄▄▄█   █▄▄▄█    ▄▄▄█ "END" █    █  █   █▄▄▄█   █\n"
-	ANSI"█   █▄▄▄█       █   █     "END" █    █▄▄█       █   █\n"
-	ANSI"█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█     "END" █▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█\n"
+	"\n"
+	ANSI"   ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄▄▄▄▄  "END"  ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄ \n"
+	ANSI"  █       █   █   █       █ "END" █       █   █   █   █\n"
+	ANSI"  █    ▄▄▄█   █   █    ▄▄▄█ "END" █       █   █   █   █\n"
+	ANSI"  █   █▄▄▄█   █   █   █▄▄▄  "END" █     ▄▄█   █   █   █\n"
+	ANSI"  █    ▄▄▄█   █▄▄▄█    ▄▄▄█ "END" █    █  █   █▄▄▄█   █\n"
+	ANSI"  █   █▄▄▄█       █   █     "END" █    █▄▄█       █   █\n"
+	ANSI"  █▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█     "END" █▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█\n"
 	"\n"
 	"%s\n"
 	"\n"
 	"Welcome to ELFTools Command Line:\n"
+	"\n"
+	" input 'help' command to show help info"
+	"\n"
 	"\n",
 	elftools_version()
 	);
