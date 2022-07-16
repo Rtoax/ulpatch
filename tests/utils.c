@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <utils/log.h>
 #include <utils/list.h>
 
@@ -17,3 +20,4 @@ TEST(Utils,	memshow,	0)
 
 	return 0;
 }
+
