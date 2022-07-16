@@ -7,6 +7,10 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/ptrace.h>
+#include <sys/user.h>
+#include <sys/mman.h>
+#include <sys/wait.h>
 
 #include "log.h"
 #include "task.h"
@@ -222,5 +226,58 @@ int free_task(struct task *task)
 	free(task);
 
 	return 0;
+}
+
+int task_attach(pid_t pid)
+{
+	int ret;
+	int status;
+
+	ret = ptrace(PTRACE_ATTACH, pid, NULL, NULL);
+	if (ret != 0) {
+		lerror("Attach %d failed. %s\n", pid, strerror(errno));
+		return -errno;
+	}
+	do {
+		ret = waitpid(pid, &status, __WALL);
+		if (ret < 0) {
+			lerror("can't wait for pid %d\n", pid);
+			return -errno;
+		}
+		ret = 0;
+
+		/* We are expecting SIGSTOP */
+		if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGSTOP)
+			break;
+
+		/* If we got SIGTRAP because we just got out of execve, wait
+		 * for the SIGSTOP
+		 */
+		if (WIFSTOPPED(status))
+			status = (WSTOPSIG(status) == SIGTRAP) ? 0 : WSTOPSIG(status);
+		else if (WIFSIGNALED(status))
+			/* Resend signal */
+			status = WTERMSIG(status);
+
+		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
+		if (ret < 0) {
+			lerror("can't cont tracee\n");
+			return -errno;
+		}
+	} while (1);
+
+	return ret;
+}
+
+int task_detach(pid_t pid)
+{
+	long rv;
+	rv = ptrace(PTRACE_DETACH, pid, NULL, NULL);
+	if (rv != 0) {
+		lerror("Detach %d failed. %s\n", pid, strerror(errno));
+		return -errno;
+	}
+
+	return rv;
 }
 

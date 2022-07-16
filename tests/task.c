@@ -1,3 +1,5 @@
+#include <errno.h>
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -39,3 +41,32 @@ TEST(Task,	dump_task_vmas,	0)
 
 	return free_task(task);
 }
+
+TEST(Task,	attach_detach,	0)
+{
+	int ret = -1;
+	int status = 0;
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		char *argv[] = {
+			"sleep", "0.1", NULL
+		};
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	} else if (pid > 0) {
+		ret = task_attach(pid);
+		ret = task_detach(pid);
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	} else {
+		lerror("vfork(2) error.\n");
+	}
+
+	return ret;
+}
+

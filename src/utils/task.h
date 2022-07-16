@@ -119,3 +119,6 @@ void dump_task_vmas(struct task *task);
 
 struct task *open_task(pid_t pid);
 int free_task(struct task *task);
+
+int task_attach(pid_t pid);
+int task_detach(pid_t pid);
