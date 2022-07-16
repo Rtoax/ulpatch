@@ -230,14 +230,17 @@ static void print_cli_logo(void)
 #define ANSI "\033[1;32m"
 #define END	"\033[m"
 	printf(
-	ANSI"   ______   ____  _   ___           "END"       ___\n"
-	ANSI"  / __/ /  / __/ | | / (_)__ _    __"END"  ____/ (_)\n"
-	ANSI" / _// /__/ _/   | |/ / / -_) |/|/ /"END" / __/ / /\n"
-	ANSI"/___/____/_/     |___/_/\\__/|__,__/"END"  \\__/_/_/\n"
+	ANSI" ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄▄▄▄▄  "END"  ▄▄▄▄▄▄▄ ▄▄▄     ▄▄▄ \n"
+	ANSI"█       █   █   █       █ "END" █       █   █   █   █\n"
+	ANSI"█    ▄▄▄█   █   █    ▄▄▄█ "END" █       █   █   █   █\n"
+	ANSI"█   █▄▄▄█   █   █   █▄▄▄  "END" █     ▄▄█   █   █   █\n"
+	ANSI"█    ▄▄▄█   █▄▄▄█    ▄▄▄█ "END" █    █  █   █▄▄▄█   █\n"
+	ANSI"█   █▄▄▄█       █   █     "END" █    █▄▄█       █   █\n"
+	ANSI"█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█     "END" █▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█▄▄▄█\n"
 	"\n"
 	"%s\n"
 	"\n"
-	"Welcome to ELFView Command Line:\n"
+	"Welcome to ELFTools Command Line:\n"
 	"\n",
 	elftools_version()
 	);

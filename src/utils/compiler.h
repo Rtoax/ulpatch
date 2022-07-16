@@ -3,8 +3,8 @@
  *  Create by Rong Tao, 2021.10.15
  */
 
-#ifndef __ELFVIEW_UTILS_COMPILER_H
-#define __ELFVIEW_UTILS_COMPILER_H 1
+#ifndef __ELFTOOLS_UTILS_COMPILER_H
+#define __ELFTOOLS_UTILS_COMPILER_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,4 +75,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __ELFVIEW_UTILS_COMPILER_H */
+#endif /* __ELFTOOLS_UTILS_COMPILER_H */

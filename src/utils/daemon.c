@@ -14,7 +14,7 @@ void daemonize(void)
 #if 0
 	int fd;
 
-	/* Every output goes to /dev/null. If Elfview is daemonized but
+	/* Every output goes to /dev/null. If ElfTools is daemonized but
 	 * the 'logfile' is set to 'stdout' in the configuration file
 	 * it will not log at all.
 	 */
@@ -26,3 +26,4 @@ void daemonize(void)
 	}
 #endif
 }
+
