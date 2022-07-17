@@ -3,6 +3,8 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 
+#include "arch/aarch64/instruments.h"
+
 #define SYSCALL_INSTR \
 		INST_SYSCALL, /* syscall */\
 		INST_INT3, /* int3 */
