@@ -148,6 +148,8 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	elf = malloc(sizeof(*elf));
 	assert(elf && "Malloc failed.");
 
+	memset(elf, 0x0, sizeof(*elf));
+
 	elf->fd = fd;
 	elf->elf = __elf;
 	elf->size = size;
