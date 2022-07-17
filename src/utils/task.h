@@ -111,6 +111,8 @@ struct task {
 	// struct vma_struct.node
 	struct list_head vmas;
 	struct rb_root vmas_rb;
+
+	struct vma_struct *libc_vma;
 };
 
 
@@ -142,4 +144,24 @@ int memcpy_to_task(struct task *task,
 		unsigned long remote_dst, void *src, ssize_t size);
 int memcpy_from_task(struct task *task,
 		void *dst, unsigned long remote_src, ssize_t size);
+
+/* syscalls based on task_syscall() */
+unsigned long task_mmap(struct task *task,
+	unsigned long addr, size_t length, int prot, int flags,
+	int fd, off_t offset);
+int task_munmap(struct task *task, unsigned long addr, size_t size);
+int task_msync(struct task *task, unsigned long addr, size_t length, int flags);
+int task_msync_sync(struct task *task, unsigned long addr, size_t length);
+int task_msync_async(struct task *task, unsigned long addr, size_t length);
+unsigned long task_malloc(struct task *task, size_t length);
+int task_free(struct task *task, unsigned long addr, size_t length);
+int task_open(struct task *task, char *pathname, int flags, mode_t mode);
+int task_close(struct task *task, int remote_fd);
+int task_ftruncate(struct task *task, int remote_fd, off_t length);
+
+/* Execute a syscall(2) in target task */
+int task_syscall(struct task *task, int nr,
+		unsigned long arg1, unsigned long arg2, unsigned long arg3,
+		unsigned long arg4, unsigned long arg5, unsigned long arg6,
+		unsigned long *res);
 

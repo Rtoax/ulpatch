@@ -11,9 +11,17 @@
 #include <sys/user.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
+#include <limits.h>
+#include <stdlib.h>
 
 #include "log.h"
 #include "task.h"
+
+#if defined(__x86_64__)
+#include "arch/x86_64/regs.h"
+#elif defined(__aarch64__)
+#include "arch/aarch64/regs.h"
+#endif
 
 LIST_HEAD(tasks_list);
 
@@ -199,6 +207,13 @@ static int read_task_vmas(struct task *task)
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
 		vma->type = get_vma_type(task->comm, name_);
+		if (!task->libc_vma
+			&& vma->type == VMA_LIBC
+			&& vma->prot & PROT_EXEC) {
+			ldebug("Get libc:\n");
+			print_vma(vma);
+			task->libc_vma = vma;
+		}
 
 		insert_vma(task, vma);
 	} while (1);
@@ -275,6 +290,7 @@ struct task *open_task(pid_t pid)
 
 	task = malloc(sizeof(struct task));
 	assert(task && "malloc failed");
+	memset(task, 0x0, sizeof(struct task));
 
 	list_init(&task->vmas);
 	rb_init(&task->vmas_rb);
@@ -288,6 +304,12 @@ struct task *open_task(pid_t pid)
 	read_task_vmas(task);
 
 	list_add(&task->node, &tasks_list);
+
+	if (!task->libc_vma) {
+		lerror("No libc founded.\n");
+		free_task(task);
+		task = NULL;
+	}
 
 	return task;
 }
@@ -360,26 +382,336 @@ int task_detach(pid_t pid)
 }
 
 int memcpy_from_task(struct task *task,
-		void *dst, unsigned long remote_src, ssize_t size)
+		void *dst, unsigned long task_src, ssize_t size)
 {
 	int ret;
-	ret = pread(task->proc_mem_fd, dst, size, remote_src);
+	ret = pread(task->proc_mem_fd, dst, size, task_src);
 	if (ret <= 0) {
-		lerror("pread(%d, ...) failed\n", task->proc_mem_fd);
+		lerror("pread(%d, ...)=%d failed, %s\n",
+			task->proc_mem_fd, ret, strerror(errno));
 		return -errno;
 	}
 	return ret;
 }
 
 int memcpy_to_task(struct task *task,
-		unsigned long remote_dst, void *src, ssize_t size)
+		unsigned long task_dst, void *src, ssize_t size)
 {
 	int ret;
-	ret = pwrite(task->proc_mem_fd, src, size, remote_dst);
+	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
 	if (ret <= 0) {
-		lerror("pwrite(%d, ...) failed\n", task->proc_mem_fd);
+		lerror("pwrite(%d, ...)=%d failed, %s\n",
+			task->proc_mem_fd, ret, strerror(errno));
+		memshow(src, size);
 		return -errno;
 	}
 	return ret;
 }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wuninitialized"
+#pragma clang diagnostic ignored "-Wmaybe-uninitialized"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+static void
+copy_regs(struct user_regs_struct *dst, struct user_regs_struct *src)
+{
+#define COPY_REG(x) dst->x = src->x
+#if defined(__x86_64__)
+	COPY_REG(r15);
+	COPY_REG(r14);
+	COPY_REG(r13);
+	COPY_REG(r12);
+	COPY_REG(rbp);
+	COPY_REG(rbx);
+	COPY_REG(r11);
+	COPY_REG(r10);
+	COPY_REG(r9);
+	COPY_REG(r8);
+	COPY_REG(rax);
+	COPY_REG(rcx);
+	COPY_REG(rdx);
+	COPY_REG(rsi);
+	COPY_REG(rdi);
+#elif defined(__aarch64__)
+	COPY_REG(regs[0]);
+	COPY_REG(regs[1]);
+	COPY_REG(regs[2]);
+	COPY_REG(regs[3]);
+	COPY_REG(regs[4]);
+	COPY_REG(regs[5]);
+	COPY_REG(regs[8]);
+	COPY_REG(regs[29]);
+	COPY_REG(regs[9]);
+	COPY_REG(regs[10]);
+	COPY_REG(regs[11]);
+	COPY_REG(regs[12]);
+	COPY_REG(regs[13]);
+	COPY_REG(regs[14]);
+	COPY_REG(regs[15]);
+	COPY_REG(regs[16]);
+	COPY_REG(regs[17]);
+	COPY_REG(regs[18]);
+	COPY_REG(regs[19]);
+	COPY_REG(regs[20]);
+#else
+# error "Unsupport architecture"
+#endif
+#undef COPY_REG
+}
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+int wait_for_stop(struct task *task)
+{
+	int ret, status = 0;
+	pid_t pid = task->pid;
+
+	while (1) {
+		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
+		if (ret < 0) {
+			print_vma(task->libc_vma);
+			lerror("ptrace(PTRACE_CONT, %d, ...) %s\n",
+				pid, strerror(ESRCH));
+			return -1;
+		}
+
+		ret = waitpid(pid, &status, __WALL);
+		if (ret < 0) {
+			lerror("can't wait tracee %d\n", pid);
+			return -1;
+		}
+		if (WIFSTOPPED(status))  {
+			if (WSTOPSIG(status) == SIGSTOP ||
+				WSTOPSIG(status) == SIGTRAP) {
+				break;
+			}
+			if (WSTOPSIG(status) == SIGSEGV) {
+				lerror("Child process %d segment fault.\n", pid);
+				return -1;
+			}
+			status = WSTOPSIG(status);
+			continue;
+		}
+
+		status = WIFSIGNALED(status) ? WTERMSIG(status) : 0;
+	}
+	return 0;
+}
+
+int task_syscall(struct task *task, int nr,
+		unsigned long arg1, unsigned long arg2, unsigned long arg3,
+		unsigned long arg4, unsigned long arg5, unsigned long arg6,
+		unsigned long *res)
+{
+	int ret;
+	struct user_regs_struct old_regs, regs, __unused syscall_regs;
+	unsigned char __syscall[] = {SYSCALL_INSTR};
+
+	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5, arg6);
+
+	unsigned char orig_code[sizeof(__syscall)];
+	unsigned long libc_base = task->libc_vma->start;
+
+	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);
+	if (ret == -1) {
+		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
+			task->pid, strerror(errno));
+		return -errno;
+	}
+
+	memcpy_from_task(task, orig_code, libc_base, sizeof(__syscall));
+
+	memcpy_to_task(task, libc_base, __syscall, sizeof(__syscall));
+
+	regs = old_regs;
+
+	SYSCALL_IP(regs) = libc_base;
+
+	copy_regs(&regs, &syscall_regs);
+
+	ret = ptrace(PTRACE_SETREGS, task->pid, NULL, &regs);
+	if (ret == -1) {
+		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
+			task->pid, strerror(errno));
+		ret = -errno;
+		goto poke_back;
+	}
+
+	ret = wait_for_stop(task);
+	if (ret < 0) {
+		lerror("failed call to func\n");
+		goto poke_back;
+	}
+
+	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &regs);
+	if (ret == -1) {
+		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
+			task->pid, strerror(errno));
+		ret = -errno;
+		goto poke_back;
+	}
+
+	ret = ptrace(PTRACE_SETREGS, task->pid, NULL, &old_regs);
+	if (ret == -1) {
+		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
+			task->pid, strerror(errno));
+		ret = -errno;
+		goto poke_back;
+	}
+
+	syscall_regs = regs;
+	*res = SYSCALL_RET(syscall_regs);
+
+	ldebug("result %lx\n", *res);
+
+poke_back:
+	memcpy_to_task(task, libc_base, orig_code, sizeof(__syscall));
+	return ret;
+}
+
+unsigned long task_mmap(struct task *task,
+	unsigned long addr, size_t length, int prot, int flags,
+	int fd, off_t offset)
+{
+	int ret;
+	unsigned long result;
+
+	ret = task_syscall(task,
+			__NR_mmap, addr, length, prot, flags, fd, offset, &result);
+	if (ret < 0) {
+		return 0;
+	}
+	return result;
+}
+
+int task_munmap(struct task *task, unsigned long addr, size_t size)
+{
+	int ret;
+	unsigned long result;
+
+	ret = task_syscall(task,
+			__NR_munmap, addr, size, 0, 0, 0, 0, &result);
+	if (ret < 0) {
+		return -1;
+	}
+	return result;
+}
+
+int task_msync(struct task *task, unsigned long addr, size_t length, int flags)
+{
+	int ret;
+	unsigned long result;
+
+	ret = task_syscall(task,
+			__NR_msync, addr, length, flags, 0, 0, 0, &result);
+	if (ret < 0) {
+		return -1;
+	}
+	return result;
+}
+
+int task_msync_sync(struct task *task, unsigned long addr, size_t length)
+{
+	return task_msync(task, addr, length, MS_SYNC);
+}
+int task_msync_async(struct task *task, unsigned long addr, size_t length)
+{
+	return task_msync(task, addr, length, MS_ASYNC);
+}
+
+unsigned long task_malloc(struct task *task, size_t length)
+{
+	unsigned long remote_addr;
+	remote_addr = task_mmap(task,
+				0UL, length,
+				PROT_READ | PROT_WRITE | PROT_EXEC,
+				MAP_PRIVATE, -1, 0);
+	if (remote_addr == (unsigned long)MAP_FAILED) {
+		lerror("Remote malloc failed, %d\n", remote_addr);
+		return 0UL;
+	}
+	return remote_addr;
+}
+
+int task_free(struct task *task, unsigned long addr, size_t length)
+{
+	return task_munmap(task, addr, length);
+}
+
+int task_open(struct task *task, char *pathname, int flags, mode_t mode)
+{
+	char maybeislink[MAX_PATH], path[MAX_PATH];
+	int ret;
+	unsigned long result;
+
+	unsigned long remote_fileaddr;
+	ssize_t remote_filename_len = 0;
+
+	if (!(flags|O_CREAT)) {
+		ret = readlink(pathname, maybeislink, sizeof(maybeislink));
+		if (ret < 0) {
+			lwarning("readlink(3) failed.\n");
+			return -1;
+		}
+		maybeislink[ret] = '\0';
+		if (!realpath(maybeislink, path)) {
+			lwarning("realpath(3) failed.\n");
+			return -1;
+		}
+		ldebug("%s -> %s -> %s\n", pathname, maybeislink, path);
+		pathname = path;
+	}
+	remote_filename_len = strlen(pathname) + 1;
+
+	remote_fileaddr = task_mmap(task,
+				0UL, remote_filename_len,
+				PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+	memcpy_to_task(task, remote_fileaddr, pathname, remote_filename_len);
+
+#if defined(__x86_64__)
+	ret = task_syscall(task,
+			__NR_open, remote_fileaddr, flags, mode, 0, 0, 0, &result);
+#elif defined(__aarch64__)
+	ret = task_syscall(task,
+			__NR_openat, AT_FDCWD, remote_fileaddr, flags, mode, 0, 0, &result);
+#else
+# error "Error arch"
+#endif
+	task_munmap(task, remote_fileaddr, remote_filename_len);
+
+	return result;
+}
+
+int task_close(struct task *task, int remote_fd)
+{
+	int ret;
+	unsigned long result;
+	ret = task_syscall(task,
+			__NR_close, remote_fd, 0, 0, 0, 0, 0, &result);
+	if (ret < 0) {
+		return 0;
+	}
+	return result;
+}
+
+int task_ftruncate(struct task *task, int remote_fd, off_t length)
+{
+	int ret;
+	unsigned long result;
+	ret = task_syscall(task,
+			__NR_ftruncate, remote_fd, length, 0, 0, 0, 0, &result);
+	if (ret < 0) {
+		return 0;
+	}
+	return result;
+}

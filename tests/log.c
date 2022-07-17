@@ -31,5 +31,7 @@ TEST(Log,	set_log_level,	0)
 	lalert("ALERT\n");
 	lemerg("EMERG\n");
 
+	set_log_level(LOG_DEBUG);
+
 	return 0;
 }
