@@ -103,3 +103,47 @@ failed:
 	return ret;
 }
 
+TEST(Task,	copy_from_task,	0)
+{
+	char data[] = "ABCDEFG";
+	char buf[64] = "XXXXXX";
+	int ret = 0;
+	int n;
+
+	struct task *task = open_task(getpid());
+
+	n = memcpy_from_task(task, buf, (unsigned long)data, strlen(data) + 1);
+	ldebug("memcpy_from_task: %s\n", buf);
+
+	// memcpy failed
+	if (n != strlen(data) + 1 || strcmp(data, buf)) {
+		ret = -1;
+	}
+
+	free_task(task);
+
+	return ret;
+}
+
+TEST(Task,	copy_to_task,	0)
+{
+	char data[] = "ABCDEFG";
+	char buf[64] = "XXXXXX";
+	int ret = 0;
+	int n;
+
+	struct task *task = open_task(getpid());
+
+	n = memcpy_to_task(task, (unsigned long)buf, data, strlen(data) + 1);
+	ldebug("memcpy_to_task: %s\n", buf);
+
+	// memcpy failed
+	if (n != strlen(data) + 1 || strcmp(data, buf)) {
+		ret = -1;
+	}
+
+	free_task(task);
+
+	return ret;
+}
+

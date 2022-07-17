@@ -359,3 +359,27 @@ int task_detach(pid_t pid)
 	return rv;
 }
 
+int memcpy_from_task(struct task *task,
+		void *dst, unsigned long remote_src, ssize_t size)
+{
+	int ret;
+	ret = pread(task->proc_mem_fd, dst, size, remote_src);
+	if (ret <= 0) {
+		lerror("pread(%d, ...) failed\n", task->proc_mem_fd);
+		return -errno;
+	}
+	return ret;
+}
+
+int memcpy_to_task(struct task *task,
+		unsigned long remote_dst, void *src, ssize_t size)
+{
+	int ret;
+	ret = pwrite(task->proc_mem_fd, src, size, remote_dst);
+	if (ret <= 0) {
+		lerror("pwrite(%d, ...) failed\n", task->proc_mem_fd);
+		return -errno;
+	}
+	return ret;
+}
+

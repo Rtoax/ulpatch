@@ -138,3 +138,8 @@ int free_task(struct task *task);
 int task_attach(pid_t pid);
 int task_detach(pid_t pid);
 
+int memcpy_to_task(struct task *task,
+		unsigned long remote_dst, void *src, ssize_t size);
+int memcpy_from_task(struct task *task,
+		void *dst, unsigned long remote_src, ssize_t size);
+
