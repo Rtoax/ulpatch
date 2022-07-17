@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <utils/log.h>
 #include <utils/list.h>
@@ -203,6 +204,69 @@ TEST(Task,	mmap_malloc,	0)
 	return ret;
 }
 
+TEST(Task,	fstat,	0)
+{
+	int ret = 0;
+	int status = 0;
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		char *argv[] = {
+			"sleep", "2", NULL
+		};
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	} else if (pid > 0) {
+
+		sleep(1);
+
+		int remote_fd, local_fd;
+		struct stat stat = {};
+		struct stat statbuf = {};
+		struct task *task = open_task(pid);
+		char *filename = "/usr/bin/ls";
+
+		ret = task_attach(pid);
+		remote_fd = task_open(task, filename, O_RDONLY, 0644);
+		if (remote_fd <= 0) {
+			lwarning("remote open failed.\n");
+			return -1;
+		}
+		local_fd = open(filename, O_RDONLY, 0644);
+		if (local_fd <= 0) {
+			lwarning("open failed.\n");
+			return -1;
+		}
+
+		fstat(local_fd, &stat);
+		ret = task_fstat(task, remote_fd, &statbuf);
+
+		if (stat.st_size != statbuf.st_size) {
+			lerror("st_size not equal: remote(%d) vs local(%d)\n",
+				statbuf.st_size, stat.st_size);
+			ret = -1;
+		}
+
+		ldebug("stat.st_size = %d\n", statbuf.st_size);
+
+		task_close(task, remote_fd);
+		task_detach(pid);
+
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+		free_task(task);
+	} else {
+		lerror("fork(2) error.\n");
+	}
+
+	ldebug("ret = %d\n", ret);
+
+	return ret;
+}
 
 static int test_mmap_file(struct task *task)
 {

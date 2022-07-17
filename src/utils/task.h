@@ -158,6 +158,7 @@ int task_free(struct task *task, unsigned long addr, size_t length);
 int task_open(struct task *task, char *pathname, int flags, mode_t mode);
 int task_close(struct task *task, int remote_fd);
 int task_ftruncate(struct task *task, int remote_fd, off_t length);
+int task_fstat(struct task *task, int remote_fd, struct stat *statbuf);
 
 /* Execute a syscall(2) in target task */
 int task_syscall(struct task *task, int nr,

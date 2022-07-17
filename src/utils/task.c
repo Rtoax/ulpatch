@@ -671,10 +671,7 @@ int task_open(struct task *task, char *pathname, int flags, mode_t mode)
 	}
 	remote_filename_len = strlen(pathname) + 1;
 
-	remote_fileaddr = task_mmap(task,
-				0UL, remote_filename_len,
-				PROT_READ | PROT_WRITE,
-				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	remote_fileaddr = task_malloc(task, remote_filename_len);
 
 	memcpy_to_task(task, remote_fileaddr, pathname, remote_filename_len);
 
@@ -687,7 +684,8 @@ int task_open(struct task *task, char *pathname, int flags, mode_t mode)
 #else
 # error "Error arch"
 #endif
-	task_munmap(task, remote_fileaddr, remote_filename_len);
+
+	task_free(task, remote_fileaddr, remote_filename_len);
 
 	return result;
 }
@@ -715,3 +713,29 @@ int task_ftruncate(struct task *task, int remote_fd, off_t length)
 	}
 	return result;
 }
+
+int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
+{
+	int ret, ret_fstat;
+	unsigned long remote_statbuf;
+	unsigned long result;
+
+	/* Alloc stat struct from remote */
+	remote_statbuf = task_malloc(task, sizeof(struct stat));
+
+	/* Call fstat(2) */
+	ret_fstat = task_syscall(task,
+			__NR_fstat, remote_fd, remote_statbuf, 0, 0, 0, 0, &result);
+	if (ret_fstat < 0) {
+		lerror("fstat failed, ret %d, %ld\n", ret_fstat, result);
+	}
+
+	ret = memcpy_from_task(task, statbuf, remote_statbuf, sizeof(struct stat));
+	if (ret != sizeof(struct stat)) {
+		lerror("failed copy struct stat.\n");
+	}
+	task_free(task, remote_statbuf, sizeof(struct stat));
+
+	return ret_fstat;
+}
+
