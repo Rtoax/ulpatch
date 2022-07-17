@@ -95,6 +95,37 @@ int free_vma(struct vma_struct *vma)
 	return 0;
 }
 
+static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
+{
+	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
+
+	if (vma->start > vaddr)
+		return -1;
+	else if (vma->start <= vaddr && vma->end > vaddr)
+		return 0;
+	else
+		return 1;
+}
+
+struct vma_struct *find_vma(struct task *task, unsigned long vaddr)
+{
+	struct rb_node * rnode =
+		rb_search_node(&task->vmas_rb, __find_vma_cmp, vaddr);
+	if (rnode) {
+		return rb_entry(rnode, struct vma_struct, node_rb);
+	}
+	return NULL;
+}
+
+struct vma_struct *next_vma(struct task *task, struct vma_struct *prev)
+{
+	struct rb_node *next;
+
+	next = prev?rb_next(&prev->node_rb):rb_first(&task->vmas_rb);
+
+	return  next?rb_entry(next, struct vma_struct, node_rb):NULL;
+}
+
 static unsigned int __perms2prot(char *perms)
 {
 	unsigned int prot = 0;

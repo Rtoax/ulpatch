@@ -70,3 +70,36 @@ TEST(Task,	attach_detach,	0)
 	return ret;
 }
 
+TEST(Task,	for_each_vma,	0)
+{
+	struct task *task = open_task(getpid());
+	struct vma_struct *vma;
+
+	task_for_each_vma(vma, task) {
+		print_vma(vma);
+	}
+
+	return free_task(task);
+}
+
+TEST(Task,	find_vma,	0)
+{
+	int ret = 0;
+	struct task *task = open_task(getpid());
+	struct vma_struct *vma;
+
+	task_for_each_vma(vma, task) {
+		struct vma_struct *find = NULL;
+		find = find_vma(task, vma->start);
+		if (!find) {
+			ret = -1;
+			goto failed;
+		}
+		print_vma(find);
+	}
+
+failed:
+	free_task(task);
+	return ret;
+}
+

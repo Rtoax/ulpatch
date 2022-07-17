@@ -117,6 +117,16 @@ struct task {
 int open_pid_maps(pid_t pid);
 int open_pid_mem(pid_t pid);
 
+struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
+
+/* Get task's first vma in rbtree */
+#define first_vma(task) next_vma(task, NULL)
+/* For each vma of task */
+#define task_for_each_vma(vma, task) \
+		for (vma = first_vma(task); vma; vma = next_vma(task, vma))
+
+struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
+
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
 
