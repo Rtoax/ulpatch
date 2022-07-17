@@ -632,8 +632,8 @@ unsigned long task_malloc(struct task *task, size_t length)
 	unsigned long remote_addr;
 	remote_addr = task_mmap(task,
 				0UL, length,
-				PROT_READ | PROT_WRITE | PROT_EXEC,
-				MAP_PRIVATE, -1, 0);
+				PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (remote_addr == (unsigned long)MAP_FAILED) {
 		lerror("Remote malloc failed, %d\n", remote_addr);
 		return 0UL;
