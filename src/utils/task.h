@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include "rbtree.h"
 #include "list.h"
 #include "compiler.h"
 
@@ -56,6 +57,7 @@ struct vma_struct {
 
 	// struct task.vmas
 	struct list_head node;
+	struct rb_node node_rb;
 };
 
 static __unused enum vma_type
@@ -108,6 +110,7 @@ struct task {
 
 	// struct vma_struct.node
 	struct list_head vmas;
+	struct rb_root vmas_rb;
 };
 
 
@@ -122,3 +125,4 @@ int free_task(struct task *task);
 
 int task_attach(pid_t pid);
 int task_detach(pid_t pid);
+

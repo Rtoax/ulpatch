@@ -55,9 +55,34 @@ struct vma_struct *alloc_vma()
 	return vma;
 }
 
+static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
+{
+	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
+	struct vma_struct *new = (struct vma_struct *)key;
+
+	if (new->end <= vma->start)
+		return -1;
+	else if (vma->start < new->end && vma->end > new->start)
+		return 0;
+	else if (vma->end <= new->start)
+		return 1;
+
+	assert(0 && "Try insert illegal vma.");
+	return 0;
+}
+
 int insert_vma(struct task *task, struct vma_struct *vma)
 {
 	list_add(&vma->node, &task->vmas);
+	rb_insert_node(&task->vmas_rb, &vma->node_rb,
+		__vma_rb_cmp, (unsigned long)vma);
+	return 0;
+}
+
+int unlink_vma(struct task *task, struct vma_struct *vma)
+{
+	list_del(&vma->node);
+	rb_erase(&vma->node_rb, &task->vmas_rb);
 	return 0;
 }
 
@@ -157,7 +182,7 @@ static int free_task_vmas(struct task *task)
 	struct vma_struct *vma, *tmpvma;
 
 	list_for_each_entry_safe(vma, tmpvma, &task->vmas, node) {
-		list_del(&vma->node);
+		unlink_vma(task, vma);
 		free_vma(vma);
 	}
 
@@ -200,6 +225,7 @@ struct task *open_task(pid_t pid)
 	assert(task && "malloc failed");
 
 	list_init(&task->vmas);
+	rb_init(&task->vmas_rb);
 
 	task->pid = pid;
 	__get_comm(task);
