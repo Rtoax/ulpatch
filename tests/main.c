@@ -28,8 +28,11 @@ static void __ctor(TEST_PRIO_START) __init_test_list(void)
 	}
 }
 
-#define test_log(fmt...) \
-	fprintf(stderr, fmt);
+#define test_log(fmt...) ({	\
+	int __n = 0;	\
+	__n = fprintf(stderr, fmt);	\
+	__n;	\
+	})
 
 #define test_ok(fmt...) \
 	fprintf(stderr, "\033[32m");	\
@@ -151,6 +154,9 @@ static int operate_test(struct test *test)
 
 	if (!test->test_cb) return -1;
 
+	test_log("=== %s.%s ",
+		test->category, test->name);
+
 	// Exe test entry
 	ret = test->test_cb();
 	if (ret == test->expect_ret) {
@@ -163,11 +169,10 @@ static int operate_test(struct test *test)
 		list_add(&test->failed, &failed_list);
 	}
 	
-	test_log("=== %s%-8s%s %s.%s\n",
+	test_log("%s%-8s%s\n",
 		failed?"\033[31m":"\033[32m",
 		failed?"Not OK":"OK",
-		"\033[m",
-		test->category, test->name);
+		"\033[m");
 
 	if (failed && test->prio < TEST_PRIO_MIDDLE) {
 		/**
