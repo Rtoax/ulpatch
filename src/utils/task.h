@@ -126,6 +126,8 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
 		for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
 struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
+/* Find a span area between two vma */
+unsigned long find_vma_span_area(struct task *task, size_t size);
 
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);

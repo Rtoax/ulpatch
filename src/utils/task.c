@@ -126,6 +126,27 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev)
 	return  next?rb_entry(next, struct vma_struct, node_rb):NULL;
 }
 
+unsigned long find_vma_span_area(struct task *task, size_t size)
+{
+	struct vma_struct *ivma;
+	struct rb_node * rnode;
+
+	for (rnode = rb_first(&task->vmas_rb); rnode; rnode = rb_next(rnode)) {
+		ivma = rb_entry(rnode, struct vma_struct, node_rb);
+		struct rb_node *next_node = rb_next(rnode);
+		struct vma_struct *next_vma;
+		if (!next_node) {
+			return 0;
+		}
+		next_vma = rb_entry(next_node, struct vma_struct, node_rb);
+		if (next_vma->start - ivma->end >= size) {
+			return ivma->end;
+		}
+	}
+	lerror("No space fatal in target process, pid %d\n", task->pid);
+	return 0;
+}
+
 static unsigned int __perms2prot(char *perms)
 {
 	unsigned int prot = 0;
