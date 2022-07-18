@@ -309,13 +309,21 @@ int elf_main(int argc, char *argv[])
 	}
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, NULL, 0);
 
-	unlink(ELF_UNIX_PATH);
+	ret = unlink(ELF_UNIX_PATH);
+	if (ret != 0) {
+		lerror("unlink(%s) failed, %s\n", ELF_UNIX_PATH, strerror(errno));
+		close(main_epollfd);
+		close(listenfd);
+		return -errno;
+	}
+
 	srv_addr.sun_family = AF_UNIX;
 	strncpy(srv_addr.sun_path, ELF_UNIX_PATH, sizeof(srv_addr.sun_path) - 1);
 	ret = bind(listenfd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
 	if (ret == -1) {
 		ret = -errno;
 		lerror("cannot bind server socket, %s\n", strerror(errno));
+		close(main_epollfd);
 		close(listenfd);
 		unlink(ELF_UNIX_PATH);
 		return ret;
@@ -328,12 +336,18 @@ int elf_main(int argc, char *argv[])
 	if (ret == -1) {
 		ret = -errno;
 		lerror("cannot add listendfd to epoll, %s\n", strerror(errno));
+		close(main_epollfd);
+		close(listenfd);
+		unlink(ELF_UNIX_PATH);
 		return ret;
 	}
 
 	ret = pthread_create(&thread, NULL, elf_thread, NULL);
 	if (ret != 0) {
 		lerror("create listend thread failed.\n");
+		close(main_epollfd);
+		close(listenfd);
+		unlink(ELF_UNIX_PATH);
 		exit(1);
 	}
 	pthread_setname_np(thread, "elf-main");

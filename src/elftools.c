@@ -243,7 +243,9 @@ int main(int argc, char *argv[])
 	/* Server or Client */
 	switch (config.role) {
 	case ROLE_SERVER:
-		elf_main(argc, argv);
+		if(elf_main(argc, argv) != 0) {
+			goto failed;
+		}
 		break;
 	case ROLE_CLIENT:
 		break;
@@ -264,4 +266,7 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
+
+failed:
+	return -1;
 }
