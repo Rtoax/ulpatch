@@ -170,13 +170,20 @@ static unsigned int __perms2prot(char *perms)
 	return prot;
 }
 
-static int read_task_vmas(struct task *task)
+static int read_task_vmas(struct task *task, bool update)
 {
-	FILE *mapsfp;
 	struct vma_struct *vma;
+	int mapsfd;
+	FILE *mapsfp;
 
-	lseek(task->proc_maps_fd, 0, SEEK_SET);
-	mapsfp = fdopen(task->proc_maps_fd, "r");
+	// open(2) /proc/PID/maps
+	mapsfd = open_pid_maps(task->pid);
+	if (mapsfd <= 0) {
+		return -1;
+	}
+	lseek(mapsfd, 0, SEEK_SET);
+
+	mapsfp = fdopen(mapsfd, "r");
 	fseek(mapsfp, 0, SEEK_SET);
 	do {
 		unsigned long start, end, offset;
@@ -216,12 +223,20 @@ static int read_task_vmas(struct task *task)
 			task->libc_vma = vma;
 		}
 
+		if (update && find_vma(task, vma->start)) continue;
+		ldebug("update : %s\n", name_);
 		insert_vma(task, vma);
 	} while (1);
 
 	fclose(mapsfp);
+	close(mapsfd);
 
 	return 0;
+}
+
+int update_task_vmas(struct task *task)
+{
+	return read_task_vmas(task, true);
 }
 
 void print_vma(struct vma_struct *vma)
@@ -277,17 +292,13 @@ static int __get_comm(struct task *task)
 struct task *open_task(pid_t pid)
 {
 	struct task *task = NULL;
-	int memfd, mapsfd;
+	int memfd;
 
 	memfd = open_pid_mem(pid);
 	if (memfd <= 0) {
 		return NULL;
 	}
 
-	mapsfd = open_pid_maps(pid);
-	if (mapsfd <= 0) {
-		return NULL;
-	}
 
 	task = malloc(sizeof(struct task));
 	assert(task && "malloc failed");
@@ -299,10 +310,8 @@ struct task *open_task(pid_t pid)
 	task->pid = pid;
 	__get_comm(task);
 	task->proc_mem_fd = memfd;
-	task->proc_maps_fd = mapsfd;
-	lseek(mapsfd, 0, SEEK_SET);
 
-	read_task_vmas(task);
+	read_task_vmas(task, false);
 
 	list_add(&task->node, &tasks_list);
 
@@ -319,7 +328,6 @@ int free_task(struct task *task)
 {
 	list_del(&task->node);
 	close(task->proc_mem_fd);
-	close(task->proc_maps_fd);
 
 	free_task_vmas(task);
 	free(task->comm);

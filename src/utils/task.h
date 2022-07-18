@@ -104,8 +104,6 @@ struct task {
 
 	// open(2) /proc/PID/mem
 	int proc_mem_fd;
-	// open(2) /proc/PID/maps
-	int proc_maps_fd;
 
 	struct list_head node;
 
@@ -131,6 +129,7 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
 struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task *task, size_t size);
+int update_task_vmas(struct task *task);
 
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
@@ -147,6 +146,7 @@ int memcpy_from_task(struct task *task,
 		void *dst, unsigned long remote_src, ssize_t size);
 
 /* syscalls based on task_syscall() */
+// if mmap file, need to update_task_vmas() manual
 unsigned long task_mmap(struct task *task,
 	unsigned long addr, size_t length, int prot, int flags,
 	int fd, off_t offset);

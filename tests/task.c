@@ -293,6 +293,9 @@ static int test_mmap_file(struct task *task)
 				MAP_PRIVATE, map_fd, 0);
 	ldebug("New mmap. %lx\n", map_v);
 
+	update_task_vmas(task);
+	dump_task_vmas(task);
+
 	ldebug("unmmap. %lx\n", map_v);
 	task_munmap(task, map_v, map_len);
 
@@ -301,7 +304,7 @@ static int test_mmap_file(struct task *task)
 close_ret:
 	task_close(task, map_fd);
 
-	return 0;
+	return ret;
 }
 TEST(Task,	mmap_file,	0)
 {
@@ -325,9 +328,10 @@ TEST(Task,	mmap_file,	0)
 
 		dump_task_vmas(task);
 
-		ret = task_attach(pid);
+		task_attach(pid);
 		ret = test_mmap_file(task);
-		ret = task_detach(pid);
+
+		task_detach(pid);
 
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
