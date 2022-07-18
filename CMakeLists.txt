@@ -10,6 +10,16 @@ PROJECT(elftools)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 
+# check processor architecture
+# only support x86_64 and aarch64 right now.
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+message(STATUS "x86_64 architecture detected")
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
+message(STATUS "aarch64 architecture detected")
+else()
+message(FATAL_ERROR "host processor architecture is unknown(x86_64,aarch64 only)")
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(find_libelf)
 include(find_linenoise)

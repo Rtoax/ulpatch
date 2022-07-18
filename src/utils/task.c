@@ -13,6 +13,7 @@
 #include <sys/wait.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <elf.h>
 
 #include "log.h"
 #include "task.h"
@@ -515,12 +516,28 @@ int task_syscall(struct task *task, int nr,
 	struct user_regs_struct old_regs, regs, __unused syscall_regs;
 	unsigned char __syscall[] = {SYSCALL_INSTR};
 
+#if defined(__aarch64__)
+	struct iovec orig_regs_iov, regs_iov;
+
+	orig_regs_iov.iov_base = &old_regs;
+	orig_regs_iov.iov_len = sizeof(old_regs);
+	regs_iov.iov_base = &regs;
+	regs_iov.iov_len = sizeof(regs);
+#endif
+
 	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5, arg6);
 
 	unsigned char orig_code[sizeof(__syscall)];
 	unsigned long libc_base = task->libc_vma->start;
 
+#if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);
+#elif defined(__aarch64__)
+	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
+			(void*)&orig_regs_iov);
+#else
+# error "Unsupport architecture"
+#endif
 	if (ret == -1) {
 		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
@@ -537,7 +554,14 @@ int task_syscall(struct task *task, int nr,
 
 	copy_regs(&regs, &syscall_regs);
 
+#if defined(__x86_64__)
 	ret = ptrace(PTRACE_SETREGS, task->pid, NULL, &regs);
+#elif defined(__aarch64__)
+	ret = ptrace(PTRACE_SETREGSET, task->pid, (void*)NT_PRSTATUS,
+			(void*)&regs_iov);
+#else
+# error "Unsupport architecture"
+#endif
 	if (ret == -1) {
 		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
@@ -551,7 +575,14 @@ int task_syscall(struct task *task, int nr,
 		goto poke_back;
 	}
 
+#if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &regs);
+#elif defined(__aarch64__)
+	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
+			(void*)&regs_iov);
+#else
+# error "Unsupport architecture"
+#endif
 	if (ret == -1) {
 		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
@@ -559,7 +590,14 @@ int task_syscall(struct task *task, int nr,
 		goto poke_back;
 	}
 
+#if defined(__x86_64__)
 	ret = ptrace(PTRACE_SETREGS, task->pid, NULL, &old_regs);
+#elif defined(__aarch64__)
+	ret = ptrace(PTRACE_SETREGSET, task->pid, (void*)NT_PRSTATUS,
+			(void*)&orig_regs_iov);
+#else
+# error "Unsupport architecture"
+#endif
 	if (ret == -1) {
 		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
