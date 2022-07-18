@@ -341,3 +341,66 @@ TEST(Task,	mmap_file,	0)
 	return ret;
 }
 
+TEST(Task,	prctl_PR_SET_NAME,	0)
+{
+	int ret = -1;
+	int status = 0;
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		char *argv[] = {
+			"sleep", "2", NULL
+		};
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	} else if (pid > 0) {
+		char data[] = "ABCDEFG";
+		char buf[64] = "XXXXXX";
+		int n;
+		unsigned long addr;
+
+		sleep(1);
+
+		struct task *task = open_task(pid);
+
+		// dump_task_vmas(task);
+
+		ret = task_attach(pid);
+		addr = task_malloc(task, 64);
+		ldebug("task %lx, addr = %lx\n", task, addr);
+
+		dump_task_vmas(task);
+
+		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
+
+		// Set thread name
+		// see:
+		// $ ps -ef | grep sleep
+		// $ top -Hp PID  ot top -Hp $(pidof sleep)
+		//     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+		//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
+		ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
+
+		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
+		ldebug("memcpy_from_task: %s\n", buf);
+
+		// memcpy failed
+		if (n != strlen(data) + 1 || strcmp(data, buf)) {
+			ret = -1;
+		}
+
+		ret = task_detach(pid);
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+		free_task(task);
+	} else {
+		lerror("fork(2) error.\n");
+	}
+
+	return ret;
+}
+

@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <sys/types.h>
+#include <sys/prctl.h>
 
 #include "rbtree.h"
 #include "list.h"
@@ -159,6 +160,8 @@ int task_open(struct task *task, char *pathname, int flags, mode_t mode);
 int task_close(struct task *task, int remote_fd);
 int task_ftruncate(struct task *task, int remote_fd, off_t length);
 int task_fstat(struct task *task, int remote_fd, struct stat *statbuf);
+int task_prctl(struct task *task, int option, unsigned long arg2,
+	unsigned long arg3, unsigned long arg4, unsigned long arg5);
 
 /* Execute a syscall(2) in target task */
 int task_syscall(struct task *task, int nr,

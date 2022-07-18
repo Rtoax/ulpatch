@@ -739,3 +739,17 @@ int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
 	return ret_fstat;
 }
 
+int task_prctl(struct task *task, int option, unsigned long arg2,
+	unsigned long arg3, unsigned long arg4, unsigned long arg5)
+{
+	int ret;
+	unsigned long result;
+
+	ret = task_syscall(task,
+		__NR_prctl, option, arg2, arg3, arg4, arg5, 0, &result);
+	if (ret < 0) {
+		return 0;
+	}
+	return result;
+}
+
