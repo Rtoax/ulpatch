@@ -206,13 +206,15 @@ static int parse_config(int argc, char *argv[])
 	case ROLE_CLIENT:
 		if (config.mode == MODE_SLEEP) {
 			fprintf(stderr,
-				"client(-c) not support sleep(%d) mode(-m).\n",
+				"client(-c) not support sleep(%d) mode(-m).\n"
+				"Try '--help' for more information.\n",
 				MODE_SLEEP);
 			exit(1);
 		}
 		break;
 	default:
-		fprintf(stderr, "wrong role(%d, -s, --server or -c, --client).\n",
+		fprintf(stderr, "wrong role(%d, -s, --server or -c, --client).\n"
+			"Try '--help' for more information.\n",
 			config.role);
 		exit(1);
 	}
@@ -222,7 +224,8 @@ static int parse_config(int argc, char *argv[])
 	case MODE_SLEEP ... MODE_GTK:
 		break;
 	default:
-		fprintf(stderr, "wrong mode(%d, -m), check with -h, --help.\n",
+		fprintf(stderr, "wrong mode(%d, -m), check with -h, --help.\n"
+			"Try '--help' for more information.\n",
 			config.mode);
 		exit(1);
 	}
