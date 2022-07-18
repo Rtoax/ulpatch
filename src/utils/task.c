@@ -170,11 +170,15 @@ static unsigned int __perms2prot(char *perms)
 	return prot;
 }
 
+static int free_task_vmas(struct task *task);
+
 static int read_task_vmas(struct task *task, bool update)
 {
 	struct vma_struct *vma;
 	int mapsfd;
 	FILE *mapsfp;
+
+	if (update) free_task_vmas(task);
 
 	// open(2) /proc/PID/maps
 	mapsfd = open_pid_maps(task->pid);
@@ -223,8 +227,6 @@ static int read_task_vmas(struct task *task, bool update)
 			task->libc_vma = vma;
 		}
 
-		if (update && find_vma(task, vma->start)) continue;
-		ldebug("update : %s\n", name_);
 		insert_vma(task, vma);
 	} while (1);
 
@@ -268,6 +270,11 @@ static int free_task_vmas(struct task *task)
 		unlink_vma(task, vma);
 		free_vma(vma);
 	}
+
+	list_init(&task->vmas);
+	rb_init(&task->vmas_rb);
+
+	task->libc_vma = NULL;
 
 	return 0;
 }
