@@ -1,13 +1,4 @@
-/**
- * @file util.h
- * @author Rong Tao
- * @brief
- * @version 0.1
- * @date 2022-03-02
- *
- * @copyright Copyright (c) 2022
- *
- */
+// Copyright Copyright (c) 2022
 #ifndef _UTIL_H
 #define _UTIL_H
 

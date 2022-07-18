@@ -17,6 +17,7 @@
 
 #include "cli-usdt.h"
 
+
 static int test_server_handler(const char *s, int slen)
 {
 	ldebug("handle: %s\n", s);
@@ -36,3 +37,4 @@ int cli_cmd_test(const struct cli_struct *cli, int argc, char *argv[])
 	}
 	return -ENOENT;
 }
+

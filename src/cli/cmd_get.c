@@ -95,3 +95,4 @@ int cli_cmd_get(const struct cli_struct *cli, int argc, char *argv[])
 
 	return -ENOENT;
 }
+

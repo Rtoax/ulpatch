@@ -1,4 +1,3 @@
-
 include_directories(..)
 
 find_library(ELF elf /usr/lib64)
@@ -19,3 +18,4 @@ aux_source_directory(. LIB_SOURCES)
 add_library(elftools_elf STATIC ${LIB_SOURCES})
 
 target_compile_definitions(elftools_elf PRIVATE ${UTILS_FLAGS})
+

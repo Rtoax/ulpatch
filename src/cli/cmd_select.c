@@ -42,3 +42,4 @@ int cli_cmd_select(const struct cli_struct *cli, int argc, char *argv[])
 	}
 	return -ENOENT;
 }
+

@@ -1,4 +1,3 @@
-
 #include <utils/list.h>
 
 #ifdef __cplusplus

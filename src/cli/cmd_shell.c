@@ -56,3 +56,4 @@ int cli_cmd_shell(int argc, char *argv[])
 
 	return -ENOENT;
 }
+

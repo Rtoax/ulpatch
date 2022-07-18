@@ -44,3 +44,4 @@ int cli_cmd_delete(const struct cli_struct *cli, int argc, char *argv[])
 
 	return -ENOENT;
 }
+

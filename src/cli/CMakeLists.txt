@@ -19,3 +19,4 @@ aux_source_directory(. LIB_SOURCES)
 add_library(elftools_cli STATIC ${LIB_SOURCES})
 
 target_compile_definitions(elftools_cli PRIVATE ${UTILS_FLAGS})
+

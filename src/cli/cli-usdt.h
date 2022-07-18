@@ -27,3 +27,4 @@
 // sudo bpftrace -e 'usdt:./src/elftools:cli:shell{printf("%s %s\n", probe, str(arg0));}'
 #define trace_cli_shell(command) \
 	__trace_cli_probe_s1(cli, shell, command)
+

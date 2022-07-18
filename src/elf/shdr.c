@@ -312,3 +312,4 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type)
 
 	return 0;
 }
+

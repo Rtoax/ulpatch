@@ -241,3 +241,4 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type);
 #ifdef __cplusplus
 }
 #endif
+

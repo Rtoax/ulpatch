@@ -1,8 +1,3 @@
-/**
- *  File name: compiler.h
- *  Create by Rong Tao, 2021.10.15
- */
-
 #ifndef __ELFTOOLS_UTILS_COMPILER_H
 #define __ELFTOOLS_UTILS_COMPILER_H 1
 
