@@ -238,6 +238,11 @@ int print_json_shdr(const GElf_Shdr *shdr, const char *secname);
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type);
 
 
+/* ELF Rela api */
+const char *rela_type_string(int r);
+void print_rela(GElf_Rela *rela);
+
+
 #ifdef __cplusplus
 }
 #endif
