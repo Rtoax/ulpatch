@@ -293,7 +293,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type)
 			" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
 		}
 
-		ldebug("%s %s\n", sh_type_string(shdr),
+		printf("%s %s", sh_type_string(shdr),
 			elf_strptr(elf->elf, shdr->sh_link, sym->st_name));
 
 		if (elf->versym_data != NULL) {
@@ -326,6 +326,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type)
 						0, &verneed_mem);
 
 					while (verneed != NULL) {
+
 						size_t vna_offset = vn_offset;
 
 						vernaux = gelf_getvernaux(elf->verneed_data,

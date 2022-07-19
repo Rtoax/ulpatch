@@ -56,7 +56,8 @@ static __unused int handle_sections(struct elf_file *elf)
 			return -ENOENT;
 		}
 
-		ldebug("section name: %s, %lx\n", elf->shdrnames[i], shdr->sh_type);
+		ldebug("section name: %s, %lx\n",
+			elf->shdrnames[i], shdr->sh_type, sh_type_string(shdr));
 
 		// Handle section header by type
 		switch (shdr->sh_type) {
@@ -68,34 +69,50 @@ static __unused int handle_sections(struct elf_file *elf)
 			elf->dynsym_data = elf_getdata(scn, NULL);
 			elf->dynsym_shdr_idx = i;
 			break;
-
-		case SHT_GNU_versym: // .gnu.version
-			if (shdr->sh_link == elf_ndxscn(scn)) {
-				elf->versym_data = elf_getdata(scn, NULL);
-			}
-		case SHT_GNU_verneed: // .gnu.version_r
-			if (shdr->sh_link == elf_ndxscn(scn)) {
-				elf->verneed_data = elf_getdata(scn, NULL);
-				elf->verneed_stridx = shdr->sh_link;
-			}
-		case SHT_GNU_verdef:
-			if (shdr->sh_link == elf_ndxscn(scn)) {
-				elf->verdef_data = elf_getdata(scn, NULL);
-				elf->verdef_stridx = shdr->sh_link;
-			}
-			break;
-		case SHT_SYMTAB_SHNDX:
-			if (shdr->sh_link == elf_ndxscn(scn)) {
-				elf->xndx_data = elf_getdata(scn, NULL);
-			}
-			break;
-
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
 		// readelf --section-groups
 		case SHT_GROUP:
 		default:
 			break;
+		}
+
+		/* Find out whether we have other sections we might need.  */
+		Elf_Scn *runscn = NULL;
+
+		while ((runscn = elf_nextscn(elf->elf, runscn)) != NULL) {
+
+			GElf_Shdr runshdr_mem;
+			GElf_Shdr *runshdr = gelf_getshdr(runscn, &runshdr_mem);
+
+			if (!runshdr) continue;
+
+			// Handle section header by type
+			switch (runshdr->sh_type) {
+
+			/* Bingo, found the version information.  Now get the data.  */
+			case SHT_GNU_versym: // .gnu.version
+				if (runshdr->sh_link == elf_ndxscn(scn)) {
+					elf->versym_data = elf_getdata(runscn, NULL);
+				}
+				break;
+			/* This is the information about the needed versions.  */
+			case SHT_GNU_verneed: // .gnu.version_r
+				elf->verneed_data = elf_getdata(runscn, NULL);
+				elf->verneed_stridx = runshdr->sh_link;
+				break;
+			/* This is the information about the defined versions.  */
+			case SHT_GNU_verdef:
+				elf->verdef_data = elf_getdata(runscn, NULL);
+				elf->verdef_stridx = runshdr->sh_link;
+				break;
+			/* Extended section index.  */
+			case SHT_SYMTAB_SHNDX:
+				if (runshdr->sh_link == elf_ndxscn(scn)) {
+					elf->xndx_data = elf_getdata(runscn, NULL);
+				}
+				break;
+			}
 		}
 	}
 
