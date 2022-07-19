@@ -14,7 +14,6 @@
 
 #if defined(__x86_64__)
 static const char *R_X86_64_STRING(int r) {
-#define _I(v) [v] = #v
 #define _I(v) case v: return #v;
 	switch (r) {
 	_I(R_X86_64_NONE)
