@@ -50,7 +50,7 @@ int close_elf_client(int fd)
 static int
 __client_elf_file(int connfd, enum cmd_type cmdType, const char *filepath)
 {
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE] = {};
 	struct cmd_elf *cmd = (struct cmd_elf *)buffer;
 	struct cmd_elf_file *elf_load;
 
@@ -259,7 +259,7 @@ int client_register(int connfd, enum client_type type, int (*handler)(void))
 {
 	assert(handler && "must have handler()");
 
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE] = {};
 	struct cmd_elf *cmd = (struct cmd_elf *)buffer;
 
 	cmd->cmd = CMD_REGISTER_CLIENT;

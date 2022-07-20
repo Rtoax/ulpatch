@@ -263,9 +263,9 @@ void *elf_thread(void *arg)
 
 			/* Handle all client */
 			} else {
-				struct client *client;
+				struct client *client, *tmp;
 
-				list_for_each_entry(client, &client_list, node) {
+				list_for_each_entry_safe(client, tmp, &client_list, node) {
 					if (client->info.connfd == event->data.fd) {
 						/* Client close */
 						if (event->events & EPOLLHUP) {
@@ -370,12 +370,12 @@ int elf_main(int argc, char *argv[])
 
 void elf_exit(void)
 {
-	struct client *client;
+	struct client *client, *tmp;
 
 	pthread_kill(thread, SIGUSR1);
 	pthread_join(thread, NULL);
 
-	list_for_each_entry(client, &client_list, node) {
+	list_for_each_entry_safe(client, tmp, &client_list, node) {
 		list_del(&client->node);
 		free(client);
 		nr_clients--;
