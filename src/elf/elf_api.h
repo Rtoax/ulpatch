@@ -196,6 +196,15 @@ static uint32_t __unused data_get_u32(void **pdata) {
 	return ret;
 }
 
+// total length = strlen(src) + 1
+static uint32_t __unused data_add_string(void **pdata, const char *src) {
+	strcpy(*pdata, src);
+	uint32_t __l = strlen(src) + 1;
+	((char*)*pdata)[__l - 1] = '\0';
+	*pdata += __l;
+	return __l;
+}
+
 int send_one_ack(struct client *client, struct cmd_elf *cmd_ack);
 int client_recv_acks(int connfd, int (*handler)(struct cmd_elf *msg_ack));
 

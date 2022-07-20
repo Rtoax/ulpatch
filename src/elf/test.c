@@ -43,6 +43,7 @@ int test_server_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 
 		has_next = msg_ack->has_next;
 
+		// TODO: why can't use data_add_string()
 		/* Copy one section header */
 		int n = sprintf(data, "(%d) Hello World%s",
 			total_nbytes, has_next?";":".");

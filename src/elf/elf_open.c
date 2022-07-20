@@ -337,21 +337,17 @@ int elf_list_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
 
-		char *filepath = elf->filepath;
-		uint16_t len = strlen(filepath);
-		if (data_left_len < len + 1) {
+		uint32_t len = data_add_string((void**)&data, elf->filepath);
+		if (data_left_len < len) {
 			lerror("no space left on buffer.\n");
 			break;
 		}
 
-		memcpy(data, filepath, len);
-		data[len] = '\0';
 		add_len += len + 1;
 		data_left_len -= len + 1;
-		data += len + 1;
 
 		if (data_left_len < 0) {
-			lerror("File name too long, %s\n", filepath);
+			lerror("File name too long, %s\n", elf->filepath);
 			return -EINVAL; /* Invalid argument */
 		}
 

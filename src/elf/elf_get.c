@@ -162,12 +162,9 @@ int elf_get_shdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		data += sizeof(GElf_Shdr) + 1;
 
 		/* Copy one section header name */
-		strcpy(data, elf->shdrnames[i]);
-		uint16_t __l = strlen(elf->shdrnames[i]);
-		data[__l] = '\0';
-		add_len += __l + 1;
-		data_left_len -= __l + 1;
-		data += __l + 1;
+		uint32_t __l = data_add_string((void**)&data, elf->shdrnames[i]);
+		add_len += __l;
+		data_left_len -= __l;
 
 		msg_ack->cmd = CMD_ELF_GET_SHDR;
 		msg_ack->data_len = init_len + add_len;
