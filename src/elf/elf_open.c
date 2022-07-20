@@ -117,12 +117,10 @@ static __unused int handle_sections(struct elf_file *elf)
 	}
 
 	if (elf->symtab_shdr_idx)
-		handle_symtab(elf,
-			elf_getscn(elf->elf, elf->symtab_shdr_idx), SHT_SYMTAB);
+		handle_symtab(elf, elf_getscn(elf->elf, elf->symtab_shdr_idx));
 
 	if (elf->dynsym_shdr_idx)
-		handle_symtab(elf,
-			elf_getscn(elf->elf, elf->dynsym_shdr_idx), SHT_DYNSYM);
+		handle_symtab(elf, elf_getscn(elf->elf, elf->dynsym_shdr_idx));
 
 	return 0;
 }

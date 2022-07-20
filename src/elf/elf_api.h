@@ -242,7 +242,35 @@ const char *st_bind_string(const GElf_Sym *sym);
 const char *st_type_string(const GElf_Sym *sym);
 const char *st_visibility_string(const GElf_Sym *sym);
 
-int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type);
+GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
+	int isym, size_t *nsyms,
+	GElf_Sym *sym_mem, char **symname, char **pversion);
+
+/**
+ * for_each_symbol - For each symbol in elf
+ *
+ * for example: see also handle_symtab()
+ *
+ *	size_t nsym = 0, isym = 0;
+ *	GElf_Sym __unused *sym, sym_mem;
+ *	char *symname, *pversion;
+ *
+ *	for_each_symbol(elf, scn, sym, sym_mem, isym, nsym, symname, pversion) {
+ *		if (!sym) continue;
+ *		printf("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
+ *	}
+ *
+ */
+#define for_each_symbol(elf, scn, sym, sym_mem, isym, nsym, symname, pversion) \
+	for (	\
+		isym = 0, sym = get_next_symbol(elf, scn, isym, &nsym,	\
+			&sym_mem, &symname, &pversion);	\
+		isym < nsym;	\
+		isym++, sym = get_next_symbol(elf, scn, isym, &nsym,	\
+			&sym_mem, &symname, &pversion)	\
+	)
+
+int handle_symtab(struct elf_file *elf, Elf_Scn *scn);
 
 
 /* ELF Rela api */
