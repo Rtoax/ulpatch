@@ -9,6 +9,66 @@
 #include <utils/log.h>
 
 
+const char *st_bind_string(const GElf_Sym *sym)
+{
+	switch (GELF_ST_BIND(sym->st_info)) {
+	case STB_LOCAL:   return "LOCAL";	/* Local symbol */
+	case STB_GLOBAL:  return "GLOBAL";	/* Global symbol */
+	case STB_WEAK:    return "WEAK";	/* Weak symbol */
+	case STB_NUM:     return "NUM";		/* Number of defined types.  */
+	case STB_LOOS:    return "LOOS";	/* Start of OS-specific */
+	// same as STB_LOOS
+	//case STB_GNU_UNIQUE:  return "GNU_UNIQUE";/* Unique symbol.  */
+	case STB_HIOS:    return "HIOS";	/* End of OS-specific */
+	case STB_LOPROC:  return "LOPROC";	/* Start of processor-specific */
+	case STB_HIPROC:  return "HIPROC";	/* End of processor-specific */
+	}
+	return "UNKNOWN";
+}
+
+const char *st_type_string(const GElf_Sym *sym)
+{
+	switch (GELF_ST_TYPE(sym->st_info)) {
+	case STT_NOTYPE:  return "NOTYPE";	/* Symbol type is unspecified */
+	case STT_OBJECT:  return "OBJECT";	/* Symbol is a data object */
+	case STT_FUNC:    return "FUNC";	/* Symbol is a code object */
+	case STT_SECTION: return "SECTION";	/* Symbol associated with a section */
+	case STT_FILE:    return "FILE";	/* Symbol's name is file name */
+	case STT_COMMON:  return "COMMON";	/* Symbol is a common data object */
+	case STT_TLS:     return "TLS";		/* Symbol is thread-local data object*/
+	case STT_NUM:     return "NUM";		/* Number of defined types.  */
+	case STT_LOOS:    return "LOOS";	/* Start of OS-specific */
+	// same as STT_LOOS
+	//case STT_GNU_IFUNC: return "GNU_IFUNC";/* Symbol is indirect code object */
+	case STT_HIOS:    return "HIOS";	/* End of OS-specific */
+	case STT_LOPROC:  return "LOPROC";	/* Start of processor-specific */
+	case STT_HIPROC:  return "HIPROC";	/* End of processor-specific */
+	}
+	return "UNKNOWN";
+}
+
+const char *st_visibility_string(const GElf_Sym *sym)
+{
+	switch (GELF_ST_VISIBILITY(sym->st_info)) {
+	case STV_DEFAULT:   return "DEFAULT"; /* Default symbol visibility rules */
+	case STV_INTERNAL:  return "INTERNAL";/* Processor specific hidden class */
+	case STV_HIDDEN:    return "HIDDEN";  /* Sym unavailable in other modules */
+	case STV_PROTECTED: return "PROTECTED";/* Not preemptible, not exported */
+	}
+	return "UNKNOWN";
+}
+
+// TODO
+int print_sym(struct elf_file *elf, const GElf_Sym *sym)
+{
+	GElf_Shdr *shdr = &elf->shdrs[elf->dynsym_shdr_idx];
+
+	printf("%s %s", sh_type_string(shdr),
+		elf_strptr(elf->elf, shdr->sh_link, sym->st_name));
+
+	return 0;
+}
+
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type)
 {
 	int isym;

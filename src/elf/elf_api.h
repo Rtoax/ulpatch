@@ -236,6 +236,12 @@ json_object *json_shdr(const GElf_Shdr *shdr, const char *secname);
 #endif
 int print_json_shdr(const GElf_Shdr *shdr, const char *secname);
 
+
+/* ELF Symbol api */
+const char *st_bind_string(const GElf_Sym *sym);
+const char *st_type_string(const GElf_Sym *sym);
+const char *st_visibility_string(const GElf_Sym *sym);
+
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn, int type);
 
 
