@@ -125,7 +125,6 @@ static __unused int handle_sections(struct elf_file *elf)
 			elf_getscn(elf->elf, elf->dynsym_shdr_idx), SHT_DYNSYM);
 
 	return 0;
-
 }
 
 static __unused struct elf_file *elf_file_load(const char *filepath)
