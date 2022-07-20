@@ -190,6 +190,12 @@ static void __unused *data_add_u32(void *data, uint32_t u32) {
 	return (char *)data + sizeof(uint32_t);
 }
 
+static uint32_t __unused data_get_u32(void **pdata) {
+	uint32_t ret = *(uint32_t *)(*pdata);
+	*pdata += sizeof(uint32_t);
+	return ret;
+}
+
 int send_one_ack(struct client *client, struct cmd_elf *cmd_ack);
 int client_recv_acks(int connfd, int (*handler)(struct cmd_elf *msg_ack));
 

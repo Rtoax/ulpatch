@@ -113,16 +113,13 @@ int client_list_elf(int connfd, void (*handler)(struct file_info *info))
 
 		char *data = ack_data(cmd_data(msg_ack));
 
-		uint32_t __unused nr_elf = *(uint32_t *)data;
+		uint32_t __unused nr_elf = data_get_u32((void **)&data);
 		if (nr_elf == 0) {
 			printf("No ELF Loaded.\n");
 			return 0;
 		}
-		data += sizeof(uint32_t);
-		uint32_t __unused idx_elf = *(uint32_t *)data;
-		data += sizeof(uint32_t);
-		uint32_t selected = *(uint32_t *)data;
-		data += sizeof(uint32_t);
+		uint32_t __unused idx_elf = data_get_u32((void **)&data);
+		uint32_t selected = data_get_u32((void **)&data);
 
 		struct file_info info = {
 			.type = FILE_ELF,
@@ -185,15 +182,13 @@ int client_get_elf_phdr(int connfd, int (*handler)(const GElf_Phdr *phdr))
 
 		char *data = ack_data(ack);
 
-		uint32_t __unused nr_phdrs = *(uint32_t *)data;
+		uint32_t __unused nr_phdrs = data_get_u32((void **)&data);
 		if (nr_phdrs == 0) {
 			printf("No ELF Selected or ELF no Program Header at all.\n");
 			return ack->result;
 		}
-		data += sizeof(uint32_t);
 
-		uint32_t __unused idx_phdr = *(uint32_t *)data;
-		data += sizeof(uint32_t);
+		uint32_t __unused idx_phdr = data_get_u32((void **)&data);
 
 		phdr = (GElf_Phdr *)data;
 		return handler(phdr);
@@ -220,14 +215,12 @@ int client_get_elf_shdr(int connfd,
 		struct cmd_elf_ack *ack = cmd_data(msg_ack);
 
 		char *data = ack_data(ack);
-		uint32_t __unused nr_shdrs = *(uint32_t *)data;
+		uint32_t __unused nr_shdrs = data_get_u32((void **)&data);
 		if (nr_shdrs == 0) {
 			printf("No ELF Selected or ELF no Section at all.\n");
 			return ack->result;
 		}
-		data += sizeof(uint32_t);
-		uint32_t __unused idx_shdr = *(uint32_t *)data;
-		data += sizeof(uint32_t);
+		uint32_t __unused idx_shdr = data_get_u32((void **)&data);
 
 		shdr = (GElf_Shdr *)data;
 
@@ -301,16 +294,13 @@ int client_list_client(int connfd,
 
 		char *data = ack_data(cmd_data(msg_ack));
 
-		uint32_t __unused nr_clis = *(uint32_t *)data;
+		uint32_t __unused nr_clis = data_get_u32((void **)&data);
 		if (nr_clis == 0) {
 			printf("No client connected.\n");
 			return 0;
 		}
-		data += sizeof(uint32_t);
-		uint32_t __unused idx = *(uint32_t *)data;
-		data += sizeof(uint32_t);
-		uint32_t __unused is_me = *(uint32_t *)data;
-		data += sizeof(uint32_t);
+		uint32_t __unused idx = data_get_u32((void **)&data);
+		uint32_t __unused is_me = data_get_u32((void **)&data);
 
 		struct nr_idx_bool nib = {
 			.nr = nr_clis,
@@ -346,8 +336,7 @@ int list_client_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 	if (nr_clients <= 0) {
 		char *data = ack_data(ack);
 		/* Number of clients */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = nr_clients;
+		data = data_add_u32(data, nr_clients);
 		msg_ack->data_len += sizeof(uint32_t);
 		send_one_ack(client, msg_ack);
 		return 0;
