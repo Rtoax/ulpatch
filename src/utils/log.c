@@ -2,6 +2,7 @@
 #include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <utils/log.h>
 
@@ -33,9 +34,15 @@ int _____log(int level, const char *file, const char *func,
 	if (level > log_level)
 		return 0;
 
+	char buffer[32];
+	time_t timestamp = time(NULL);
+
+	// like 15:53:52
+	strftime(buffer, 32, "%T", localtime(&timestamp));
+
 	va_start(va, fmt);
 
-	fprintf(fp, "%s[%s:%ld] ", level_prefix[level], func, line);
+	fprintf(fp, "%s %s[%s:%ld] ", buffer, level_prefix[level], func, line);
 	n += vfprintf(fp, fmt, va);
 
 	va_end(va);
