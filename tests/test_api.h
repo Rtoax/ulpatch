@@ -57,6 +57,10 @@ struct test {
 #define TEST(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_MIDDLE, Ret)
 
+// Lower prio TEST
+#define TEST_LOWER(Category, Name, Ret)	\
+	__TEST(Category, Name, TEST_PRIO_LOWER, Ret)
+
 extern struct list_head test_list[TEST_PRIO_NUM];
 
 struct test*

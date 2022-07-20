@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include <sys/epoll.h>
 
 #include <elf/elf_api.h>
@@ -221,6 +222,10 @@ void *elf_thread(void *arg)
 {
 	int i, ret, nfds;
 	struct epoll_event events[MAX_EVENTS];
+	static sigset_t sigmask;
+
+	sigemptyset(&sigmask);
+	sigaddset(&sigmask, SIGUSR1);
 
 	for (;;) {
 		nfds = epoll_wait(main_epollfd, events, MAX_EVENTS, -1);
@@ -284,11 +289,18 @@ void *elf_thread(void *arg)
 	}
 }
 
+static void sig_handler(int signum)
+{
+	pthread_exit(NULL);
+}
+
 int elf_main(int argc, char *argv[])
 {
 	int ret = 0;
 	struct epoll_event event;
 	struct sockaddr_un srv_addr;
+
+	signal(SIGUSR1, sig_handler);
 
 	pthread_mutex_lock(&epoll_mutex);
 	if (main_epollfd != -1) {
@@ -358,5 +370,15 @@ int elf_main(int argc, char *argv[])
 
 void elf_exit(void)
 {
+	struct client *client;
+
+	pthread_kill(thread, SIGUSR1);
+	pthread_join(thread, NULL);
+
+	list_for_each_entry(client, &client_list, node) {
+		list_del(&client->node);
+		free(client);
+		nr_clients--;
+	}
 }
 

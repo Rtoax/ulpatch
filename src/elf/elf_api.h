@@ -169,6 +169,7 @@ struct client {
 };
 
 int elf_main(int argc, char *argv[]);
+void elf_exit(void);
 int create_elf_client(void);
 int close_elf_client(int fd);
 

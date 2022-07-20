@@ -48,3 +48,10 @@ TEST_HIGHEST(Elf_init,	create_elf_client_again,	0)
 	}
 	return test_client_fd>0?0:-1;
 }
+
+TEST_LOWER(Elf_init,	elf_exit,	0)
+{
+	elf_exit();
+	return 0;
+}
+
