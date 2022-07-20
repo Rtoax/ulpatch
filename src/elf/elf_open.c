@@ -308,8 +308,7 @@ int elf_list_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 	if (elf_files_number <= 0) {
 		char *data = ack_data(ack);
 		/* Number of ELF files */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = elf_files_number;
+		data_add_u32(data, elf_files_number);
 		msg_ack->data_len += sizeof(uint32_t);
 		send_one_ack(client, msg_ack);
 		return 0;
@@ -323,26 +322,20 @@ int elf_list_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of ELF files */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = elf_files_number;
+		data = data_add_u32(data, elf_files_number);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Index of ELF files */
-		uint32_t *idx = (uint32_t *)data;
-		*idx = ++count;
+		data = data_add_u32(data, ++count);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* This client selected? */
-		uint32_t *selected = (uint32_t *)data;
 		// 0 - not select, see struct cmd_elf_ack.data
-		*selected = (client->selected_elf == elf)?1:0;
+		data = data_add_u32(data, (client->selected_elf == elf)?1:0);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		char *filepath = elf->filepath;
 		uint16_t len = strlen(filepath);

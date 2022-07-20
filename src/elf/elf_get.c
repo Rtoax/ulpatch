@@ -66,8 +66,7 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		lerror("no selected elf.\n");
 		char *data = ack_data(ack);
 		/* No selected elf file */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = 0;
+		data_add_u32(data, 0);
 		msg_ack->data_len += sizeof(uint32_t);
 
 		ack->result = -ENOENT; /* No such file or directory */
@@ -84,18 +83,14 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of ELF program header */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = elf->phdrnum;
+		data = data_add_u32(data, elf->phdrnum);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Index of this ELF program header */
-		uint32_t *idx = (uint32_t *)data;
-		*idx = i + 1;
+		data = data_add_u32(data, i + 1);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Copy one program header */
 		memcpy(data, &elf->phdrs[i], sizeof(GElf_Phdr));
@@ -150,18 +145,14 @@ int elf_get_shdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of ELF section header */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = elf->shdrnum;
+		data = data_add_u32(data, elf->shdrnum);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Index of this ELF section header */
-		uint32_t *idx = (uint32_t *)data;
-		*idx = i + 1;
+		data = data_add_u32(data, i + 1);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Copy one section header */
 		memcpy(data, &elf->shdrs[i], sizeof(GElf_Shdr));

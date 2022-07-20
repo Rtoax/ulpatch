@@ -361,26 +361,20 @@ int list_client_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of Clients */
-		uint32_t *nr = (uint32_t *)data;
-		*nr = nr_clients;
+		data = data_add_u32(data, nr_clients);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* Index of client */
-		uint32_t *idx = (uint32_t *)data;
-		*idx = ++count;
+		data = data_add_u32(data, ++count);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		/* It's me? */
-		uint32_t *is_me = (uint32_t *)data;
 		// 0 - isn't me
-		*is_me = (client == iclient)?1:0;
+		data = data_add_u32(data, (client == iclient)?1:0);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
-		data += sizeof(uint32_t);
 
 		uint16_t len = sizeof(struct client_info);
 		if (data_left_len < len + 1) {
