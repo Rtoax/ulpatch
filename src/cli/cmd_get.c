@@ -46,6 +46,18 @@ static int cli_elf_shdr_handler_json(const GElf_Shdr *shdr, const char *secname)
 	return print_json_shdr(shdr, secname);
 }
 
+static int cli_elf_syms_handler(const GElf_Sym *sym, const char *symname,
+	const char *vername)
+{
+	return print_sym(sym, symname, vername);
+}
+
+static int cli_elf_syms_handler_json(const GElf_Sym *sym, const char *symname,
+	const char *vername)
+{
+	return print_json_sym(sym, symname, vername);
+}
+
 int cli_cmd_get(const struct cli_struct *cli, int argc, char *argv[])
 {
 	if (argc < 2) {
@@ -81,6 +93,15 @@ int cli_cmd_get(const struct cli_struct *cli, int argc, char *argv[])
 					} else {
 						return client_get_elf_shdr(cli->elf_client_fd,
 								cli_elf_shdr_handler);
+					}
+				// GET ELF SYMS
+				} else if (strcasecmp(argv[2], "syms") == 0) {
+					if (argc == 4 && strcasecmp(argv[3], "json") == 0) {
+						return client_get_elf_syms(cli->elf_client_fd,
+								cli_elf_syms_handler_json);
+					} else {
+						return client_get_elf_syms(cli->elf_client_fd,
+								cli_elf_syms_handler);
 					}
 				} else {
 					printf("unknown %s argument.\n", argv[2]);

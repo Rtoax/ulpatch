@@ -242,3 +242,64 @@ TEST(Elf_client,	get_shdr_non_exist,	-ENOENT)
 {
 	return client_get_elf_shdr(test_client_fd, get_shdr_handler);
 }
+
+static int get_shdr_handler_json(const GElf_Shdr *shdr, const char *secname) {
+	return print_json_shdr(shdr, secname);
+}
+#ifdef HAVE_JSON_C_LIBRARIES
+TEST(Elf_client,	get_shdr_json,	0)
+#else
+TEST(Elf_client,	get_shdr_json,	-EIO)
+#endif //HAVE_JSON_C_LIBRARIES
+{
+	int ret;
+
+	client_open_elf_file(test_client_fd, "/usr/bin/ls");
+	client_select_elf_file(test_client_fd, "/usr/bin/ls");
+	ret = client_get_elf_shdr(test_client_fd, get_shdr_handler_json);
+	client_delete_elf_file(test_client_fd, "/usr/bin/ls");
+
+	return ret;
+}
+
+static int get_sym_handler(const GElf_Sym *sym, const char *symname,
+	const char *vername) {
+	return print_sym(sym, symname, vername);
+}
+TEST(Elf_client,	get_sym,	0)
+{
+	int ret;
+
+	client_open_elf_file(test_client_fd, "/usr/bin/ls");
+	client_select_elf_file(test_client_fd, "/usr/bin/ls");
+	ret = client_get_elf_syms(test_client_fd, get_sym_handler);
+	client_delete_elf_file(test_client_fd, "/usr/bin/ls");
+
+	return ret;
+}
+
+TEST(Elf_client,	get_sym_non_exist,	-ENOENT)
+{
+	return client_get_elf_syms(test_client_fd, get_sym_handler);
+}
+
+static int get_sym_handler_json(const GElf_Sym *sym, const char *symname,
+	const char *vername) {
+	return print_json_sym(sym, symname, vername);
+}
+#ifdef HAVE_JSON_C_LIBRARIES
+TEST(Elf_client,	get_sym_json,	0)
+#else
+TEST(Elf_client,	get_sym_json,	-EIO)
+#endif //HAVE_JSON_C_LIBRARIES
+{
+	int ret;
+
+	client_open_elf_file(test_client_fd, "/usr/bin/ls");
+	client_select_elf_file(test_client_fd, "/usr/bin/ls");
+	ret = client_get_elf_syms(test_client_fd, get_sym_handler_json);
+	client_delete_elf_file(test_client_fd, "/usr/bin/ls");
+
+	return ret;
+}
+

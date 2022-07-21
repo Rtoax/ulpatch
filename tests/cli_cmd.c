@@ -280,6 +280,68 @@ TEST(Cli_cmd,	elf_get_shdr_json,	-EIO)
 	return ret;
 }
 
+TEST(Cli_cmd,	elf_get_syms,	0)
+{
+	int ret;
+#define TEST_FILE "/usr/bin/ls"
+
+	struct cli_struct cli = {
+		.elf_client_fd = test_client_fd
+	};
+	int argc = 3;
+	char *argv[] = {
+		"GET",
+		"ELF",
+		"SYMS",
+		NULL
+	};
+
+	client_open_elf_file(cli.elf_client_fd, TEST_FILE);
+	client_select_elf_file(cli.elf_client_fd, TEST_FILE);
+
+	ret = cli_cmd_get(&cli, argc, argv);
+
+	client_delete_elf_file(cli.elf_client_fd, TEST_FILE);
+
+#undef TEST_FILE
+
+	return ret;
+}
+
+
+#ifdef HAVE_JSON_C_LIBRARIES
+TEST(Cli_cmd,	elf_get_syms_json,	0)
+#else
+TEST(Cli_cmd,	elf_get_syms_json,	-EIO)
+#endif
+{
+	int ret;
+#define TEST_FILE "/usr/bin/ls"
+
+	struct cli_struct cli = {
+		.elf_client_fd = test_client_fd
+	};
+	int argc = 4;
+	char *argv[] = {
+		"GET",
+		"ELF",
+		"SYMS",
+		"json",
+		NULL
+	};
+
+	client_open_elf_file(cli.elf_client_fd, TEST_FILE);
+	client_select_elf_file(cli.elf_client_fd, TEST_FILE);
+
+	ret = cli_cmd_get(&cli, argc, argv);
+
+	client_delete_elf_file(cli.elf_client_fd, TEST_FILE);
+
+#undef TEST_FILE
+
+	return ret;
+}
+
 TEST(Cli_cmd,	test_server,	0)
 {
 	struct cli_struct cli = {

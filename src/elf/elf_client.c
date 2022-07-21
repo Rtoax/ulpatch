@@ -234,6 +234,44 @@ int client_get_elf_shdr(int connfd,
 	return client_recv_acks(connfd, ack_handler);
 }
 
+int client_get_elf_syms(int connfd,
+	int (*handler)(const GElf_Sym *sym, const char *symname,
+		const char *vername))
+{
+	assert(handler && "must have handler()");
+
+	struct cmd_elf cmd = {
+		.cmd = CMD_ELF_GET_SYMS,
+		.is_ack = 0,
+		.has_next = 0,
+		.data_len = sizeof(struct cmd_elf_empty),
+	};
+	write(connfd, &cmd, cmd_len(&cmd));
+
+	int ack_handler(struct cmd_elf *msg_ack) {
+		GElf_Sym *sym = NULL;
+		struct cmd_elf_ack *ack = cmd_data(msg_ack);
+
+		char *data = ack_data(ack);
+		uint32_t __unused nr_syms = data_get_u32((void **)&data);
+		if (nr_syms == 0) {
+			printf("No ELF Selected or ELF no Symbol at all.\n");
+			return ack->result;
+		}
+		uint32_t __unused idx_sym = data_get_u32((void **)&data);
+
+		sym = (GElf_Sym *)data;
+
+		data += sizeof(GElf_Sym) + 1;
+
+		char *symname = data;
+
+		return handler(sym, symname, data + strlen(symname)+1);
+	}
+
+	return client_recv_acks(connfd, ack_handler);
+}
+
 int register_client_handler(struct client *client, struct cmd_elf *cmd)
 {
 	struct client_info *info = cmd_data(cmd);

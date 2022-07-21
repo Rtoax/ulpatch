@@ -29,6 +29,7 @@ enum cmd_type {
 	CMD_ELF_GET_EHDR,	/* Get elf header */
 	CMD_ELF_GET_PHDR,	/* Get elf program header */
 	CMD_ELF_GET_SHDR,	/* Get elf section header */
+	CMD_ELF_GET_SYMS,	/* Get elf symbols */
 	CMD_REGISTER_CLIENT,/* Register client information */
 	CMD_LIST_CLIENT,	/* List clients information */
 	CMD_TEST_SERVER,	/* Test UNIX socket is OK? */
@@ -44,6 +45,7 @@ enum cmd_type {
  * CMD_ELF_GET_EHDR struct cmd_elf_empty      struct
  * CMD_ELF_GET_PHDR struct cmd_elf_empty      struct
  * CMD_ELF_GET_SHDR struct cmd_elf_empty      struct
+ * CMD_ELF_GET_SYMS struct cmd_elf_empty      struct
  * CMD_REGISTER_CLIENT  struct client_info    struct
  * CMD_LIST_CLIENT  struct cmd_elf_empty      struct
  * CMD_TEST_SERVER  struct cmd_elf_empty      struct
@@ -73,6 +75,7 @@ struct cmd_elf_empty {
 #define CMD_ELF_GET_EHDR CMD_ELF_GET_EHDR
 #define CMD_ELF_GET_PHDR CMD_ELF_GET_PHDR
 #define CMD_ELF_GET_SHDR CMD_ELF_GET_SHDR
+#define CMD_ELF_GET_SYMS CMD_ELF_GET_SYMS
 #define CMD_TEST_SERVER	CMD_TEST_SERVER
 #define CMD_LIST_CLIENT CMD_LIST_CLIENT
 };
@@ -106,6 +109,14 @@ struct cmd_elf_ack {
 	 *   +(GElf_Shdr shdr)
 	 *   +(1 byte)
 	 *   +shdrname\0
+	 *
+	 *  CMD_ELF_GET_SYMS
+	 *   +(uint32_t total_number)
+	 *   +(uint32_t index_number, start from 1)
+	 *   +(GElf_Sym sym)
+	 *   +(1 byte)
+	 *   +symname\0
+	 *   +vername\0
 	 *
 	 *  CMD_LIST_CLIENT:
 	 *   +(uint32_t total_number)
@@ -217,6 +228,9 @@ int client_get_elf_ehdr(int connfd, int (*handler)(const GElf_Ehdr *ehdr));
 int client_get_elf_phdr(int connfd, int (*handler)(const GElf_Phdr *phdr));
 int client_get_elf_shdr(int connfd,
 		int (*handler)(const GElf_Shdr *shdr, const char *secname));
+int client_get_elf_syms(int connfd,
+	int (*handler)(const GElf_Sym *sym, const char *symname,
+		const char *vername));
 int client_register(int connfd, enum client_type type, int (*handler)(void));
 int client_list_client(int connfd,
 		void (*handler)(struct nr_idx_bool *, struct client_info *info));
@@ -291,6 +305,17 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 	)
 
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn);
+
+// stderr@GLIBC_2.2.5
+// symname = stderr
+// vername = GLIBC_2.2.5
+int print_sym(const GElf_Sym *sym, const char *symname, const char *vername);
+#ifdef HAVE_JSON_C_LIBRARIES
+json_object *json_sym(const GElf_Sym *sym, const char *symname,
+	const char *vername);
+#endif
+int print_json_sym(const GElf_Sym *sym, const char *symname,
+	const char *vername);
 
 
 /* ELF Rela api */

@@ -58,13 +58,75 @@ const char *st_visibility_string(const GElf_Sym *sym)
 	return "UNKNOWN";
 }
 
-// TODO
-int print_sym(struct elf_file *elf, const GElf_Sym *sym)
+// stderr@GLIBC_2.2.5
+// symname = stderr
+// vername = GLIBC_2.2.5
+int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 {
-	GElf_Shdr *shdr = &elf->shdrs[elf->dynsym_shdr_idx];
+	printf(
+	"%s%s%s\n",
+	symname, vername?"@":"", vername?:""
+	);
 
-	printf("%s %s", sh_type_string(shdr),
-		elf_strptr(elf->elf, shdr->sh_link, sym->st_name));
+	return 0;
+}
+
+#ifdef HAVE_JSON_C_LIBRARIES
+json_object *json_sym(const GElf_Sym *sym, const char *symname,
+	const char *vername)
+{
+	char __unused buffer[256];
+
+	json_object *root = json_object_new_object();
+
+	json_object *head = json_object_new_object();
+	json_object *body = json_object_new_object();
+	json_object *foot = json_object_new_object();
+
+	json_object_object_add(root, "Head", head);
+	json_object_object_add(root, "Body", body);
+	json_object_object_add(root, "Foot", foot);
+
+	/* Head */
+	json_object_object_add(head,
+		"Type", json_object_new_string("ELF Symbol"));
+
+	/* Body */
+#if 0
+	json_object_object_add(body,
+		"Name", json_object_new_string(secname));
+
+	snprintf(buffer, sizeof(buffer), "%#016lx", shdr->sh_addr);
+	json_object_object_add(body,
+		"Address", json_object_new_string(buffer));
+
+	json_object_object_add(body,
+		"Link", json_object_new_int64(shdr->sh_link));
+#endif
+	return root;
+}
+#endif
+
+int print_json_sym(const GElf_Sym *sym, const char *symname,
+	const char *vername)
+{
+#ifdef HAVE_JSON_C_LIBRARIES
+	json_object *root = json_sym(sym, symname, vername);
+	if (!root) {
+		return -EINVAL;
+	}
+	/* Print */
+	printf("%s\r\n",
+		json_object_to_json_string_ext(root, JSON_C_TO_STRING_PRETTY));
+
+	/* Free */
+	json_object_put(root);
+
+#else // HAVE_JSON_C_LIBRARIES
+
+	lerror("Not support json-c.\n");
+	return -EIO;
+#endif
 
 	return 0;
 }
@@ -240,3 +302,4 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 	}
 	return 0;
 }
+

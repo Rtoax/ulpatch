@@ -104,6 +104,15 @@ struct command_help commands_help[] = {
 		.summary = "Get ELF Shdr",
 	},
 	{
+		.name = "GET ELF SYMS",
+#ifdef HAVE_JSON_C_LIBRARIES
+		.params = "[json]",
+#else
+		.params = "",
+#endif
+		.summary = "Get ELF Symbols",
+	},
+	{
 		.name = "SHELL",
 		.params = "<command> [arg1] ...",
 		.summary = "Execute command on client",
