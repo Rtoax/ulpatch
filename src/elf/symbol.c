@@ -64,7 +64,12 @@ const char *st_visibility_string(const GElf_Sym *sym)
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 {
 	printf(
-	"%s%s%s\n",
+	" %#016lx %-7ld %-8s %-8s %-8s %s%s%s\n",
+	sym->st_value,
+	sym->st_size,
+	st_type_string(sym),
+	st_bind_string(sym),
+	st_visibility_string(sym),
 	symname, vername?"@":"", vername?:""
 	);
 
@@ -92,17 +97,33 @@ json_object *json_sym(const GElf_Sym *sym, const char *symname,
 		"Type", json_object_new_string("ELF Symbol"));
 
 	/* Body */
-#if 0
+	snprintf(buffer, sizeof(buffer), "%#016lx", sym->st_value);
 	json_object_object_add(body,
-		"Name", json_object_new_string(secname));
+		"Value", json_object_new_string(buffer));
 
-	snprintf(buffer, sizeof(buffer), "%#016lx", shdr->sh_addr);
+	snprintf(buffer, sizeof(buffer), "%ld", sym->st_size);
 	json_object_object_add(body,
-		"Address", json_object_new_string(buffer));
+		"Size", json_object_new_string(buffer));
 
 	json_object_object_add(body,
-		"Link", json_object_new_int64(shdr->sh_link));
-#endif
+		"Type", json_object_new_string(st_type_string(sym)));
+
+	json_object_object_add(body,
+		"Bind", json_object_new_string(st_bind_string(sym)));
+
+	json_object_object_add(body,
+		"Visibility", json_object_new_string(st_visibility_string(sym)));
+
+	json_object_object_add(body,
+		"Name", json_object_new_string(symname));
+
+	json_object_object_add(body,
+		"Version", json_object_new_string(vername?:""));
+
+	/* Foot */
+	json_object_object_add(foot,
+		"Version", json_object_new_string(elftools_version()));
+
 	return root;
 }
 #endif

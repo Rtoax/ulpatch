@@ -194,7 +194,7 @@ static void handle_get_symtab(struct client *client, struct cmd_elf *msg_ack,
 
 		if (!sym) continue;
 
-		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
+		// ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
 
 		uint16_t add_len = 0;
 		// see struct cmd_elf_ack.data
