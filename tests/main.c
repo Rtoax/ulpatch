@@ -194,6 +194,12 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
+	test_log("=========================================\n");
+	test_log("===\n");
+	test_log("=== ELFTools Testing\n");
+	test_log("===\n");
+	test_log("===  version: %s\n", elftools_version());
+	test_log("=== ---------------------------\n");
 	if (just_list_tests) {
 		fprintf(stderr,
 			"\n"
@@ -257,6 +263,7 @@ print_stat:
 				show_test(test);
 			}
 		}
+		test_log("=========================================\n");
 	}
 
 	release_tests();
