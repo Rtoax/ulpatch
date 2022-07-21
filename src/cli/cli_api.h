@@ -17,6 +17,11 @@ struct cli_struct {
 extern struct cli_struct cli;
 
 void cli_main(int argc, char *argv[]);
+
+// Commands launch befor cli_main()'s loop in cli_main()
+int cli_register_pre_command_cb(int (*cb)(void *arg), void *cb_arg);
+void cli_destroy_pre_commands();
+
 int cli_send_command(int argc, char *argv[]);
 
 // Commands handlers

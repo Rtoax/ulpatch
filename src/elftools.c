@@ -19,6 +19,7 @@ struct str_node {
 
 // node: struct str_node.node
 static LIST_HEAD(pre_load_files);
+static char *selected_elf = NULL;
 
 struct config config = {
 	.log_level = LOG_DEBUG,
@@ -102,6 +103,7 @@ static void print_help(void)
 	"\n"
 	"Client specific:\n"
 	" -c, --client        run in client mode, connecting to <server>\n"
+	" -e, --select-elf    select one elf that pre load(-i, --input-files)\n"
 	"\n"
 	"Server or Client:\n"
 	"\n"
@@ -139,6 +141,7 @@ static int parse_config(int argc, char *argv[])
 		{"server",	no_argument,	0,	's'},
 		{"client",	no_argument,	0,	'c'},
 		{"daemon",	no_argument,	0,	'd'},
+		{"select-elf",	required_argument,	0,	'e'},
 		{"input-files",		required_argument,	0,	'i'},
 		{"log-level",		required_argument,	0,	'l'},
 		{"mode",		required_argument,	0,	'm'},
@@ -147,7 +150,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "vhl:m:scdi:", options, &option_index);
+		c = getopt_long(argc, argv, "vhl:m:sce:di:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -174,6 +177,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case 'i':
 			parse_pre_list((char *)optarg);
+			break;
+		case 'e':
+			selected_elf = (char *)optarg;
 			break;
 		default:
 			print_help();
@@ -230,7 +236,37 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
+	/* Select one elf check */
+	if (selected_elf) {
+		bool found = false;
+		struct str_node *file = NULL, *tmp;
+
+		list_for_each_entry_safe(file, tmp, &pre_load_files, node) {
+			if (!strcmp(selected_elf, file->str)) {
+				ldebug("Find %s in `-i`.\n");
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			fprintf(stderr, "%s not in `-i, --input-files' list.\n",
+				selected_elf);
+			exit(1);
+		}
+	}
+
 	return 0;
+}
+
+int cli_selected_elf_cb(void *arg)
+{
+	int ret = 0;
+
+	if (selected_elf) {
+		ret = client_select_elf_file(cli.elf_client_fd, selected_elf);
+	}
+
+	return ret;
 }
 
 int main(int argc, char *argv[])
@@ -252,11 +288,13 @@ int main(int argc, char *argv[])
 	}
 
 	load_pre_list_elf();
+	cli_register_pre_command_cb(cli_selected_elf_cb, NULL);
 
 	/* Run mode */
 	switch (config.mode) {
 	case MODE_CLI:
 		cli_main(argc, argv);
+		// if select one
 		break;
 	case MODE_GTK:
 		break;

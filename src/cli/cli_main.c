@@ -19,11 +19,24 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
+#include <utils/callback.h>
 
 struct cli_struct cli;
 
 static LIST_HEAD(help_entries_list);
 static int help_entries_len = 0;
+
+static INIT_CB_CHAIN(pre_commands);
+
+int cli_register_pre_command_cb(int (*cb)(void *arg), void *cb_arg)
+{
+	return insert_callback(&pre_commands, cb, cb_arg);
+}
+
+void cli_destroy_pre_commands()
+{
+	destroy_chain(&pre_commands);
+}
 
 static char **cli_split_args(const char *line, int *argc)
 {
@@ -273,6 +286,7 @@ void cli_main(int argc, char *argv[])
 		}
 	}
 
+	launch_chain(&pre_commands);
 	print_cli_logo();
 
 	/* Main loop of linenoise */
