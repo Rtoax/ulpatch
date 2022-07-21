@@ -187,6 +187,10 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 		lerror("unknown elf version %d\n", elf->ehdr->e_version);
 		goto free_elf;
 	}
+	if (elf->ehdr->e_ident[EI_CLASS] != ELFCLASS64) {
+		lerror("unsupport %d\n", ei_class_string(elf->ehdr));
+		goto free_elf;
+	}
 
 /* Program header */
 	elf_getphdrnum(__elf, &elf->phdrnum);
