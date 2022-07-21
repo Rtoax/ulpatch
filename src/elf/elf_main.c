@@ -177,7 +177,7 @@ void handle_client_msg(struct client *client)
 	struct cmd_elf *cmd_ack;
 	struct cmd_elf_ack *ack;
 	ssize_t __unused size;
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE] = {};
 	int ret = -1;
 
 	/* Recv request */
