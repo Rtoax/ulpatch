@@ -318,6 +318,9 @@ int print_json_sym(const GElf_Sym *sym, const char *symname,
 	const char *vername);
 
 
+/* ELF Note api */
+
+
 /* ELF Rela api */
 const char *rela_type_string(int r);
 void print_rela(GElf_Rela *rela);
