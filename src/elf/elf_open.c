@@ -69,6 +69,9 @@ static __unused int handle_sections(struct elf_file *elf)
 			elf->dynsym_data = elf_getdata(scn, NULL);
 			elf->dynsym_shdr_idx = i;
 			break;
+		case SHT_NOTE:
+			handle_notes(elf, shdr, scn);
+			break;
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
 		// readelf --section-groups

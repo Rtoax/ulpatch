@@ -319,6 +319,7 @@ int print_json_sym(const GElf_Sym *sym, const char *symname,
 
 
 /* ELF Note api */
+int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
 
 
 /* ELF Rela api */
