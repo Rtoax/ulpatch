@@ -243,7 +243,7 @@ static int parse_config(int argc, char *argv[])
 
 		list_for_each_entry_safe(file, tmp, &pre_load_files, node) {
 			if (!strcmp(selected_elf, file->str)) {
-				ldebug("Find %s in `-i`.\n");
+				ldebug("Find %s in `-i`.\n", selected_elf);
 				found = true;
 				break;
 			}
