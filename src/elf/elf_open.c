@@ -194,6 +194,10 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 		lerror("unsupport %d\n", ei_class_string(elf->ehdr));
 		goto free_elf;
 	}
+	if (elf->ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
+		lerror("unsupport %s\n", ei_data_string(elf->ehdr));
+		goto free_elf;
+	}
 
 /* Program header */
 	elf_getphdrnum(__elf, &elf->phdrnum);
