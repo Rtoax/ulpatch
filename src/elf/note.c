@@ -19,6 +19,21 @@
 #include <utils/util.h>
 #include <utils/log.h>
 
+#if defined(__aarch64__)
+/* AArch64 specific GNU properties.
+ * see elfutils/libelf/elf.h or linux/elf.h */
+# ifndef GNU_PROPERTY_AARCH64_FEATURE_1_AND
+#  define GNU_PROPERTY_AARCH64_FEATURE_1_AND  0xc0000000
+# endif
+
+# ifndef GNU_PROPERTY_AARCH64_FEATURE_1_BTI
+#  define GNU_PROPERTY_AARCH64_FEATURE_1_BTI  (1U << 0)
+# endif
+# ifndef GNU_PROPERTY_AARCH64_FEATURE_1_PAC
+#  define GNU_PROPERTY_AARCH64_FEATURE_1_PAC  (1U << 1)
+# endif
+#endif
+
 /* Packaging metadata as defined on
  * https://systemd.io/COREDUMP_PACKAGE_METADATA/ */
 #ifndef NT_FDO_PACKAGING_METADATA
