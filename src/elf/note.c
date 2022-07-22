@@ -8,12 +8,19 @@
 #include <elfutils/elf-knowledge.h>
 #else
 #define ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX "GA"
+#define NT_GNU_BUILD_ATTRIBUTE_OPEN 0x100
+#define NT_GNU_BUILD_ATTRIBUTE_FUNC 0x101
 #endif
 
 #include <elf/elf_api.h>
 #include <utils/util.h>
 #include <utils/log.h>
 
+/* Packaging metadata as defined on
+ * https://systemd.io/COREDUMP_PACKAGE_METADATA/ */
+#ifndef NT_FDO_PACKAGING_METADATA
+#define NT_FDO_PACKAGING_METADATA 0xcafe1a7e
+#endif
 
 const char *n_type_core_string(GElf_Nhdr *nhdr)
 {
@@ -71,7 +78,95 @@ const char *n_type_core_string(GElf_Nhdr *nhdr)
 
 		default:
 		res = "<unknown>";
-	  }
+		}
+	}
+
+	return res;
+}
+
+const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
+	uint32_t type, GElf_Word descsz, char *buf, size_t len)
+{
+	const char *res = NULL;
+
+	if (strcmp(name, "stapsdt") == 0) {
+		snprintf(buf, len, "Version: %" PRIu32, type);
+		return buf;
+	}
+
+#if defined(GO_NOTE_TYPE_H)
+	static const char *goknowntypes[] = {
+#define KNOWNSTYPE(name) [ELF_NOTE_GO##name] = #name
+	KNOWNSTYPE (PKGLIST),
+	KNOWNSTYPE (ABIHASH),
+	KNOWNSTYPE (DEPS),
+	KNOWNSTYPE (BUILDID),
+	NULL,
+#undef KNOWNSTYPE
+	};
+	if (strcmp(name, "Go") == 0) {
+		if (type < ARRAY_SIZE(goknowntypes)
+			&& goknowntypes[type] != NULL)
+			return goknowntypes[type];
+		else {
+			snprintf(buf, len, "%s: %" PRIu32 "<unknown>", type);
+			return buf;
+		}
+	}
+#endif
+
+	if (startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX)) {
+
+		/* GNU Build Attribute notes (ab)use the owner name to store
+		 * most of their data.  Don't decode everything here.  Just
+		 * the type.*/
+		char *t = buf;
+		const char *gba = "GNU Build Attribute";
+		int w = snprintf(t, len, "%s ", gba);
+		t += w;
+		len -= w;
+
+		if (type == NT_GNU_BUILD_ATTRIBUTE_OPEN)
+			snprintf(t, len, "OPEN");
+		else if (type == NT_GNU_BUILD_ATTRIBUTE_FUNC)
+			snprintf(t, len, "FUNC");
+		else
+			snprintf(t, len, "%x", type);
+
+		return buf;
+	}
+
+	if (strcmp(name, "FDO") == 0 && type == NT_FDO_PACKAGING_METADATA)
+		return "FDO_PACKAGING_METADATA";
+
+	if (strcmp(name, "GNU") != 0) {
+
+		/* NT_VERSION is special, all data is in the name.  */
+		if (descsz == 0 && type == NT_VERSION)
+			return "VERSION";
+
+		snprintf(buf, len, "%s: %" PRIu32, "<unknown>", type);
+		return buf;
+	}
+
+	/* And finally all the "GNU" note types.  */
+	static const char *knowntypes[] = {
+#define KNOWNSTYPE(name) [NT_##name] = #name
+		KNOWNSTYPE (GNU_ABI_TAG),
+		KNOWNSTYPE (GNU_HWCAP),
+		KNOWNSTYPE (GNU_BUILD_ID),
+		KNOWNSTYPE (GNU_GOLD_VERSION),
+		KNOWNSTYPE (GNU_PROPERTY_TYPE_0),
+#undef KNOWNSTYPE
+	};
+
+	/* Handle standard names.  */
+	if (type < ARRAY_SIZE(knowntypes) && knowntypes[type] != NULL)
+		res = knowntypes[type];
+
+	else {
+		snprintf(buf, len, "%s: %" PRIu32, "<unknown>", type);
+		res = buf;
 	}
 
 	return res;
@@ -83,8 +178,6 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 	if (!data)
 		goto bad_note;
-
-#if 0
 
 	size_t offset  = 0;
 	GElf_Nhdr nhdr;
@@ -100,7 +193,7 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 		/* GNU Build Attributes are weird, they store most of their data
 		 * into the owner name field.  Extract just the owner name
-		 * prefix here, then use the rest later as data.  */
+		 * prefix here, then use the rest later as data. */
 		bool is_gnu_build_attr =
 			startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX);
 
@@ -110,14 +203,17 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		size_t print_namesz = (is_gnu_build_attr
 			? strlen (print_name) : nhdr.n_namesz);
 
+		char buf[100];
 		printf ("  %-13.*s  %9" PRId32 "  %s\n",
 			(int) print_namesz, print_name, nhdr.n_descsz,
 			elf->ehdr->e_type == ET_CORE
 			? n_type_core_string(&nhdr)
-			: "TODO: object note type");
-	}
-	// TODO
+			: n_type_object_string(&nhdr, name,
+				nhdr.n_type, nhdr.n_descsz, buf, sizeof(buf)));
+#if 1
+	// TODO: more note type
 #endif
+	}
 
 	return 0;
 
