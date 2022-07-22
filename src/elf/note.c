@@ -3,6 +3,7 @@
 #include <libelf.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #if defined(HAVE_ELFUTILS_DEVEL)
 #include <elfutils/elf-knowledge.h>
