@@ -331,6 +331,9 @@ const char *rela_type_string(int r);
 void print_rela(GElf_Rela *rela);
 
 
+/* ELF Auxv api */
+int auxv_type_info(GElf_Xword a_type, const char **name, const char **format);
+
 #ifdef __cplusplus
 }
 #endif
