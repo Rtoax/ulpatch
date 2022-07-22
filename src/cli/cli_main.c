@@ -252,11 +252,13 @@ static void print_cli_logo(void)
 	"%s\n"
 	"\n"
 	"Welcome to ELFTools Command Line:\n"
+	" Machine: %s\n"
 	"\n"
 	" input 'help' command to show help info"
 	"\n"
 	"\n",
-	elftools_version()
+	elftools_version(),
+	elftools_arch()
 	);
 }
 

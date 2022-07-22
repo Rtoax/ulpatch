@@ -56,6 +56,8 @@ struct nr_idx_bool {
 extern struct config config;
 
 const char *elftools_version(void);
+const char *elftools_arch(void);
+
 void daemonize(void);
 
 int memshow(void *data, int data_len);
