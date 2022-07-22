@@ -6,6 +6,8 @@
 #include <inttypes.h>
 #include <byteswap.h>
 #include <endian.h>
+#include <malloc.h>
+#include <stdlib.h>
 
 #if defined(HAVE_ELFUTILS_DEVEL)
 #include <elfutils/elf-knowledge.h>
