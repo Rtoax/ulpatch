@@ -59,6 +59,8 @@ const char *elftools_version(void);
 void daemonize(void);
 
 int memshow(void *data, int data_len);
+/* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
+int startswith (const char *str, const char *prefix);
 
 #ifdef __cplusplus
 }

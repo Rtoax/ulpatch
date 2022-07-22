@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
+
 
 int memshow(void *data, int data_len)
 {
@@ -14,5 +16,11 @@ int memshow(void *data, int data_len)
 	} printf("\n");
 
 	return 0;
+}
+
+/* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
+int startswith (const char *str, const char *prefix)
+{
+	return strncmp(str, prefix, strlen (prefix)) == 0;
 }
 
