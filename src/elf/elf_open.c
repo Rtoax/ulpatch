@@ -226,14 +226,16 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	if (handle_sections(elf) != 0)
 		goto free_shdrs;
 
-	// Elf MUST has Build ID
-#if 1
+/* Do some necessary check */
+
+	/* Elf MUST has Build ID */
 	if (!elf->build_id) {
 		lerror("No Build ID found in %s,%s, check with 'readelf -n'\n",
 			elf->filepath, elf->build_id);
 		goto free_shdrs;
 	}
-#endif
+
+/* All successful */
 
 	/* Save it to ELF list */
 	list_add(&elf->node, &elf_file_list);
