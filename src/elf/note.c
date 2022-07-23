@@ -8,6 +8,7 @@
 #include <endian.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #if defined(HAVE_ELFUTILS_DEVEL)
 #include <elfutils/elf-knowledge.h>
@@ -748,10 +749,27 @@ unknown:
 		if (strcmp(name, "GNU") == 0 && descsz > 0) {
 			printf("    Build ID: ");
 			uint_fast32_t i;
+			char v[3] = {};
+			char *build_id = malloc(descsz * 2 + 1);
+			assert(build_id && "Malloc fatal.");
+
+			// save Build ID, see:
+			// $ readelf -n /bin/ls | grep "Build ID"
+			//  Build ID: 49c2fad65d0c2df70025644c9bc7485b28bab899
+
 			for (i = 0; i < descsz - 1; ++i) {
 				printf("%02" PRIx8, (uint8_t) desc[i]);
+				sprintf(v, "%02" PRIx8, (uint8_t) desc[i]);
+				build_id[i * 2] = v[0];
+				build_id[i * 2 + 1] = v[1];
 			}
 			printf("%02" PRIx8 "\n", (uint8_t) desc[i]);
+			sprintf(v, "%02" PRIx8, (uint8_t) desc[i]);
+			build_id[i * 2] = v[0];
+			build_id[i * 2 + 1] = v[1];
+			build_id[i * 2 + 2] = '\0';
+			ldebug("Build ID: %s\n", build_id);
+			elf->build_id = build_id;
 		}
 		break;
 

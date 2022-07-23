@@ -16,6 +16,7 @@ struct elf_file {
 	Elf *elf;
 	size_t size;
 	char filepath[MAX_PATH];
+	char *build_id;
 
 	/* ELF file header */
 	GElf_Ehdr *ehdr;

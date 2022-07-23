@@ -226,6 +226,15 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	if (handle_sections(elf) != 0)
 		goto free_shdrs;
 
+	// Elf MUST has Build ID
+#if 1
+	if (!elf->build_id) {
+		lerror("No Build ID found in %s,%s, check with 'readelf -n'\n",
+			elf->filepath, elf->build_id);
+		goto free_shdrs;
+	}
+#endif
+
 	/* Save it to ELF list */
 	list_add(&elf->node, &elf_file_list);
 	elf_files_number++;
@@ -235,6 +244,8 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 free_shdrs:
 	free(elf->shdrnames);
 	free(elf->shdrs);
+	if (elf->build_id)
+		free(elf->build_id);
 free_phdrs:
 	free(elf->phdrs);
 free_elf:
@@ -265,6 +276,8 @@ elf_file_delete(struct client *client, const char *filepath)
 	}
 	if (!elf) return -ENOENT;
 
+	if (elf->build_id)
+		free(elf->build_id);
 	free(elf->shdrnames);
 	free(elf->shdrs);
 	free(elf->phdrs);
