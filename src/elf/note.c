@@ -275,7 +275,7 @@ convert(Elf *core, Elf_Type type, uint_fast16_t count,
 		.d_buf = value,
 		.d_size = size ?: gelf_fsize (core, type, count, EV_CURRENT),
 		.d_version = EV_CURRENT,
-    };
+	};
 
 	Elf_Data indata = {
 		.d_type = type,
@@ -396,9 +396,62 @@ fail:
 	}
 }
 
+static void __unused
+handle_file_note (struct elf_file *elf, GElf_Word descsz, GElf_Off desc_pos)
+{
+	Elf *core = elf->elf;
+	Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
+	if (data == NULL) {
+		lerror("cannot convert core note data: %s", elf_errmsg (-1));
+	}
+
+	unsigned char const *ptr = data->d_buf;
+	unsigned char const *const end = data->d_buf + data->d_size;
+
+	uint64_t count, page_size;
+	if (! buf_read_ulong (core, &ptr, end, &count)
+		|| ! buf_read_ulong (core, &ptr, end, &page_size))
+	{
+fail:
+		printf("    Not enough data in NT_FILE note.\n");
+		return;
+	}
+
+	size_t addrsize = gelf_fsize (core, ELF_T_ADDR, 1, EV_CURRENT);
+	uint64_t maxcount = (size_t) (end - ptr) / (3 * addrsize);
+	if (count > maxcount)
+		goto fail;
+
+	/* Where file names are stored.  */
+	unsigned char const *const fstart = ptr + 3 * count * addrsize;
+	char const *fptr = (char *) fstart;
+
+	printf("    %" PRId64 " files:\n", count);
+	for (uint64_t i = 0; i < count; ++i) {
+		uint64_t mstart, mend, moffset;
+		if (! buf_read_ulong (core, &ptr, fstart, &mstart)
+		  || ! buf_read_ulong (core, &ptr, fstart, &mend)
+		  || ! buf_read_ulong (core, &ptr, fstart, &moffset))
+		{
+			goto fail;
+		}
+
+		const char *fnext = memchr (fptr, '\0', (char *) end - fptr);
+		if (fnext == NULL)
+			goto fail;
+
+		int ct = printf("      %08" PRIx64 "-%08" PRIx64
+	       " %08" PRIx64 " %" PRId64,
+	       mstart, mend, moffset * page_size, mend - mstart);
+		printf("%*s%s\n", ct > 50 ? 3 : 53 - ct, "", fptr);
+
+		fptr = fnext + 1;
+	}
+}
+
 /* Align offset to 4 bytes as needed for note name and descriptor data.
-   This is almost always used, except for GNU Property notes, which use
-   8 byte padding...  */
+ * This is almost always used, except for GNU Property notes, which use
+ * 8 byte padding...  */
 #define NOTE_ALIGN4(n)	(((n) + 3) & -4UL)
 
 /* Special note padding rule for GNU Property notes.  */
@@ -603,17 +656,17 @@ invalid_sdt:
 			size_t bytes = namesz - (value - name);
 			uint64_t val;
 # define read_2ubyte_unaligned(order, Addr) \
-  (unlikely(order)	\
-   ? bswap_16 (*((const uint16_t *) (Addr)))	\
-   : *((const uint16_t *) (Addr)))
+	(unlikely(order)	\
+	 ? bswap_16 (*((const uint16_t *) (Addr)))	\
+	 : *((const uint16_t *) (Addr)))
 # define read_4ubyte_unaligned(order, Addr) \
-  (unlikely(order)	\
-   ? bswap_32 (*((const uint32_t *) (Addr)))	\
-   : *((const uint32_t *) (Addr)))
+	(unlikely(order)	\
+	 ? bswap_32 (*((const uint32_t *) (Addr)))	\
+	 : *((const uint32_t *) (Addr)))
 # define read_8ubyte_unaligned(order, Addr) \
-  (unlikely(order)	\
-   ? bswap_64 (*((const uint64_t *) (Addr)))	\
-   : *((const uint64_t *) (Addr)))
+	(unlikely(order)	\
+	 ? bswap_64 (*((const uint64_t *) (Addr)))	\
+	 : *((const uint64_t *) (Addr)))
 
 			if (bytes == 1)
 				val = *(unsigned char *) value;
@@ -1063,12 +1116,12 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 						handle_siginfo_note(elf, nhdr.n_descsz,
 							shdr->sh_offset + desc_offset);
 						break;
-#if 0
 					case NT_FILE:
-						handle_file_note(ebl->elf, nhdr.n_descsz,
-							start + desc_offset);
+						handle_file_note(elf, nhdr.n_descsz,
+							shdr->sh_offset + desc_offset);
 						break;
 
+#if 0
 					default:
 						handle_core_note(ebl, &nhdr, name, desc);
 #endif
