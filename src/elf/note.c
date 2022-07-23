@@ -115,6 +115,7 @@ const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
 	}
 
 #if defined(GO_NOTE_TYPE_H)
+	// TODO: Go support?!
 	static const char *goknowntypes[] = {
 #define KNOWNSTYPE(name) [ELF_NOTE_GO##name] = #name
 	KNOWNSTYPE (PKGLIST),
@@ -135,6 +136,27 @@ const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
 	}
 #endif
 
+	// name has "GA" prefix, for example:
+	// $ strings /bin/ls | grep  GA
+	//  GA+GLIBCXX_ASSERTIONS
+	//  GA*cf_protection
+	//  GA+omit_frame_pointer
+	//  GA+stack_clash
+	//  GA*FORTIFY
+	//  GA*GOW
+	//  GA*FORTIFY
+	//  GA+GLIBCXX_ASSERTIONS
+	//  GA*GOW
+	//  GA*cf_protection
+	//  GA+omit_frame_pointer
+	//  GA+stack_clash
+	//  GA*FORTIFY
+	//  GA*GOW
+	//  GA!stack_realign
+	//  GA*FORTIFY
+	//  GA+GLIBCXX_ASSERTIONS
+	//  GA+GLIBCXX_ASSERTIONS
+	//  GA*FORTIFY
 	if (startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX)) {
 
 		/* GNU Build Attribute notes (ab)use the owner name to store
@@ -548,6 +570,7 @@ invalid_sdt:
 	} // stapsdt
 
 
+	// name has "GA" prefix
 	if (strncmp(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX,
 			strlen(ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX)) == 0
 		&& (type == NT_GNU_BUILD_ATTRIBUTE_OPEN
@@ -601,7 +624,9 @@ invalid_sdt:
 		 * https://fedoraproject.org/wiki/Toolchain/Watermark  */
 
 		/* We need at least 2 chars of data to describe the
-		 * attribute and value encodings.  */
+		 * attribute and value encodings.
+		 *
+		 * 'name' has "GA" prefix, skip "GA" */
 		const char *data = (name
 				+ strlen(ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX));
 		if (namesz < 2) {
@@ -1083,6 +1108,7 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		bool is_gnu_build_attr =
 			startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX);
 
+		// if name has "GA" prefix
 		const char *print_name = (is_gnu_build_attr
 			? ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX : name);
 
