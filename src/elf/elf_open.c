@@ -20,6 +20,7 @@ static LIST_HEAD(elf_file_list);
 static __unused int handle_sections(struct elf_file *elf)
 {
 	int i;
+	int ret = 0;
 
 	for (i = 0; i < elf->shdrnum; i++) {
 		GElf_Shdr *shdr = &elf->shdrs[i];
@@ -74,6 +75,9 @@ static __unused int handle_sections(struct elf_file *elf)
 			break;
 		case SHT_REL:
 		case SHT_RELA:
+			if ((ret = handle_relocs(elf, shdr, scn)) != 0) {
+				return ret;
+			}
 			break;
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
@@ -128,7 +132,7 @@ static __unused int handle_sections(struct elf_file *elf)
 	if (elf->dynsym_shdr_idx)
 		handle_symtab(elf, elf_getscn(elf->elf, elf->dynsym_shdr_idx));
 
-	return 0;
+	return ret;
 }
 
 static __unused struct elf_file *elf_file_load(const char *filepath)
@@ -221,8 +225,9 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	elf->shdrnames = malloc(sizeof(char*) * elf->shdrnum);
 	assert(elf->shdrnames && "Malloc failed.");
 
-	if (elf_getshdrstrndx(__elf, &elf->shdrstrndx) == -1) {
-		lerror("elf_getshdrstrnd failed %s\n", elf_errmsg(-1));
+	if (elf_getshdrstrndx(__elf, &elf->shdrstrndx) < 0) {
+		lerror("cannot get section header string table index %s\n",
+			elf_errmsg(-1));
 		goto free_phdrs;
 	}
 
