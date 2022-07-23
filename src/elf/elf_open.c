@@ -372,6 +372,16 @@ int elf_list_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		add_len += len + 1;
 		data_left_len -= len + 1;
 
+		// Build ID
+		len = data_add_string((void**)&data, elf->build_id);
+		if (data_left_len < len) {
+			lerror("no space left on buffer.\n");
+			break;
+		}
+
+		add_len += len + 1;
+		data_left_len -= len + 1;
+
 		if (data_left_len < 0) {
 			lerror("File name too long, %s\n", elf->filepath);
 			return -EINVAL; /* Invalid argument */

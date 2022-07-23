@@ -21,8 +21,13 @@
 
 static void cli_elf_list_handler(struct file_info *info)
 {
-	if (info->type == FILE_ELF)
-		printf(" %s ELF %s\n", info->client_select?"> ":"  ", info->name);
+	if (info->type != FILE_ELF)
+		return;
+	printf(" %s ELF %s %s\n",
+		info->client_select?"> ":"  ",
+		info->name,
+		info->elf_build_id
+	);
 }
 
 static void

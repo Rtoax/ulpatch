@@ -125,6 +125,7 @@ int client_list_elf(int connfd, void (*handler)(struct file_info *info))
 			.type = FILE_ELF,
 			.name = data,
 			.client_select = selected?true:false,
+			.elf_build_id = data + strlen(data) + 1,
 		};
 
 		handler(&info);

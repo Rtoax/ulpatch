@@ -94,6 +94,7 @@ struct cmd_elf_ack {
 	 *   +(uint32_t index_number, start from 1)
 	 *   +(uint32_t selected, boolean, 0-not selected)
 	 *   +filename\0
+	 *   +build_id\0
 	 *
 	 *  CMD_ELF_GET_EHDR:
 	 *   +(GElf_Ehdr ehdr)
@@ -137,6 +138,8 @@ struct file_info {
 	file_type type;
 	const char *name;
 	bool client_select;
+	// If ELF
+	const char *elf_build_id;
 };
 
 struct client;
