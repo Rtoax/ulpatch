@@ -268,7 +268,7 @@ TEST(Task,	fstat,	0)
 	return ret;
 }
 
-static int test_mmap_file(struct task *task)
+static int test_mmap_file(struct task *task, int prot)
 {
 	int ret = 0;
 	unsigned long map_v;
@@ -289,7 +289,7 @@ static int test_mmap_file(struct task *task)
 	}
 	map_v = task_mmap(task,
 				0UL, map_len,
-				PROT_READ | PROT_WRITE,
+				prot,
 				MAP_PRIVATE, map_fd, 0);
 	ldebug("New mmap. %lx\n", map_v);
 
@@ -306,7 +306,8 @@ close_ret:
 
 	return ret;
 }
-TEST(Task,	mmap_file,	0)
+
+static int task_mmap_file(int prot)
 {
 	int ret = -1;
 	int status = 0;
@@ -329,7 +330,7 @@ TEST(Task,	mmap_file,	0)
 		dump_task_vmas(task);
 
 		task_attach(pid);
-		ret = test_mmap_file(task);
+		ret = test_mmap_file(task, prot);
 
 		task_detach(pid);
 
@@ -343,6 +344,14 @@ TEST(Task,	mmap_file,	0)
 	}
 
 	return ret;
+}
+TEST(Task,	mmap_file_rw,	0)
+{
+	return task_mmap_file(PROT_READ | PROT_WRITE);
+}
+TEST(Task,	mmap_file_rwx,	0)
+{
+	return task_mmap_file(PROT_READ | PROT_WRITE | PROT_EXEC);
 }
 
 TEST(Task,	prctl_PR_SET_NAME,	0)
