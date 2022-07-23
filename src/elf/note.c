@@ -195,7 +195,6 @@ const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
 static void handle_auxv_note(struct elf_file *elf, GElf_Word descsz,
 	GElf_Off desc_pos)
 {
-#if 1
 	Elf_Data *data = elf_getdata_rawchunk(elf->elf,
 		desc_pos, descsz, ELF_T_AUXV);
 	if (data == NULL) {
@@ -265,7 +264,136 @@ elf_error:
 			}
 		}
 	}
-#endif
+}
+
+static const void *
+convert(Elf *core, Elf_Type type, uint_fast16_t count,
+	void *value, const void *data, size_t size)
+{
+	Elf_Data valuedata = {
+		.d_type = type,
+		.d_buf = value,
+		.d_size = size ?: gelf_fsize (core, type, count, EV_CURRENT),
+		.d_version = EV_CURRENT,
+    };
+
+	Elf_Data indata = {
+		.d_type = type,
+		.d_buf = (void *) data,
+		.d_size = valuedata.d_size,
+		.d_version = EV_CURRENT,
+	};
+
+	// not support 32bit yet
+	Elf_Data *d = (gelf_getclass(core) == ELFCLASS32
+		? elf32_xlatetom : elf64_xlatetom)
+			(&valuedata, &indata, elf_getident (core, NULL)[EI_DATA]);
+	if (d == NULL) {
+		lerror("cannot convert core note data: %s", elf_errmsg(-1));
+		return 0;
+	}
+
+	return data + indata.d_size;
+}
+
+typedef uint8_t GElf_Byte;
+
+static bool
+buf_has_data(unsigned char const *ptr, unsigned char const *end, size_t sz)
+{
+	return ptr < end && (size_t) (end - ptr) >= sz;
+}
+
+static bool
+buf_read_int(Elf *core, unsigned char const **ptrp, unsigned char const *end,
+	int *retp)
+{
+	if (! buf_has_data(*ptrp, end, 4))
+		return false;
+
+	*ptrp = convert (core, ELF_T_WORD, 1, retp, *ptrp, 4);
+	return true;
+}
+
+static bool
+buf_read_ulong(Elf *core, unsigned char const **ptrp, unsigned char const *end,
+	uint64_t *retp)
+{
+	size_t sz = gelf_fsize(core, ELF_T_ADDR, 1, EV_CURRENT);
+	if (! buf_has_data (*ptrp, end, sz))
+		return false;
+
+	union {
+		uint64_t u64;
+		uint32_t u32;
+	} u;
+
+	*ptrp = convert(core, ELF_T_ADDR, 1, &u, *ptrp, sz);
+
+	if (sz == 4)
+		*retp = u.u32;
+	else
+		*retp = u.u64;
+	return true;
+}
+
+static void __unused
+handle_siginfo_note(struct elf_file *elf, GElf_Word descsz, GElf_Off desc_pos)
+{
+	Elf *core = elf->elf;
+	Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
+	if (data == NULL) {
+		lerror("cannot convert core note data: %s", elf_errmsg (-1));
+		return;
+	}
+
+	unsigned char const *ptr = data->d_buf;
+	unsigned char const *const end = data->d_buf + data->d_size;
+
+	/* Siginfo head is three ints: signal number, error number, origin
+	 * code. */
+	int si_signo, si_errno, si_code;
+	if (! buf_read_int (core, &ptr, end, &si_signo)
+		|| ! buf_read_int (core, &ptr, end, &si_errno)
+		|| ! buf_read_int (core, &ptr, end, &si_code))
+	{
+fail:
+		printf("    Not enough data in NT_SIGINFO note.\n");
+		return;
+	}
+
+	/* Next is a pointer-aligned union of structures.  On 64-bit
+	 * machines, that implies a word of padding.  */
+	if (gelf_getclass(core) == ELFCLASS64)
+		ptr += 4;
+
+	printf("    si_signo: %d, si_errno: %d, si_code: %d\n",
+		si_signo, si_errno, si_code);
+
+	if (si_code > 0) {
+		switch (si_signo) {
+		case CORE_SIGILL:
+		case CORE_SIGFPE:
+		case CORE_SIGSEGV:
+		case CORE_SIGBUS:
+		{
+			uint64_t addr;
+			if (! buf_read_ulong (core, &ptr, end, &addr))
+				goto fail;
+			printf("    fault address: %#" PRIx64 "\n", addr);
+			break;
+		}
+		default:
+			;
+		}
+
+	} else if (si_code == CORE_SI_USER) {
+		int pid, uid;
+		if (! buf_read_int (core, &ptr, end, &pid)
+			|| ! buf_read_int (core, &ptr, end, &uid))
+			goto fail;
+		printf("    sender PID: %d, sender UID: %d\n", pid, uid);
+	}
 }
 
 /* Align offset to 4 bytes as needed for note name and descriptor data.
@@ -928,15 +1056,14 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 				{
 					handle_auxv_note(elf, nhdr.n_descsz,
 						shdr->sh_offset + desc_offset);
-#if 0
 				} else if (nhdr.n_namesz == 5 && strcmp (name, "CORE") == 0) {
 
 					switch (nhdr.n_type) {
 					case NT_SIGINFO:
-						handle_siginfo_note(ebl->elf, nhdr.n_descsz,
-							start + desc_offset);
+						handle_siginfo_note(elf, nhdr.n_descsz,
+							shdr->sh_offset + desc_offset);
 						break;
-
+#if 0
 					case NT_FILE:
 						handle_file_note(ebl->elf, nhdr.n_descsz,
 							start + desc_offset);
@@ -944,8 +1071,10 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 					default:
 						handle_core_note(ebl, &nhdr, name, desc);
+#endif
 					}
 				} else {
+#if 0
 					handle_core_note(ebl, &nhdr, name, desc);
 #endif
 				}
@@ -963,5 +1092,4 @@ bad_note:
 		data != NULL ? "garbage data" : elf_errmsg(-1));
 	return -ENODATA;
 }
-
 
