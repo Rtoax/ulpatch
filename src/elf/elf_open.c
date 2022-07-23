@@ -72,6 +72,9 @@ static __unused int handle_sections(struct elf_file *elf)
 		case SHT_NOTE:
 			handle_notes(elf, shdr, scn);
 			break;
+		case SHT_REL:
+		case SHT_RELA:
+			break;
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
 		// readelf --section-groups
