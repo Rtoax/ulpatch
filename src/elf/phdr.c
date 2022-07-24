@@ -153,3 +153,23 @@ int print_json_phdr(const GElf_Phdr *phdr)
 	return 0;
 }
 
+int handle_phdrs(struct elf_file *elf)
+{
+	int i;
+	for (i = 0; i < elf->phdrnum; i++) {
+		GElf_Phdr *phdr = &elf->phdrs[i];
+
+		switch (phdr->p_type) {
+		case PT_INTERP:
+			elf->elf_interpreter = elf->rawfile + phdr->p_offset;
+			ldebug("[Requesting program interpreter: %s]\n",
+				elf->elf_interpreter);
+			break;
+		default:
+			break;
+		}
+	}
+
+	return 0;
+}
+

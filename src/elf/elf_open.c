@@ -176,6 +176,7 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 
 	elf->fd = fd;
 	elf->elf = __elf;
+	elf->rawfile = elf_rawfile(__elf, &elf->rawsize);
 	elf->size = size;
 	strncpy(elf->filepath, filepath, sizeof(elf->filepath));
 
@@ -217,6 +218,9 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 			lerror("NULL phdr.\n");
 		}
 	}
+
+	if (handle_phdrs(elf) != 0)
+		goto free_phdrs;
 
 /* Section header */
 	elf_getshdrnum(__elf, &elf->shdrnum);

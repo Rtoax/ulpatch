@@ -14,6 +14,8 @@ extern "C" {
 struct elf_file {
 	int fd;
 	Elf *elf;
+	char *rawfile;
+	size_t rawsize;
 	size_t size;
 	char filepath[MAX_PATH];
 	char *build_id;
@@ -24,6 +26,7 @@ struct elf_file {
 	/* Program header */
 	size_t phdrnum;
 	GElf_Phdr *phdrs;
+	const char *elf_interpreter;
 
 	/* Section header */
 	size_t shdrnum;

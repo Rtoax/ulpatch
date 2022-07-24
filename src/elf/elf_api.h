@@ -279,6 +279,8 @@ json_object *json_phdr(const GElf_Phdr *phdr);
 int print_json_phdr(const GElf_Phdr *phdr);
 const char *p_type_string(const GElf_Phdr *phdr);
 
+int handle_phdrs(struct elf_file *elf);
+
 
 /* ELF Shdr api */
 int print_shdr(const GElf_Shdr *shdr, const char *secname);
