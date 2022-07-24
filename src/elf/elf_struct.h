@@ -52,6 +52,9 @@ struct elf_file {
 	GElf_Word verneed_stridx;
 	GElf_Word verdef_stridx;
 
+	// has fentry, mcount(), etc.
+	bool support_ftrace;
+
 	/* List all elf files */
 	struct list_head node;
 };

@@ -7,6 +7,7 @@
 #include <elf/elf_api.h>
 #include <utils/util.h>
 #include <utils/log.h>
+#include <patch/patch.h>
 
 
 const char *st_bind_string(const GElf_Sym *sym)
@@ -320,6 +321,17 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 
 		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
 		// TODO: May you want save 'sym'
+
+		switch (GELF_ST_TYPE(sym->st_info)) {
+		case STT_FUNC:
+			if (is_ftrace_entry(symname)) {
+				elf->support_ftrace = true;
+				lwarning("Found fentry %s\n", symname);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 	return 0;
 }

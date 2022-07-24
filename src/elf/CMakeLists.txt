@@ -8,7 +8,10 @@ if(JSON_C_LIBRARIES)
 find_library(JSON_C json-c /usr/lib64)
 endif()
 
-link_libraries(${ELF} ${PTHREAD} ${JSON_C} elftools_utils)
+link_libraries(${ELF} ${PTHREAD} ${JSON_C}
+	elftools_utils
+	elftools_patch
+)
 
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
