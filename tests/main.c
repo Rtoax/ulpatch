@@ -5,10 +5,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
+#include <utils/task.h>
 #include <elf/elf_api.h>
 
 #include "test_api.h"
@@ -53,8 +57,40 @@ static bool just_list_tests = false;
 // For -f, --filter-tests
 static char *filter_format = NULL;
 
+// For -I, --i-am-tested
+static enum who {
+	I_AM_NONE,
+	I_AM_TESTER, // testing all Tests
+	I_AM_SLEEPER, // be tested
+	I_AM_MAX,
+} whoami = I_AM_TESTER;
+
+static const char *whoami_string[I_AM_MAX] = {
+	[I_AM_NONE] = "none",
+	[I_AM_TESTER] = "tester",
+	[I_AM_SLEEPER] = "sleeper",
+};
+
+static int sleep_sec = 10;
+
+static char elftools_test_path_buf[MAX_PATH];
+const char *elftools_test_path = NULL;
+
 // For -V, --verbose
 static bool verbose = false;
+
+static enum who who_am_i(const char *s)
+{
+	int i;
+
+	for (i = I_AM_TESTER; i < ARRAY_SIZE(whoami_string); i++) {
+		if (!strcmp(s, whoami_string[i])) {
+			return i;
+		}
+	}
+
+	return 0;
+}
 
 static void print_help(void)
 {
@@ -62,17 +98,28 @@ static void print_help(void)
 	"\n"
 	"Usage: elftools_test [OPTION]... \n"
 	"\n"
+	"  Exe: %s\n"
+	"\n"
 	"Test elftools\n"
 	"\n"
 	"Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
 	" -l, --list-tests    list all tests\n"
 	" -f, --filter-tests  filter out some tests\n"
+	" -w, --whoami        who am i, what should i do\n"
+	"                     '%s' test all Tests, see with -l, default.\n"
+	"                     '%s' i will sleep %ds by default, set with -s.\n"
+	" -s, --sleep         only -w %s, this argument take effect\n"
 	" -V, --verbose       output all test logs\n"
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
 	"\n"
 	"elftools_test %s\n",
+	elftools_test_path,
+	whoami_string[I_AM_TESTER],
+	whoami_string[I_AM_SLEEPER],
+	sleep_sec,
+	whoami_string[I_AM_SLEEPER],
 	elftools_version()
 	);
 	exit(0);
@@ -83,6 +130,8 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{"list-tests",	no_argument,	0,	'l'},
 		{"filter-tests",	required_argument,	0,	'f'},
+		{"whoami",	required_argument,	0,	'w'},
+		{"sleep",	required_argument,	0,	's'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
@@ -92,7 +141,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:Vvh", options, &option_index);
+		c = getopt_long(argc, argv, "lf:w:s:Vvh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -102,6 +151,12 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case 'f':
 			filter_format = optarg;
+			break;
+		case 'w':
+			whoami = who_am_i(optarg);
+			break;
+		case 's':
+			sleep_sec = atoi(optarg);
 			break;
 		case 'V':
 			verbose = true;
@@ -115,6 +170,16 @@ static int parse_config(int argc, char *argv[])
 			print_help();
 			break;
 		}
+	}
+
+	if (whoami == I_AM_NONE) {
+		fprintf(stderr, "wrong -w, --whoami argument.\n");
+		exit(1);
+	}
+
+	if (sleep_sec <= 0 || sleep_sec > 999) {
+		fprintf(stderr, "wrong -s, --sleep argument, 0 < X < 999\n");
+		exit(1);
 	}
 
 	return 0;
@@ -168,7 +233,7 @@ static int operate_test(struct test *test)
 
 		list_add(&test->failed, &failed_list);
 	}
-	
+
 	test_log("%s%-8s%s\n",
 		failed?"\033[31m":"\033[32m",
 		failed?"Not OK":"OK",
@@ -184,15 +249,10 @@ static int operate_test(struct test *test)
 	return 0;
 }
 
-/**
- * __main__
- */
-int main(int argc, char *argv[])
+static void launch_tester(void)
 {
 	int i, fd;
 	struct test *test = NULL;
-
-	parse_config(argc, argv);
 
 	test_log("=========================================\n");
 	test_log("===\n");
@@ -266,7 +326,83 @@ print_stat:
 		test_log("=========================================\n");
 	}
 
+}
+
+static void launch_sleeper(void)
+{
+	int sec = sleep_sec;
+	while (sec--) sleep(1);
+}
+
+static void sig_handler(int signum)
+{
+	switch (signum) {
+	case SIGINT:
+		fprintf(stderr, "Catch Ctrl-C, bye\n");
+		release_tests();
+		// exit abnormal
+		exit(1);
+		break;
+	}
+}
+
+/**
+ * __main__
+ */
+int main(int argc, char *argv[])
+{
+	signal(SIGINT, sig_handler);
+
+	elftools_test_path =
+		get_proc_pid_exe(getpid(), elftools_test_path_buf, MAX_PATH);
+
+	parse_config(argc, argv);
+
+	switch (whoami) {
+	case I_AM_TESTER:
+		launch_tester();
+		break;
+	case I_AM_SLEEPER:
+		launch_sleeper();
+		break;
+	default:
+		print_help();
+		break;
+	}
+
 	release_tests();
 
 	return 0;
 }
+
+/* There are some selftests */
+
+TEST(elftools_test,	sleeper,	0)
+{
+	int ret = 0;
+	int status = 0;
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		char *argv[] = {
+			(char*)elftools_test_path,
+			"-w", "sleeper",
+			"-s", "1",
+			NULL
+		};
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	} else if (pid > 0) {
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	} else {
+		lerror("fork(2) error.\n");
+	}
+
+	return ret;
+}
+

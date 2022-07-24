@@ -12,6 +12,18 @@
 
 #include "test_api.h"
 
+
+TEST(Task_utils,	get_proc_pid_exe,	0)
+{
+	char buf[256] = {}, *exe;
+
+	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) != NULL) {
+		ldebug("exe: <%s>\n", exe);
+		return 0;
+	}
+	return -1;
+}
+
 TEST(Task,	open_free,	0)
 {
 	struct task *task = open_task(getpid());

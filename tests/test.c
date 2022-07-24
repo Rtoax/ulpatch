@@ -1,6 +1,10 @@
 #include <malloc.h>
 #include <string.h>
 
+#include <utils/log.h>
+#include <utils/list.h>
+#include <utils/task.h>
+
 #include "test_api.h"
 
 struct test*

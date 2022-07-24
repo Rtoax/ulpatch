@@ -279,6 +279,20 @@ static int free_task_vmas(struct task *task)
 	return 0;
 }
 
+char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
+{
+	ssize_t ret = 0;
+	char path[128];
+
+	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
+	ret = readlink(path, buf, bufsz);
+	if (ret < 0) {
+		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		return NULL;
+	}
+	return buf;
+}
+
 static int __get_comm(struct task *task)
 {
 	char path[128], realpath[128];
