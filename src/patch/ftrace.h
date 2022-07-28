@@ -8,3 +8,4 @@
 
 #define __ftrace_text __section(SECTION_FTRACE_TEXT)
 #define __ftrace_data __section(SECTION_FTRACE_DATA)
+
