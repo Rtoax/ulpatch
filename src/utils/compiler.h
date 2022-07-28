@@ -66,6 +66,8 @@ extern "C" {
 // value: 101 ~ 200, 101 first
 #define __ctor(value) __attribute__((constructor(value)))
 
+#define __section(sec) __attribute__((section(sec)))
+
 #ifndef FALLTHROUGH
 # ifdef HAVE_FALLTHROUGH
 #  define FALLTHROUGH __attribute__ ((fallthrough))
