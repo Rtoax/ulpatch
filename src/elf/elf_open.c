@@ -242,9 +242,13 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 
 	/* Elf MUST has Build ID */
 	if (!elf->build_id) {
-		lerror("No Build ID found in %s,%s, check with 'readelf -n'\n",
-			elf->filepath, elf->build_id);
-		goto free_shdrs;
+		if (elf->ehdr->e_type == ET_REL) {
+			elf->build_id = "REL no Build ID";
+		} else {
+			lerror("No Build ID found in %s,%s, check with 'readelf -n'\n",
+				elf->filepath, e_type_string(elf->ehdr));
+			goto free_shdrs;
+		}
 	}
 
 /* All successful */
