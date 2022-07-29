@@ -337,7 +337,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 						}
 					}
 				}
-	      
+
 				if (is_statically_linked > 0 && shdr->sh_link == 0) {
 					ldebug("  %#0*" PRIx64 "  %-15s %*s  %#6" PRIx64 " %s\n",
 						class == ELFCLASS32 ? 10 : 18,
