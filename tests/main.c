@@ -63,6 +63,7 @@ static enum who {
 	ROLE_TESTER, // testing all Tests
 	ROLE_SLEEPER, // be tested
 	ROLE_WAITING, // wait for a while
+	ROLE_TRIGGER, // trigger
 	ROLE_MAX,
 } role = ROLE_TESTER;
 
@@ -71,10 +72,11 @@ static const char *role_string[ROLE_MAX] = {
 	[ROLE_TESTER] = "tester",
 	[ROLE_SLEEPER] = "sleeper",
 	[ROLE_WAITING] = "wait",
+	[ROLE_TRIGGER] = "trigger",
 };
 
 static int sleep_usec = 100;
-static char *wait_msg_file = NULL;
+static char *msgq_file = NULL;
 
 static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
@@ -107,17 +109,27 @@ static void print_help(int ex)
 	"\n"
 	"Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
+	"Tests:\n"
+	"\n"
 	" -l, --list-tests    list all tests\n"
 	" -f, --filter-tests  filter out some tests\n"
+	"\n"
+	"Role:\n"
+	"\n"
 	" -r, --role          who am i, what should i do\n"
 	"                     '%s' test all Tests, see with -l, default.\n"
 	"                     '%s' i will sleep %ds by default, set with -s.\n"
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
+	"                     '%s' i will msgsnd(2) a msg, specify by -m.\n"
 	"\n"
 	" -s, --usecond       usecond of time, sleep, etc.\n"
 	"                     -r %s, the main thread will sleep -s useconds.\n"
-	" -m, --msgq          wait one msgrcv(2)'s file, this arg wait a msg.\n"
+	"\n"
+	" -m, --msgq          key to ftok(3).\n"
 	"                     -r %s, the main thread will wait on msgrcv(2).\n"
+	"                     -r %s, the main thread will msgsnd(2) to msgq.\n"
+	"\n"
+	"Others:\n"
 	"\n"
 	" -V, --verbose       output all test logs\n"
 	" -h, --help          display this help and exit\n"
@@ -129,8 +141,10 @@ static void print_help(int ex)
 	role_string[ROLE_SLEEPER],
 	sleep_usec,
 	role_string[ROLE_WAITING],
+	role_string[ROLE_TRIGGER],
 	role_string[ROLE_SLEEPER],
 	role_string[ROLE_WAITING],
+	role_string[ROLE_TRIGGER],
 	elftools_version()
 	);
 	exit(ex);
@@ -171,7 +185,7 @@ static int parse_config(int argc, char *argv[])
 			sleep_usec = atoi(optarg);
 			break;
 		case 'm':
-			wait_msg_file = (char*)optarg;
+			msgq_file = (char*)optarg;
 			break;
 		case 'V':
 			verbose = true;
@@ -353,14 +367,30 @@ static void launch_waiting(void)
 {
 	struct task_wait wait_here;
 
-	if (!wait_msg_file) {
-		fprintf(stderr, "Need a ftok(2) file input with -m.\n");
+	if (!msgq_file) {
+		fprintf(stderr, "Need a ftok(3) file input with -m.\n");
 		exit(1);
 	}
 
-	task_wait_init(&wait_here, wait_msg_file);
+	task_wait_init(&wait_here, msgq_file);
 	ldebug("CHILD: wait msg.\n");
 	task_wait_wait(&wait_here);
+	ldebug("CHILD: return.\n");
+	// task_wait_destroy(&wait_here);
+}
+
+static void launch_trigger(void)
+{
+	struct task_wait wait_here;
+
+	if (!msgq_file) {
+		fprintf(stderr, "Need a ftok(3) file input with -m.\n");
+		exit(1);
+	}
+
+	task_wait_init(&wait_here, msgq_file);
+	ldebug("CHILD: send msg.\n");
+	task_wait_trigger(&wait_here, 0);
 	ldebug("CHILD: return.\n");
 	// task_wait_destroy(&wait_here);
 }
@@ -398,6 +428,9 @@ int main(int argc, char *argv[])
 		break;
 	case ROLE_WAITING:
 		launch_waiting();
+		break;
+	case ROLE_TRIGGER:
+		launch_trigger();
 		break;
 	default:
 		print_help(1);
@@ -472,6 +505,49 @@ TEST(elftools_test,	wait,	0)
 		ldebug("PARENT: do 2s thing.\n");
 		task_wait_trigger(&waitqueue, 10000);
 		ldebug("PARENT: kick child.\n");
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
+}
+
+TEST(elftools_test,	trigger,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "trigger",
+			"--msgq", waitqueue.tmpfile,
+			NULL,
+		};
+		ldebug("PARENT: fork one.\n");
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		// do something
+		ldebug("PARENT: waiting.\n");
+		task_wait_wait(&waitqueue);
+		ldebug("PARENT: get msg.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
