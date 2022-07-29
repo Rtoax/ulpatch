@@ -65,7 +65,7 @@ struct elf_iter {
 
 	union {
 		GElf_Phdr *phdr; // point to elf_file.phdrs[]
-		GElf_Shdr shdr;
+		GElf_Shdr *shdr; // point to elf_file.shdrs[]
 		GElf_Nhdr nhdr;
 		GElf_Sym sym;
 		GElf_Dyn dyn;

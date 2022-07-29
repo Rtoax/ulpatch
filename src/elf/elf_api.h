@@ -288,6 +288,14 @@ int handle_phdrs(struct elf_file *elf);
 
 
 /* ELF Shdr api */
+#define elf_for_each_shdr(elf, iter)                                        \
+	for ((iter)->i = 0, (iter)->nr = elf->shdrnum,                          \
+		 (iter)->str_idx = elf->shdrstrndx;                                 \
+		((iter)->scn = elf_getscn(elf->elf, (iter)->i)) &&                  \
+		 ((iter)->shdr = &elf->shdrs[(iter)->i]) &&                         \
+		 (iter)->i < elf->shdrnum;                                          \
+		(iter)->i++)
+
 int print_shdr(const GElf_Shdr *shdr, const char *secname);
 const char *sh_name_string(const GElf_Shdr *shdr);
 const char *sh_type_string(const GElf_Shdr *shdr);

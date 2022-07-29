@@ -19,56 +19,35 @@ static LIST_HEAD(elf_file_list);
 
 static __unused int handle_sections(struct elf_file *elf)
 {
-	int i;
 	int ret = 0;
 
-	for (i = 0; i < elf->shdrnum; i++) {
-		GElf_Shdr *shdr = &elf->shdrs[i];
-		Elf_Scn *scn = elf_getscn(elf->elf, i);
+	struct elf_iter iter;
 
-		if (gelf_getshdr(scn, shdr) == NULL) {
-			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
-			return -ENOENT;
-		}
+	elf_for_each_shdr(elf, &iter) {
 
-		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
+		GElf_Shdr *shdr = iter.shdr;
+		Elf_Scn *scn = iter.scn;
 
-			if (elf_compress (scn, 0, 0) < 0)
-				lwarning("WARNING: %s [%zd]\n",
-					"Couldn't uncompress section",
-					elf_ndxscn(scn));
-
-			GElf_Shdr shdr_mem;
-			shdr = gelf_getshdr(scn, &shdr_mem);
-
-			if (unlikely (shdr == NULL)) {
-				lerror("cannot get section [%zd] header: %s",
-					elf_ndxscn(scn), elf_errmsg (-1));
-
-				continue;
-			}
-		}
-
-		elf->shdrnames[i] =
+		elf->shdrnames[iter.i] =
 			elf_strptr(elf->elf, elf->shdrstrndx, shdr->sh_name);
 
-		if (elf->shdrnames[i] == NULL) {
+		if (elf->shdrnames[iter.i] == NULL) {
 			lerror("couldn't get section name: %s\n", elf_errmsg(-1));
 			return -ENOENT;
 		}
 
 		ldebug("section name: %s, %lx\n",
-			elf->shdrnames[i], shdr->sh_type, sh_type_string(shdr));
+			elf->shdrnames[iter.i], shdr->sh_type, sh_type_string(shdr));
 
 		// Handle section header by type
 		switch (shdr->sh_type) {
 		case SHT_SYMTAB:
 			elf->symtab_data = elf_getdata(scn, NULL);
-			elf->symtab_shdr_idx = i;
+			elf->symtab_shdr_idx = iter.i;
 			break;
 		case SHT_DYNSYM:
 			elf->dynsym_data = elf_getdata(scn, NULL);
-			elf->dynsym_shdr_idx = i;
+			elf->dynsym_shdr_idx = iter.i;
 			break;
 		case SHT_NOTE:
 			handle_notes(elf, shdr, scn);
@@ -233,7 +212,36 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	if (elf_getshdrstrndx(__elf, &elf->shdrstrndx) < 0) {
 		lerror("cannot get section header string table index %s\n",
 			elf_errmsg(-1));
-		goto free_phdrs;
+		goto free_shdrs;
+	}
+
+	elf_for_each_shdr(elf, &iter) {
+
+		GElf_Shdr *shdr = iter.shdr;
+		Elf_Scn *scn = iter.scn;
+
+		if (gelf_getshdr(scn, shdr) == NULL) {
+			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
+			goto free_shdrs;
+		}
+
+		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
+
+			if (elf_compress (scn, 0, 0) < 0)
+				lwarning("WARNING: %s [%zd]\n",
+					"Couldn't uncompress section",
+					elf_ndxscn(scn));
+
+			GElf_Shdr shdr_mem;
+			shdr = gelf_getshdr(scn, &shdr_mem);
+
+			if (unlikely (shdr == NULL)) {
+				lerror("cannot get section [%zd] header: %s",
+					elf_ndxscn(scn), elf_errmsg (-1));
+
+				continue;
+			}
+		}
 	}
 
 	if (handle_sections(elf) != 0)

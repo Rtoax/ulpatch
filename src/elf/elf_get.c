@@ -119,10 +119,11 @@ int elf_get_shdr_handler(struct client *client, struct cmd_elf *msg_ack)
 
 int elf_get_shdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 {
-	int i;
 	struct elf_file *elf = client->selected_elf;
 	uint32_t init_len = msg_ack->data_len;
 	struct cmd_elf_ack *ack = cmd_data(msg_ack);
+
+	struct elf_iter iter;
 
 	if (!elf) {
 		lerror("no selected elf.\n");
@@ -137,7 +138,8 @@ int elf_get_shdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		return 0;
 	}
 
-	for (i = 0; i < elf->shdrnum; i++) {
+	elf_for_each_shdr(elf, &iter) {
+
 		uint16_t add_len = 0;
 		// see struct cmd_elf_ack.data
 		char *data = ack_data(ack);
@@ -145,31 +147,31 @@ int elf_get_shdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of ELF section header */
-		data = data_add_u32(data, elf->shdrnum);
+		data = data_add_u32(data, iter.nr);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
 
 		/* Index of this ELF section header */
-		data = data_add_u32(data, i + 1);
+		data = data_add_u32(data, iter.i + 1);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
 
 		/* Copy one section header */
-		memcpy(data, &elf->shdrs[i], sizeof(GElf_Shdr));
+		memcpy(data, iter.shdr, sizeof(GElf_Shdr));
 		data[sizeof(GElf_Shdr)] = '\0';
 		add_len += sizeof(GElf_Shdr) + 1;
 		data_left_len -= sizeof(GElf_Shdr) + 1;
 		data += sizeof(GElf_Shdr) + 1;
 
 		/* Copy one section header name */
-		uint32_t __l = data_add_string((void**)&data, elf->shdrnames[i]);
+		uint32_t __l = data_add_string((void**)&data, elf->shdrnames[iter.i]);
 		add_len += __l;
 		data_left_len -= __l;
 
 		msg_ack->cmd = CMD_ELF_GET_SHDR;
 		msg_ack->data_len = init_len + add_len;
 		msg_ack->is_ack = 1;
-		msg_ack->has_next = (i == (elf->shdrnum - 1))?0:1;
+		msg_ack->has_next = (iter.i == (iter.nr - 1))?0:1;
 
 		/* Talk to client */
 		send_one_ack(client, msg_ack);
