@@ -11,6 +11,7 @@
 #include <sys/user.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
+#include <sys/msg.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <elf.h>
@@ -818,5 +819,98 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 		return 0;
 	}
 	return result;
+}
+
+
+/* task_wait inner message?
+ *
+ */
+struct msg_form {
+	int mtype;
+	char mtext[32];
+};
+
+#define PROG_ID	123
+
+/* key: ftok(2) open/create a tmp file
+ */
+int task_wait_init(struct task_wait *task_wait, char *tmpfile)
+{
+	int fd;
+
+	sprintf(task_wait->tmpfile, tmpfile?:"/tmp/key-XXXXXXX");
+
+	if (tmpfile)
+		return 0;
+
+	fd = mkstemp(task_wait->tmpfile);
+	if (fd <= 0) {
+		fprintf(stderr, "mkstemp: %s\n", strerror(errno));
+		return -errno;
+	}
+	close(fd);
+
+	return 0;
+}
+
+int task_wait_destroy(struct task_wait *task_wait)
+{
+	unlink(task_wait->tmpfile);
+	return 0;
+}
+
+int task_wait_wait(struct task_wait *task_wait)
+{
+	int msqid;
+	key_t key;
+
+	struct msg_form msg;
+
+	if ((key = ftok(task_wait->tmpfile, PROG_ID)) < 0) {
+		perror("ftok error");
+		exit(1);
+	}
+
+	if ((msqid = msgget(key, IPC_CREAT | 0777)) == -1) {
+		perror("msgget error");
+		exit(1);
+	}
+
+	msgrcv(msqid, &msg, sizeof(msg), msg.mtype, 0);
+
+	msgctl(msqid, IPC_RMID, NULL);
+
+	return 0;
+}
+
+int task_wait_trigger(struct task_wait *task_wait, useconds_t usec)
+{
+	int msqid;
+	key_t key;
+	struct msg_form msg = {
+		.mtype = 0,
+		.mtext = {0},
+	};
+
+	if ((key = ftok(task_wait->tmpfile, PROG_ID)) < 0) {
+		perror("ftok error");
+		exit(1);
+	}
+
+	if ((msqid = msgget(key, IPC_CREAT | 0777)) == -1) {
+		perror("msgget error");
+		exit(1);
+	}
+
+	// Do you need sleep for a while
+	if (usec)
+		usleep(usec);
+
+	msg.mtext[0] = 'q';
+	msgsnd(msqid, &msg, sizeof(msg), 0);
+
+	msgctl(msqid, IPC_RMID, NULL);
+
+	return 0;
 }
 

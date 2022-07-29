@@ -62,6 +62,7 @@ static enum who {
 	I_AM_NONE,
 	I_AM_TESTER, // testing all Tests
 	I_AM_SLEEPER, // be tested
+	I_AM_WAITING, // wait for a while
 	I_AM_MAX,
 } whoami = I_AM_TESTER;
 
@@ -69,9 +70,11 @@ static const char *whoami_string[I_AM_MAX] = {
 	[I_AM_NONE] = "none",
 	[I_AM_TESTER] = "tester",
 	[I_AM_SLEEPER] = "sleeper",
+	[I_AM_WAITING] = "wait",
 };
 
-static int sleep_sec = 10;
+static int sleep_usec = 100;
+static char *wait_msg_file = NULL;
 
 static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
@@ -109,9 +112,12 @@ static void print_help(void)
 	" -w, --whoami        who am i, what should i do\n"
 	"                     '%s' test all Tests, see with -l, default.\n"
 	"                     '%s' i will sleep %ds by default, set with -s.\n"
+	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"\n"
-	" -s, --second        second of time, sleep, etc.\n"
-	"                     -w %s, the main thread will sleep -s seconds.\n"
+	" -s, --usecond       usecond of time, sleep, etc.\n"
+	"                     -w %s, the main thread will sleep -s useconds.\n"
+	" -m, --msgq          wait one msgrcv(2)'s file, this arg wait a msg.\n"
+	"                     -w %s, the main thread will wait on msgrcv(2).\n"
 	"\n"
 	" -V, --verbose       output all test logs\n"
 	" -h, --help          display this help and exit\n"
@@ -121,8 +127,10 @@ static void print_help(void)
 	elftools_test_path,
 	whoami_string[I_AM_TESTER],
 	whoami_string[I_AM_SLEEPER],
-	sleep_sec,
+	sleep_usec,
+	whoami_string[I_AM_WAITING],
 	whoami_string[I_AM_SLEEPER],
+	whoami_string[I_AM_WAITING],
 	elftools_version()
 	);
 	exit(0);
@@ -134,7 +142,8 @@ static int parse_config(int argc, char *argv[])
 		{"list-tests",	no_argument,	0,	'l'},
 		{"filter-tests",	required_argument,	0,	'f'},
 		{"whoami",	required_argument,	0,	'w'},
-		{"sleep",	required_argument,	0,	's'},
+		{"usecond",	required_argument,	0,	's'},
+		{"msg",	required_argument,	0,	'm'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
@@ -144,7 +153,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:w:s:Vvh", options, &option_index);
+		c = getopt_long(argc, argv, "lf:w:s:m:Vvh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -159,7 +168,10 @@ static int parse_config(int argc, char *argv[])
 			whoami = who_am_i(optarg);
 			break;
 		case 's':
-			sleep_sec = atoi(optarg);
+			sleep_usec = atoi(optarg);
+			break;
+		case 'm':
+			wait_msg_file = (char*)optarg;
 			break;
 		case 'V':
 			verbose = true;
@@ -180,8 +192,8 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (sleep_sec <= 0 || sleep_sec > 999) {
-		fprintf(stderr, "wrong -s, --sleep argument, 0 < X < 999\n");
+	if (sleep_usec <= 0 || sleep_usec > 999000000) {
+		fprintf(stderr, "wrong -s, --second argument, 0 < X < 999\n");
 		exit(1);
 	}
 
@@ -333,8 +345,23 @@ print_stat:
 
 static void launch_sleeper(void)
 {
-	int sec = sleep_sec;
-	while (sec--) sleep(1);
+	usleep(sleep_usec);
+}
+
+static void launch_waiting(void)
+{
+	struct task_wait wait_here;
+
+	if (!wait_msg_file) {
+		fprintf(stderr, "Need a ftok(2) file input with -m.\n");
+		exit(1);
+	}
+
+	task_wait_init(&wait_here, wait_msg_file);
+	ldebug("CHILD: wait msg.\n");
+	task_wait_wait(&wait_here);
+	ldebug("CHILD: return.\n");
+	// task_wait_destroy(&wait_here);
 }
 
 static void sig_handler(int signum)
@@ -368,6 +395,9 @@ int main(int argc, char *argv[])
 	case I_AM_SLEEPER:
 		launch_sleeper();
 		break;
+	case I_AM_WAITING:
+		launch_waiting();
+		break;
 	default:
 		print_help();
 		break;
@@ -390,7 +420,7 @@ TEST(elftools_test,	sleeper,	0)
 		char *argv[] = {
 			(char*)elftools_test_path,
 			"-w", "sleeper",
-			"-s", "1",
+			"-s", "100",
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -407,5 +437,43 @@ TEST(elftools_test,	sleeper,	0)
 	}
 
 	return ret;
+}
+
+TEST(elftools_test,	wait,	0)
+{
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"-w", "wait",
+			"-m", waitqueue.tmpfile,
+			NULL,
+		};
+		ldebug("PARENT: fork one.\n");
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		// do something
+		ldebug("PARENT: do 2s thing.\n");
+		task_wait_trigger(&waitqueue, 10000);
+		ldebug("PARENT: kick child.\n");
+		waitpid(pid, NULL, 0);
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return 0;
 }
 
