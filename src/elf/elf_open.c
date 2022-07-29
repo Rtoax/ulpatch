@@ -137,9 +137,10 @@ static __unused int handle_sections(struct elf_file *elf)
 
 static __unused struct elf_file *elf_file_load(const char *filepath)
 {
-	int fd, i;
+	int fd;
 	size_t size;
 	struct elf_file *elf = NULL;
+	struct elf_iter iter;
 
 	/* Already open */
 	list_for_each_entry(elf, &elf_file_list, node) {
@@ -212,8 +213,8 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	elf->phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);
 	assert(elf->phdrs && "Malloc failed.");
 
-	for (i = 0; i < elf->phdrnum; i++) {
-		GElf_Phdr *phdr = gelf_getphdr(__elf, i, &elf->phdrs[i]);
+	elf_for_each_phdr(elf, &iter) {
+		GElf_Phdr *phdr = gelf_getphdr(__elf, iter.i, iter.phdr);
 		if (unlikely(phdr == NULL)) {
 			lerror("NULL phdr.\n");
 		}

@@ -60,6 +60,7 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 	struct elf_file *elf = client->selected_elf;
 	uint32_t init_len = msg_ack->data_len;
 	struct cmd_elf_ack *ack = cmd_data(msg_ack);
+	struct elf_iter iter;
 
 	if (!elf) {
 		lerror("no selected elf.\n");
@@ -74,8 +75,6 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		return 0;
 	}
 
-	struct elf_iter iter;
-
 	elf_for_each_phdr(elf, &iter) {
 
 		uint16_t add_len = 0;
@@ -85,7 +84,7 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
 
 		/* Number of ELF program header */
-		data = data_add_u32(data, elf->phdrnum);
+		data = data_add_u32(data, iter.nr);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
 
@@ -104,7 +103,7 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		msg_ack->cmd = CMD_ELF_GET_PHDR;
 		msg_ack->data_len = init_len + add_len;
 		msg_ack->is_ack = 1;
-		msg_ack->has_next = (iter.i == (elf->phdrnum - 1))?0:1;
+		msg_ack->has_next = (iter.i == (iter.nr - 1))?0:1;
 
 		/* Talk to client */
 		send_one_ack(client, msg_ack);

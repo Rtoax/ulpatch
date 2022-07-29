@@ -247,6 +247,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 	int class = gelf_getclass(elf->elf);
 	size_t sh_entsize = gelf_fsize (elf->elf, ELF_T_RELA, 1, EV_CURRENT);
 	int nentries = shdr->sh_size / sh_entsize;
+	struct elf_iter iter;
 
 	/* Get the data of the section.  */
 	Elf_Data *data = elf_getdata(scn, NULL);
@@ -326,10 +327,8 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 					if (elf->ehdr->e_type == ET_EXEC) {
 						is_statically_linked = 1;
 
-						for (size_t inner = 0; inner < elf->phdrnum; ++inner) {
-							GElf_Phdr phdr_mem;
-							GElf_Phdr *phdr = gelf_getphdr (elf->elf, inner,
-								&phdr_mem);
+						elf_for_each_phdr(elf, &iter) {
+							GElf_Phdr *phdr = iter.phdr;
 							if (phdr != NULL && phdr->p_type == PT_INTERP) {
 								is_statically_linked = -1;
 								break;
