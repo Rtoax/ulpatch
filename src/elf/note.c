@@ -22,7 +22,7 @@
 #include <utils/util.h>
 #include <utils/log.h>
 
-#if defined(__aarch64__)
+#if defined(__aarch64__) || defined(__x86_64__)
 /* AArch64 specific GNU properties.
  * see elfutils/libelf/elf.h or linux/elf.h */
 # ifndef GNU_PROPERTY_AARCH64_FEATURE_1_AND
