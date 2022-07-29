@@ -57,20 +57,20 @@ static bool just_list_tests = false;
 // For -f, --filter-tests
 static char *filter_format = NULL;
 
-// For -I, --i-am-tested
+// For -r, --role
 static enum who {
-	I_AM_NONE,
-	I_AM_TESTER, // testing all Tests
-	I_AM_SLEEPER, // be tested
-	I_AM_WAITING, // wait for a while
-	I_AM_MAX,
-} whoami = I_AM_TESTER;
+	ROLE_NONE,
+	ROLE_TESTER, // testing all Tests
+	ROLE_SLEEPER, // be tested
+	ROLE_WAITING, // wait for a while
+	ROLE_MAX,
+} role = ROLE_TESTER;
 
-static const char *whoami_string[I_AM_MAX] = {
-	[I_AM_NONE] = "none",
-	[I_AM_TESTER] = "tester",
-	[I_AM_SLEEPER] = "sleeper",
-	[I_AM_WAITING] = "wait",
+static const char *role_string[ROLE_MAX] = {
+	[ROLE_NONE] = "none",
+	[ROLE_TESTER] = "tester",
+	[ROLE_SLEEPER] = "sleeper",
+	[ROLE_WAITING] = "wait",
 };
 
 static int sleep_usec = 100;
@@ -86,8 +86,8 @@ static enum who who_am_i(const char *s)
 {
 	int i;
 
-	for (i = I_AM_TESTER; i < ARRAY_SIZE(whoami_string); i++) {
-		if (!strcmp(s, whoami_string[i])) {
+	for (i = ROLE_TESTER; i < ARRAY_SIZE(role_string); i++) {
+		if (!strcmp(s, role_string[i])) {
 			return i;
 		}
 	}
@@ -95,7 +95,7 @@ static enum who who_am_i(const char *s)
 	return 0;
 }
 
-static void print_help(void)
+static void print_help(int ex)
 {
 	printf(
 	"\n"
@@ -109,15 +109,15 @@ static void print_help(void)
 	"\n"
 	" -l, --list-tests    list all tests\n"
 	" -f, --filter-tests  filter out some tests\n"
-	" -w, --whoami        who am i, what should i do\n"
+	" -r, --role          who am i, what should i do\n"
 	"                     '%s' test all Tests, see with -l, default.\n"
 	"                     '%s' i will sleep %ds by default, set with -s.\n"
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"\n"
 	" -s, --usecond       usecond of time, sleep, etc.\n"
-	"                     -w %s, the main thread will sleep -s useconds.\n"
+	"                     -r %s, the main thread will sleep -s useconds.\n"
 	" -m, --msgq          wait one msgrcv(2)'s file, this arg wait a msg.\n"
-	"                     -w %s, the main thread will wait on msgrcv(2).\n"
+	"                     -r %s, the main thread will wait on msgrcv(2).\n"
 	"\n"
 	" -V, --verbose       output all test logs\n"
 	" -h, --help          display this help and exit\n"
@@ -125,15 +125,15 @@ static void print_help(void)
 	"\n"
 	"elftools_test %s\n",
 	elftools_test_path,
-	whoami_string[I_AM_TESTER],
-	whoami_string[I_AM_SLEEPER],
+	role_string[ROLE_TESTER],
+	role_string[ROLE_SLEEPER],
 	sleep_usec,
-	whoami_string[I_AM_WAITING],
-	whoami_string[I_AM_SLEEPER],
-	whoami_string[I_AM_WAITING],
+	role_string[ROLE_WAITING],
+	role_string[ROLE_SLEEPER],
+	role_string[ROLE_WAITING],
 	elftools_version()
 	);
-	exit(0);
+	exit(ex);
 }
 
 static int parse_config(int argc, char *argv[])
@@ -141,9 +141,9 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{"list-tests",	no_argument,	0,	'l'},
 		{"filter-tests",	required_argument,	0,	'f'},
-		{"whoami",	required_argument,	0,	'w'},
+		{"role",	required_argument,	0,	'r'},
 		{"usecond",	required_argument,	0,	's'},
-		{"msg",	required_argument,	0,	'm'},
+		{"msgq",	required_argument,	0,	'm'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
@@ -153,7 +153,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:w:s:m:Vvh", options, &option_index);
+		c = getopt_long(argc, argv, "lf:r:s:m:Vvh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -164,8 +164,8 @@ static int parse_config(int argc, char *argv[])
 		case 'f':
 			filter_format = optarg;
 			break;
-		case 'w':
-			whoami = who_am_i(optarg);
+		case 'r':
+			role = who_am_i(optarg);
 			break;
 		case 's':
 			sleep_usec = atoi(optarg);
@@ -180,15 +180,16 @@ static int parse_config(int argc, char *argv[])
 			printf("version %s\n", elftools_version());
 			exit(0);
 		case 'h':
-			print_help();
+			print_help(0);
+			break;
 		default:
-			print_help();
+			print_help(1);
 			break;
 		}
 	}
 
-	if (whoami == I_AM_NONE) {
-		fprintf(stderr, "wrong -w, --whoami argument.\n");
+	if (role == ROLE_NONE) {
+		fprintf(stderr, "wrong -r, --role argument.\n");
 		exit(1);
 	}
 
@@ -388,18 +389,18 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	switch (whoami) {
-	case I_AM_TESTER:
+	switch (role) {
+	case ROLE_TESTER:
 		launch_tester();
 		break;
-	case I_AM_SLEEPER:
+	case ROLE_SLEEPER:
 		launch_sleeper();
 		break;
-	case I_AM_WAITING:
+	case ROLE_WAITING:
 		launch_waiting();
 		break;
 	default:
-		print_help();
+		print_help(1);
 		break;
 	}
 
@@ -419,7 +420,7 @@ TEST(elftools_test,	sleeper,	0)
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)elftools_test_path,
-			"-w", "sleeper",
+			"-r", "sleeper",
 			"-s", "100",
 			NULL
 		};
@@ -441,6 +442,8 @@ TEST(elftools_test,	sleeper,	0)
 
 TEST(elftools_test,	wait,	0)
 {
+	int ret = 0;
+	int status = 0;
 	pid_t pid;
 
 	struct task_wait waitqueue;
@@ -453,8 +456,8 @@ TEST(elftools_test,	wait,	0)
 
 		char *_argv[] = {
 			(char*)elftools_test_path,
-			"-w", "wait",
-			"-m", waitqueue.tmpfile,
+			"--role", "wait",
+			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
 		ldebug("PARENT: fork one.\n");
@@ -469,11 +472,14 @@ TEST(elftools_test,	wait,	0)
 		ldebug("PARENT: do 2s thing.\n");
 		task_wait_trigger(&waitqueue, 10000);
 		ldebug("PARENT: kick child.\n");
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
 	}
 
 	task_wait_destroy(&waitqueue);
 
-	return 0;
+	return ret;
 }
 
