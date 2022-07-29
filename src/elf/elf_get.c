@@ -57,7 +57,6 @@ int elf_get_phdr_handler(struct client *client, struct cmd_elf *msg_ack)
 
 int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 {
-	int i;
 	struct elf_file *elf = client->selected_elf;
 	uint32_t init_len = msg_ack->data_len;
 	struct cmd_elf_ack *ack = cmd_data(msg_ack);
@@ -75,7 +74,10 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		return 0;
 	}
 
-	for (i = 0; i < elf->phdrnum; i++) {
+	struct elf_iter iter;
+
+	elf_for_each_phdr(elf, &iter) {
+
 		uint16_t add_len = 0;
 		// see struct cmd_elf_ack.data
 		char *data = ack_data(ack);
@@ -88,12 +90,12 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		data_left_len -= sizeof(uint32_t);
 
 		/* Index of this ELF program header */
-		data = data_add_u32(data, i + 1);
+		data = data_add_u32(data, iter.i + 1);
 		add_len += sizeof(uint32_t);
 		data_left_len -= sizeof(uint32_t);
 
 		/* Copy one program header */
-		memcpy(data, &elf->phdrs[i], sizeof(GElf_Phdr));
+		memcpy(data, iter.phdr, sizeof(GElf_Phdr));
 		data[sizeof(GElf_Phdr)] = '\0';
 		add_len += sizeof(GElf_Phdr) + 1;
 		data_left_len -= sizeof(GElf_Phdr) + 1;
@@ -102,7 +104,7 @@ int elf_get_phdr_handler_ack(struct client *client, struct cmd_elf *msg_ack)
 		msg_ack->cmd = CMD_ELF_GET_PHDR;
 		msg_ack->data_len = init_len + add_len;
 		msg_ack->is_ack = 1;
-		msg_ack->has_next = (i == (elf->phdrnum - 1))?0:1;
+		msg_ack->has_next = (iter.i == (elf->phdrnum - 1))?0:1;
 
 		/* Talk to client */
 		send_one_ack(client, msg_ack);

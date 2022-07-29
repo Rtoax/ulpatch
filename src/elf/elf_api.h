@@ -272,6 +272,11 @@ const char *e_machine_string(const GElf_Ehdr *ehdr);
 
 
 /* ELF Phdr api */
+#define elf_for_each_phdr(elf, iter)                                        \
+	for ((iter)->i = 0, (iter)->nr = (elf)->phdrnum;                        \
+		(iter)->i < (iter)->nr && ((iter)->phdr = &elf->phdrs[(iter)->i]);  \
+		(iter)->i++)
+
 int print_phdr(const GElf_Phdr *phdr);
 #ifdef HAVE_JSON_C_LIBRARIES
 json_object *json_phdr(const GElf_Phdr *phdr);

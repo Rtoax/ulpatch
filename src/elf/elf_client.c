@@ -183,8 +183,8 @@ int client_get_elf_phdr(int connfd, int (*handler)(const GElf_Phdr *phdr))
 
 		char *data = ack_data(ack);
 
-		uint32_t __unused nr_phdrs = data_get_u32((void **)&data);
-		if (nr_phdrs == 0) {
+		uint32_t __unused nr_phdr = data_get_u32((void **)&data);
+		if (nr_phdr == 0) {
 			printf("No ELF Selected or ELF no Program Header at all.\n");
 			return ack->result;
 		}

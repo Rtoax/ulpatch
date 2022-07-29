@@ -59,6 +59,31 @@ struct elf_file {
 	struct list_head node;
 };
 
+struct elf_iter {
+	size_t i;
+	size_t nr;
+
+	union {
+		GElf_Phdr *phdr; // point to elf_file.phdrs[]
+		GElf_Shdr shdr;
+		GElf_Nhdr nhdr;
+		GElf_Sym sym;
+		GElf_Dyn dyn;
+		GElf_Rel rel;
+		GElf_Rela rela;
+	};
+
+	void *note_name;
+	void *note_desc;
+
+	/* private hidden */
+	int type;
+	size_t str_idx;
+	Elf_Scn *scn;
+	Elf_Data *data;
+};
+
+
 extern struct list_head client_list;
 extern unsigned int nr_clients;
 
