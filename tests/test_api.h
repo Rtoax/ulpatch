@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <malloc.h>
+#include <sys/time.h>
+
 #include <utils/list.h>
 #include <utils/compiler.h>
 
@@ -31,6 +33,11 @@ struct test {
 	test_prio prio;
 	int (*test_cb)(void);
 	int expect_ret;
+
+	// record testing time spend
+	struct timeval start, end;
+	suseconds_t spend_us;
+
 	struct list_head node;
 	// if test result is failed, add to 'failed_list'
 	struct list_head failed;

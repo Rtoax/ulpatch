@@ -54,6 +54,8 @@ static void __ctor(TEST_PRIO_START) __init_test_list(void)
 // 0-success, 1-failed
 static unsigned long stat_count[2] = {0};
 
+static unsigned long total_spent_us = 0;
+
 // For -l, --list-tests
 static bool just_list_tests = false;
 // For -f, --filter-tests
@@ -280,6 +282,8 @@ static int operate_test(struct test *test)
 	test_log("=== %s.%s ",
 		test->category, test->name);
 
+	gettimeofday(&test->start, NULL);
+
 	// Exe test entry
 	ret = test->test_cb();
 	if (ret == test->expect_ret) {
@@ -292,7 +296,15 @@ static int operate_test(struct test *test)
 		list_add(&test->failed, &failed_list);
 	}
 
-	test_log("%s%-8s%s\n",
+	gettimeofday(&test->end, NULL);
+
+	test->spend_us = test->end.tv_sec * 1000000UL + test->end.tv_usec
+		- test->start.tv_sec * 1000000UL - test->start.tv_usec;
+
+	total_spent_us += test->spend_us;
+
+	test_log("\033[2m%ldus\033[m %s%-8s%s\n",
+		test->spend_us,
 		failed?"\033[31m":"\033[32m",
 		failed?"Not OK":"OK",
 		"\033[m");
@@ -363,10 +375,13 @@ print_stat:
 			"=========================================\n"
 			"=== Total %ld tested\n"
 			"===  Success %ld\n"
-			"===  Failed %ld\n",
+			"===  Failed %ld\n"
+			"===  Spend %ldms %.2lfms/per\n",
 			stat_count[0] + stat_count[1],
 			stat_count[0],
-			stat_count[1]
+			stat_count[1],
+			total_spent_us / 1000,
+			total_spent_us * 1.0f / (stat_count[0] + stat_count[1]) / 1000.0f
 		);
 
 		if (stat_count[1] > 0) {
