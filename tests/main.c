@@ -24,6 +24,8 @@
 struct list_head test_list[TEST_PRIO_NUM];
 static LIST_HEAD(failed_list);
 
+static LIST_HEAD(mix_role_list);
+
 static void __ctor(TEST_PRIO_START) __init_test_list(void)
 {
 	int i;
@@ -64,6 +66,7 @@ static enum who {
 	ROLE_SLEEPER, // be tested
 	ROLE_WAITING, // wait for a while
 	ROLE_TRIGGER, // trigger
+	ROLE_MIX, // mix: sleeper, waiting, trigger
 	ROLE_MAX,
 } role = ROLE_TESTER;
 
@@ -73,6 +76,7 @@ static const char *role_string[ROLE_MAX] = {
 	[ROLE_SLEEPER] = "sleeper",
 	[ROLE_WAITING] = "wait",
 	[ROLE_TRIGGER] = "trigger",
+	[ROLE_MIX] = "mix",
 };
 
 static int sleep_usec = 100;
@@ -90,11 +94,33 @@ static enum who who_am_i(const char *s)
 
 	for (i = ROLE_TESTER; i < ARRAY_SIZE(role_string); i++) {
 		if (!strcmp(s, role_string[i])) {
-			return i;
+			/* Not allow set ROLE_MIX directly
+			 */
+			return i!=ROLE_MIX?i:ROLE_NONE;
 		}
 	}
 
-	return 0;
+	/* Not one of ROLE_XXX, maybe is ROLE_MIX, that is to say
+	 * -r, --role is sleeper,wait,trigger mixed
+	 */
+	if (strstr(s, ",")) {
+		struct str_node *str = NULL, *tmp;
+		parse_strstr((char *)s, &mix_role_list);
+
+		strstr_for_each_node_safe(str, tmp, &mix_role_list) {
+			switch (who_am_i(str->str)) {
+			case ROLE_NONE:
+			case ROLE_TESTER:
+			case ROLE_MIX:
+				return ROLE_NONE;
+			default:
+				break;
+			}
+		}
+		return ROLE_MIX;
+	}
+
+	return ROLE_NONE;
 }
 
 static void print_help(int ex)
@@ -121,6 +147,8 @@ static void print_help(int ex)
 	"                     '%s' i will sleep %ds by default, set with -s.\n"
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"                     '%s' i will msgsnd(2) a msg, specify by -m.\n"
+	"                     MIX:\n"
+	"                       -r sleeper,sleeper, will launch sleeper twice\n"
 	"\n"
 	" -s, --usecond       usecond of time, sleep, etc.\n"
 	"                     -r %s, the main thread will sleep -s useconds.\n"
@@ -395,11 +423,43 @@ static void launch_trigger(void)
 	// task_wait_destroy(&wait_here);
 }
 
+static void launch_mix_role(enum who r)
+{
+	switch (r) {
+	case ROLE_SLEEPER:
+		launch_sleeper();
+		break;
+	case ROLE_WAITING:
+		launch_waiting();
+		break;
+	case ROLE_TRIGGER:
+		launch_trigger();
+		break;
+	case ROLE_MIX:
+	case ROLE_TESTER:
+	default:
+		print_help(1);
+		break;
+	}
+}
+
+static void launch_mix(void)
+{
+	ldebug("MIX\n");
+	struct str_node *str = NULL, *tmp;
+
+	strstr_for_each_node_safe(str, tmp, &mix_role_list) {
+		ldebug("MIX: %s\n", str->str);
+		launch_mix_role(who_am_i(str->str));
+	}
+}
+
 static void sig_handler(int signum)
 {
 	switch (signum) {
 	case SIGINT:
 		fprintf(stderr, "Catch Ctrl-C, bye\n");
+		free_strstr_list(&mix_role_list);
 		release_tests();
 		// exit abnormal
 		exit(1);
@@ -424,19 +484,19 @@ int main(int argc, char *argv[])
 		launch_tester();
 		break;
 	case ROLE_SLEEPER:
-		launch_sleeper();
-		break;
 	case ROLE_WAITING:
-		launch_waiting();
-		break;
 	case ROLE_TRIGGER:
-		launch_trigger();
+		launch_mix_role(role);
+		break;
+	case ROLE_MIX:
+		launch_mix();
 		break;
 	default:
 		print_help(1);
 		break;
 	}
 
+	free_strstr_list(&mix_role_list);
 	release_tests();
 
 	return 0;
