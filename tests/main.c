@@ -650,7 +650,7 @@ TEST(elftools_test,	wait_wait_wait,	0)
 
 		char *_argv[] = {
 			(char*)elftools_test_path,
-			"--role", "wait,wait,wait",
+			"--role", "wait,sleeper,wait,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
@@ -664,9 +664,9 @@ TEST(elftools_test,	wait_wait_wait,	0)
 
 		// do something
 		ldebug("PARENT: msgsnd to child.\n");
-		task_wait_trigger(&waitqueue, 1000);
-		task_wait_trigger(&waitqueue, 1000);
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue, 10000);
+		task_wait_trigger(&waitqueue, 10000);
+		task_wait_trigger(&waitqueue, 10000);
 		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
@@ -754,9 +754,9 @@ TEST(elftools_test,	wait_trigger,	0)
 
 		// do something
 		ldebug("PARENT: do some thing.\n");
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue, 10000);
 		task_wait_wait(&waitqueue);
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue, 10000);
 		task_wait_wait(&waitqueue);
 		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);
