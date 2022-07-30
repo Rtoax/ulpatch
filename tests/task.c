@@ -61,19 +61,31 @@ TEST(Task,	attach_detach,	0)
 {
 	int ret = -1;
 	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			"sleep", "0.2", NULL
+			(char*)elftools_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
 		};
 		ret = execvp(argv[0], argv);
 		if (ret == -1) {
 			exit(1);
 		}
 	} else if (pid > 0) {
+
+		task_wait_wait(&waitqueue);
+
 		ret = task_attach(pid);
 		ret = task_detach(pid);
+
+		task_wait_trigger(&waitqueue, 1000);
+
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
