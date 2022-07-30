@@ -166,11 +166,17 @@ TEST(Task,	mmap_malloc,	0)
 {
 	int ret = -1;
 	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			"sleep", "2", NULL
+			(char*)elftools_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
 		};
 		ret = execvp(argv[0], argv);
 		if (ret == -1) {
@@ -182,7 +188,7 @@ TEST(Task,	mmap_malloc,	0)
 		int n;
 		unsigned long addr;
 
-		sleep(1);
+		task_wait_wait(&waitqueue);
 
 		struct task *task = open_task(pid);
 
@@ -204,6 +210,7 @@ TEST(Task,	mmap_malloc,	0)
 		}
 
 		ret = task_detach(pid);
+		task_wait_trigger(&waitqueue, 1000);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -220,11 +227,17 @@ TEST(Task,	fstat,	0)
 {
 	int ret = 0;
 	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			"sleep", "2", NULL
+			(char*)elftools_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
 		};
 		ret = execvp(argv[0], argv);
 		if (ret == -1) {
@@ -232,7 +245,7 @@ TEST(Task,	fstat,	0)
 		}
 	} else if (pid > 0) {
 
-		sleep(1);
+		task_wait_wait(&waitqueue);
 
 		int remote_fd, local_fd;
 		struct stat stat = {};
@@ -266,6 +279,7 @@ TEST(Task,	fstat,	0)
 		task_close(task, remote_fd);
 		task_detach(pid);
 
+		task_wait_trigger(&waitqueue, 1000);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -323,11 +337,17 @@ static int task_mmap_file(int prot)
 {
 	int ret = -1;
 	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			"sleep", "2", NULL
+			(char*)elftools_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
 		};
 		ret = execvp(argv[0], argv);
 		if (ret == -1) {
@@ -335,7 +355,7 @@ static int task_mmap_file(int prot)
 		}
 	} else if (pid > 0) {
 
-		sleep(1);
+		task_wait_wait(&waitqueue);
 
 		struct task *task = open_task(pid);
 
@@ -346,6 +366,7 @@ static int task_mmap_file(int prot)
 
 		task_detach(pid);
 
+		task_wait_trigger(&waitqueue, 1000);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -370,11 +391,17 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 {
 	int ret = -1;
 	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			"sleep", "2", NULL
+			(char*)elftools_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
 		};
 		ret = execvp(argv[0], argv);
 		if (ret == -1) {
@@ -386,7 +413,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 		int n;
 		unsigned long addr;
 
-		sleep(1);
+		task_wait_wait(&waitqueue);
 
 		struct task *task = open_task(pid);
 
@@ -417,6 +444,8 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 		}
 
 		ret = task_detach(pid);
+
+		task_wait_trigger(&waitqueue, 1000);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
