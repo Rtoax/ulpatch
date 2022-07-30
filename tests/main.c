@@ -279,8 +279,8 @@ static int operate_test(struct test *test)
 
 	if (!test->test_cb) return -1;
 
-	test_log("=== %s.%s ",
-		test->category, test->name);
+	test_log("=== %s.%s %c",
+		test->category, test->name, verbose?'\n':'\0');
 
 	gettimeofday(&test->start, NULL);
 
