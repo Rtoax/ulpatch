@@ -11,11 +11,6 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
-struct str_node {
-	// list: pre_load_files
-	struct list_head node;
-	char *str; // malloc, strdup
-};
 
 // node: struct str_node.node
 static LIST_HEAD(pre_load_files);
@@ -28,20 +23,6 @@ struct config config = {
 	.daemon = false,
 };
 
-static void add_pre_list(const char *name)
-{
-	// Must exist
-	if (access(name, F_OK) != 0) {
-		fprintf(stderr, "%s not exist.\n", name);
-		return;
-	}
-
-	struct str_node *file = malloc(sizeof(struct str_node));
-	assert(file && "malloc failed");
-
-	file->str = strdup(name);
-	list_add(&file->node, &pre_load_files);
-}
 
 static void load_pre_list_elf(void)
 {
@@ -49,43 +30,17 @@ static void load_pre_list_elf(void)
 
 	int tmp_client_fd = create_elf_client();
 
-	list_for_each_entry_safe(file, tmp, &pre_load_files, node) {
+	strstr_for_each_node_safe(file, tmp, &pre_load_files) {
+		// Must exist
+		if (access(file->str, F_OK) != 0) {
+			fprintf(stderr, "%s not exist.\n", file->str);
+			continue;
+		}
 		ldebug("name = %s\n", file->str);
 		client_open_elf_file(tmp_client_fd, file->str);
 	}
 
 	close_elf_client(tmp_client_fd);
-}
-
-static void parse_pre_list(char *str)
-{
-	assert(str && "NULL pointer");
-
-	char *newstr = strdup(str);
-	char *p = newstr;
-
-	// a,b,c,,d,e,,,
-	// >>
-	// a b c d e
-	while (*p) {
-		char *name = p;
-
-		while (p && *p && *p != ',') {
-			p++;
-		}
-
-		if (*p == ',' || *p == '\0') {
-			if (*p == ',') {
-				p[0] = '\0';
-				p++;
-			}
-
-			if (name[0] != '\0') {
-				add_pre_list(name);
-			}
-		} else break;
-	}
-	free(newstr);
 }
 
 static void print_help(void)
@@ -178,7 +133,7 @@ static int parse_config(int argc, char *argv[])
 			config.daemon = true;
 			break;
 		case 'i':
-			parse_pre_list((char *)optarg);
+			parse_strstr((char *)optarg, &pre_load_files);
 			break;
 		case 'e':
 			selected_elf = (char *)optarg;
