@@ -562,9 +562,9 @@ TEST(elftools_test,	wait,	0)
 	} else if (pid > 0) {
 
 		// do something
-		ldebug("PARENT: do 2s thing.\n");
+		ldebug("PARENT: msgsnd to child.\n");
 		task_wait_trigger(&waitqueue, 10000);
-		ldebug("PARENT: kick child.\n");
+		ldebug("PARENT: send done.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -608,6 +608,142 @@ TEST(elftools_test,	trigger,	0)
 		ldebug("PARENT: waiting.\n");
 		task_wait_wait(&waitqueue);
 		ldebug("PARENT: get msg.\n");
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
+}
+
+TEST(elftools_test,	wait_wait_wait,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "wait,wait,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL,
+		};
+		ldebug("PARENT: fork one.\n");
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		// do something
+		ldebug("PARENT: msgsnd to child.\n");
+		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue, 1000);
+		ldebug("PARENT: done.\n");
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
+}
+
+TEST(elftools_test,	trigger_trigger_trigger,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "trigger,sleeper,trigger,sleeper,trigger",
+			"--msgq", waitqueue.tmpfile,
+			NULL,
+		};
+		ldebug("PARENT: fork one.\n");
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		// do something
+		ldebug("PARENT: wait child.\n");
+		task_wait_wait(&waitqueue);
+		task_wait_wait(&waitqueue);
+		task_wait_wait(&waitqueue);
+		ldebug("PARENT: get msgs from child.\n");
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
+}
+
+TEST(elftools_test,	wait_trigger,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "wait,trigger,wait,trigger",
+			"--msgq", waitqueue.tmpfile,
+			NULL,
+		};
+		ldebug("PARENT: fork one.\n");
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		// do something
+		ldebug("PARENT: do some thing.\n");
+		task_wait_trigger(&waitqueue, 1000);
+		task_wait_wait(&waitqueue);
+		task_wait_trigger(&waitqueue, 1000);
+		task_wait_wait(&waitqueue);
+		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
