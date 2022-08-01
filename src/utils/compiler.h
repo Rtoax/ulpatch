@@ -68,6 +68,8 @@ extern "C" {
 
 #define __section(sec) __attribute__((section(sec)))
 
+// Or use pragma:
+// #pragma GCC optimize("O0")
 #define __opt_O0 __attribute__((optimize("-O0")))
 #define __opt_O1 __attribute__((optimize("-O1")))
 #define __opt_O2 __attribute__((optimize("-O2")))
