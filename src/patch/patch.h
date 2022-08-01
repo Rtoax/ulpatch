@@ -4,6 +4,12 @@
 
 #include <utils/compiler.h>
 
+#if defined(__x86_64__)
+#include <utils/arch/x86_64/instruments.h>
+#elif defined(__aarch64__)
+#include <utils/arch/aarch64/instruments.h>
+#endif
+
 #define SEC_PATCH_PREFIX	".patch"
 
 #define SEC_PATCH_INFO_NAME	SEC_PATCH_PREFIX".info"
@@ -21,9 +27,10 @@
 
 /* ftrace */
 #if defined(__x86_64__)
-# define MCOUNT_INSN_SIZE	5
+# define MCOUNT_INSN_SIZE	CALL_INSN_SIZE
 #elif defined(__aarch64__)
-# define MCOUNT_INSN_SIZE	4 /* A64 instructions are always 32 bits. */
+/* A64 instructions are always 32 bits. */
+# define MCOUNT_INSN_SIZE	BL_INSN_SIZE
 #endif
 
 #define SECTION_FTRACE_TEXT	SEC_PATCH_PREFIX".ftrace.text"
