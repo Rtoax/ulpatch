@@ -12,7 +12,7 @@ link_libraries(${ELF} ${PTHREAD}
 	elftools_cli
 )
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
+add_definitions(-MD -Wall -Werror -g -ggdb -pg -O0 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
 aux_source_directory(. DIR_SRCS)

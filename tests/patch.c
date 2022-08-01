@@ -3,63 +3,61 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/util.h>
+#include <utils/task.h>
 #include <elf/elf_api.h>
 #include <patch/patch.h>
 
 #include "test_api.h"
 
 #if defined(__x86_64__)
-void my_direct_func(void *arg)
+
+static int ret_TTWU = 0;
+
+#define TTWU_FTRACE_RETURN	1
+
+static void my_direct_func(void)
 {
-	ldebug("Hello. %#0lx\n", my_direct_func);
+	ldebug(">>>>> REPLACE mcount() <<<<<\n");
+	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-extern void my_tramp(void *);
-
-// see linux:samples/ftrace/ftrace-direct.c
-asm (
-"	.pushsection    .text, \"ax\", @progbits\n"
-"	.type		my_tramp, @function\n"
-"	.globl		my_tramp\n"
-"   my_tramp:"
-"	pushq %rbp\n"
-"	movq %rsp, %rbp\n"
-"	pushq %rdi\n"
-"	call my_direct_func\n"
-"	popq %rdi\n"
-"	leave\n"
-"	ret\n"
-"	.size		my_tramp, .-my_tramp\n"
-"	.popsection\n"
-);
-
-extern void mcount(void);
-
-static void try_to_wake_up(void)
+static int try_to_wake_up(void)
 {
-	ldebug("TTWU emulate. %#0lx, mcount:%#0lx\n",
-		try_to_wake_up, mcount);
+	ldebug("TTWU emulate.\n");
+	return ret_TTWU;
 }
 
-TEST(Patch,	ftrace_tramp,	0)
+TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
+	int ret = 0;
+	struct task *task = open_task(getpid());
+
 	try_to_wake_up();
 
 	memshow(try_to_wake_up, MCOUNT_INSN_SIZE * 2);
 
-	// TODO: make ftrace to try_to_wake_up()
-#if 0
-	unsigned long __unused ip = (unsigned long)try_to_wake_up + MCOUNT_INSN_SIZE + 1;
-	unsigned long __unused addr = (unsigned long)my_tramp;
-	// *(unsigned long *)ip = addr - (ip - 5);
-	*(unsigned long *)ip = addr;
-	ldebug("ip:%#0lx addr:%#0lx\n", ip, addr);
-#endif
+	unsigned long call_addr = (unsigned long)try_to_wake_up + MCOUNT_INSN_SIZE - 1;
+	unsigned long ip = call_addr + 1;
+	unsigned long addr = (unsigned long)my_direct_func;
+	unsigned long __unused off = addr - call_addr - 5;
 
-	// call again
-	try_to_wake_up();
+	ldebug("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
 
-	return 0;
+	// MUST use memcpy_to_task here, because ip has no write permission, but
+	// pwrite(2) or ptrace(2) has.
+	ret = memcpy_to_task(task, (unsigned long)ip, (void*)&off, 4);
+	if (ret != 4) {
+		lerror("failed to memcpy.\n");
+	}
+
+	memshow(try_to_wake_up, MCOUNT_INSN_SIZE * 2);
+
+	// call again, my_direct_func will be called.
+	ret = try_to_wake_up();
+
+	free_task(task);
+
+	return ret;
 }
 #endif // __x86_64__
 
