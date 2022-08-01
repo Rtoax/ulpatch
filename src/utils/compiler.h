@@ -68,6 +68,11 @@ extern "C" {
 
 #define __section(sec) __attribute__((section(sec)))
 
+#define __opt_O0 __attribute__((optimize("-O0")))
+#define __opt_O1 __attribute__((optimize("-O1")))
+#define __opt_O2 __attribute__((optimize("-O2")))
+
+
 #ifndef FALLTHROUGH
 # ifdef HAVE_FALLTHROUGH
 #  define FALLTHROUGH __attribute__ ((fallthrough))

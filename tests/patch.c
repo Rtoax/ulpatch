@@ -21,7 +21,7 @@ static void my_direct_func(void)
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-static int try_to_wake_up(void)
+static __opt_O0 int try_to_wake_up(void)
 {
 	ldebug("TTWU emulate.\n");
 	return ret_TTWU;
