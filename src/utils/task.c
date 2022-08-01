@@ -416,10 +416,62 @@ int task_detach(pid_t pid)
 	return rv;
 }
 
+static int __unused pid_write(int pid, void *dest, const void *src, size_t len)
+{
+	int ret = -1;
+	unsigned char *s = (unsigned char *) src;
+	unsigned char *d = (unsigned char *) dest;
+
+	while (ROUND_DOWN(len, sizeof(unsigned long))) {
+		if (ptrace(PTRACE_POKEDATA, pid, d, *(long *)s) == -1) {
+			ret = -errno;
+			goto err;
+		}
+		s += sizeof(unsigned long);
+		d += sizeof(unsigned long);
+		len -= sizeof(unsigned long);
+	}
+
+	if (len) {
+		unsigned long tmp;
+		tmp = ptrace(PTRACE_PEEKTEXT, pid, d, NULL);
+		if (tmp == (unsigned long)-1 && errno)
+			return -errno;
+		memcpy(&tmp, s, len);
+
+		ret = ptrace(PTRACE_POKEDATA, pid, d, tmp);
+	}
+
+	return 0;
+err:
+	return ret;
+}
+
+static int __unused pid_read(int pid, void *dst, const void *src, size_t len)
+{
+	int sz = len / sizeof(void *);
+	unsigned char *s = (unsigned char *)src;
+	unsigned char *d = (unsigned char *)dst;
+	long word;
+
+	while (sz-- != 0) {
+		word = ptrace(PTRACE_PEEKTEXT, pid, s, NULL);
+		if (word == -1 && errno) {
+			return -errno;
+		}
+
+		*(long *)d = word;
+		s += sizeof(long);
+		d += sizeof(long);
+	}
+
+	return len;
+}
+
 int memcpy_from_task(struct task *task,
 		void *dst, unsigned long task_src, ssize_t size)
 {
-	int ret;
+	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
 	if (ret <= 0) {
 		lerror("pread(%d, ...)=%d failed, %s\n",
@@ -432,7 +484,7 @@ int memcpy_from_task(struct task *task,
 int memcpy_to_task(struct task *task,
 		unsigned long task_dst, void *src, ssize_t size)
 {
-	int ret;
+	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
 	if (ret <= 0) {
 		lerror("pwrite(%d, ...)=%d failed, %s\n",

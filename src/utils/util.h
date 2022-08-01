@@ -26,6 +26,12 @@ extern "C" {
 	((type *)(((char *)(ptr)) - offsetof(type,member)))
 #endif
 
+#ifndef ROUND_DOWN
+#define ROUND_DOWN(x, m) ((x) & ~((m) - 1))
+#endif
+#ifndef ROUND_UP
+#define ROUND_UP(x, m) (((x) + (m) - 1) & ~((m) - 1))
+#endif
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 #endif

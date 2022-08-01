@@ -132,8 +132,8 @@ failed:
 
 TEST(Task,	copy_from_task,	0)
 {
-	char data[] = "ABCDEFG";
-	char buf[64] = "XXXXXX";
+	char data[] = "ABCDEFGH";
+	char buf[64] = "XXXXXXXX";
 	int ret = 0;
 	int n;
 
