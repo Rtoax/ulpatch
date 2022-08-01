@@ -113,6 +113,7 @@ struct task {
 	struct rb_root vmas_rb;
 
 	struct vma_struct *libc_vma;
+	struct vma_struct *stack;
 };
 
 

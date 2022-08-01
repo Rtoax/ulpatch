@@ -227,6 +227,9 @@ static int read_task_vmas(struct task *task, bool update)
 			print_vma(vma);
 			task->libc_vma = vma;
 		}
+		if (!task->stack) {
+			task->stack = vma;
+		}
 
 		insert_vma(task, vma);
 	} while (1);
@@ -276,6 +279,7 @@ static int free_task_vmas(struct task *task)
 	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
+	task->stack = NULL;
 
 	return 0;
 }
@@ -337,8 +341,8 @@ struct task *open_task(pid_t pid)
 
 	list_add(&task->node, &tasks_list);
 
-	if (!task->libc_vma) {
-		lerror("No libc founded.\n");
+	if (!task->libc_vma || !task->stack) {
+		lerror("No libc or stack founded.\n");
 		free_task(task);
 		task = NULL;
 	}
