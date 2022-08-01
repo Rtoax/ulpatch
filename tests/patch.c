@@ -39,7 +39,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	unsigned long call_addr = (unsigned long)try_to_wake_up + MCOUNT_INSN_SIZE - 1;
 	unsigned long ip = call_addr + 1;
 	unsigned long addr = (unsigned long)my_direct_func;
-	unsigned long __unused off = addr - call_addr - 5;
+	unsigned long __unused off = addr - call_addr - MCOUNT_INSN_SIZE;
 
 	ldebug("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
 
