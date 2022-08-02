@@ -4,9 +4,9 @@
 #include <utils/util.h>
 #include <elf/elf_api.h>
 
-#include "test_api.h"
-
 #include <cli/cli-usdt.h>
+
+#include "../test_api.h"
 
 
 TEST(usdt,	cli,	0)

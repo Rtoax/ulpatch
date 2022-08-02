@@ -7,7 +7,7 @@
 #include <elf/elf_api.h>
 #include <patch/patch.h>
 
-#include "test_api.h"
+#include "../test_api.h"
 
 
 extern void _mcount(void);

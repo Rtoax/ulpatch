@@ -10,7 +10,7 @@
 #include <utils/linenoise/linenoise.h>
 #endif
 
-#include "test_api.h"
+#include "../test_api.h"
 
 
 static void completionCallback(const char *buf, linenoiseCompletions *lc) {}

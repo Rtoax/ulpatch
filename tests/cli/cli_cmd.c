@@ -5,7 +5,7 @@
 #include <elf/elf_api.h>
 #include <cli/cli_api.h>
 
-#include "test_api.h"
+#include "../test_api.h"
 
 // Initialized in other TEST_xxx()
 extern int test_client_fd;
