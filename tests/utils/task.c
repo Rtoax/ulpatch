@@ -26,16 +26,30 @@ TEST(Task_utils,	get_proc_pid_exe,	0)
 
 TEST(Task,	open_free,	0)
 {
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 
 	return free_task(task);
+}
+
+TEST(Task,	open_free_fto_flags,	0)
+{
+	int ret = 0;
+	struct task *task = open_task(getpid(), FTO_ALL);
+
+	if (!task->libc_elf || !task->exe_elf) {
+		ret = -1;
+	}
+
+	free_task(task);
+
+	return ret;
 }
 
 TEST(Task,	open_failed,	-1)
 {
 	// Try to open pid 1 (systemd)
 	// with 'sudo' it's will success
-	struct task *task = open_task(0);
+	struct task *task = open_task(0, FTO_NONE);
 
 	return task?0:-1;
 }
@@ -43,14 +57,14 @@ TEST(Task,	open_failed,	-1)
 TEST(Task,	open_non_exist,	-1)
 {
 	// Try to open pid -1 (non exist)
-	struct task *task = open_task(-1);
+	struct task *task = open_task(-1, FTO_NONE);
 
 	return task?0:-1;
 }
 
 TEST(Task,	dump_task,	0)
 {
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 
 	dump_task(task);
 	dump_task_vmas(task);
@@ -100,7 +114,7 @@ TEST(Task,	attach_detach,	0)
 
 TEST(Task,	for_each_vma,	0)
 {
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 	struct vma_struct *vma;
 
 	task_for_each_vma(vma, task) {
@@ -113,7 +127,7 @@ TEST(Task,	for_each_vma,	0)
 TEST(Task,	find_vma,	0)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 	struct vma_struct *vma;
 
 	task_for_each_vma(vma, task) {
@@ -138,7 +152,7 @@ TEST(Task,	copy_from_task,	0)
 	int ret = 0;
 	int n;
 
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 
 	n = memcpy_from_task(task, buf, (unsigned long)data, strlen(data) + 1);
 	ldebug("memcpy_from_task: %s\n", buf);
@@ -160,7 +174,7 @@ TEST(Task,	copy_to_task,	0)
 	int ret = 0;
 	int n;
 
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 
 	n = memcpy_to_task(task, (unsigned long)buf, data, strlen(data) + 1);
 	ldebug("memcpy_to_task: %s\n", buf);
@@ -203,7 +217,7 @@ TEST(Task,	mmap_malloc,	0)
 
 		task_wait_wait(&waitqueue);
 
-		struct task *task = open_task(pid);
+		struct task *task = open_task(pid, FTO_NONE);
 
 		// dump_task_vmas(task);
 
@@ -263,7 +277,7 @@ TEST(Task,	fstat,	0)
 		int remote_fd, local_fd;
 		struct stat stat = {};
 		struct stat statbuf = {};
-		struct task *task = open_task(pid);
+		struct task *task = open_task(pid, FTO_NONE);
 		char *filename = "/usr/bin/ls";
 
 		ret = task_attach(pid);
@@ -370,7 +384,7 @@ static int task_mmap_file(int prot)
 
 		task_wait_wait(&waitqueue);
 
-		struct task *task = open_task(pid);
+		struct task *task = open_task(pid, FTO_NONE);
 
 		dump_task_vmas(task);
 
@@ -428,7 +442,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 
 		task_wait_wait(&waitqueue);
 
-		struct task *task = open_task(pid);
+		struct task *task = open_task(pid, FTO_NONE);
 
 		// dump_task_vmas(task);
 

@@ -356,7 +356,7 @@ static int __get_exe(struct task *task)
 	return 0;
 }
 
-struct task *open_task(pid_t pid)
+struct task *open_task(pid_t pid, enum fto_flag flag)
 {
 	struct task *task = NULL;
 	int memfd;
@@ -374,6 +374,7 @@ struct task *open_task(pid_t pid)
 	list_init(&task->vmas);
 	rb_init(&task->vmas_rb);
 
+	task->fto_flag = flag;
 	task->pid = pid;
 	__get_comm(task);
 	__get_exe(task);
@@ -381,17 +382,37 @@ struct task *open_task(pid_t pid)
 
 	read_task_vmas(task, false);
 
-	task->libc_elf = elf_file_open(task->libc_vma->name_);
-
-	if (!task->libc_vma || !task->stack || !task->libc_elf) {
+	if (!task->libc_vma || !task->stack) {
 		lerror("No libc or stack founded.\n");
-		free_task(task);
-		task = NULL;
+		goto free_task;
 	}
 
+	/* Load libc ELF file if needed
+	 */
+	if (flag & FTO_LIBC) {
+		task->libc_elf = elf_file_open(task->libc_vma->name_);
+		if (!task->libc_elf) {
+			lerror("Open libc failed.\n");
+			goto free_task;
+		}
+	}
+	if (flag & FTO_SELF) {
+		task->exe_elf = elf_file_open(task->exe);
+		if (!task->exe_elf) {
+			lerror("Open exe:%s failed.\n", task->exe);
+			goto free_task;
+		}
+	}
+
+	/* All success, add task to global list
+	 */
 	list_add(&task->node, &tasks_list);
 
 	return task;
+
+free_task:
+	free_task(task);
+	return NULL;
 }
 
 int free_task(struct task *task)
@@ -399,7 +420,11 @@ int free_task(struct task *task)
 	list_del(&task->node);
 	close(task->proc_mem_fd);
 
-	elf_file_close(task->libc_vma->name_);
+	if (task->fto_flag & FTO_SELF)
+		elf_file_close(task->exe);
+
+	if (task->fto_flag & FTO_LIBC)
+		elf_file_close(task->libc_vma->name_);
 
 	free_task_vmas(task);
 	free(task->exe);

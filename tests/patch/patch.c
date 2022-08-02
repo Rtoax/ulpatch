@@ -31,7 +31,7 @@ static __opt_O0 int try_to_wake_up(void)
 TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid());
+	struct task *task = open_task(getpid(), FTO_NONE);
 
 	try_to_wake_up();
 

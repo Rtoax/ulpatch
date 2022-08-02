@@ -97,6 +97,22 @@ get_vma_type(const char *exe, const char *name)
 	return type;
 }
 
+/* When task opening, what do you want to do?
+ *
+ * FTO means Flag of Task when Open.
+ *
+ * @FTO_LIBC in /proc/PID/maps specify a libc.so ELF file, if you want to
+ *            open it when open task, set this flag.
+ * @FTO_SELF task.exe or /proc/PID/exe specify a ELF file, open it or not.
+ */
+enum fto_flag {
+	FTO_SELF = 0x1 << 0,
+	FTO_LIBC = 0x1 << 1,
+};
+
+#define FTO_NONE 0x0
+#define FTO_ALL (FTO_SELF|FTO_LIBC)
+
 struct elf_file;
 
 /* This struct use to discript a running process in system, like you can see in
@@ -108,8 +124,14 @@ struct task {
 
 	pid_t pid;
 
-	// /proc/PID/exe
+	enum fto_flag fto_flag;
+
+	// realpath of /proc/PID/exe
 	char *exe;
+
+	/* If FTO_SELF set, load SELF ELF file when open.
+	 */
+	struct elf_file *exe_elf;
 
 	// open(2) /proc/PID/mem
 	int proc_mem_fd;
@@ -125,6 +147,8 @@ struct task {
 	/* if we found libc library, open it when open task with PID, and load all
 	 * symbol. when patch/ftrace command launched, it is useful to handle rela
 	 * symbol.
+	 *
+	 * Check FTO_LIBC
 	 */
 	struct elf_file *libc_elf;
 
@@ -155,7 +179,7 @@ int dump_task(const struct task *t);
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
 
-struct task *open_task(pid_t pid);
+struct task *open_task(pid_t pid, enum fto_flag flag);
 int free_task(struct task *task);
 
 int task_attach(pid_t pid);
