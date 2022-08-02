@@ -160,6 +160,11 @@ struct elf_file *elf_file_open(const char *filepath)
 	elf->size = size;
 	strncpy(elf->filepath, filepath, sizeof(elf->filepath) - 1);
 
+	/* Init symbols red black tree
+	 */
+	rb_init(&elf->symbols);
+
+
 /* ELF file header */
 	elf->ehdr = malloc(sizeof(GElf_Ehdr));
 	assert(elf->ehdr && "Malloc failed.");
@@ -286,6 +291,12 @@ error_open:
 	return NULL;
 }
 
+
+static void rb_free_symbol(struct rb_node *node) {
+	struct symbol *s = rb_entry(node, struct symbol, node);
+	free_symbol(s);
+}
+
 int elf_file_close(const char *filepath)
 {
 	struct elf_file *elf = NULL, *tmp;
@@ -308,6 +319,9 @@ int elf_file_close(const char *filepath)
 	free(elf->shdrs);
 	free(elf->phdrs);
 	free(elf->ehdr);
+
+	/* Destroy symbols rb tree */
+	rb_destroy(&elf->symbols, rb_free_symbol);
 
 	close(elf->fd);
 	list_del(&elf->node);

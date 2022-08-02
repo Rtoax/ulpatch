@@ -320,8 +320,14 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		if (!sym) continue;
 
 		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
-		// TODO: May you want save 'sym'
 
+		/* save symbol to rbtree
+		 */
+		struct symbol *s = alloc_symbol(symname, sym);
+		link_symbol(elf, s);
+
+		/* make some special handle
+		 */
 		switch (GELF_ST_TYPE(sym->st_info)) {
 		case STT_FUNC:
 			if (is_ftrace_entry(symname)) {
@@ -334,5 +340,45 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		}
 	}
 	return 0;
+}
+
+
+static int cmp_symbol_name(struct rb_node *n1, unsigned long key) {
+	struct symbol *s1 = rb_entry(n1, struct symbol, node);
+	struct symbol *s2 = (struct symbol*)key;
+	return strcmp(s1->name, s2->name);
+}
+
+struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
+{
+	struct symbol *s = malloc(sizeof(struct symbol));
+	s->name = strdup(name);
+	memcpy(&s->sym, sym, sizeof(GElf_Sym));
+
+	return s;
+}
+
+struct symbol *find_symbol(struct elf_file *elf, const char *name)
+{
+	struct symbol tmp = {
+		.name = (char *)name,
+	};
+	struct rb_node *node = rb_search_node(&elf->symbols,
+						cmp_symbol_name, (unsigned long)&tmp);
+
+	return node?rb_entry(node, struct symbol, node):NULL;
+}
+
+int link_symbol(struct elf_file *elf, struct symbol *s)
+{
+	struct rb_node *node = rb_insert_node(&elf->symbols, &s->node,
+						cmp_symbol_name, (unsigned long)s);
+	return node?0:-1;
+}
+
+void free_symbol(struct symbol *s)
+{
+	free(s->name);
+	free(s);
 }
 

@@ -30,7 +30,7 @@ static bool file_exist(const char *filepath)
 	return access(filepath, F_OK) == 0? true:false;
 }
 
-TEST(Elf,	open_close,	0)
+TEST(Elf,	find_symbol,	0)
 {
 	int i;
 	int ret = 0;
@@ -43,6 +43,15 @@ TEST(Elf,	open_close,	0)
 
 		if (!e) {
 			lerror("open %s failed.\n", test_elfs[i]);
+			ret = -1;
+			break;
+		}
+
+#define LIBC_MAIN	"__libc_start_main"
+		struct symbol *s = find_symbol(e, LIBC_MAIN);
+		if (!s) {
+			lerror("no symbol %s founded in %s.\n", LIBC_MAIN, test_elfs[i]);
+			elf_file_close(test_elfs[i]);
 			ret = -1;
 			break;
 		}

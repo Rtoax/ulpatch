@@ -52,11 +52,25 @@ struct elf_file {
 	GElf_Word verneed_stridx;
 	GElf_Word verdef_stridx;
 
+	/* save all symbol for fast search
+	 * struct symbol.node
+	 */
+	struct rb_root symbols;
+
 	// has fentry, mcount(), etc.
 	bool support_ftrace;
 
 	/* List all elf files */
 	struct list_head node;
+};
+
+struct symbol {
+	/* strdup() */
+	char *name;
+	GElf_Sym sym;
+
+	/* struct elf_file.symbols */
+	struct rb_node node;
 };
 
 struct elf_iter {

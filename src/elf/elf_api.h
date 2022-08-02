@@ -345,6 +345,11 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn);
 
+struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
+void free_symbol(struct symbol *s);
+int link_symbol(struct elf_file *elf, struct symbol *s);
+struct symbol *find_symbol(struct elf_file *elf, const char *name);
+
 // stderr@GLIBC_2.2.5
 // symname = stderr
 // vername = GLIBC_2.2.5
