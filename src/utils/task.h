@@ -97,6 +97,11 @@ get_vma_type(const char *exe, const char *name)
 	return type;
 }
 
+struct elf_file;
+
+/* This struct use to discript a running process in system, like you can see in
+ * proc file system, there are lots of HANDLE in this structure get from procfs.
+ */
 struct task {
 	// /proc/PID/comm
 	char comm[128];
@@ -116,6 +121,13 @@ struct task {
 	struct rb_root vmas_rb;
 
 	struct vma_struct *libc_vma;
+
+	/* if we found libc library, open it when open task with PID, and load all
+	 * symbol. when patch/ftrace command launched, it is useful to handle rela
+	 * symbol.
+	 */
+	struct elf_file *libc_elf;
+
 	struct vma_struct *stack;
 };
 

@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <elf.h>
 
+#include <elf/elf_api.h>
+
 #include "log.h"
 #include "task.h"
 
@@ -379,13 +381,15 @@ struct task *open_task(pid_t pid)
 
 	read_task_vmas(task, false);
 
-	list_add(&task->node, &tasks_list);
+	task->libc_elf = elf_file_open(task->libc_vma->name_);
 
-	if (!task->libc_vma || !task->stack) {
+	if (!task->libc_vma || !task->stack || !task->libc_elf) {
 		lerror("No libc or stack founded.\n");
 		free_task(task);
 		task = NULL;
 	}
+
+	list_add(&task->node, &tasks_list);
 
 	return task;
 }
@@ -394,6 +398,8 @@ int free_task(struct task *task)
 {
 	list_del(&task->node);
 	close(task->proc_mem_fd);
+
+	elf_file_close(task->libc_vma->name_);
 
 	free_task_vmas(task);
 	free(task->exe);
