@@ -35,6 +35,12 @@ add_executable(elfshow
 )
 target_compile_definitions(elfshow PRIVATE ${UTILS_FLAGS})
 
+# Target: uftrace
+add_executable(uftrace
+	uftrace.c
+)
+target_compile_definitions(uftrace PRIVATE ${UTILS_FLAGS})
+
 # Target: upatch
 add_executable(upatch
 	upatch.c
