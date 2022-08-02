@@ -49,7 +49,7 @@ static void print_help(void)
 	"\n"
 	" Usage: elfshow [OPTION]... [FILE]...\n"
 	"\n"
-	" ELF Tools\n"
+	" ELF Show\n"
 	"\n"
 	" Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
