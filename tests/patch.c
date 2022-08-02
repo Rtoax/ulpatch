@@ -10,6 +10,8 @@
 #include "test_api.h"
 
 
+extern void _mcount(void);
+
 static int ret_TTWU = 0;
 
 #define TTWU_FTRACE_RETURN	1
@@ -54,18 +56,20 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 #elif defined(__aarch64__)
 
-	// TODO: aarch64 ftrace
-	return TTWU_FTRACE_RETURN;
-
 	unsigned long bl_addr = (unsigned long)try_to_wake_up + 24;
 	unsigned long addr = (unsigned long)my_direct_func;
-	long off = (long)(addr - bl_addr);
-	long _mcount_insn = 0U;
 
-	_mcount_insn |= bl_addr & 0xfc000000U;
-	_mcount_insn |= (off >> 2) & 0x03ffffffU;
+	uint32_t bl_insn = (*(uint32_t *)bl_addr) & 0xfc000000U;
+	uint32_t bl_off = (addr - bl_addr);
 
-	ldebug("addr:%#0lx bl:%#0lx new:%#0lx\n", addr, bl_addr, _mcount_insn);
+	bl_off >>= 2;
+	bl_off &= 0x03ffffffU;
+
+	uint32_t _mcount_insn = bl_insn | bl_off;
+
+	ldebug("dst addr:%#0lx, old addr:%#0lx, bl addr:%#0lx\n",
+		addr, (unsigned long)_mcount, bl_addr);
+	ldebug("old insn:%#0lx, new insn:%#0lx\n", *(int32_t*)bl_addr, _mcount_insn);
 
 	memshow((void*)bl_addr, MCOUNT_INSN_SIZE);
 
