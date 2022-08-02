@@ -200,6 +200,9 @@ struct client {
 #endif
 
 
+struct elf_file *elf_file_open(const char *filepath);
+int elf_file_close(const char *filepath);
+
 int elf_main(int argc, char *argv[]);
 void elf_exit(void);
 int create_elf_client(void);

@@ -61,6 +61,8 @@ static bool just_list_tests = false;
 // For -f, --filter-tests
 static char *filter_format = NULL;
 
+static int log_level = LOG_ERR;
+
 // For -r, --role
 static enum who {
 	ROLE_NONE,
@@ -161,6 +163,9 @@ static void print_help(int ex)
 	"\n"
 	"Others:\n"
 	"\n"
+	"  -l, --log-level    set log level, default(%d)\n"
+	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
+	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	" -V, --verbose       output all test logs\n"
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
@@ -175,6 +180,9 @@ static void print_help(int ex)
 	role_string[ROLE_SLEEPER],
 	role_string[ROLE_WAITING],
 	role_string[ROLE_TRIGGER],
+	log_level,
+	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
+	LOG_DEBUG,
 	elftools_version()
 	);
 	exit(ex);
@@ -188,6 +196,7 @@ static int parse_config(int argc, char *argv[])
 		{"role",	required_argument,	0,	'r'},
 		{"usecond",	required_argument,	0,	's'},
 		{"msgq",	required_argument,	0,	'm'},
+		{"log-level",		required_argument,	0,	'L'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
@@ -197,7 +206,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:r:s:m:Vvh", options, &option_index);
+		c = getopt_long(argc, argv, "lf:r:s:m:L:Vvh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -217,6 +226,9 @@ static int parse_config(int argc, char *argv[])
 		case 'm':
 			msgq_file = (char*)optarg;
 			break;
+		case 'L':
+			log_level = atoi(optarg);
+			break;
 		case 'V':
 			verbose = true;
 			break;
@@ -231,6 +243,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		}
 	}
+
+	/* Set log level */
+	set_log_level(log_level);
 
 	if (role == ROLE_NONE) {
 		fprintf(stderr, "wrong -r, --role argument.\n");

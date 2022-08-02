@@ -114,7 +114,7 @@ static __unused int handle_sections(struct elf_file *elf)
 	return ret;
 }
 
-static __unused struct elf_file *elf_file_load(const char *filepath)
+struct elf_file *elf_file_open(const char *filepath)
 {
 	int fd;
 	size_t size;
@@ -158,7 +158,7 @@ static __unused struct elf_file *elf_file_load(const char *filepath)
 	elf->elf = __elf;
 	elf->rawfile = elf_rawfile(__elf, &elf->rawsize);
 	elf->size = size;
-	strncpy(elf->filepath, filepath, sizeof(elf->filepath));
+	strncpy(elf->filepath, filepath, sizeof(elf->filepath) - 1);
 
 /* ELF file header */
 	elf->ehdr = malloc(sizeof(GElf_Ehdr));
@@ -286,8 +286,7 @@ error_open:
 	return NULL;
 }
 
-static __unused int
-elf_file_delete(struct client *client, const char *filepath)
+int elf_file_close(const char *filepath)
 {
 	struct elf_file *elf = NULL, *tmp;
 
@@ -330,7 +329,7 @@ elf_file_delete(struct client *client, const char *filepath)
 int elf_load_handler(struct client *client, struct cmd_elf *cmd)
 {
 	struct cmd_elf_file *load = cmd_data(cmd);
-	struct elf_file __unused *elf = elf_file_load(load->file);
+	struct elf_file __unused *elf = elf_file_open(load->file);
 
 	return elf?0:-ENOENT;
 }
@@ -339,7 +338,7 @@ int elf_delete_handler(struct client *client, struct cmd_elf *cmd)
 {
 	struct cmd_elf_file *load = cmd_data(cmd);
 
-	return elf_file_delete(client, load->file);
+	return elf_file_close(load->file);
 }
 
 int elf_list_handler(struct client *client, struct cmd_elf *cmd)
