@@ -244,6 +244,9 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
+	if (verbose)
+		log_level = LOG_DEBUG;
+
 	/* Set log level */
 	set_log_level(log_level);
 
