@@ -47,7 +47,7 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: elftools [OPTION]... [FILE]...\n"
+	" Usage: elfshow [OPTION]... [FILE]...\n"
 	"\n"
 	" ELF Tools\n"
 	"\n"
@@ -66,7 +66,7 @@ static void print_help(void)
 	"\n"
 	"  -i, --input-files   input files to pre-load, auto filter out non exist\n"
 	"                      files.\n"
-	"                      for example: -i /bin/ls,/bin/cat,elftools,\n"
+	"                      for example: -i /bin/ls,/bin/cat,elfshow,\n"
 	"\n"
 	"  -l, --log-level     set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
@@ -78,7 +78,7 @@ static void print_help(void)
 	"  -h, --help          display this help and exit\n"
 	"  -v, --version       output version information and exit\n"
 	"\n"
-	" elftools %s\n",
+	" elfshow %s\n",
 	ELF_UNIX_PATH,
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
@@ -265,3 +265,4 @@ int main(int argc, char *argv[])
 failed:
 	return -1;
 }
+

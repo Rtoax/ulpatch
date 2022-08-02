@@ -29,8 +29,15 @@ link_libraries(${ELF} ${RT} ${PTHREAD}
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
-add_executable(elftools
-	elftools.c
+# Target: elfshow
+add_executable(elfshow
+	elfshow.c
 )
+target_compile_definitions(elfshow PRIVATE ${UTILS_FLAGS})
 
-target_compile_definitions(elftools PRIVATE ${UTILS_FLAGS})
+# Target: upatch
+add_executable(upatch
+	upatch.c
+)
+target_compile_definitions(upatch PRIVATE ${UTILS_FLAGS})
+
