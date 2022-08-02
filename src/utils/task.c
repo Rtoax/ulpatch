@@ -257,6 +257,20 @@ void print_vma(struct vma_struct *vma)
 			vma->maj, vma->min, vma->inode, vma->name_);
 }
 
+int dump_task(const struct task *task)
+{
+	printf(
+		"COMM: %s\n"
+		"PID:  %d\n"
+		"EXE:  %s\n",
+		task->comm,
+		task->pid,
+		task->exe
+	);
+
+	return 0;
+}
+
 void dump_task_vmas(struct task *task)
 {
 	struct vma_struct *vma;
@@ -298,6 +312,27 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
+static int __get_comm(struct task *task)
+{
+	char path[128];
+	ssize_t ret;
+	FILE *fp = NULL;
+
+	ret = snprintf(path, sizeof(path), "/proc/%d/comm", task->pid);
+	if (ret < 0) {
+		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		return -errno;
+	}
+
+	fp = fopen(path, "r");
+
+	fscanf(fp, "%s", task->comm);
+
+	fclose(fp);
+
+	return 0;
+}
+
 static int __get_exe(struct task *task)
 {
 	char path[128], realpath[128];
@@ -334,6 +369,7 @@ struct task *open_task(pid_t pid)
 	rb_init(&task->vmas_rb);
 
 	task->pid = pid;
+	__get_comm(task);
 	__get_exe(task);
 	task->proc_mem_fd = memfd;
 

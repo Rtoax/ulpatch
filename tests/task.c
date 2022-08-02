@@ -48,10 +48,11 @@ TEST(Task,	open_non_exist,	-1)
 	return task?0:-1;
 }
 
-TEST(Task,	dump_task_vmas,	0)
+TEST(Task,	dump_task,	0)
 {
 	struct task *task = open_task(getpid());
 
+	dump_task(task);
 	dump_task_vmas(task);
 
 	return free_task(task);

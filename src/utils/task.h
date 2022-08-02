@@ -98,6 +98,9 @@ get_vma_type(const char *exe, const char *name)
 }
 
 struct task {
+	// /proc/PID/comm
+	char comm[128];
+
 	pid_t pid;
 
 	// /proc/PID/exe
@@ -134,6 +137,8 @@ struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task *task, size_t size);
 int update_task_vmas(struct task *task);
+
+int dump_task(const struct task *t);
 
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
