@@ -219,7 +219,7 @@ static int read_task_vmas(struct task *task, bool update)
 		vma->min = min;
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
-		vma->type = get_vma_type(task->comm, name_);
+		vma->type = get_vma_type(task->exe, name_);
 		if (!task->libc_vma
 			&& vma->type == VMA_LIBC
 			&& vma->prot & PROT_EXEC) {
@@ -298,7 +298,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
-static int __get_comm(struct task *task)
+static int __get_exe(struct task *task)
 {
 	char path[128], realpath[128];
 	ssize_t ret;
@@ -310,7 +310,7 @@ static int __get_comm(struct task *task)
 		return -errno;
 	}
 	realpath[ret] = '\0';
-	task->comm = strdup(realpath);
+	task->exe = strdup(realpath);
 
 	return 0;
 }
@@ -334,7 +334,7 @@ struct task *open_task(pid_t pid)
 	rb_init(&task->vmas_rb);
 
 	task->pid = pid;
-	__get_comm(task);
+	__get_exe(task);
 	task->proc_mem_fd = memfd;
 
 	read_task_vmas(task, false);
@@ -356,7 +356,7 @@ int free_task(struct task *task)
 	close(task->proc_mem_fd);
 
 	free_task_vmas(task);
-	free(task->comm);
+	free(task->exe);
 
 	free(task);
 

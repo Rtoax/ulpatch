@@ -63,11 +63,11 @@ struct vma_struct {
 };
 
 static __unused enum vma_type
-get_vma_type(const char *comm, const char *name)
+get_vma_type(const char *exe, const char *name)
 {
 	enum vma_type type = VMA_NONE;
 
-	if (!strcmp(name, comm)) {
+	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
 	} else if (!strncmp(basename(name), "libc", 4)
 		|| !strncmp(basename(name), "libssp", 6)) {
@@ -101,7 +101,7 @@ struct task {
 	pid_t pid;
 
 	// /proc/PID/exe
-	char *comm;
+	char *exe;
 
 	// open(2) /proc/PID/mem
 	int proc_mem_fd;
