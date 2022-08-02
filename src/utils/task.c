@@ -220,6 +220,8 @@ static int read_task_vmas(struct task *task, bool update)
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
 		vma->type = get_vma_type(task->exe, name_);
+
+		// Find libc.so
 		if (!task->libc_vma
 			&& vma->type == VMA_LIBC
 			&& vma->prot & PROT_EXEC) {
@@ -227,7 +229,9 @@ static int read_task_vmas(struct task *task, bool update)
 			print_vma(vma);
 			task->libc_vma = vma;
 		}
-		if (!task->stack) {
+
+		// Find [stack]
+		if (!task->stack && vma->type == VMA_STACK) {
 			task->stack = vma;
 		}
 
