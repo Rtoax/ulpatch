@@ -12,11 +12,21 @@
 
 extern void mcount(void);
 extern void _mcount(void);
-extern void __mcount(void);
 
 static int ret_TTWU = 0;
 
 #define TTWU_FTRACE_RETURN	1
+
+/* when mcount() be called at the first time, mcount's address will be parse
+ * so that, if you don't access mcount, sym.st_value will be '0'
+ */
+#if defined(__x86_64__)
+char const *mcount_str = "mcount";
+const unsigned long mcount_addr = (unsigned long)mcount;
+#elif defined(__aarch64__)
+char const *mcount_str = "_mcount";
+const unsigned long mcount_addr = (unsigned long)_mcount;
+#endif
 
 static void my_direct_func(void)
 {
@@ -37,14 +47,10 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 	struct symbol *s = NULL;
 
-	char const *mcount_str =
-#if defined(__x86_64__)
-		"mcount";
-#elif defined(__aarch64__)
-		"_mcount";
-#endif
 
-	/* Try to find mcount symbol in target task address space
+	/* Try to find mcount symbol in target task address space, you need to
+	 * access mcount before find_symbol("mcount"), otherwise, st_value will be
+	 * zero.
 	 */
 	s = find_symbol(task->exe_elf, mcount_str);
 	if (!s) {
@@ -52,7 +58,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 		return -1;
 	}
 
-	linfo("_mcount: st_value: %lx\n", s->sym.st_value);
+	linfo("_mcount: st_value: %lx %lx\n", s->sym.st_value, mcount_addr);
 
 	try_to_wake_up();
 
