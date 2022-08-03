@@ -10,7 +10,9 @@
 #include "../test_api.h"
 
 
+extern void mcount(void);
 extern void _mcount(void);
+extern void __mcount(void);
 
 static int ret_TTWU = 0;
 
@@ -30,12 +32,24 @@ static __opt_O0 int try_to_wake_up(void)
 
 TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
-	int ret = 0;
+	int ret = 0, i;
 	struct task *task = open_task(getpid(), FTO_SELF);
 
-	struct symbol *s = find_symbol(task->exe_elf, "_mcount");
+	struct symbol *s = NULL;
+	const char *const mcount_symbols[] = {
+		"mcount", "_mcount", "__mcount", NULL,
+	};
+
+	/* Try to find mcount symbol in target task address space
+	 */
+	for (i = 0; i < ARRAY_SIZE(mcount_symbols); i++) {
+		s = find_symbol(task->exe_elf, mcount_symbols[i]);
+		if (s)
+			break;
+	}
+
 	if (!s) {
-		lerror("Not found _mcount()\n");
+		lerror("Not found mcount symbol\n");
 		return -1;
 	}
 
