@@ -14,7 +14,9 @@ struct test_data {
 TEST(List,	list,	0)
 {
 	LIST_HEAD(list1);
+	int ret = -1;
 	int i;
+	int sum = 0;
 	struct test_data *tmp = NULL;
 
 	struct test_data tests[] = {
@@ -29,6 +31,9 @@ TEST(List,	list,	0)
 
 	list_for_each_entry(tmp, &list1, node) {
 		ldebug("%d\n", tmp->v);
+
+		/* make sure all test data in list */
+		sum += tmp->v;
 	}
 
 	for (i = 0; i < ARRAY_SIZE(tests); i++) {
@@ -36,6 +41,9 @@ TEST(List,	list,	0)
 		list_del(&tmp->node);
 	}
 
-	return 0;
+	if (sum == 50)
+		ret = 0;
+
+	return ret;
 }
 
