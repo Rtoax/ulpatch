@@ -163,10 +163,11 @@ static void print_help(int ex)
 	"\n"
 	"Others:\n"
 	"\n"
-	"  -l, --log-level    set log level, default(%d)\n"
+	" -L, --log-level     set log level, default(%d)\n"
 	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
-	" -V, --verbose       output all test logs\n"
+	" -V, --verbose       output all test logs, if -V arg was set, you may\n"
+	"                     need to set -L, --log-level.\n"
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
 	"\n"
@@ -243,9 +244,6 @@ static int parse_config(int argc, char *argv[])
 			break;
 		}
 	}
-
-	if (verbose)
-		log_level = LOG_DEBUG;
 
 	/* Set log level */
 	set_log_level(log_level);

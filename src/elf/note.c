@@ -105,6 +105,12 @@ const char *n_type_core_string(GElf_Nhdr *nhdr)
 	return res;
 }
 
+/* Don't output
+ */
+#define printf(...) \
+	({int __ret = 0; __ret;})
+
+
 const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
 	uint32_t type, GElf_Word descsz, char *buf, size_t len)
 {
@@ -270,7 +276,7 @@ elf_error:
 			case 'b':
 				printf("    %s: %#" PRIx64 "  ", name, av->a_un.a_val);
 				GElf_Xword bit = 1;
-				const char *pfx = "<";
+				const char __unused *pfx = "<";
 				const char *p = NULL;
 				for (p = fmt + 1; *p != 0; p = strchr(p, '\0') + 1) {
 					if (av->a_un.a_val & bit) {
@@ -463,7 +469,7 @@ fail:
 		if (fnext == NULL)
 			goto fail;
 
-		int ct = printf("      %08" PRIx64 "-%08" PRIx64
+		int __unused ct = printf("      %08" PRIx64 "-%08" PRIx64
 	       " %08" PRIx64 " %" PRId64,
 	       mstart, mend, moffset * page_size, mend - mstart);
 		printf("%*s%s\n", ct > 50 ? 3 : 53 - ct, "", fptr);
@@ -540,9 +546,9 @@ invalid_sdt:
 			goto invalid_sdt;
 		}
 
-		GElf_Addr pc;
-		GElf_Addr base;
-		GElf_Addr sem;
+		GElf_Addr __unused pc;
+		GElf_Addr __unused base;
+		GElf_Addr __unused sem;
 
 		// already not support 32bit when open elf file
 		if (gelf_getclass(elf->elf) == ELFCLASS32) {
@@ -680,7 +686,7 @@ invalid_sdt:
 			bool other_byte_order =
 				(elf->ehdr->e_ident[EI_DATA] != ELFDATA2LSB);
 			size_t bytes = namesz - (value - name);
-			uint64_t val;
+			uint64_t __unused val;
 # define read_2ubyte_unaligned(order, Addr) \
 	(unlikely(order)	\
 	 ? bswap_16 (*((const uint16_t *) (Addr)))	\
@@ -768,7 +774,9 @@ unknown:
 			build_id[i * 2] = v[0];
 			build_id[i * 2 + 1] = v[1];
 			build_id[i * 2 + 2] = '\0';
+
 			ldebug("Build ID: %s\n", build_id);
+
 			elf->build_id = build_id;
 		}
 		break;
@@ -1055,7 +1063,7 @@ unknown:
 
 		if (elf32_xlatetom(&out, &in, elf->ehdr->e_ident[EI_DATA]) != NULL) {
 
-			const char *os;
+			const char __unused *os;
 
 			switch (buf[0]) {
 			case ELF_NOTE_OS_LINUX:
@@ -1130,10 +1138,10 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		const char *print_name = (is_gnu_build_attr
 			? ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX : name);
 
-		size_t print_namesz = (is_gnu_build_attr
+		size_t __unused print_namesz = (is_gnu_build_attr
 			? strlen (print_name) : nhdr.n_namesz);
 
-		char buf[100];
+		char __unused buf[100];
 		printf("  %-13.*s  %9" PRId32 "  %s\n",
 			(int) print_namesz, print_name, nhdr.n_descsz,
 			elf->ehdr->e_type == ET_CORE

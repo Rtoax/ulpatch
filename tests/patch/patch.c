@@ -18,20 +18,28 @@ static int ret_TTWU = 0;
 
 static void my_direct_func(void)
 {
-	ldebug(">>>>> REPLACE mcount() <<<<<\n");
+	linfo(">>>>> REPLACE mcount() <<<<<\n");
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
 static __opt_O0 int try_to_wake_up(void)
 {
-	ldebug("TTWU emulate.\n");
+	linfo("TTWU emulate.\n");
 	return ret_TTWU;
 }
 
 TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid(), FTO_NONE);
+	struct task *task = open_task(getpid(), FTO_SELF);
+
+	struct symbol *s = find_symbol(task->exe_elf, "_mcount");
+	if (!s) {
+		lerror("Not found _mcount()\n");
+		return -1;
+	}
+
+	linfo("_mcount: st_value: %lx\n", s->sym.st_value);
 
 	try_to_wake_up();
 
@@ -42,7 +50,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	unsigned long addr = (unsigned long)my_direct_func;
 	unsigned long __unused off = addr - call_addr - MCOUNT_INSN_SIZE;
 
-	ldebug("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
+	linfo("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
 	memshow((void*)call_addr, MCOUNT_INSN_SIZE);
 
 	// MUST use memcpy_to_task here, because ip has no write permission, but
@@ -67,9 +75,9 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 	uint32_t _mcount_insn = bl_insn | bl_off;
 
-	ldebug("dst addr:%#0lx, old addr:%#0lx, bl addr:%#0lx\n",
+	linfo("dst addr:%#0lx, old addr:%#0lx, bl addr:%#0lx\n",
 		addr, (unsigned long)_mcount, bl_addr);
-	ldebug("old insn:%#0lx, new insn:%#0lx\n", *(int32_t*)bl_addr, _mcount_insn);
+	linfo("old insn:%#0lx, new insn:%#0lx\n", *(int32_t*)bl_addr, _mcount_insn);
 
 	memshow((void*)bl_addr, MCOUNT_INSN_SIZE);
 

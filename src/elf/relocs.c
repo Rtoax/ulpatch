@@ -234,6 +234,13 @@ void print_rela(GElf_Rela *rela)
 		GELF_R_TYPE(rela->r_info), rela->r_addend);
 }
 
+
+/* Don't output
+ */
+#define printf(...) \
+	({int __ret = 0; __ret;})
+
+
 static int
 handle_relocs_rel(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 {
@@ -244,7 +251,7 @@ handle_relocs_rel(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 static int
 handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 {
-	int class = gelf_getclass(elf->elf);
+	int __unused class = gelf_getclass(elf->elf);
 	size_t sh_entsize = gelf_fsize (elf->elf, ELF_T_RELA, 1, EV_CURRENT);
 	int nentries = shdr->sh_size / sh_entsize;
 	struct elf_iter iter;
@@ -278,11 +285,11 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		xndxdata = elf_getdata (elf_getscn (elf->elf, xndxscnidx), NULL);
 
 	/* Get the section header string table index.  */
-	size_t shstrndx = elf->shdrstrndx;
+	size_t __unused shstrndx = elf->shdrstrndx;
 
 	if (shdr->sh_info != 0) {
 		// Relocation section [11] '.rela.plt' for section [24] '.got' at offset 0x2b38 contains 105 entries:
-		ldebug("Relocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
+		printf("Relocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
 			elf_ndxscn (scn),
 			elf_strptr (elf->elf, shstrndx, shdr->sh_name),
 			(unsigned int) shdr->sh_info,
@@ -294,7 +301,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		 * instead of section index zero.  Do not try to print a section
 		 * name.  */
 		// Relocation section [10] '.rela.dyn' at offset 0x1728 contains 214 entries:
-		ldebug("Relocation section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
+		printf("Relocation section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
 			(unsigned int) elf_ndxscn (scn),
 			elf_strptr (elf->elf, shstrndx, shdr->sh_name),
 			shdr->sh_offset,
@@ -338,7 +345,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 				}
 
 				if (is_statically_linked > 0 && shdr->sh_link == 0) {
-					ldebug("  %#0*" PRIx64 "  %-15s %*s  %#6" PRIx64 " %s\n",
+					printf("  %#0*" PRIx64 "  %-15s %*s  %#6" PRIx64 " %s\n",
 						class == ELFCLASS32 ? 10 : 18,
 						rel->r_offset,
 						rela_type_string(GELF_R_TYPE (rel->r_info)),
@@ -346,7 +353,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 						rel->r_addend,
 						elf_strptr (elf->elf, shstrndx, destshdr->sh_name));
 				} else {
-					ldebug("  %#0*" PRIx64 "  %-15s <%s %ld>\n",
+					printf("  %#0*" PRIx64 "  %-15s <%ld>\n",
 						class == ELFCLASS32 ? 10 : 18,
 						rel->r_offset,
 						rela_type_string(GELF_R_TYPE (rel->r_info)),
@@ -355,7 +362,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 			} // sym == NULL
 			else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION) {
-				ldebug("  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
+				printf("  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
 					class == ELFCLASS32 ? 10 : 18,
 					rel->r_offset,
 					rela_type_string(GELF_R_TYPE (rel->r_info)),
@@ -375,7 +382,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 							&secshdr_mem);
 
 				if (unlikely (secshdr == NULL)) {
-					ldebug("  %#0*" PRIx64 "  %-15s <%s %ld>\n",
+					printf("  %#0*" PRIx64 "  %-15s <%ld>\n",
 						class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 						rela_type_string(GELF_R_TYPE (rel->r_info)),
 						(long int) (sym->st_shndx == SHN_XINDEX
@@ -383,7 +390,7 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 				} else {
 
-					ldebug("%#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
+					printf("%#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
 						class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 						rela_type_string(GELF_R_TYPE (rel->r_info)),
 						class == ELFCLASS32 ? 10 : 18, sym->st_value,
