@@ -106,6 +106,7 @@ void free_strstr_list(struct list_head *list);
 
 struct mmap_struct {
 	char *filepath;
+	file_type ftype;
 	int fd;
 	int flags;
 	int prot;
@@ -117,6 +118,8 @@ struct mmap_struct {
  */
 int fsize(const char *filepath);
 bool fexist(const char *filepath);
+file_type ftype(const char *filepath);
+
 struct mmap_struct *fmmap_rdonly(const char *filepath);
 int fmunmap(struct mmap_struct *mem);
 

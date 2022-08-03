@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <assert.h>
 
+#include <gelf.h>
+
 #include "log.h"
 #include "task.h"
 #include "util.h"
@@ -36,6 +38,40 @@ bool fexist(const char *filepath)
 	return access(filepath, F_OK) == 0? true:false;
 }
 
+static int _file_type_mem(struct mmap_struct *mem)
+{
+	GElf_Ehdr *ehdr = mem->mem;
+
+	if (ehdr->e_ident[EI_MAG0] == ELFMAG0 &&
+		ehdr->e_ident[EI_MAG1] == ELFMAG1 &&
+		ehdr->e_ident[EI_MAG2] == ELFMAG2 &&
+		ehdr->e_ident[EI_MAG3] == ELFMAG3) {
+		return FILE_ELF;
+	}
+
+	return FILE_UNKNOWN;
+}
+
+static int _file_type(const char *filepath)
+{
+	file_type type = FILE_UNKNOWN;
+
+	struct mmap_struct *f = fmmap_rdonly(filepath);
+	if (!f)
+		return FILE_UNKNOWN;
+
+	type = _file_type_mem(f);
+
+	fmunmap(f);
+
+	return type;
+}
+
+file_type ftype(const char *filepath)
+{
+	return _file_type(filepath);
+}
+
 
 static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
 {
@@ -58,6 +94,8 @@ static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
 		lerror("mmap %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
 	}
+
+	mem->ftype = _file_type_mem(mem);
 
 	return mem;
 
