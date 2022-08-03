@@ -306,6 +306,14 @@ static int free_task_vmas(struct task *task)
 	return 0;
 }
 
+bool proc_pid_exist(pid_t pid)
+{
+	char path[128];
+
+	snprintf(path, sizeof(path), "/proc/%d", pid);
+	return fexist(path);
+}
+
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;

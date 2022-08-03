@@ -11,12 +11,16 @@
 
 #include <utils/log.h>
 #include <utils/list.h>
+#include <utils/task.h>
 #include <utils/compiler.h>
 
 
 struct config config = {
 	.log_level = LOG_DEBUG,
 };
+
+static pid_t target_pid = -1;
+
 
 static void print_help(void)
 {
@@ -47,6 +51,7 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
+		{"pid",		required_argument,	0,	'p'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
 		{"log-level",		required_argument,	0,	'l'},
@@ -55,11 +60,14 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "vhl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:vhl:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
 		switch (c) {
+		case 'p':
+			target_pid = atoi(optarg);
+			break;
 		case 'v':
 			printf("version %s\n", elftools_version());
 			exit(0);
@@ -71,6 +79,16 @@ static int parse_config(int argc, char *argv[])
 		default:
 			print_help();
 		}
+	}
+
+	if (target_pid == -1) {
+		fprintf(stderr, "Specify pid with -p, --pid.\n");
+		exit(1);
+	}
+
+	if (!proc_pid_exist(target_pid)) {
+		fprintf(stderr, "pid %d not exist.\n", target_pid);
+		exit(1);
 	}
 
 	return 0;
