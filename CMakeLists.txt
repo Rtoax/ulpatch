@@ -1,8 +1,6 @@
-###################################
-## Top level CMakeLists.txt
-##
-## Author: Rong Tao
-###################################
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2022 Rong Tao
+
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 PROJECT(elftools)

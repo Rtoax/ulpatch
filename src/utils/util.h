@@ -1,4 +1,5 @@
-// Copyright Copyright (c) 2022
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022 Rong Tao */
 #ifndef _UTIL_H
 #define _UTIL_H
 

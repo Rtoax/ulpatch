@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022 Rong Tao */
 #ifdef HAVE_SDT_H
 #include <sys/sdt.h>
 #endif
