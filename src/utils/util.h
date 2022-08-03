@@ -51,7 +51,8 @@ struct list_head {
 };
 
 typedef enum {
-        FILE_ELF,
+	FILE_UNKNOWN,
+	FILE_ELF,
 } file_type;
 
 // elftools arguments configuration
