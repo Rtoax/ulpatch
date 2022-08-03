@@ -51,6 +51,8 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	/* Try to find mcount symbol in target task address space, you need to
 	 * access mcount before find_symbol("mcount"), otherwise, st_value will be
 	 * zero.
+	 *
+	 * AArch64: bl <_mcount> is 0x94000000 before relocation
 	 */
 	s = find_symbol(task->exe_elf, mcount_str);
 	if (!s) {
