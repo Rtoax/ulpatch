@@ -43,9 +43,10 @@ static __opt_O0 int try_to_wake_up(void)
 TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid(), FTO_SELF);
+	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
-	struct symbol *s = NULL;
+	struct symbol *rel_s = NULL;
+	struct symbol *libc_s = NULL;
 
 
 	/* Try to find mcount symbol in target task address space, you need to
@@ -54,14 +55,27 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	 *
 	 * AArch64: bl <_mcount> is 0x94000000 before relocation
 	 */
-	s = find_symbol(task->exe_elf, mcount_str);
-	if (!s) {
-		lerror("Not found mcount symbol\n");
+	rel_s = find_symbol(task->exe_elf, mcount_str);
+	if (!rel_s) {
+		lerror("Not found mcount symbol in %s\n", task->exe);
+		return -1;
+	}
+
+	/* Try to find mcount in libc.so, some time, libc.so's symbols is very
+	 * useful when you try to patch a running process or ftrace it. so, this
+	 * is a test.
+	 */
+	libc_s = find_symbol(task->libc_elf, mcount_str);
+	if (!libc_s) {
+		lerror("Not found mcount symbol\n", task->libc_elf->filepath);
 		return -1;
 	}
 
 	dump_task(task);
-	linfo("_mcount: st_value: %lx %lx\n", s->sym.st_value, mcount_addr);
+	linfo("SELF: _mcount: st_value: %lx %lx\n",
+		rel_s->sym.st_value, mcount_addr);
+	linfo("LIBC: _mcount: st_value: %lx %lx\n",
+		libc_s->sym.st_value, mcount_addr);
 
 	try_to_wake_up();
 
@@ -86,12 +100,14 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 #elif defined(__aarch64__)
 
+	// TODO: how to get bl <_mcount> address (24)
 	unsigned long bl_addr = (unsigned long)try_to_wake_up + 24;
 	unsigned long addr = (unsigned long)my_direct_func;
 
 	uint32_t bl_insn = (*(uint32_t *)bl_addr) & 0xfc000000U;
 	uint32_t bl_off = (addr - bl_addr);
 
+	// TODO: how to calculate offset of "bl"
 	bl_off >>= 2;
 	bl_off &= 0x03ffffffU;
 
