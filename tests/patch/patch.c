@@ -60,6 +60,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 		return -1;
 	}
 
+	dump_task(task);
 	linfo("_mcount: st_value: %lx %lx\n", s->sym.st_value, mcount_addr);
 
 	try_to_wake_up();
