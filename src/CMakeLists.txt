@@ -35,6 +35,12 @@ add_executable(elfshow
 )
 target_compile_definitions(elfshow PRIVATE ${UTILS_FLAGS})
 
+# Target: utask
+add_executable(utask
+	utask.c
+)
+target_compile_definitions(utask PRIVATE ${UTILS_FLAGS})
+
 # Target: uftrace
 add_executable(uftrace
 	uftrace.c
