@@ -32,22 +32,21 @@ static __opt_O0 int try_to_wake_up(void)
 
 TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
-	int ret = 0, i;
+	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF);
 
 	struct symbol *s = NULL;
-	const char *const mcount_symbols[] = {
-		"mcount", "_mcount", "__mcount", NULL,
-	};
+
+	char const *mcount_str =
+#if defined(__x86_64__)
+		"mcount";
+#elif defined(__aarch64__)
+		"_mcount";
+#endif
 
 	/* Try to find mcount symbol in target task address space
 	 */
-	for (i = 0; i < ARRAY_SIZE(mcount_symbols); i++) {
-		s = find_symbol(task->exe_elf, mcount_symbols[i]);
-		if (s)
-			break;
-	}
-
+	s = find_symbol(task->exe_elf, mcount_str);
 	if (!s) {
 		lerror("Not found mcount symbol\n");
 		return -1;
