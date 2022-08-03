@@ -254,7 +254,7 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (sleep_usec <= 0 || sleep_usec > 999000000) {
-		fprintf(stderr, "wrong -s, --second argument, 0 < X < 999\n");
+		fprintf(stderr, "wrong -s, --usecond argument, 0 < X < 999000000\n");
 		exit(1);
 	}
 
