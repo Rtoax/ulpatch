@@ -75,7 +75,14 @@ file_type ftype(const char *filepath)
 
 static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
 {
-	struct mmap_struct *mem = malloc(sizeof(struct mmap_struct));
+	struct mmap_struct *mem = NULL;
+
+	if (!fexist(filepath)) {
+		lerror("%s not exist.\n", filepath);
+		return NULL;
+	}
+
+	mem = malloc(sizeof(struct mmap_struct));
 	assert(mem && "malloc fatal.");
 
 	mem->filepath = strdup(filepath);
