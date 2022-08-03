@@ -25,10 +25,6 @@ static const char *test_elfs[] = {
 	"/usr/bin/who",
 };
 
-static bool file_exist(const char *filepath)
-{
-	return access(filepath, F_OK) == 0? true:false;
-}
 
 TEST(Elf,	open_close,	0)
 {
@@ -36,7 +32,7 @@ TEST(Elf,	open_close,	0)
 	int ret = 0;
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i]))
+		if (!fexist(test_elfs[i]))
 			continue;
 
 		struct elf_file __unused *e = elf_file_open(test_elfs[i]);

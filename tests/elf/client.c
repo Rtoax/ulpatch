@@ -24,11 +24,6 @@ static const char *test_elfs[] = {
 	"/usr/bin/who",
 };
 
-static bool file_exist(const char *filepath)
-{
-	return access(filepath, F_OK) == 0? true:false;
-}
-
 static void print_elf(struct file_info *info)
 {
 	if (info->type == FILE_ELF)
@@ -78,7 +73,7 @@ TEST(Elf_client,	open_delete_loop,	0)
 	int ret = -1, i;
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i])) {
+		if (!fexist(test_elfs[i])) {
 			continue;
 		}
 		ret = client_open_elf_file(test_client_fd, test_elfs[i]);
@@ -95,7 +90,7 @@ TEST(Elf_client,	list,	0)
 	int ret = -1, i;
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i])) {
+		if (!fexist(test_elfs[i])) {
 			continue;
 		}
 		ret = client_open_elf_file(test_client_fd, test_elfs[i]);
@@ -114,7 +109,7 @@ TEST(Elf_client,	select,	0)
 	int ret = -1, i;
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i])) {
+		if (!fexist(test_elfs[i])) {
 			continue;
 		}
 		ret = client_open_elf_file(test_client_fd, test_elfs[i]);
@@ -122,7 +117,7 @@ TEST(Elf_client,	select,	0)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i])) {
+		if (!fexist(test_elfs[i])) {
 			continue;
 		}
 		ret = client_select_elf_file(test_client_fd, test_elfs[i]);
@@ -131,7 +126,7 @@ TEST(Elf_client,	select,	0)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
-		if (!file_exist(test_elfs[i])) {
+		if (!fexist(test_elfs[i])) {
 			continue;
 		}
 		ret = client_delete_elf_file(test_client_fd, test_elfs[i]);

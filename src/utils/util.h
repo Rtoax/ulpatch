@@ -4,6 +4,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,6 +101,23 @@ void free_strstr_list(struct list_head *list);
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)
+
+
+struct mmap_struct {
+	char *filepath;
+	int fd;
+	int flags;
+	int prot;
+	void *mem;
+	size_t size;
+};
+
+/* there are some file mmap apis
+ */
+int fsize(const char *filepath);
+bool fexist(const char *filepath);
+struct mmap_struct *fmmap_rdonly(const char *filepath);
+int fmunmap(struct mmap_struct *mem);
 
 
 #ifdef __cplusplus
