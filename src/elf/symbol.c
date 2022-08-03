@@ -3,6 +3,7 @@
 #include <libelf.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include <elf/elf_api.h>
 #include <utils/util.h>
