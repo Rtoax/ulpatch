@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include <elf/elf_api.h>
 #include <cli/cli_api.h>
@@ -25,7 +26,10 @@ struct config config = {
 
 static pid_t target_pid = -1;
 
+static bool flag_dump_vmas = false;
 static bool flag_dump_vma = false;
+static unsigned long dump_vma_addr = 0;
+static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
 
@@ -43,6 +47,12 @@ static void print_help(void)
 	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
 	"  -v, --dump-vmas     dump vmas\n"
+	"  -V, --dump-vma      save VMA address space to console or to a file,\n"
+	"                      need to specify address of a VMA. check with -v.\n"
+	"                      the input will be take as base 16, default output\n"
+	"                      is stdout, write(2), specify output file with -o.\n"
+	"\n"
+	"  -o, --output        specify output filename.\n"
 	"\n"
 	" Other argument:\n"
 	"\n"
@@ -66,6 +76,8 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{"pid",		required_argument,	0,	'p'},
 		{"dump-vmas",	no_argument,	0,	'v'},
+		{"dump-vma",	required_argument,	0,	'V'},
+		{"output",	required_argument,	0,	'o'},
 		{"version",	no_argument,	0,	ARG_VERSION},
 		{"help",	no_argument,	0,	'h'},
 		{"log-level",		required_argument,	0,	'l'},
@@ -74,7 +86,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vhl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:vV:o:hl:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -83,7 +95,14 @@ static int parse_config(int argc, char *argv[])
 			target_pid = atoi(optarg);
 			break;
 		case 'v':
+			flag_dump_vmas = true;
+			break;
+		case 'V':
 			flag_dump_vma = true;
+			dump_vma_addr = strtoull(optarg, NULL, 16);
+			break;
+		case 'o':
+			output_file = optarg;
 			break;
 		case ARG_VERSION:
 			printf("version %s\n", elftools_version());
@@ -98,8 +117,13 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	if (!flag_dump_vma) {
+	if (!flag_dump_vmas && !flag_dump_vma) {
 		fprintf(stderr, "nothing to do, -h, --help.\n");
+		exit(1);
+	}
+
+	if (output_file && fexist(output_file)) {
+		fprintf(stderr, "%s exist.\n", output_file);
 		exit(1);
 	}
 
@@ -130,10 +154,52 @@ int main(int argc, char *argv[])
 	}
 
 	/* dump target task VMAs from /proc/PID/maps */
-	if (flag_dump_vma)
+	if (flag_dump_vmas)
 		dump_task_vmas(target_task);
 
+	/* dump an VMA */
+	if (flag_dump_vma) {
 
+		size_t vma_size = 0;
+		void *mem = NULL;
+
+		/* default is stdout */
+		int nbytes;
+		int fd = fileno(stdout);
+
+		if (output_file) {
+			fd = open(output_file, O_CREAT | O_RDWR, 0664);
+			if (fd <= 0) {
+				fprintf(stderr, "open %s: %s\n", output_file, strerror(errno));
+				goto free_and_ret;
+			}
+		}
+		struct vma_struct *vma = find_vma(target_task, dump_vma_addr);
+		if (!vma) {
+			fprintf(stderr, "vma not exist.\n");
+			goto free_and_ret;
+		}
+
+		vma_size = vma->end - vma->start;
+
+		mem = malloc(vma_size);
+
+		memcpy_from_task(target_task, mem, vma->start, vma_size);
+
+		/* write to file or stdout */
+		nbytes = write(fd, mem, vma_size);
+		if (nbytes != vma_size) {
+			fprintf(stderr, "write failed, %s.\n", strerror(errno));
+			free(mem);
+			goto free_and_ret;
+		}
+
+		free(mem);
+		if (fd != fileno(stdout))
+			close(fd);
+	}
+
+free_and_ret:
 	free_task(target_task);
 
 	return 0;
