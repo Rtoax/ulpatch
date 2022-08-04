@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <elf/elf_api.h>
 #include <cli/cli_api.h>
@@ -16,11 +17,17 @@
 
 
 struct config config = {
-	.log_level = LOG_DEBUG,
+	.log_level = -1,
 };
+
+#define ARG_VERSION	100
+
 
 static pid_t target_pid = -1;
 
+static bool flag_dump_vma = false;
+
+static struct task *target_task = NULL;
 
 static void print_help(void)
 {
@@ -35,6 +42,7 @@ static void print_help(void)
 	" Essential argument:\n"
 	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"  -v, --dump-vmas     dump vmas\n"
 	"\n"
 	" Other argument:\n"
 	"\n"
@@ -42,7 +50,7 @@ static void print_help(void)
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
+	"  --version           output version information and exit\n"
 	"\n"
 	" utask %s\n",
 	config.log_level,
@@ -57,7 +65,8 @@ static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
 		{"pid",		required_argument,	0,	'p'},
-		{"version",	no_argument,	0,	'v'},
+		{"dump-vmas",	no_argument,	0,	'v'},
+		{"version",	no_argument,	0,	ARG_VERSION},
 		{"help",	no_argument,	0,	'h'},
 		{"log-level",		required_argument,	0,	'l'},
 	};
@@ -74,6 +83,9 @@ static int parse_config(int argc, char *argv[])
 			target_pid = atoi(optarg);
 			break;
 		case 'v':
+			flag_dump_vma = true;
+			break;
+		case ARG_VERSION:
 			printf("version %s\n", elftools_version());
 			exit(0);
 		case 'h':
@@ -84,6 +96,11 @@ static int parse_config(int argc, char *argv[])
 		default:
 			print_help();
 		}
+	}
+
+	if (!flag_dump_vma) {
+		fprintf(stderr, "nothing to do, -h, --help.\n");
+		exit(1);
 	}
 
 	if (target_pid == -1) {
@@ -102,6 +119,22 @@ static int parse_config(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
+
+	set_log_level(config.log_level);
+
+	target_task = open_task(target_pid, FTO_ALL);
+
+	if (!target_task) {
+		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
+		return 1;
+	}
+
+	/* dump target task VMAs from /proc/PID/maps */
+	if (flag_dump_vma)
+		dump_task_vmas(target_task);
+
+
+	free_task(target_task);
 
 	return 0;
 }

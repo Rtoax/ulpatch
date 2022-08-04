@@ -112,6 +112,9 @@ const char *n_type_core_string(GElf_Nhdr *nhdr)
 #define printf(...) \
 	({int __ret = 0; __ret;})
 
+#define putchar_unlocked(...) \
+	({int __ret = 0; __ret;})
+
 
 const char *n_type_object_string(GElf_Nhdr *nhdr, const char *name,
 	uint32_t type, GElf_Word descsz, char *buf, size_t len)

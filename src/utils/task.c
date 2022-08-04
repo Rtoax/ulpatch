@@ -230,7 +230,6 @@ static int read_task_vmas(struct task *task, bool update)
 			&& vma->type == VMA_LIBC
 			&& vma->prot & PROT_EXEC) {
 			ldebug("Get libc:\n");
-			print_vma(vma);
 			task->libc_vma = vma;
 		}
 
