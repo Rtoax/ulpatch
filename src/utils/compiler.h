@@ -65,6 +65,8 @@ extern "C" {
 
 #define __deprecated  __attribute__((deprecated))
 
+#define CTOR_PRIO_1	101
+#define CTOR_PRIO_USER	105
 // value: 101 ~ 200, 101 first
 #define __ctor(value) __attribute__((constructor(value)))
 

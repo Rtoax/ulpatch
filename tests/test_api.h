@@ -13,7 +13,7 @@
  */
 typedef enum {
 // constructor priorities from 0 to 100 are reserved for the implementation
-#define TEST_PRIO_START	101
+#define TEST_PRIO_START	CTOR_PRIO_USER
 	TEST_HIGHEST = 1,
 #define TEST_PRIO_HIGHEST	TEST_PRIO_START + TEST_HIGHEST
 	TEST_HIGHER,

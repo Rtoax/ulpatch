@@ -38,6 +38,12 @@ extern "C" {
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 #endif
 
+
+/* all output need file store here, mkdir(2) it before running.
+ */
+#define ROOT_DIR	"/tmp/elftools"
+
+
 /* Indirect stringification.  Doing two levels allows the parameter to be a
  * macro itself.  For example, compile with -DFOO=bar, __stringify(FOO)
  * converts to "bar".
@@ -83,6 +89,8 @@ struct str_node {
 // Global configuration
 extern struct config config;
 
+
+void elftools_init(void);
 const char *elftools_version(void);
 const char *elftools_arch(void);
 

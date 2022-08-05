@@ -142,6 +142,8 @@ static int parse_config(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+	elftools_init();
+
 	parse_config(argc, argv);
 
 	set_log_level(config.log_level);

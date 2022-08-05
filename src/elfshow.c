@@ -230,6 +230,8 @@ int cli_selected_elf_cb(void *arg)
 
 int main(int argc, char *argv[])
 {
+	elftools_init();
+
 	parse_config(argc, argv);
 
 	/* Run background */

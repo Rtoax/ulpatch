@@ -505,6 +505,8 @@ static void sig_handler(int signum)
  */
 int main(int argc, char *argv[])
 {
+	elftools_init();
+
 	signal(SIGINT, sig_handler);
 
 	elftools_test_path =
