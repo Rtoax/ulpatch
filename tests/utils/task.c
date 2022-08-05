@@ -111,6 +111,8 @@ TEST(Task,	attach_detach,	0)
 		lerror("fork(2) error.\n");
 	}
 
+	task_wait_destroy(&waitqueue);
+
 	return ret;
 }
 
@@ -249,6 +251,8 @@ TEST(Task,	mmap_malloc,	0)
 		lerror("fork(2) error.\n");
 	}
 
+	task_wait_destroy(&waitqueue);
+
 	return ret;
 }
 
@@ -317,6 +321,8 @@ TEST(Task,	fstat,	0)
 	} else {
 		lerror("fork(2) error.\n");
 	}
+
+	task_wait_destroy(&waitqueue);
 
 	ldebug("ret = %d\n", ret);
 
@@ -405,6 +411,8 @@ static int task_mmap_file(int prot)
 		lerror("fork(2) error.\n");
 	}
 
+	task_wait_destroy(&waitqueue);
+
 	return ret;
 }
 TEST(Task,	mmap_file_rw,	0)
@@ -483,6 +491,8 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 	} else {
 		lerror("fork(2) error.\n");
 	}
+
+	task_wait_destroy(&waitqueue);
 
 	return ret;
 }
