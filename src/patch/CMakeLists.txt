@@ -3,6 +3,8 @@
 #
 include_directories(..)
 
+add_subdirectory(objects)
+
 find_library(ELF elf /usr/lib64)
 find_library(PTHREAD pthread /usr/lib64)
 
