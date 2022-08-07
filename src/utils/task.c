@@ -408,6 +408,16 @@ struct task *open_task(pid_t pid, enum fto_flag flag)
 			goto free_task;
 		}
 	}
+	/* Create a directory under ROOT_DIR */
+	if (flag & FTO_PROC) {
+		char buffer[BUFFER_SIZE];
+		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+
+		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
+			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
+			goto free_task;
+		}
+	}
 
 	/* All success, add task to global list
 	 */
@@ -430,6 +440,16 @@ int free_task(struct task *task)
 
 	if (task->fto_flag & FTO_LIBC)
 		elf_file_close(task->libc_vma->name_);
+
+	if (task->fto_flag & FTO_PROC) {
+		char buffer[BUFFER_SIZE];
+		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+
+		if (rmdir(buffer) != 0) {
+			lerror("rmdir(%s) for %d:%s failed, %s.\n",
+				buffer, task->pid, task->exe, strerror(errno));
+		}
+	}
 
 	free_task_vmas(task);
 	free(task->exe);

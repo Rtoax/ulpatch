@@ -41,6 +41,12 @@ TEST(Task,	open_free_fto_flags,	0)
 	if (!task->libc_elf || !task->exe_elf) {
 		ret = -1;
 	}
+	char buffer[BUFFER_SIZE];
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+
+	if (!fexist(buffer)) {
+		ret = -1;
+	}
 
 	free_task(task);
 
