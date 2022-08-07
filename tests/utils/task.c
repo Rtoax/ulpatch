@@ -107,7 +107,7 @@ TEST(Task,	attach_detach,	0)
 		ret = task_attach(pid);
 		ret = task_detach(pid);
 
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue);
 
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
@@ -247,7 +247,7 @@ TEST(Task,	mmap_malloc,	0)
 		}
 
 		ret = task_detach(pid);
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -318,7 +318,7 @@ TEST(Task,	fstat,	0)
 		task_close(task, remote_fd);
 		task_detach(pid);
 
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -407,7 +407,7 @@ static int task_mmap_file(int prot)
 
 		task_detach(pid);
 
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;
@@ -488,7 +488,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 
 		ret = task_detach(pid);
 
-		task_wait_trigger(&waitqueue, 1000);
+		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
 			ret = -EINVAL;

@@ -451,7 +451,7 @@ static void launch_trigger(void)
 
 	task_wait_init(&wait_here, msgq_file);
 	ldebug("CHILD: send msg.\n");
-	task_wait_trigger(&wait_here, 0);
+	task_wait_trigger(&wait_here);
 	ldebug("CHILD: return.\n");
 	// task_wait_destroy(&wait_here);
 }
@@ -598,7 +598,7 @@ TEST(elftools_test,	wait,	0)
 
 		// do something
 		ldebug("PARENT: msgsnd to child.\n");
-		task_wait_trigger(&waitqueue, 10000);
+		task_wait_trigger(&waitqueue);
 		ldebug("PARENT: send done.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
@@ -684,9 +684,9 @@ TEST(elftools_test,	wait_wait_wait,	0)
 
 		// do something
 		ldebug("PARENT: msgsnd to child.\n");
-		task_wait_trigger(&waitqueue, 10000);
-		task_wait_trigger(&waitqueue, 10000);
-		task_wait_trigger(&waitqueue, 10000);
+		task_wait_trigger(&waitqueue);
+		task_wait_trigger(&waitqueue);
+		task_wait_trigger(&waitqueue);
 		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
@@ -774,9 +774,12 @@ TEST(elftools_test,	wait_trigger,	0)
 
 		// do something
 		ldebug("PARENT: do some thing.\n");
-		task_wait_trigger(&waitqueue, 10000);
+		task_wait_trigger(&waitqueue);
+		usleep(1000);
 		task_wait_wait(&waitqueue);
-		task_wait_trigger(&waitqueue, 10000);
+		usleep(1000);
+		task_wait_trigger(&waitqueue);
+		usleep(1000);
 		task_wait_wait(&waitqueue);
 		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);

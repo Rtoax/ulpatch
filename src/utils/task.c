@@ -974,15 +974,8 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 }
 
 
-/* task_wait inner message?
- *
- */
-struct msg_form {
-	int mtype;
-	char mtext[32];
-};
-
 #define PROG_ID	123
+#define MSG_TYPE	1
 
 /* key: ftok(2) open/create a tmp file
  */
@@ -1007,6 +1000,7 @@ int task_wait_init(struct task_wait *task_wait, char *tmpfile)
 
 int task_wait_destroy(struct task_wait *task_wait)
 {
+	msgctl(task_wait->msqid, IPC_RMID, NULL);
 	unlink(task_wait->tmpfile);
 	return 0;
 }
@@ -1015,8 +1009,11 @@ int task_wait_wait(struct task_wait *task_wait)
 {
 	int msqid;
 	key_t key;
+	int ret;
 
-	struct msg_form msg;
+	struct msgbuf msg;
+
+	while (!fexist(task_wait->tmpfile));
 
 	if ((key = ftok(task_wait->tmpfile, PROG_ID)) < 0) {
 		perror("ftok error");
@@ -1028,19 +1025,27 @@ int task_wait_wait(struct task_wait *task_wait)
 		exit(1);
 	}
 
-	msgrcv(msqid, &msg, sizeof(msg), msg.mtype, 0);
-
-	msgctl(msqid, IPC_RMID, NULL);
+recv:
+	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE, 0);
+	if (ret == -1) {
+		if (errno != ENOMSG) {
+			perror("msgrcv");
+		} else {
+			goto recv;
+		}
+	}
 
 	return 0;
 }
 
-int task_wait_trigger(struct task_wait *task_wait, useconds_t usec)
+int task_wait_trigger(struct task_wait *task_wait)
 {
 	int msqid;
 	key_t key;
-	struct msg_form msg = {
-		.mtype = 0,
+	int ret = 0;
+
+	struct msgbuf msg = {
+		.mtype = MSG_TYPE,
 		.mtext = {0},
 	};
 
@@ -1054,14 +1059,12 @@ int task_wait_trigger(struct task_wait *task_wait, useconds_t usec)
 		exit(1);
 	}
 
-	// Do you need sleep for a while
-	if (usec)
-		usleep(usec);
-
 	msg.mtext[0] = 'q';
-	msgsnd(msqid, &msg, sizeof(msg), 0);
-
-	msgctl(msqid, IPC_RMID, NULL);
+	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
+	if (ret < 0) {
+		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
+			ret, msqid, strerror(errno));
+	}
 
 	return 0;
 }

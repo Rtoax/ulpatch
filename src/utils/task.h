@@ -224,11 +224,12 @@ int task_syscall(struct task *task, int nr,
 
 /* Add wait api */
 struct task_wait {
+	int msqid;
 	char tmpfile[64];
 };
 
 int task_wait_init(struct task_wait *task_wait, char *tmpfile);
 int task_wait_destroy(struct task_wait *task_wait);
 int task_wait_wait(struct task_wait *task_wait);
-int task_wait_trigger(struct task_wait *task_wait, useconds_t usec);
+int task_wait_trigger(struct task_wait *task_wait);
 
