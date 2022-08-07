@@ -8,6 +8,9 @@
 
 #include <utils/log.h>
 
+#include "compiler.h"
+
+
 static const char *level_prefix[] = {
 	"[\033[1;5;31mEMERG\033[m]",
 	"[\033[1;5;31mALERT\033[m]",
@@ -20,10 +23,17 @@ static const char *level_prefix[] = {
 };
 
 static int log_level = LOG_DEBUG;
+static bool prefix_on = true;
+
 
 void set_log_level(int level)
 {
 	log_level = level;
+}
+
+void set_log_prefix(bool on)
+{
+	prefix_on = !!on;
 }
 
 int _____log(int level, const char *file, const char *func,
@@ -36,15 +46,18 @@ int _____log(int level, const char *file, const char *func,
 	if (level > log_level)
 		return 0;
 
-	char buffer[32];
-	time_t timestamp = time(NULL);
+	if (likely(prefix_on)) {
+		char buffer[32];
+		time_t timestamp = time(NULL);
 
-	// like 15:53:52
-	strftime(buffer, 32, "%T", localtime(&timestamp));
+		// like 15:53:52
+		strftime(buffer, 32, "%T", localtime(&timestamp));
+
+		fprintf(fp, "%s %s[%s:%ld] ", buffer, level_prefix[level], func, line);
+	}
 
 	va_start(va, fmt);
 
-	fprintf(fp, "%s %s[%s:%ld] ", buffer, level_prefix[level], func, line);
 	n += vfprintf(fp, fmt, va);
 
 	va_end(va);

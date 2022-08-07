@@ -3,6 +3,7 @@
 #pragma once
 
 #include <syslog.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +23,7 @@ _____log(int level, const char *file, const char *func,
 	unsigned long int line, char *fmt, ...);
 
 void set_log_level(int level);
+void set_log_prefix(bool on);
 
 #ifdef __cplusplus
 }

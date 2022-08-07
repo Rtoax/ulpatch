@@ -37,3 +37,31 @@ TEST(Log,	set_log_level,	0)
 
 	return 0;
 }
+
+TEST(Log,	set_log_prefix,	0)
+{
+	set_log_prefix(false);
+
+	ldebug("DEBUG\n");
+	linfo("INFO\n");
+	lnotice("NOTICE\n");
+	lwarning("WARN\n");
+	lerror("ERROR\n");
+	lcrit("CRIT\n");
+	lalert("ALERT\n");
+	lemerg("EMERG\n");
+
+	set_log_prefix(true);
+
+	ldebug("DEBUG\n");
+	linfo("INFO\n");
+	lnotice("NOTICE\n");
+	lwarning("WARN\n");
+	lerror("ERROR\n");
+	lcrit("CRIT\n");
+	lalert("ALERT\n");
+	lemerg("EMERG\n");
+
+	return 0;
+}
+
