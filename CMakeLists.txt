@@ -84,3 +84,26 @@ add_subdirectory(src)
 if(BUILD_TESTING)
 add_subdirectory(tests)
 endif()
+
+# install targets
+install(
+TARGETS
+	uftrace
+	upatch
+	utask
+	elfshow
+	elftools_test
+RUNTIME DESTINATION /usr/local/bin
+)
+
+# uninstall targets
+if(NOT TARGET uninstall)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+    IMMEDIATE @ONLY)
+
+  add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()
+
