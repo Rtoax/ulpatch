@@ -13,6 +13,8 @@
 
 #include <gelf.h>
 
+#include <elf/elf_api.h>
+
 #include "log.h"
 #include "task.h"
 #include "util.h"
@@ -42,16 +44,16 @@ bool fexist(const char *filepath)
 
 static int _file_type_mem(struct mmap_struct *mem)
 {
+	file_type type = FILE_UNKNOWN;
 	GElf_Ehdr *ehdr = mem->mem;
 
-	if (ehdr->e_ident[EI_MAG0] == ELFMAG0 &&
-		ehdr->e_ident[EI_MAG1] == ELFMAG1 &&
-		ehdr->e_ident[EI_MAG2] == ELFMAG2 &&
-		ehdr->e_ident[EI_MAG3] == ELFMAG3) {
-		return FILE_ELF;
+	if (check_ehdr_magic_is_ok(ehdr)) {
+		type = FILE_ELF;
+		if (ehdr->e_type == ET_REL)
+			type |= FILE_ELF_RELO;
 	}
 
-	return FILE_UNKNOWN;
+	return type;
 }
 
 static int _file_type(const char *filepath)

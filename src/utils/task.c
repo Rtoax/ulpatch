@@ -6,12 +6,8 @@
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/mman.h>
 #include <sys/ptrace.h>
 #include <sys/user.h>
-#include <sys/mman.h>
 #include <sys/wait.h>
 #include <sys/msg.h>
 #include <limits.h>

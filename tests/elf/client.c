@@ -28,8 +28,11 @@ static const char *test_elfs[] = {
 
 static void print_elf(struct file_info *info)
 {
-	if (info->type == FILE_ELF)
+	if (info->type & FILE_ELF) {
 		printf(" %s ELF %s\n", info->client_select?"> ":"  ", info->name);
+	} else {
+		fprintf(stderr, " %s is not ELF\n", info->name);
+	}
 }
 
 static int register_handler(void) {

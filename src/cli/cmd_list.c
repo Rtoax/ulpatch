@@ -23,7 +23,7 @@
 
 static void cli_elf_list_handler(struct file_info *info)
 {
-	if (info->type != FILE_ELF)
+	if ((info->type & FILE_ELF) != FILE_ELF)
 		return;
 	printf(" %s ELF %s %s\n",
 		info->client_select?"> ":"  ",

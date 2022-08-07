@@ -58,8 +58,10 @@ struct list_head {
 };
 
 typedef enum {
-	FILE_UNKNOWN,
-	FILE_ELF,
+	FILE_UNKNOWN = 0,
+	FILE_ELF = 0x1 << 0,
+	// ELF LSB relocatable
+	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
 } file_type;
 
 // elftools arguments configuration

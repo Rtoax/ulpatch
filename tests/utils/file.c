@@ -74,7 +74,7 @@ TEST(File,	ftype_ELF,	0)
 	}
 
 	file_type type = ftype(USR_BIN_LS);
-	if (type != FILE_ELF) {
+	if ((type & FILE_ELF) != FILE_ELF) {
 		lerror("%s is not ELF(%d), but %d\n", USR_BIN_LS, FILE_ELF, type);
 		return -1;
 	}

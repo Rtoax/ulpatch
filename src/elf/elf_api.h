@@ -264,6 +264,7 @@ int client_test_server(int connfd, int (*handler)(const char *str, int len));
 
 
 /* ELF Ehdr api */
+bool check_ehdr_magic_is_ok(const GElf_Ehdr *ehdr);
 int print_ehdr(const GElf_Ehdr *ehdr);
 #ifdef HAVE_JSON_C_LIBRARIES
 json_object *json_ehdr(const GElf_Ehdr *ehdr);
