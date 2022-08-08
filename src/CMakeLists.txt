@@ -24,6 +24,7 @@ find_library(PTHREAD pthread /usr/lib64)
 
 link_libraries(${ELF} ${RT} ${PTHREAD}
 	elftools_utils
+	elftools_utils_arch
 	elftools_elf
 	elftools_cli
 	elftools_gtk
