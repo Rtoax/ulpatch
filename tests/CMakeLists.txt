@@ -11,6 +11,7 @@ link_libraries(${ELF} ${PTHREAD}
 	elftools_elf
 	elftools_patch
 	elftools_utils
+	elftools_utils_arch
 	elftools_cli
 )
 

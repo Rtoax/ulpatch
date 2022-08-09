@@ -9,6 +9,41 @@
 #include "debug-monitors.h"
 
 
+/*
+ * In ARMv8-A, A64 instructions have a fixed length of 32 bits and are always
+ * little-endian.
+ */
+int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp)
+{
+	int ret;
+	uint32_t val;
+
+	ret = memcpy_from_task(task, &val, addr, AARCH64_INSN_SIZE);
+	if (ret)
+		*insnp = val;
+
+	return ret?0:-1;
+}
+
+int aarch64_insn_write(struct task *task, unsigned long addr, uint32_t insn)
+{
+	uint32_t *tp = (uint32_t *)addr;
+	int ret;
+
+	/* A64 instructions must be word aligned */
+	if ((uintptr_t)tp & 0x3)
+		return -EINVAL;
+
+	ret = memcpy_to_task(task, addr, &insn, AARCH64_INSN_SIZE);
+	if (ret) {
+		// TODO
+		//__flush_icache_range((uintptr_t)tp,
+		//		     (uintptr_t)tp + AARCH64_INSN_SIZE);
+	}
+
+	return ret?0:-1;
+}
+
 // see arch/arm64/kernel/insn.c same function
 static inline long branch_imm_common(unsigned long pc, unsigned long addr,
 					long range)

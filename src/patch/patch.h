@@ -15,6 +15,7 @@
 #include <utils/arch/x86_64/instruments.h>
 #elif defined(__aarch64__)
 #include <utils/arch/aarch64/instruments.h>
+#include <utils/arch/aarch64/ftrace.h>
 #endif
 
 

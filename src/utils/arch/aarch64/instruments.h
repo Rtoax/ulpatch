@@ -5,11 +5,13 @@
 #include <stdint.h>
 #include <assert.h>
 
+#include <utils/task.h>
 #include <utils/compiler.h>
 
 
 /* A64 instructions are always 32 bits. */
-#define BL_INSN_SIZE 4
+#define	AARCH64_INSN_SIZE		4
+#define BL_INSN_SIZE AARCH64_INSN_SIZE
 
 
 #define INST_SYSCALL    0x01, 0x00, 0x00, 0xd4  /*0xd4000001 svc #0  = syscall*/
@@ -167,6 +169,9 @@ __AARCH64_INSN_FUNCS(ssbb,	0xFFFFFFFF, 0xD503309F)
 __AARCH64_INSN_FUNCS(pssbb,	0xFFFFFFFF, 0xD503349F)
 
 #undef	__AARCH64_INSN_FUNCS
+
+int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp);
+int aarch64_insn_write(struct task *task, unsigned long addr, uint32_t insn);
 
 uint64_t aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type,
 			uint32_t insn);

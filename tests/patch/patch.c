@@ -103,29 +103,17 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 #elif defined(__aarch64__)
 
 	// TODO: how to get bl <_mcount> address (24)
-	unsigned long bl_addr = (unsigned long)try_to_wake_up + 24;
-	unsigned long addr = (unsigned long)my_direct_func;
+	unsigned long pc = (unsigned long)try_to_wake_up + 24;
+	uint32_t new = aarch64_insn_gen_branch_imm(pc,
+						(unsigned long)my_direct_func,
+						AARCH64_INSN_BRANCH_LINK);
 
-	uint32_t bl_insn = (*(uint32_t *)bl_addr) & 0xfc000000U;
-	uint32_t bl_off = (addr - bl_addr);
+	memshow((void*)pc, MCOUNT_INSN_SIZE);
 
-	// TODO: how to calculate offset of "bl"
-	bl_off >>= 2;
-	bl_off &= 0x03ffffffU;
+	/* application the patch */
+	ftrace_modify_code(task, pc, 0, new, false);
 
-	uint32_t _mcount_insn = bl_insn | bl_off;
-
-	linfo("dst addr:%#0lx, old addr:%#0lx, bl addr:%#0lx\n",
-		addr, (unsigned long)_mcount, bl_addr);
-	linfo("old insn:%#0lx, new insn:%#0lx\n", *(int32_t*)bl_addr, _mcount_insn);
-
-	memshow((void*)bl_addr, MCOUNT_INSN_SIZE);
-
-	ret = memcpy_to_task(task, (unsigned long)bl_addr, (void*)&_mcount_insn, MCOUNT_INSN_SIZE);
-	if (ret != 4) {
-		lerror("failed to memcpy.\n");
-	}
-	memshow((void*)bl_addr, MCOUNT_INSN_SIZE);
+	memshow((void*)pc, MCOUNT_INSN_SIZE);
 
 #endif
 
