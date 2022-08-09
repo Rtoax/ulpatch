@@ -115,6 +115,7 @@ static int direct_patch_test(struct patch_test_arg *arg)
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
+	linfo("pc:%#0lx new addr:%#0lx\n", pc, new);
 	memshow((void*)pc, MCOUNT_INSN_SIZE);
 
 	/* application the patch */

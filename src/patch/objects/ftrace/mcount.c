@@ -44,10 +44,11 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 		ARG6(regs)
 	);
 
-	/* This is try_to_wake_up() ftrace
+	/* This is try_to_wake_up() ftrace, here 0x26 is a emulate value, you can
+	 * check the offset with 'objdump -d' command.
 	 */
 	if (child - (unsigned long)try_to_wake_up > 0x0 &&
-		child - (unsigned long)try_to_wake_up < 0x16) {
+		child - (unsigned long)try_to_wake_up < 0x26) {
 		struct task *task = (void *)ARG1(regs);
 		lwarning("COMM: %s, PID %d\n", task->comm, task->pid);
 	}
