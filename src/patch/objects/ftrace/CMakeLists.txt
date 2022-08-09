@@ -42,5 +42,8 @@ file(GLOB_RECURSE LIB_ASM_SOURCES
 
 add_library(elftools_patch_obj STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
 
-target_compile_definitions(elftools_patch_obj PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(elftools_patch_obj PRIVATE
+	${UTILS_FLAGS}
+	ELFTOOLS_TEST
+)
 
