@@ -89,7 +89,7 @@ static int direct_patch_test(struct patch_test_arg *arg)
 
 #if defined(__x86_64__)
 
-	unsigned long call_addr = (unsigned long)try_to_wake_up + 4;
+	unsigned long call_addr = (unsigned long)try_to_wake_up + 8;
 	unsigned long ip = call_addr + 1;
 	unsigned long addr = (unsigned long)arg->custom_mcount;
 	unsigned long __unused off = addr - call_addr - MCOUNT_INSN_SIZE;
