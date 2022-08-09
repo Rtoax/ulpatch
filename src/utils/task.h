@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -73,14 +74,14 @@ get_vma_type(const char *exe, const char *name)
 
 	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
-	} else if (!strncmp(basename(name), "libc", 4)
-		|| !strncmp(basename(name), "libssp", 6)) {
+	} else if (!strncmp(basename((char*)name), "libc", 4)
+		|| !strncmp(basename((char*)name), "libssp", 6)) {
 		type = VMA_LIBC;
-	} else if (!strncmp(basename(name), "libelf", 6)) {
+	} else if (!strncmp(basename((char*)name), "libelf", 6)) {
 		type = VMA_LIBELF;
 	} else if (!strcmp(name, "[heap]")) {
 		type = VMA_HEAP;
-	} else if (!strncmp(basename(name), "ld-linux", 8)) {
+	} else if (!strncmp(basename((char*)name), "ld-linux", 8)) {
 		type = VMA_LD;
 	} else if (!strcmp(name, "[stack]")) {
 		type = VMA_STACK;
@@ -90,7 +91,7 @@ get_vma_type(const char *exe, const char *name)
 		type = VMA_VDSO;
 	} else if (!strcmp(name, "[vsyscall]")) {
 		type = VMA_VSYSCALL;
-	} else if (!strncmp(basename(name), "lib", 3)) {
+	} else if (!strncmp(basename((char*)name), "lib", 3)) {
 		type = VMA_LIB_DONT_KNOWN;
 	} else if (strlen(name) == 0) {
 		type = VMA_ANON;
