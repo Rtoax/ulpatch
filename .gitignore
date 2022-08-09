@@ -7,5 +7,9 @@ Makefile
 # elf
 *.a
 *.o
+*.op
+*.oS
+*.oc
+*.obj
 *.d
 *.out

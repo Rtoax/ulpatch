@@ -1,20 +1,25 @@
-#include <stdio.h>
-
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022 Rong Tao */
 #include <patch/patch.h>
 
-#define __visible_default  __attribute__((visibility("default")))
+#if defined(__x86_64__)
+#include "utils/arch/x86_64/mcount.h"
+#elif defined(__aarch64__)
+#include "utils/arch/aarch64/mcount.h"
+#endif
 
-#define print_func() printf("[%s:%d]\n", __func__, __LINE__)
 
-
-void __visible_default ftrace_mcount(void)
+int mcount_entry(unsigned long *parent_loc, unsigned long child,
+			struct mcount_regs *regs)
 {
-	print_func();
+	// TODO
+	return 0;
 }
 
-void __visible_default ftrace__mcount(void)
+unsigned long mcount_exit(long *retval)
 {
-	print_func();
+	// TODO
+	return 0;
 }
 
 #if defined(__x86_64__)

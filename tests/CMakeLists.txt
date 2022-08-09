@@ -23,6 +23,7 @@ aux_source_directory(elf DIR_ELF_SRCS)
 aux_source_directory(patch DIR_PATCH_SRCS)
 aux_source_directory(cli DIR_CLI_SRCS)
 aux_source_directory(utils DIR_UTILS_SRCS)
+aux_source_directory(utils/arch DIR_UTILS_SRCS)
 
 add_executable(elftools_test
 	${DIR_SRCS}
