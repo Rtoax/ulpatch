@@ -40,7 +40,7 @@ static void my_direct_func(void)
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-static __opt_O0 int try_to_wake_up(void)
+static __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 {
 	linfo("TTWU emulate.\n");
 	int ret = ret_TTWU;
@@ -85,7 +85,7 @@ static int direct_patch_test(struct patch_test_arg *arg)
 	linfo("LIBC: _mcount: st_value: %lx %lx\n",
 		libc_s->sym.st_value, mcount_addr);
 
-	try_to_wake_up();
+	try_to_wake_up(task, 0, 0);
 
 #if defined(__x86_64__)
 
@@ -124,7 +124,7 @@ static int direct_patch_test(struct patch_test_arg *arg)
 #endif
 
 	// call again, custom_mcount() will be called.
-	ret = try_to_wake_up();
+	ret = try_to_wake_up(task, 1, 1);
 
 	free_task(task);
 
