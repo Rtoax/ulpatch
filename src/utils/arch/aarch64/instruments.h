@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include <utils/task.h>
 #include <utils/compiler.h>
 
 
@@ -169,6 +168,8 @@ __AARCH64_INSN_FUNCS(ssbb,	0xFFFFFFFF, 0xD503309F)
 __AARCH64_INSN_FUNCS(pssbb,	0xFFFFFFFF, 0xD503349F)
 
 #undef	__AARCH64_INSN_FUNCS
+
+struct task;
 
 int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp);
 int aarch64_insn_write(struct task *task, unsigned long addr, uint32_t insn);

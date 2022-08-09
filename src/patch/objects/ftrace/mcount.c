@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022 Rong Tao */
+#include <stdio.h>
 #include <patch/patch.h>
 
 #if defined(__x86_64__)
@@ -12,12 +13,14 @@
 int mcount_entry(unsigned long *parent_loc, unsigned long child,
 			struct mcount_regs *regs)
 {
+	printf("CALL mcount_entry.\n");
 	// TODO
 	return 0;
 }
 
 unsigned long mcount_exit(long *retval)
 {
+	printf("CALL mcount_exit.\n");
 	// TODO
 	return 0;
 }

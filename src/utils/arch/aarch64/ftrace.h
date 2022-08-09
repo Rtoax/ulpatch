@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <utils/task.h>
 
+struct task;
 
 int ftrace_modify_code(struct task *task, unsigned long pc, uint32_t old,
 		uint32_t new, bool validate);

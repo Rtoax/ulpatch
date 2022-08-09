@@ -20,10 +20,3 @@ struct mcount_regs {
 #define ARG5(a) ((a)->r8)
 #define ARG6(a) ((a)->r9)
 
-extern void _ftrace_mcount(void);
-extern void _ftrace_mcount_return(void);
-
-int mcount_entry(unsigned long *parent_loc, unsigned long child,
-			struct mcount_regs *regs);
-unsigned long mcount_exit(long *retval);
-

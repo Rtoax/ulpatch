@@ -12,6 +12,10 @@
 #include "../test_api.h"
 
 
+struct patch_test_arg {
+	void (*custom_mcount)(void);
+};
+
 extern void mcount(void);
 extern void _mcount(void);
 
@@ -39,10 +43,12 @@ static void my_direct_func(void)
 static __opt_O0 int try_to_wake_up(void)
 {
 	linfo("TTWU emulate.\n");
-	return ret_TTWU;
+	int ret = ret_TTWU;
+	ret_TTWU = 0;
+	return ret;
 }
 
-TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
+static int direct_patch_test(struct patch_test_arg *arg)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
@@ -85,7 +91,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 	unsigned long call_addr = (unsigned long)try_to_wake_up + 4;
 	unsigned long ip = call_addr + 1;
-	unsigned long addr = (unsigned long)my_direct_func;
+	unsigned long addr = (unsigned long)arg->custom_mcount;
 	unsigned long __unused off = addr - call_addr - MCOUNT_INSN_SIZE;
 
 	linfo("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
@@ -105,7 +111,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	// TODO: how to get bl <_mcount> address (24)
 	unsigned long pc = (unsigned long)try_to_wake_up + 24;
 	uint32_t new = aarch64_insn_gen_branch_imm(pc,
-						(unsigned long)my_direct_func,
+						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
 	memshow((void*)pc, MCOUNT_INSN_SIZE);
@@ -117,11 +123,29 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 
 #endif
 
-	// call again, my_direct_func will be called.
+	// call again, custom_mcount() will be called.
 	ret = try_to_wake_up();
 
 	free_task(task);
 
 	return ret;
+}
+
+TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
+{
+	struct patch_test_arg arg = {
+		.custom_mcount = my_direct_func,
+	};
+
+	return direct_patch_test(&arg);
+}
+
+TEST(Patch,	ftrace_object,	0)
+{
+	struct patch_test_arg arg = {
+		.custom_mcount = _ftrace_mcount,
+	};
+
+	return direct_patch_test(&arg);
 }
 

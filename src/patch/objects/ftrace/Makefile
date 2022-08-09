@@ -10,7 +10,7 @@ CC = gcc
 CFLAGS := -Werror -Wall
 
 ifdef DEBUG
-CFLAGS += -DDEBUG -O0 -g
+CFLAGS += -DDEBUG -O0
 endif
 
 ifdef INCS1

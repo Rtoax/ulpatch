@@ -3,6 +3,11 @@
 #
 include_directories(../../../)
 
+enable_language(C ASM)
+
+set(ASM_OPTIONS "-x assembler-with-cpp")
+set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
+
 set(FTRACE_OBJ_TARGET ftrace_obj)
 
 add_custom_target(${FTRACE_OBJ_TARGET}
@@ -25,12 +30,17 @@ link_libraries(${ELF} ${PTHREAD} ${JSON_C}
 	elftools_elf
 )
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
+add_definitions(-MD -Wall -Werror -O0 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(elftools_patch_obj STATIC ${LIB_SOURCES})
+# Need to explicitly add assembly files
+file(GLOB_RECURSE LIB_ASM_SOURCES
+	mcount.S
+)
+
+add_library(elftools_patch_obj STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
 
 target_compile_definitions(elftools_patch_obj PRIVATE ${UTILS_FLAGS})
 

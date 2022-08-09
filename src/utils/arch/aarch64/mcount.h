@@ -25,11 +25,4 @@ struct mcount_regs {
 #define ARG8(a) ((a)->x7)
 
 
-extern void _ftrace_mcount(void);
-extern void _ftrace_mcount_return(void);
-
-int mcount_entry(unsigned long *parent_loc, unsigned long child,
-			struct mcount_regs *regs);
-unsigned long mcount_exit(long *retval);
-
 

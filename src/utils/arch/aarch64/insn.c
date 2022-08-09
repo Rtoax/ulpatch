@@ -4,6 +4,7 @@
 
 #include <utils/util.h>
 #include <utils/log.h>
+#include <utils/task.h>
 
 #include "instruments.h"
 #include "debug-monitors.h"
