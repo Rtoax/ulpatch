@@ -49,6 +49,20 @@ static void my_direct_func(void)
 	return ret;
 }
 
+#if defined(__aarch64__)
+static __unused uint32_t aarch64_func_bl_offset(void *func)
+{
+	uint32_t offset = 0;
+	while (1) {
+		if (aarch64_insn_is_bl(*(uint32_t *)(func + offset)))
+			break;
+		offset += 4;
+	}
+
+	return offset;
+}
+#endif
+
 static int direct_patch_test(struct patch_test_arg *arg)
 {
 	int ret = 0;
@@ -110,12 +124,15 @@ static int direct_patch_test(struct patch_test_arg *arg)
 #elif defined(__aarch64__)
 
 	// TODO: how to get bl <_mcount> address (24)
-	unsigned long pc = (unsigned long)try_to_wake_up + 24;
+	unsigned long pc =
+		(unsigned long)try_to_wake_up + aarch64_func_bl_offset(try_to_wake_up);
 	uint32_t new = aarch64_insn_gen_branch_imm(pc,
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
-	linfo("pc:%#0lx new addr:%#0lx\n", pc, new);
+	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n",
+		pc, new, aarch64_func_bl_offset(try_to_wake_up));
+
 	memshow((void*)pc, MCOUNT_INSN_SIZE);
 
 	/* application the patch */
