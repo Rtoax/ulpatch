@@ -56,7 +56,7 @@ static __unused uint32_t aarch64_func_bl_offset(void *func)
 	while (1) {
 		if (aarch64_insn_is_bl(*(uint32_t *)(func + offset)))
 			break;
-		offset += 4;
+		offset += AARCH64_INSN_SIZE;
 	}
 
 	return offset;

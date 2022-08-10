@@ -18,6 +18,10 @@
 #define INST_CALLQ      modify_me               /* callq */
 #define INST_JMPQ       modify_me               /* jmpq */
 
+#define SYSCALL_INSTR \
+		INST_SYSCALL, /* syscall */\
+		INST_INT3, /* int3 */
+
 #define JMP_TABLE_JUMP_AARCH64  0xd61f022058000051 /*  ldr x17 #8; br x17 */
 #define JMP_TABLE_JUMP_ARCH     JMP_TABLE_JUMP_AARCH64
 
