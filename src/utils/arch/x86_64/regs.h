@@ -5,11 +5,6 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 
-#include "arch/x86_64/instruments.h"
-
-#define SYSCALL_INSTR \
-		INST_SYSCALL, /* syscall */\
-		INST_INT3, /* int3 */
 
 #define SYSCALL_REGS_PREPARE(regs, nr, p1, p2, p3, p4, p5, p6)  \
         regs.rax = (unsigned long)nr;   \

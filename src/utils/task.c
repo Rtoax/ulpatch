@@ -21,8 +21,10 @@
 
 #if defined(__x86_64__)
 #include "arch/x86_64/regs.h"
+#include "arch/x86_64/instruments.h"
 #elif defined(__aarch64__)
 #include "arch/aarch64/regs.h"
+#include "arch/aarch64/instruments.h"
 #endif
 
 LIST_HEAD(tasks_list);
