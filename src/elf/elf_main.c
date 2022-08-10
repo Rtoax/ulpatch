@@ -326,8 +326,7 @@ int elf_main(int argc, char *argv[])
 	}
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, NULL, 0);
 
-	ret = unlink(ELF_UNIX_PATH);
-	if (ret != 0) {
+	if (fexist(ELF_UNIX_PATH) && (ret = unlink(ELF_UNIX_PATH))) {
 		lerror("unlink(%s) failed, %s\n", ELF_UNIX_PATH, strerror(errno));
 		close(main_epollfd);
 		close(listenfd);
