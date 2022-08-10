@@ -139,7 +139,7 @@ const char *elftools_arch(void);
 
 void daemonize(void);
 
-int memshow(void *data, int data_len);
+int memshow(const void *data, int data_len);
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int startswith (const char *str, const char *prefix);
 

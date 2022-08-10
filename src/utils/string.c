@@ -8,17 +8,55 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "list.h"
 
-int memshow(void *data, int data_len)
+int memshow(const void *data, int data_len)
 {
 	if (!data || data_len <= 0) return -EINVAL;
-	int i;
-	unsigned char *c = (unsigned char *)data;
-	for (i = 0; i < data_len; i++) {
-		printf("%02x ", c[i]);
-	} printf("\n");
+
+	int i, iline;
+	const int align = 16;
+
+	for (iline = 0; iline * align < data_len; iline++) {
+
+		unsigned char *line = (unsigned char *)data + iline * align;
+
+		printf("%08x  ", iline * align);
+
+		for (i = 0; i < align; i++) {
+			char *e = " ";
+			int len = iline * align + i;
+
+			if (i == align / 2 - 1)
+				e = "  ";
+
+			if (len >= data_len) {
+				printf("%2s%s", "", e);
+			} else {
+				printf("%02x%s", line[i], e);
+			}
+		}
+
+		printf("  |");
+
+		for (i = 0; i < align; i++) {
+			char e = '.';
+			int len = iline * align + i;
+
+			if (isprint(line[i]))
+				e = line[i];
+
+			if (len >= data_len) {
+				printf(" ");
+			} else {
+				printf("%c", e);
+			}
+		}
+
+		printf("|\n");
+	}
 
 	return 0;
 }
