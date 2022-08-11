@@ -56,6 +56,12 @@ TEST(Task,	open_free_fto_flags,	0)
 		ret = -1;
 	}
 
+	/* /tmp/elftools/PID/patches */
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/patches", task->pid);
+	if (!fexist(buffer)) {
+		ret = -1;
+	}
+
 	free_task(task);
 
 	return ret;
