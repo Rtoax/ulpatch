@@ -104,22 +104,21 @@ static int direct_patch_test(struct patch_test_arg *arg)
 
 #if defined(__x86_64__)
 
-	unsigned long call_addr = (unsigned long)try_to_wake_up + 8;
-	unsigned long ip = call_addr + 1;
+	unsigned long ip = (unsigned long)try_to_wake_up + 8;
 	unsigned long addr = (unsigned long)arg->custom_mcount;
-	unsigned long __unused off = addr - call_addr - MCOUNT_INSN_SIZE;
 
-	linfo("ip:%#0lx addr:%#0lx call:%#0lx\n", ip, addr, call_addr);
-	memshow((void*)call_addr, MCOUNT_INSN_SIZE);
+	union text_poke_insn insn;
+	const char *new = ftrace_call_replace(&insn, ip, addr);
 
-	// MUST use memcpy_to_task here, because ip has no write permission, but
-	// pwrite(2) or ptrace(2) has.
-	ret = memcpy_to_task(task, (unsigned long)ip, (void*)&off, MCOUNT_INSN_SIZE - 1);
-	if (ret != 4) {
+	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
+	memshow((void*)ip, MCOUNT_INSN_SIZE);
+
+	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
+	if (ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 
-	memshow((void*)call_addr, MCOUNT_INSN_SIZE);
+	memshow((void*)ip, MCOUNT_INSN_SIZE);
 
 #elif defined(__aarch64__)
 
