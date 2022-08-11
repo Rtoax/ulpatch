@@ -14,6 +14,10 @@
 
 struct patch_test_arg {
 	void (*custom_mcount)(void);
+	enum {
+		REPLACE_MCOUNT,
+		REPLACE_NOP,
+	} replace;
 };
 
 extern void mcount(void);
@@ -108,7 +112,16 @@ static int direct_patch_test(struct patch_test_arg *arg)
 	unsigned long addr = (unsigned long)arg->custom_mcount;
 
 	union text_poke_insn insn;
-	const char *new = ftrace_call_replace(&insn, ip, addr);
+	const char *new = NULL;
+
+	switch (arg->replace) {
+	case REPLACE_MCOUNT:
+		new = ftrace_call_replace(&insn, ip, addr);
+		break;
+	case REPLACE_NOP:
+		new = ftrace_nop_replace();
+		break;
+	}
 
 	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
 	memshow((void*)ip, MCOUNT_INSN_SIZE);
@@ -154,6 +167,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 {
 	struct patch_test_arg arg = {
 		.custom_mcount = my_direct_func,
+		.replace = REPLACE_MCOUNT,
 	};
 
 	return direct_patch_test(&arg);
@@ -163,8 +177,21 @@ TEST(Patch,	ftrace_object,	0)
 {
 	struct patch_test_arg arg = {
 		.custom_mcount = _ftrace_mcount,
+		.replace = REPLACE_MCOUNT,
 	};
 
 	return direct_patch_test(&arg);
 }
+
+#if defined(__x86_64__)
+TEST(Patch,	ftrace_nop,	0)
+{
+	struct patch_test_arg arg = {
+		.custom_mcount = NULL,
+		.replace = REPLACE_NOP,
+	};
+
+	return direct_patch_test(&arg);
+}
+#endif
 

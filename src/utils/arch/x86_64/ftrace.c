@@ -10,7 +10,12 @@
 
 #include "instruments.h"
 #include "ftrace.h"
+#include "nops.h"
 
+const char *ftrace_nop_replace(void)
+{
+	return (const char *)ideal_nops[NOP_ATOMIC5];
+}
 
 const char *ftrace_call_replace(union text_poke_insn *insn, unsigned long ip,
 			unsigned long addr)
