@@ -53,7 +53,22 @@ static void my_direct_func(void)
 	return ret;
 }
 
-#if defined(__aarch64__)
+#if defined(__x86_64__)
+/* find first callq instrument in the front of function body, it's mcount()
+ * address.
+ */
+static __unused uint32_t x86_64_func_callq_offset(void *func)
+{
+	uint32_t offset = 0;
+	while (1) {
+		if (*(uint8_t *)(func + offset) == INST_CALLQ)
+			break;
+		offset += 1;
+	}
+
+	return offset;
+}
+#elif defined(__aarch64__)
 static __unused uint32_t aarch64_func_bl_offset(void *func)
 {
 	uint32_t offset = 0;
@@ -108,7 +123,8 @@ static int direct_patch_test(struct patch_test_arg *arg)
 
 #if defined(__x86_64__)
 
-	unsigned long ip = (unsigned long)try_to_wake_up + 8;
+	unsigned long ip = (unsigned long)try_to_wake_up +
+		x86_64_func_callq_offset(try_to_wake_up);
 	unsigned long addr = (unsigned long)arg->custom_mcount;
 
 	union text_poke_insn insn;
