@@ -36,14 +36,22 @@ TEST(Task,	open_free,	0)
 TEST(Task,	open_free_fto_flags,	0)
 {
 	int ret = 0;
+	char buffer[BUFFER_SIZE];
+
 	struct task *task = open_task(getpid(), FTO_ALL);
 
 	if (!task->libc_elf || !task->exe_elf) {
 		ret = -1;
 	}
-	char buffer[BUFFER_SIZE];
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
 
+	/* /tmp/elftools/PID */
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+	if (!fexist(buffer)) {
+		ret = -1;
+	}
+
+	/* /tmp/elftools/PID/comm */
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/comm", task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
