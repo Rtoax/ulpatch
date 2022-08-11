@@ -49,6 +49,7 @@ extern "C" {
 # define __unused  __attribute__((unused))
 # define __noreturn  __attribute__((noreturn))
 #define __align(n)  __attribute__((aligned(n)))
+#define __packed  __attribute__((packed))
 
 #ifndef likely
 #define likely(x)    __builtin_expect(!!(x), 1)

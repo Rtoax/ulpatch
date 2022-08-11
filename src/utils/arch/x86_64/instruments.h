@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: GPL-2.0
 /* Copyright (C) 2022 Rong Tao */
 #pragma once
 
 #include <stdint.h>
 #include <utils/compiler.h>
+#include <utils/log.h>
 
 
 #define INT3_INSN_SIZE		1
@@ -18,6 +20,12 @@
 #define CET_JMP_INSN_SIZE	7 /* indirect jump + prefix */
 #define NOP_INSN_SIZE		1
 
+/*
+ * Currently, the max observed size in the kernel code is
+ * JUMP_LABEL_NOP_SIZE/RELATIVEJUMP_SIZE, which are 5.
+ * Raise it if needed.
+ */
+#define POKE_MAX_OPCODE_SIZE	5
 
 #define INST_SYSCALL    0x0f, 0x05  /* syscall */
 
@@ -62,3 +70,37 @@ static inline int text_opcode_size(uint8_t opcode)
 	return size;
 }
 
+// see linux:arch/x86/include/asm/text-patching.h
+union text_poke_insn {
+	uint8_t text[POKE_MAX_OPCODE_SIZE];
+	struct {
+		uint8_t opcode;
+		int32_t disp;
+	} __packed;
+};
+
+
+static inline __unused
+void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
+		const void *addr, const void *dest)
+{
+	int size = text_opcode_size(opcode);
+
+	insn->opcode = opcode;
+
+	if (size > 1) {
+		insn->disp = (long)dest - (long)(addr + size);
+
+		if (size == 2) {
+			/*
+			 * Ensure that for JMP9 the displacement
+			 * actually fits the signed byte.
+			 */
+			if (unlikely((insn->disp >> 31) != (insn->disp >> 7))) {
+				lerror("ERROR: JMP8.\n");
+			}
+		}
+	}
+
+	return &insn->text;
+}

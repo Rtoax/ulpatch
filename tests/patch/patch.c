@@ -27,11 +27,11 @@ static int ret_TTWU = 0;
  * so that, if you don't access mcount, sym.st_value will be '0'
  */
 #if defined(__x86_64__)
-char const *mcount_str = "mcount";
-const unsigned long mcount_addr = (unsigned long)mcount;
+__unused char const *mcount_str = "mcount";
+__unused const unsigned long mcount_addr = (unsigned long)mcount;
 #elif defined(__aarch64__)
-char const *mcount_str = "_mcount";
-const unsigned long mcount_addr = (unsigned long)_mcount;
+__unused char const *mcount_str = "_mcount";
+__unused const unsigned long mcount_addr = (unsigned long)_mcount;
 #endif
 
 static void my_direct_func(void)
