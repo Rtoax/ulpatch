@@ -18,10 +18,24 @@
 
 #include "patch.h"
 
+// see linux:kernel/module.c
+static int parse_load_info(const char *obj_file, struct load_info *info)
+{
+	// TODO:
+
+	return 0;
+}
 
 int init_patch(struct task *task, const char *obj_file)
 {
+	int err;
+	struct load_info info = {};
 
+	err = parse_load_info(obj_file, &info);
+	if (err)
+		return err;
+
+	// TODO:
 
 	return 0;
 }

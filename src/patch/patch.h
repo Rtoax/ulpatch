@@ -4,6 +4,7 @@
 #define __ELF_UPATCH_H 1
 
 #include <stdbool.h>
+#include <gelf.h>
 
 #include <utils/util.h>
 #include <utils/compiler.h>
@@ -19,6 +20,27 @@
 #include <utils/arch/aarch64/mcount.h>
 #include <utils/arch/aarch64/ftrace.h>
 #endif
+
+
+// see linux:kernel/module-internal.h
+struct load_info {
+	const char *name;
+
+	GElf_Ehdr *hdr;
+	unsigned long len;
+
+	GElf_Shdr *sechdrs;
+	char *secstrings, *strtab;
+	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
+
+	struct {
+		unsigned int
+			sym,
+			str,
+			vers,
+			info;
+	} index;
+};
 
 
 /* ftrace */
