@@ -76,6 +76,68 @@ file_type ftype(const char *filepath)
 	return _file_type(filepath);
 }
 
+/* Make sure @srcpath is exist and @dstpath is not exist
+ *
+ * return - bytes of copy if success, -errno if fail
+ */
+static int _file_copy(const char *srcpath, const char *dstpath)
+{
+	FILE *in, *out;
+	int nbytes = 0;
+
+	in = fopen(srcpath, "r");
+	if (!in) {
+		lerror("open %s failed.\n", srcpath);
+		return -errno;
+	}
+	out = fopen(dstpath, "w");
+	if (!out) {
+		lerror("open %s failed.\n", dstpath);
+		fclose(in);
+		return -errno;
+	}
+
+	while (1) {
+		uint8_t c;
+
+		fread(&c, 1, 1, in);
+		if (feof(in))
+			break;
+
+		fwrite(&c, 1, 1, out);
+
+		nbytes++;
+	}
+
+	fclose(in);
+	fclose(out);
+
+	ldebug("copy a %d bytes file.\n", nbytes);
+
+	return nbytes;
+}
+
+int fcopy(const char *srcpath, const char *dstpath)
+{
+	int err, ret = 0;
+
+	if (!srcpath || !dstpath) {
+		lerror("NULL pointer.\n");
+		return -EINVAL;
+	}
+	if (!fexist(srcpath) || fexist(dstpath)) {
+		lerror("src not exist or dst exist\n");
+		return -EEXIST;
+	}
+
+	err = _file_copy(srcpath, dstpath);
+	if (err <= 0) {
+		lerror("copy from %s to %s failed\n", srcpath, dstpath);
+		ret = err;
+	}
+
+	return ret;
+}
 
 static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
 {

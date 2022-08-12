@@ -82,3 +82,40 @@ TEST(File,	ftype_ELF,	0)
 	return 0;
 }
 
+TEST(File,	fcopy_NULL,	-EINVAL)
+{
+	return fcopy(NULL, NULL);
+}
+
+TEST(File,	fcopy_EXIST,	-EEXIST)
+{
+	/* Make sure NOT exist */
+	return fcopy("/a/b/c/d/e/f/g/h/i", "/j/k/l/m/n/o/p");
+}
+
+TEST(File,	fcopy,	0)
+{
+#define TMP_FILE	"./a.out"
+
+	int ret;
+
+	ret = fcopy(USR_BIN_LS, TMP_FILE);
+
+	if (!fexist(TMP_FILE)) {
+		lerror("%s not exist after copy.\n", TMP_FILE);
+		ret = -1;
+	}
+
+	if (fsize(USR_BIN_LS) != fsize(TMP_FILE)) {
+		lerror("file size not equal %d != %d.\n",
+			fsize(USR_BIN_LS), fsize(TMP_FILE));
+		ret = -1;
+	}
+
+	unlink(TMP_FILE);
+
+#undef TMP_FILE
+
+	return ret;
+}
+
