@@ -1,7 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022 Rong Tao
 #
+ifdef FTRACE_OBJ
+TARGETS = $(FTRACE_OBJ)
+else
 TARGETS = ftrace-mcount.obj
+endif
 
 DEBUG = yes
 SRC_PATH := $(shell pwd)
