@@ -29,6 +29,9 @@ struct load_info {
 	GElf_Ehdr *hdr;
 	unsigned long len;
 
+	/* the VMA start address in target task/process address space */
+	unsigned long target_addr;
+
 	GElf_Shdr *sechdrs;
 	char *secstrings, *strtab;
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;

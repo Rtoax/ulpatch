@@ -105,6 +105,9 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 		goto close_ret;
 	}
 
+	/* save the address */
+	info->target_addr = map_v;
+
 	task_detach(task->pid);
 
 	update_task_vmas(task);
