@@ -8,6 +8,8 @@ PROJECT(elftools)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 
+set(ELFTOOLS_SHARE_DIR /usr/share/elftools/)
+
 # check processor architecture
 # only support x86_64 and aarch64 right now.
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -94,6 +96,15 @@ TARGETS
 	elfshow
 	elftools_test
 RUNTIME DESTINATION /usr/local/bin
+)
+
+# install object file
+# see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
+install(DIRECTORY DESTINATION ${ELFTOOLS_SHARE_DIR})
+install(
+PROGRAMS
+	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/ftrace-mcount.obj
+	DESTINATION ${ELFTOOLS_SHARE_DIR}
 )
 
 # uninstall targets
