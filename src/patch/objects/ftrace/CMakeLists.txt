@@ -5,22 +5,7 @@ include_directories(../../../)
 
 enable_language(C ASM)
 
-set(ASM_OPTIONS "-x assembler-with-cpp")
-set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
-
-set(FTRACE_OBJ_TARGET ftrace_obj)
-
-add_custom_target(${FTRACE_OBJ_TARGET}
-	COMMAND echo "=== Make ${FTRACE_OBJ_TARGET}"
-)
-
-set(make_include ${PROJECT_SOURCE_DIR}/src/)
-message(STATUS "=== Compile ftrace object ${make_include}")
-add_custom_command(
-	TARGET ${FTRACE_OBJ_TARGET}
-	COMMAND make INCS1="-I${make_include}"
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace
-)
+set(FTRACE_OBJ_TARGET elftools_patch_obj)
 
 find_library(ELF elf /usr/lib64)
 find_library(PTHREAD pthread /usr/lib64)
@@ -40,10 +25,22 @@ file(GLOB_RECURSE LIB_ASM_SOURCES
 	mcount.S
 )
 
-add_library(elftools_patch_obj STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
+add_library(${FTRACE_OBJ_TARGET} STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
 
-target_compile_definitions(elftools_patch_obj PRIVATE
+target_compile_definitions(${FTRACE_OBJ_TARGET} PRIVATE
 	${UTILS_FLAGS}
 	ELFTOOLS_TEST
+)
+
+set(ASM_OPTIONS "-x assembler-with-cpp")
+set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
+
+
+set(make_include ${PROJECT_SOURCE_DIR}/src/)
+message(STATUS "=== Compile ftrace object ${make_include}")
+add_custom_command(
+	TARGET ${FTRACE_OBJ_TARGET}
+	COMMAND make INCS1="-I${make_include}"
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace
 )
 
