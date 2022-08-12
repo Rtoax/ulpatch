@@ -53,35 +53,6 @@ static void my_direct_func(void)
 	return ret;
 }
 
-#if defined(__x86_64__)
-/* find first callq instrument in the front of function body, it's mcount()
- * address.
- */
-static __unused uint32_t x86_64_func_callq_offset(void *func)
-{
-	uint32_t offset = 0;
-	while (1) {
-		if (*(uint8_t *)(func + offset) == INST_CALLQ)
-			break;
-		offset += 1;
-	}
-
-	return offset;
-}
-#elif defined(__aarch64__)
-static __unused uint32_t aarch64_func_bl_offset(void *func)
-{
-	uint32_t offset = 0;
-	while (1) {
-		if (aarch64_insn_is_bl(*(uint32_t *)(func + offset)))
-			break;
-		offset += AARCH64_INSN_SIZE;
-	}
-
-	return offset;
-}
-#endif
-
 static int direct_patch_test(struct patch_test_arg *arg)
 {
 	int ret = 0;

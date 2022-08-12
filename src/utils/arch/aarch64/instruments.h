@@ -173,6 +173,19 @@ __AARCH64_INSN_FUNCS(pssbb,	0xFFFFFFFF, 0xD503349F)
 
 #undef	__AARCH64_INSN_FUNCS
 
+
+static __unused uint32_t aarch64_func_bl_offset(void *func)
+{
+	uint32_t offset = 0;
+	while (1) {
+		if (aarch64_insn_is_bl(*(uint32_t *)(func + offset)))
+			break;
+		offset += AARCH64_INSN_SIZE;
+	}
+
+	return offset;
+}
+
 struct task;
 
 int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp);

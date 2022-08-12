@@ -104,3 +104,19 @@ void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
 
 	return &insn->text;
 }
+
+/* find first callq instrument in the front of function body, it's mcount()
+ * address.
+ */
+static __unused uint32_t x86_64_func_callq_offset(void *func)
+{
+	uint32_t offset = 0;
+	while (1) {
+		if (*(uint8_t *)(func + offset) == INST_CALLQ)
+			break;
+		offset += 1;
+	}
+
+	return offset;
+}
+
