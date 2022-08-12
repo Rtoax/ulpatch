@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <libgen.h>
+#include <stdlib.h>
 
 #include <gelf.h>
 
