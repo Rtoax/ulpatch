@@ -174,6 +174,76 @@ static int rewrite_section_headers(struct load_info *info)
 {
 	unsigned int __unused i;
 
+	/* This should always be true, but let's be sure. */
+	info->sechdrs[0].sh_addr = 0;
+
+	for (i = 0; i < info->hdr->e_shnum; i++) {
+		GElf_Shdr *shdr = &info->sechdrs[i];
+
+		if (shdr->sh_type != SHT_NOBITS
+			&& info->len < shdr->sh_offset + shdr->sh_size) {
+			lerror("Patch len %lu truncated\n", info->len);
+			return -ENOEXEC;
+		}
+
+		shdr->sh_addr = (size_t)info->target_addr + shdr->sh_offset;
+	}
+
+	info->sechdrs[info->index.info].sh_flags &= ~(unsigned long)SHF_ALLOC;
+	// MORE sechdrs
+
+	return 0;
+}
+
+#ifndef ARCH_SHF_SMALL
+#define ARCH_SHF_SMALL 0
+#endif
+#ifndef SHF_RO_AFTER_INIT
+#define SHF_RO_AFTER_INIT	0x00200000
+#endif
+
+static void layout_sections(struct load_info *info)
+{
+	static __unused unsigned long const masks[][2] = {
+		/* NOTE: all executable code must be the first section
+		 * in this array; otherwise modify the text_size
+		 * finder in the two loops below */
+		{ SHF_EXECINSTR | SHF_ALLOC, ARCH_SHF_SMALL },
+		{ SHF_ALLOC, SHF_WRITE | ARCH_SHF_SMALL },
+		{ SHF_RO_AFTER_INIT | SHF_ALLOC, ARCH_SHF_SMALL },
+		{ SHF_WRITE | SHF_ALLOC, ARCH_SHF_SMALL },
+		{ ARCH_SHF_SMALL | SHF_ALLOC, 0 }
+	};
+
+	// TODO: i don't know what happen here
+}
+
+static void layout_symtab(struct load_info *info)
+{
+	GElf_Shdr __unused *symsect = info->sechdrs + info->index.sym;
+	GElf_Shdr __unused *strsect = info->sechdrs + info->index.str;
+
+	const GElf_Sym __unused *src;
+	unsigned int __unused i, nsrc, ndst, strtab_size = 0;
+
+	symsect->sh_flags |= SHF_ALLOC;
+
+	// TODO:
+}
+
+static int layout_and_allocate(struct load_info *info)
+{
+	unsigned int __unused ndx;
+	int __unused err;
+
+
+	/* Determine total sizes, and put offsets in sh_entsize.  For now
+	   this is done generically; there doesn't appear to be any
+	   special cases for the architectures. */
+	layout_sections(info);
+
+	layout_symtab(info);
+
 	// TODO:
 
 	return 0;
@@ -200,6 +270,10 @@ static int load_patch(struct load_info *info)
 		goto free_copy;
 
 	err = rewrite_section_headers(info);
+	if (err)
+		goto free_copy;
+
+	err = layout_and_allocate(info);
 	if (err)
 		goto free_copy;
 
