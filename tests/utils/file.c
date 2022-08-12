@@ -82,6 +82,26 @@ TEST(File,	ftype_ELF,	0)
 	return 0;
 }
 
+TEST(File,	fmktempname,	0)
+{
+	int err = 0;
+	char buffer[BUFFER_SIZE];
+
+	char *name;
+
+	name = fmktempname(buffer, BUFFER_SIZE, NULL);
+	if (!name)
+		err = -1;
+	linfo("fmktempname: %s\n", name);
+
+	name = fmktempname(buffer, BUFFER_SIZE, "patch-XXXXXX");
+	if (!name)
+		err = -1;
+	linfo("fmktempname: %s\n", name);
+
+	return err;
+}
+
 TEST(File,	fcopy_NULL,	-EINVAL)
 {
 	return fcopy(NULL, NULL);

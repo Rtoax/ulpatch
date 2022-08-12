@@ -10,6 +10,7 @@
 #include <malloc.h>
 #include <errno.h>
 #include <assert.h>
+#include <libgen.h>
 
 #include <gelf.h>
 
@@ -137,6 +138,40 @@ int fcopy(const char *srcpath, const char *dstpath)
 	}
 
 	return ret;
+}
+
+char* fmktempname(char *buf, int buf_len, char *seed)
+{
+	int fd;
+	char *_seed = seed?:"/tmp/temp-XXXXXXX";
+
+	snprintf(buf, buf_len, _seed);
+
+	fd = mkstemp(buf);
+	if (fd <= 0) {
+		fprintf(stderr, "mkstemp: %s\n", strerror(errno));
+		return NULL;
+	}
+	close(fd);
+	unlink(buf);
+
+	return basename(buf);
+}
+
+/* Load a @file to @mem, make sure @file exist in file system
+ */
+int copy_chunked_from_file(void *mem, int mem_len, const char *file)
+{
+	FILE *fp;
+	int size = MIN(mem_len, fsize(file));
+
+	fp = fopen(file, "r");
+
+	fread(mem, size, 1, fp);
+
+	fclose(fp);
+
+	return size;
 }
 
 static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)

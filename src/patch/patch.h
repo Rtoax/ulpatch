@@ -61,6 +61,9 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 			struct mcount_regs *regs);
 unsigned long mcount_exit(long *retval);
 
+struct task;
+
+int init_patch(struct task *task, const char *obj_file);
 
 #endif /* __ELF_UPATCH_H */
 

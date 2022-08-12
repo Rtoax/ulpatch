@@ -20,8 +20,17 @@ struct config config = {
 	.log_level = -1,
 };
 
+enum command {
+	CMD_NONE,
+	CMD_PATCH,
+} command_type = CMD_NONE;
+
+
 static pid_t target_pid = -1;
 static struct task *target_task = NULL;
+
+
+#define ARG_PATCH	99
 
 
 static void print_help(void)
@@ -34,7 +43,15 @@ static void print_help(void)
 	"\n"
 	" Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
+	" Option argument:\n"
+	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"\n"
+	" Operate argument:\n"
+	"\n"
+	"  --patch             patch a object file into target task\n"
+	"\n"
+	" Common argument:\n"
 	"\n"
 	"  -l, --log-level     set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
@@ -55,6 +72,7 @@ static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
 		{"pid",		required_argument,	0,	'p'},
+		{"patch",	no_argument,	0,	ARG_PATCH},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
 		{"log-level",		required_argument,	0,	'l'},
@@ -71,6 +89,9 @@ static int parse_config(int argc, char *argv[])
 		case 'p':
 			target_pid = atoi(optarg);
 			break;
+		case ARG_PATCH:
+			command_type = CMD_PATCH;
+			break;
 		case 'v':
 			printf("version %s\n", elftools_version());
 			exit(0);
@@ -84,6 +105,11 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
+	if (command_type == CMD_NONE) {
+		fprintf(stderr, "Nothing to do, check -h, --help.\n");
+		exit(1);
+	}
+
 	if (target_pid == -1) {
 		fprintf(stderr, "Specify pid with -p, --pid.\n");
 		exit(1);
@@ -95,6 +121,12 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	return 0;
+}
+
+static void command_patch(void)
+{
+	fprintf(stdout, "TODO: finish me.\n");
+	// TODO
 }
 
 int main(int argc, char *argv[])
@@ -112,6 +144,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	switch (command_type) {
+	case CMD_PATCH:
+		command_patch();
+		break;
+	case CMD_NONE:
+	default:
+		fprintf(stderr, "What to do.\n");
+	}
 
 	free_task(target_task);
 

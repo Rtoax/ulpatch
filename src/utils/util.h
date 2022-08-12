@@ -29,6 +29,14 @@ extern "C" {
 	((type *)(((char *)(ptr)) - offsetof(type,member)))
 #endif
 
+#ifndef MAX
+#define MAX(a, b) ((a > b) ? a : b)
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a > b) ? b : a)
+#endif
+
 #ifndef ROUND_DOWN
 #define ROUND_DOWN(x, m) ((x) & ~((m) - 1))
 #endif
@@ -173,6 +181,8 @@ int fsize(const char *filepath);
 bool fexist(const char *filepath);
 file_type ftype(const char *filepath);
 int fcopy(const char *srcpath, const char *dstpath);
+char* fmktempname(char *buf, int buf_len, char *seed);
+int copy_chunked_from_file(void *mem, int mem_len, const char *file);
 
 struct mmap_struct *fmmap_rdonly(const char *filepath);
 int fmunmap(struct mmap_struct *mem);
