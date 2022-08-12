@@ -1,7 +1,7 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#include "util.h"
+#include <utils/util.h>
 
 #ifdef __cplusplus
 extern "C" {

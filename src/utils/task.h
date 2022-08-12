@@ -10,9 +10,10 @@
 #include <sys/mman.h>
 #include <sys/prctl.h>
 
-#include "rbtree.h"
-#include "list.h"
-#include "compiler.h"
+#include <utils/util.h>
+#include <utils/rbtree.h>
+#include <utils/list.h>
+#include <utils/compiler.h>
 
 enum vma_type {
 	VMA_NONE,   /* None */
