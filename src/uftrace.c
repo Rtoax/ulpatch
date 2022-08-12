@@ -53,6 +53,8 @@ static void print_help(void)
 	" Ftrace argument:\n"
 	"\n"
 	"  -j, --patch-obj     input a ELF 64-bit LSB relocatable object file.\n"
+	"                      actually, this input is not necessary, but you know\n"
+	"                      how to generate a ftrace relocatable object.\n"
 	"                      default: %s\n"
 	"\n"
 	"\n"
@@ -122,13 +124,31 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (!patch_object_file) {
-		fprintf(stderr, "Specify object -j, --patch-obj.\n");
+	if (patch_object_file && !fexist(patch_object_file)) {
+		fprintf(stderr, "%s not exist.\n", patch_object_file);
 		exit(1);
 	}
 
-	if (!fexist(patch_object_file) ||
-		(ftype(patch_object_file) & FILE_ELF_RELO) != FILE_ELF_RELO) {
+	if (!patch_object_file) {
+		if (!fexist(ELFTOOLS_FTRACE_OBJ_PATH)) {
+			fprintf(stderr,
+				"Default ftrace relocatable object %s is not exist.\n"
+				"Make sure you install elftools correctly.\n",
+				ELFTOOLS_FTRACE_OBJ_PATH
+			);
+			exit(1);
+		}
+		fprintf(stderr, "WARNING: use default %s.\n",
+			ELFTOOLS_FTRACE_OBJ_PATH);
+		patch_object_file = ELFTOOLS_FTRACE_OBJ_PATH;
+	}
+
+	if (!fexist(patch_object_file)) {
+		fprintf(stderr, "%s is not exist.\n", patch_object_file);
+		exit(1);
+	}
+
+	if ((ftype(patch_object_file) & FILE_ELF_RELO) != FILE_ELF_RELO) {
 		fprintf(stderr, "%s is not ELF or ELF LSB relocatable.\n",
 			patch_object_file);
 		exit(1);
@@ -137,66 +157,6 @@ static int parse_config(int argc, char *argv[])
 	return 0;
 }
 
-static unsigned long obj_target_task_map_addr = 0;
-static size_t obj_target_tasp_map_size = 0;
-
-
-static __unused int mmap_object(struct task *task)
-{
-	int ret = 0;
-	ssize_t obj_target_tasp_map_size = fsize(patch_object_file);
-	int __unused map_fd;
-
-	ret = task_attach(task->pid);
-	if (ret != 0) {
-		fprintf(stderr, "attach %d failed.\n", task->pid);
-		return -1;
-	}
-	map_fd = task_open(task,
-				(char *)patch_object_file,
-				O_RDWR,
-				0644);
-	if (map_fd <= 0) {
-		fprintf(stderr, "remote open failed.\n");
-		return -1;
-	}
-	ldebug("New open. %d\n", map_fd);
-	ret = task_ftruncate(task, map_fd, obj_target_tasp_map_size);
-	if (ret != 0) {
-		fprintf(stderr, "remote ftruncate failed.\n");
-		goto close_ret;
-	}
-	obj_target_task_map_addr =
-		task_mmap(task,
-				0UL, obj_target_tasp_map_size,
-				PROT_READ | PROT_WRITE | PROT_EXEC,
-				MAP_PRIVATE, map_fd, 0);
-	if (!obj_target_task_map_addr) {
-		fprintf(stderr, "remote mmap failed.\n");
-		goto close_ret;
-	}
-
-	update_task_vmas(task);
-	dump_task_vmas(task);
-
-close_ret:
-	task_close(task, map_fd);
-	task_detach(task->pid);
-
-	return ret;
-}
-
-static __unused int munmap_object(struct task *task)
-{
-	if (obj_target_task_map_addr) {
-		ldebug("unmmap. %lx\n", obj_target_task_map_addr);
-		task_attach(task->pid);
-		task_munmap(target_task,
-			obj_target_task_map_addr, obj_target_tasp_map_size);
-		task_detach(task->pid);
-	}
-	return 0;
-}
 
 int main(int argc, char *argv[])
 {
@@ -215,20 +175,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-#if 1
-	/* mmap relocatable object ELF file to target process */
-	ret = mmap_object(target_task);
-	if (ret != 0) {
-		fprintf(stderr, "mmap %s failed.\n", patch_object_file);
-		goto free_and_ret;
-	}
 
-free_and_ret:
-	munmap_object(target_task);
 	free_task(target_task);
-#else
-	dump_task_vmas(target_task);
-#endif
 
 	return 0;
 }
