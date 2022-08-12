@@ -51,6 +51,15 @@ extern "C" {
 #define BIT(n)		(1UL << (n))
 #endif
 
+#if defined(KERNEL_HEADERS_CONST_H)
+#include <linux/const.h>
+#else
+#define __ALIGN_KERNEL(x, a)		__ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
+#define __ALIGN_KERNEL_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+
+#define __KERNEL_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+#endif
+
 // see linux:include/linux/sizes.h
 #define SZ_1				0x00000001
 #define SZ_2				0x00000002
