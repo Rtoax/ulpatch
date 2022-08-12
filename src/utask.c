@@ -29,11 +29,13 @@ static pid_t target_pid = -1;
 
 static bool flag_dump_vmas = false;
 static bool flag_dump_vma = false;
+static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
-static unsigned long dump_vma_addr = 0;
+static unsigned long vma_addr = 0;
 static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
+
 
 static void print_help(void)
 {
@@ -48,6 +50,7 @@ static void print_help(void)
 	" Essential argument:\n"
 	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"\n"
 	"  -v, --dump-vmas     dump vmas\n"
 	"  -V, --dump-vma      save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
@@ -55,8 +58,12 @@ static void print_help(void)
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"\n"
 	"  -f, --map-file      mmap a exist file into target process address space\n"
+	"  -u, --unmap-vma     munmap a exist VMA, the argument need input vma address.\n"
+	"                      and witch is mmapped by -f, --map-file.\n"
+	"                      check with -v and -f\n"
 	"\n"
 	"  -o, --output        specify output filename.\n"
+	"\n"
 	"\n"
 	" Other argument:\n"
 	"\n"
@@ -82,6 +89,7 @@ static int parse_config(int argc, char *argv[])
 		{"dump-vmas",	no_argument,	0,	'v'},
 		{"dump-vma",	required_argument,	0,	'V'},
 		{"map-file",		required_argument,	0,	'f'},
+		{"unmap-vma",		required_argument,	0,	'u'},
 		{"output",	required_argument,	0,	'o'},
 		{"version",	no_argument,	0,	ARG_VERSION},
 		{"help",	no_argument,	0,	'h'},
@@ -91,7 +99,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vV:f:o:hl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:vV:f:u:o:hl:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -104,10 +112,14 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case 'V':
 			flag_dump_vma = true;
-			dump_vma_addr = strtoull(optarg, NULL, 16);
+			vma_addr = strtoull(optarg, NULL, 16);
 			break;
 		case 'f':
 			map_file = optarg;
+			break;
+		case 'u':
+			flag_unmap_vma = true;
+			vma_addr = strtoull(optarg, NULL, 16);
 			break;
 		case 'o':
 			output_file = optarg;
@@ -125,7 +137,7 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	if (!flag_dump_vmas && !flag_dump_vma) {
+	if (!flag_dump_vmas && !flag_dump_vma && !map_file && !flag_unmap_vma) {
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 		exit(1);
 	}
@@ -169,7 +181,7 @@ static int dump_an_vma(void)
 			return -1;
 		}
 	}
-	struct vma_struct *vma = find_vma(target_task, dump_vma_addr);
+	struct vma_struct *vma = find_vma(target_task, vma_addr);
 	if (!vma) {
 		fprintf(stderr, "vma not exist.\n");
 		return -1;
@@ -196,6 +208,75 @@ static int dump_an_vma(void)
 	return 0;
 }
 
+static int mmap_a_file(void)
+{
+	int ret = 0;
+	ssize_t map_len = fsize(map_file);
+	unsigned long __unused map_v;
+	int __unused map_fd;
+	const char *filename = map_file;
+
+	struct task *task = target_task;
+
+	task_attach(task->pid);
+
+	map_fd = task_open(task, (char *)filename, O_RDWR, 0644);
+	if (map_fd <= 0) {
+		fprintf(stderr, "ERROR: remote open failed.\n");
+		return -1;
+	}
+
+	ret = task_ftruncate(task, map_fd, map_len);
+	if (ret != 0) {
+		fprintf(stderr, "ERROR: remote ftruncate failed.\n");
+		goto close_ret;
+	}
+
+	map_v = task_mmap(task,
+				0UL, map_len,
+				PROT_READ | PROT_WRITE | PROT_EXEC,
+				MAP_PRIVATE, map_fd, 0);
+	if (!map_v) {
+		fprintf(stderr, "ERROR: remote mmap failed.\n");
+		goto close_ret;
+	}
+
+	task_detach(task->pid);
+
+	update_task_vmas(task);
+
+close_ret:
+	task_close(task, map_fd);
+
+	return ret;
+}
+
+static int munmap_an_vma(void)
+{
+	size_t size = 0;
+	struct task *task = target_task;
+	unsigned long addr = 0;
+
+	struct vma_struct *vma = find_vma(task, vma_addr);
+	if (!vma) {
+		fprintf(stderr, "vma not exist.\n");
+		return -1;
+	}
+
+	if (fexist(vma->name_)) {
+		size = fsize(vma->name_);
+	} else {
+		size = vma->end - vma->start;
+	}
+	addr = vma->start;
+
+	task_attach(task->pid);
+	task_munmap(task, addr, size);
+	task_detach(task->pid);
+
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	elftools_init();
@@ -212,7 +293,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (map_file) {
-		// TODO
+		mmap_a_file();
+	}
+
+	if (flag_unmap_vma) {
+		munmap_an_vma();
 	}
 
 	/* dump target task VMAs from /proc/PID/maps */
