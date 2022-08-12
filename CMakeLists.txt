@@ -9,6 +9,8 @@ set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 
 set(ELFTOOLS_SHARE_DIR /usr/share/elftools/)
+# see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
+set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
 
 # check processor architecture
 # only support x86_64 and aarch64 right now.
@@ -72,6 +74,10 @@ if(HAVE_GTK_3_0_H)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_GTK_3_0_H)
 endif()
 
+# macro ELFTOOLS_FTRACE_OBJ_PATH="/usr/share/elftools/ftrace-mcount.obj" for example
+set(UTILS_FLAGS "${UTILS_FLAGS}" ELFTOOLS_FTRACE_OBJ_PATH="${ELFTOOLS_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
+
+
 set(TESTS_FLAGS)
 if(CUNIT_INCLUDE_DIRS)
 	message(STATUS "=== FOUND CUnit Dev")
@@ -103,8 +109,8 @@ RUNTIME DESTINATION /usr/local/bin
 install(DIRECTORY DESTINATION ${ELFTOOLS_SHARE_DIR})
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/ftrace-mcount.obj
-	DESTINATION ${ELFTOOLS_SHARE_DIR}
+	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
+DESTINATION ${ELFTOOLS_SHARE_DIR}
 )
 
 # uninstall targets

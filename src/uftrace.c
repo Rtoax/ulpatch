@@ -25,6 +25,16 @@ static struct task *target_task = NULL;
 
 static const char *patch_object_file = NULL;
 
+/* This is ftrace object file path, during 'make install' install to
+ * /usr/share/elftools/, this macro is a absolute path of LSB relocatable file.
+ *
+ * see top level of CMakeLists.txt
+ */
+#if !defined(ELFTOOLS_FTRACE_OBJ_PATH)
+# error "Need ELFTOOLS_FTRACE_OBJ_PATH"
+#endif
+
+
 static void print_help(void)
 {
 	printf(
@@ -35,17 +45,28 @@ static void print_help(void)
 	"\n"
 	" Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n"
+	" Base argument:\n"
+	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
 	"\n"
+	"\n"
+	" Ftrace argument:\n"
+	"\n"
 	"  -j, --patch-obj     input a ELF 64-bit LSB relocatable object file.\n"
+	"                      default: %s\n"
+	"\n"
+	"\n"
+	" Common argument:\n"
 	"\n"
 	"  -l, --log-level     set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
+	"\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  -h, --help          display this help and exit\n"
 	"  -v, --version       output version information and exit\n"
 	"\n"
 	" uftrace %s\n",
+	ELFTOOLS_FTRACE_OBJ_PATH,
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
