@@ -52,6 +52,9 @@ struct load_info {
 #endif
 
 
+#define PATCH_VMA_TEMP_PREFIX	"patch-"
+
+
 bool is_ftrace_entry(char *func);
 
 extern void _ftrace_mcount(void);

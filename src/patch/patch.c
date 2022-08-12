@@ -70,7 +70,8 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 		return -1;
 	}
 
-	filename = fmktempname(buffer1, BUFFER_SIZE, NULL);
+	filename = fmktempname(buffer1, BUFFER_SIZE,
+		PATCH_VMA_TEMP_PREFIX "XXXXXX");
 	if (!filename) {
 		return -1;
 	}
