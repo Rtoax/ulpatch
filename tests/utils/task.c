@@ -44,20 +44,22 @@ TEST(Task,	open_free_fto_flags,	0)
 		ret = -1;
 	}
 
-	/* /tmp/elftools/PID */
+	/* ROOT_DIR/PID */
 	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
-	/* /tmp/elftools/PID/comm */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/comm", task->pid);
+	/* ROOT_DIR/PID/TASK_PROC_COMM */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
-	/* /tmp/elftools/PID/patches */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/patches", task->pid);
+	/* ROOT_DIR/PID/patches */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}

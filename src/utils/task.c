@@ -415,21 +415,22 @@ struct task *open_task(pid_t pid, enum fto_flag flag)
 		FILE *fp;
 		char buffer[BUFFER_SIZE];
 
-		/* /tmp/elftools/PID */
+		/* ROOT_DIR/PID */
 		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
 		}
 
-		/* /tmp/elftools/PID/comm */
-		sprintf(buffer + strlen(buffer), "/comm");
+		/* ROOT_DIR/PID/TASK_PROC_COMM */
+		sprintf(buffer + strlen(buffer), "/" TASK_PROC_COMM);
 		fp = fopen(buffer, "w");
 		fprintf(fp, "%s", task->comm);
 		fclose(fp);
 
-		/* /tmp/elftools/PID/patches */
-		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/patches", task->pid);
+		/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
+		snprintf(buffer, BUFFER_SIZE - 1,
+			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
@@ -461,18 +462,23 @@ int free_task(struct task *task)
 	if (task->fto_flag & FTO_PROC) {
 		char buffer[BUFFER_SIZE];
 
-		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/comm", task->pid);
+		/* ROOT_DIR/PID/TASK_PROC_COMM */
+		snprintf(buffer, BUFFER_SIZE - 1,
+			ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
 		if (unlink(buffer) != 0) {
 			lerror("unlink(%s) for %d:%s failed, %s.\n",
 				buffer, task->pid, task->exe, strerror(errno));
 		}
 
-		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/patches", task->pid);
+		/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
+		snprintf(buffer, BUFFER_SIZE - 1,
+			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 		if (rmdir(buffer) != 0) {
 			lerror("rmdir(%s) for %d:%s failed, %s.\n",
 				buffer, task->pid, task->exe, strerror(errno));
 		}
 
+		/* ROOT_DIR/PID */
 		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
 		if (rmdir(buffer) != 0) {
 			lerror("rmdir(%s) for %d:%s failed, %s.\n",

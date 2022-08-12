@@ -121,6 +121,12 @@ enum fto_flag {
 #define FTO_NONE 0x0
 #define FTO_ALL (FTO_SELF|FTO_LIBC|FTO_PROC)
 
+
+/* under ROOT_DIR/PID/ */
+#define TASK_PROC_COMM	"comm"
+#define TASK_PROC_MAP_FILES	"map_files"
+
+
 struct elf_file;
 
 /* This struct use to discript a running process in system, like you can see in
