@@ -228,3 +228,12 @@ int init_patch(struct task *task, const char *obj_file)
 	return load_patch(&info);
 }
 
+/* delete last patched patch, so, don't need any other arguments
+ */
+int delete_patch(struct task *task)
+{
+	// TODO:
+
+	return 0;
+}
+

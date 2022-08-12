@@ -64,6 +64,7 @@ unsigned long mcount_exit(long *retval);
 struct task;
 
 int init_patch(struct task *task, const char *obj_file);
+int delete_patch(struct task *task);
 
 #endif /* __ELF_UPATCH_H */
 
