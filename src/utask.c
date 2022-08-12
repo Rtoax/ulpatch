@@ -13,6 +13,7 @@
 
 #include <utils/log.h>
 #include <utils/list.h>
+#include <utils/util.h>
 #include <utils/task.h>
 #include <utils/compiler.h>
 
@@ -28,6 +29,7 @@ static pid_t target_pid = -1;
 
 static bool flag_dump_vmas = false;
 static bool flag_dump_vma = false;
+static const char *map_file = NULL;
 static unsigned long dump_vma_addr = 0;
 static const char *output_file = NULL;
 
@@ -51,6 +53,8 @@ static void print_help(void)
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
+	"\n"
+	"  -f, --map-file      mmap a exist file into target process address space\n"
 	"\n"
 	"  -o, --output        specify output filename.\n"
 	"\n"
@@ -77,6 +81,7 @@ static int parse_config(int argc, char *argv[])
 		{"pid",		required_argument,	0,	'p'},
 		{"dump-vmas",	no_argument,	0,	'v'},
 		{"dump-vma",	required_argument,	0,	'V'},
+		{"map-file",		required_argument,	0,	'f'},
 		{"output",	required_argument,	0,	'o'},
 		{"version",	no_argument,	0,	ARG_VERSION},
 		{"help",	no_argument,	0,	'h'},
@@ -86,7 +91,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vV:o:hl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:vV:f:o:hl:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -100,6 +105,9 @@ static int parse_config(int argc, char *argv[])
 		case 'V':
 			flag_dump_vma = true;
 			dump_vma_addr = strtoull(optarg, NULL, 16);
+			break;
+		case 'f':
+			map_file = optarg;
 			break;
 		case 'o':
 			output_file = optarg;
@@ -122,8 +130,13 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
+	if (map_file && !fexist(map_file)) {
+		fprintf(stderr, "%s is not exist.\n", map_file);
+		exit(1);
+	}
+
 	if (output_file && fexist(output_file)) {
-		fprintf(stderr, "%s exist.\n", output_file);
+		fprintf(stderr, "%s is already exist.\n", output_file);
 		exit(1);
 	}
 
@@ -136,6 +149,49 @@ static int parse_config(int argc, char *argv[])
 		fprintf(stderr, "pid %d not exist.\n", target_pid);
 		exit(1);
 	}
+
+	return 0;
+}
+
+static int dump_an_vma(void)
+{
+	size_t vma_size = 0;
+	void *mem = NULL;
+
+	/* default is stdout */
+	int nbytes;
+	int fd = fileno(stdout);
+
+	if (output_file) {
+		fd = open(output_file, O_CREAT | O_RDWR, 0664);
+		if (fd <= 0) {
+			fprintf(stderr, "open %s: %s\n", output_file, strerror(errno));
+			return -1;
+		}
+	}
+	struct vma_struct *vma = find_vma(target_task, dump_vma_addr);
+	if (!vma) {
+		fprintf(stderr, "vma not exist.\n");
+		return -1;
+	}
+
+	vma_size = vma->end - vma->start;
+
+	mem = malloc(vma_size);
+
+	memcpy_from_task(target_task, mem, vma->start, vma_size);
+
+	/* write to file or stdout */
+	nbytes = write(fd, mem, vma_size);
+	if (nbytes != vma_size) {
+		fprintf(stderr, "write failed, %s.\n", strerror(errno));
+		free(mem);
+		return -1;
+	}
+
+	free(mem);
+	if (fd != fileno(stdout))
+		close(fd);
 
 	return 0;
 }
@@ -155,53 +211,19 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	if (map_file) {
+		// TODO
+	}
+
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_dump_vmas)
 		dump_task_vmas(target_task);
 
 	/* dump an VMA */
 	if (flag_dump_vma) {
-
-		size_t vma_size = 0;
-		void *mem = NULL;
-
-		/* default is stdout */
-		int nbytes;
-		int fd = fileno(stdout);
-
-		if (output_file) {
-			fd = open(output_file, O_CREAT | O_RDWR, 0664);
-			if (fd <= 0) {
-				fprintf(stderr, "open %s: %s\n", output_file, strerror(errno));
-				goto free_and_ret;
-			}
-		}
-		struct vma_struct *vma = find_vma(target_task, dump_vma_addr);
-		if (!vma) {
-			fprintf(stderr, "vma not exist.\n");
-			goto free_and_ret;
-		}
-
-		vma_size = vma->end - vma->start;
-
-		mem = malloc(vma_size);
-
-		memcpy_from_task(target_task, mem, vma->start, vma_size);
-
-		/* write to file or stdout */
-		nbytes = write(fd, mem, vma_size);
-		if (nbytes != vma_size) {
-			fprintf(stderr, "write failed, %s.\n", strerror(errno));
-			free(mem);
-			goto free_and_ret;
-		}
-
-		free(mem);
-		if (fd != fileno(stdout))
-			close(fd);
+		dump_an_vma();
 	}
 
-free_and_ret:
 	free_task(target_task);
 
 	return 0;
