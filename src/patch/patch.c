@@ -20,7 +20,8 @@
 
 
 // see linux:kernel/module.c
-static int parse_load_info(const char *obj_file, struct load_info *info)
+static int parse_load_info(struct task *task, const char *obj_file,
+	struct load_info *info)
 {
 	int err = 0;
 
@@ -41,6 +42,8 @@ static int parse_load_info(const char *obj_file, struct load_info *info)
 		err = -EFAULT;
 		goto out;
 	}
+
+	info->target_task = task;
 
 out:
 	if (err)
@@ -323,6 +326,44 @@ static void setup_modinfo(struct load_info *info)
 {
 }
 
+/* try find symbol in current patch, otherwise, search in libc and target task
+ * symtab.
+ */
+static const struct symbol *resolve_symbol(const struct load_info *info,
+			const char *name)
+{
+	const struct symbol *sym = NULL;
+	const struct task *task = info->target_task;
+
+	if (!task)
+		return NULL;
+
+	/* try find symbol in libc.so */
+	if (task->fto_flag & FTO_LIBC) {
+		sym = find_symbol(task->libc_elf, name);
+	}
+	/* try find symbol in SELF */
+	if (task->fto_flag & FTO_SELF) {
+		sym = find_symbol(task->exe_elf, name);
+	}
+
+	if (!sym) {
+		lerror("Not find symbol in libc and %s\n", task->exe);
+	}
+
+	return sym;
+}
+
+static const struct symbol *
+resolve_symbol_wait(const struct load_info *info, const char *name)
+{
+	const struct symbol *symbol;
+
+	symbol = resolve_symbol(info, name);
+
+	return symbol;
+}
+
 static int simplify_symbols(const struct load_info *info)
 {
 	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
@@ -342,13 +383,49 @@ static int simplify_symbols(const struct load_info *info)
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
 
-		ldebug("%3d/%3d: symbol name = %lx, %s\n",
-			i, symsec->sh_size / sizeof(GElf_Sym), sym[i].st_name, name);
+		switch (sym[i].st_shndx) {
 
-		// TODO:
+		case SHN_COMMON:
+			ldebug("Common symbol: %s\n", name);
+			lwarning("please compile with -fno-common.\n");
+			ret = -ENOEXEC;
+			break;
+
+		case SHN_ABS:
+			ldebug("Absolute symbol: 0x%08lx\n",
+				(long)sym[i].st_value);
+			break;
+
+		case SHN_UNDEF:
+			ldebug("Solve UNDEF sym %s\n", name);
+			symbol = resolve_symbol_wait(info, name);
+			if (symbol) {
+				sym[i].st_value = symbol->sym.st_value;
+			}
+
+			/* Ok if weak.  */
+			if (!symbol && GELF_ST_BIND(sym[i].st_info) == STB_WEAK) {
+				break;
+			}
+
+			/* Not found symbol in any where */
+			ret = symbol ?0:-ENOENT;
+
+			lwarning("Unknown symbol %s (err %d)\n", name, ret);
+
+			break;
+
+		default:
+			ldebug("OK, the symbol in this patch. %s\n", name);
+
+			secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
+
+			sym[i].st_value += secbase;
+			break;
+		}
 	}
 
-	return 0;
+	return ret;
 }
 
 static int load_patch(struct load_info *info)
@@ -401,7 +478,7 @@ int init_patch(struct task *task, const char *obj_file)
 	int err;
 	struct load_info info = {};
 
-	err = parse_load_info(obj_file, &info);
+	err = parse_load_info(task, obj_file, &info);
 	if (err)
 		return err;
 

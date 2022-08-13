@@ -31,6 +31,7 @@ struct load_info {
 
 	/* the VMA start address in target task/process address space */
 	unsigned long target_addr;
+	struct task *target_task;
 
 	GElf_Shdr *sechdrs;
 	char *secstrings, *strtab;
