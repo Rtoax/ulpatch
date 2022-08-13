@@ -82,12 +82,12 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 
 	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/filename */
 	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "%s", task->pid, filename);
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, filename);
 
 	/* attach target task */
 	task_attach(task->pid);
 
-	map_fd = task_open(task, (char *)filename,
+	map_fd = task_open(task, (char *)buffer,
 				O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (map_fd <= 0) {
 		lerror("remote open failed.\n");
