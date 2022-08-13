@@ -52,31 +52,47 @@ static int parse_load_info(struct task *task, const char *obj_file,
 
 	info->len = fsize(obj_file);
 	if (info->len < sizeof(*(info->hdr))) {
-		return -ENOEXEC;
+		lerror("%s truncated.\n", obj_file);
+		err = -ENOEXEC;
+		goto out;
 	}
 
-	/* malloc a object file memory */
-	info->hdr = malloc(info->len);
+	lwarning("mmap shmem: %s %d\n", info->patch_path, info->len);
+
+	info->patch_mmap = fmmap_shmem_create(info->patch_path, info->len);
+	if (!info->patch_mmap) {
+		lerror("%s: fmmap failed.\n", info->patch_path);
+		err = -1;
+		goto out;
+	}
 
 	/* copy from file */
-	if (copy_chunked_from_file(info->hdr, info->len, obj_file) != info->len) {
+	if (copy_chunked_from_file(info->patch_mmap->mem, info->len,
+			obj_file) != info->len) {
+		lerror("copy chunk failed.\n");
 		err = -EFAULT;
 		goto out;
 	}
 
+	info->hdr = info->patch_mmap->mem;
 	info->target_task = task;
 
 out:
-	if (err)
-		free(info->hdr);
 
 	return err;
 }
 
 static void free_copy(struct load_info *info)
 {
-	free(info->patch_path);
-	free(info->hdr);
+	if (info->patch_mmap) {
+		fmunmap(info->patch_mmap);
+		info->patch_mmap = NULL;
+	}
+
+	if (info->patch_path) {
+		free(info->patch_path);
+		info->patch_path = NULL;
+	}
 }
 
 static __unused int
@@ -91,7 +107,7 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 	task_attach(task->pid);
 
 	map_fd = task_open(task, (char *)info->patch_path,
-				O_RDWR | O_CREAT | O_TRUNC, 0644);
+				O_RDWR, 0644);
 	if (map_fd <= 0) {
 		lerror("remote open failed.\n");
 		return -1;
@@ -106,7 +122,7 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 	map_v = task_mmap(task,
 				0UL, map_len,
 				PROT_READ | PROT_WRITE | PROT_EXEC,
-				MAP_PRIVATE, map_fd, 0);
+				MAP_SHARED, map_fd, 0);
 	if (!map_v) {
 		lerror("remote mmap failed.\n");
 		goto close_ret;

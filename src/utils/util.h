@@ -200,7 +200,7 @@ char* fmktempname(char *buf, int buf_len, char *seed);
 int copy_chunked_from_file(void *mem, int mem_len, const char *file);
 
 struct mmap_struct *fmmap_rdonly(const char *filepath);
-struct mmap_struct *fmmap_shmem(const char *filepath);
+struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size);
 int fmunmap(struct mmap_struct *mem);
 
 

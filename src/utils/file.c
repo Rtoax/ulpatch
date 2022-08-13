@@ -176,11 +176,11 @@ int copy_chunked_from_file(void *mem, int mem_len, const char *file)
 }
 
 static struct mmap_struct *_mmap_file(const char *filepath,
-		int o_flags, int m_flags, int prot)
+		int o_flags, int m_flags, int prot, size_t truncate_size)
 {
 	struct mmap_struct *mem = NULL;
 
-	if (!fexist(filepath)) {
+	if (!(o_flags & O_CREAT) && !fexist(filepath)) {
 		lerror("%s not exist.\n", filepath);
 		return NULL;
 	}
@@ -193,13 +193,16 @@ static struct mmap_struct *_mmap_file(const char *filepath,
 	mem->mmap_flags = m_flags;
 	mem->prot = prot;
 
-	mem->fd = open(filepath, o_flags);
+	mem->fd = open(filepath, o_flags, 0644);
 	if (mem->fd <= 0) {
 		lerror("open %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
 	}
 
-	mem->size = fsize(filepath);
+	if (truncate_size)
+		ftruncate(mem->fd, truncate_size);
+
+	mem->size = truncate_size?:fsize(filepath);
 	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
 	if (mem->mem == MAP_FAILED) {
 		lerror("mmap %s failed, %s\n", filepath, strerror(errno));
@@ -207,6 +210,9 @@ static struct mmap_struct *_mmap_file(const char *filepath,
 	}
 
 	mem->ftype = _file_type_mem(mem);
+
+	ldebug("mmap %s: %d(trun %d), %p\n",
+		filepath, mem->size, truncate_size, mem->mem);
 
 	return mem;
 
@@ -226,14 +232,14 @@ static int _munmap_file(struct mmap_struct *mem)
 
 struct mmap_struct *fmmap_rdonly(const char *filepath)
 {
-	return _mmap_file(filepath, O_RDONLY, MAP_PRIVATE, PROT_READ);
+	return _mmap_file(filepath, O_RDONLY, MAP_PRIVATE, PROT_READ, 0);
 }
 
-struct mmap_struct *fmmap_shmem(const char *filepath)
+struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size)
 {
 	// @PROT_EXEC cause i need it
-	return _mmap_file(filepath, O_RDWR, MAP_SHARED,
-			PROT_READ | PROT_WRITE | PROT_EXEC);
+	return _mmap_file(filepath, O_RDWR | O_CREAT | O_TRUNC, MAP_SHARED,
+			PROT_READ | PROT_WRITE | PROT_EXEC, size);
 }
 
 int fmunmap(struct mmap_struct *mem)

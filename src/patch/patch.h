@@ -34,6 +34,7 @@ struct load_info {
 	struct task *target_task;
 	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
 	char *patch_path;
+	struct mmap_struct *patch_mmap;
 
 	GElf_Shdr *sechdrs;
 	char *secstrings, *strtab;
