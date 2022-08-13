@@ -35,7 +35,7 @@ __asm__ (	\
 	"	.string \"" author "\" \n"	\
 	"	.popsection \n"	\
 	"	.pushsection " SEC_UPATCH_INFO ", \"aw\", @progbits\n"	\
-	"	.quad 0 \n"	\
+	"	.quad " #dst_func " \n"	\
 	"	.quad 0 \n"	\
 	"	.long 0 \n"	\
 	"	.long 0 \n"	\

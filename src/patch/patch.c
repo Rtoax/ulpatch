@@ -161,7 +161,6 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 static __unused int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
-	struct upatch_info *patchinfo;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
@@ -175,12 +174,12 @@ static __unused int setup_load_info(struct load_info *info)
 		return -EEXIST;
 	}
 
-	patchinfo = (void *)info->hdr
+	info->info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
 	ldebug("%s: off %lx\n", SEC_UPATCH_INFO,
 		info->sechdrs[info->index.info].sh_offset);
-	memshow(patchinfo, sizeof(*patchinfo));
+	memshow(info->info, sizeof(struct upatch_info));
 
 	// TODO+MORE info
 

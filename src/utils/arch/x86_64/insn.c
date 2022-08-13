@@ -9,6 +9,11 @@
 #include "instruments.h"
 
 
+// see linux/scripts/recordmcount.c
+static unsigned char __unused ideal_nop5_x86_64[5] = { 0x0f, 0x1f, 0x44, 0x00, 0x00 };
+static unsigned char __unused ideal_nop5_x86_32[5] = { 0x3e, 0x8d, 0x74, 0x26, 0x00 };
+
+
 int text_opcode_size(uint8_t opcode)
 {
 	int size;

@@ -40,6 +40,8 @@ struct load_info {
 	char *secstrings, *strtab;
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
+	struct upatch_info *info;
+
 	struct {
 		unsigned int
 			sym,

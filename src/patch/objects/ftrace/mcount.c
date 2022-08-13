@@ -61,14 +61,18 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 
 unsigned long mcount_exit(long *retval)
 {
+#if defined(ELFTOOLS_TEST)
 	printf("CALL mcount_exit.\n");
+
+#endif /* ELFTOOLS_TEST */
+
 	// TODO
 	return 0;
 }
 
 #if defined(__x86_64__)
-UPATCH_INFO(mcount, ftrace_mcount, "Rong Tao");
+UPATCH_INFO(mcount, _ftrace_mcount, "Rong Tao");
 #elif defined(__aarch64__)
-UPATCH_INFO(_mcount, ftrace__mcount, "Rong Tao");
+UPATCH_INFO(_mcount, _ftrace_mcount, "Rong Tao");
 #endif
 
