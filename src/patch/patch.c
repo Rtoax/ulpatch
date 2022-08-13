@@ -480,8 +480,6 @@ static int kick_target_process(const struct load_info *info)
 	struct task *task = info->target_task;
 	unsigned long target_addr = info->target_addr;
 
-	task_attach(task->pid);
-
 	/* copy patch to target address space
 	 */
 	n = memcpy_to_task(task, target_addr, info->hdr, info->len);
@@ -489,8 +487,6 @@ static int kick_target_process(const struct load_info *info)
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
 	}
-
-	task_detach(task->pid);
 
 	return err;
 }
