@@ -473,6 +473,28 @@ static int post_relocation(const struct load_info *info)
 	return 0;
 }
 
+static int kick_target_process(const struct load_info *info)
+{
+	ssize_t n;
+	int err = 0;
+	struct task *task = info->target_task;
+	unsigned long target_addr = info->target_addr;
+
+	task_attach(task->pid);
+
+	/* copy patch to target address space
+	 */
+	n = memcpy_to_task(task, target_addr, info->hdr, info->len);
+	if (n < info->len) {
+		lerror("failed kick target process.\n");
+		err = -ENOEXEC;
+	}
+
+	task_detach(task->pid);
+
+	return err;
+}
+
 static int load_patch(struct load_info *info)
 {
 	long err = 0;
@@ -517,6 +539,10 @@ static int load_patch(struct load_info *info)
 		goto free_copy;
 
 	err = post_relocation(info);
+	if (err < 0)
+		goto free_copy;
+
+	err = kick_target_process(info);
 	if (err < 0)
 		goto free_copy;
 
