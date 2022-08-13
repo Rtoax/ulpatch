@@ -220,3 +220,15 @@ uint32_t aarch64_insn_gen_branch_imm(unsigned pc, unsigned long addr,
 				offset >> 2);
 }
 
+uint32_t aarch64_func_bl_offset(void *func)
+{
+	uint32_t offset = 0;
+	while (1) {
+		if (aarch64_insn_is_bl(*(uint32_t *)(func + offset)))
+			break;
+		offset += AARCH64_INSN_SIZE;
+	}
+
+	return offset;
+}
+
