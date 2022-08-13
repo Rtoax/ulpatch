@@ -15,6 +15,8 @@
 #include <utils/compiler.h>
 #include <utils/task.h>
 
+#include <patch/patch.h>
+
 
 struct config config = {
 	.log_level = -1,
@@ -175,6 +177,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	init_patch(target_task, ELFTOOLS_FTRACE_OBJ_PATH);
+
+	// MORE
+
+	delete_patch(target_task);
 
 	free_task(target_task);
 

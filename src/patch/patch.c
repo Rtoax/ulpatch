@@ -108,12 +108,14 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 	/* save the address */
 	info->target_addr = map_v;
 
-	task_detach(task->pid);
-
 	update_task_vmas(task);
+
+	ldebug("Done to create patch vma, addr 0x%lx\n", map_v);
 
 close_ret:
 	task_close(task, map_fd);
+
+	task_detach(task->pid);
 
 	return ret;
 }
@@ -155,6 +157,8 @@ static __unused int setup_load_info(struct load_info *info)
 			info->strtab = (char *)info->hdr
 				+ info->sechdrs[info->index.str].sh_offset;
 
+			ldebug("found symtab %d\n", info->index.sym);
+
 			break;
 		}
 	}
@@ -170,6 +174,25 @@ static __unused int setup_load_info(struct load_info *info)
 	return 0;
 }
 
+/* Additional bytes needed by arch in front of individual sections */
+unsigned int __weak arch_mod_section_prepend(unsigned int section)
+{
+	/* default implementation just returns zero */
+	return 0;
+}
+
+/* Update size with this section: return offset. */
+static long __unused get_offset(unsigned int *size, GElf_Shdr *sechdr,
+		unsigned int section)
+{
+	long ret;
+
+	*size += arch_mod_section_prepend(section);
+	ret = ALIGN(*size, sechdr->sh_addralign ?: 1);
+	*size = ret + sechdr->sh_size;
+	return ret;
+}
+
 static int rewrite_section_headers(struct load_info *info)
 {
 	unsigned int __unused i;
@@ -177,7 +200,7 @@ static int rewrite_section_headers(struct load_info *info)
 	/* This should always be true, but let's be sure. */
 	info->sechdrs[0].sh_addr = 0;
 
-	for (i = 0; i < info->hdr->e_shnum; i++) {
+	for (i = 1; i < info->hdr->e_shnum; i++) {
 		GElf_Shdr *shdr = &info->sechdrs[i];
 
 		if (shdr->sh_type != SHT_NOBITS
@@ -186,6 +209,7 @@ static int rewrite_section_headers(struct load_info *info)
 			return -ENOEXEC;
 		}
 
+		/* Update sh_addr to point to target task address space. */
 		shdr->sh_addr = (size_t)info->target_addr + shdr->sh_offset;
 	}
 
@@ -227,8 +251,44 @@ static void layout_symtab(struct load_info *info)
 	unsigned int __unused i, nsrc, ndst, strtab_size = 0;
 
 	symsect->sh_flags |= SHF_ALLOC;
+	//symsect->sh_entsize = get_offset()
 
-	// TODO:
+	ldebug("\t%s\n", info->secstrings + symsect->sh_name);
+
+	src = (void *)info->hdr + symsect->sh_offset;
+	nsrc = symsect->sh_size / sizeof(*src);
+
+	/* Compute total space required for the core symbols' strtab. */
+	for (ndst = i = 0; i < nsrc; i++) {
+	}
+
+	// TODO: not consider symtab yet
+}
+
+static __unused int move_module(struct load_info *info)
+{
+	int i;
+	void __unused *ptr = info->hdr;
+
+	ldebug("final section addresses:\n");
+
+	for (i = 0; i < info->hdr->e_shnum; i++) {
+		void __unused *dest;
+		GElf_Shdr *shdr = &info->sechdrs[i];
+
+		if (!(shdr->sh_flags & SHF_ALLOC))
+			continue;
+
+		/* Update sh_addr to point to target task address space.
+		 * already do in rewrite_section_headers(),
+		 */
+		// shdr->sh_addr += (unsigned long)info->target_addr;
+
+		ldebug("\t0x%lx %s\n",
+			(long)shdr->sh_addr, info->secstrings + shdr->sh_name);
+	}
+
+	return 0;
 }
 
 static int layout_and_allocate(struct load_info *info)
@@ -244,7 +304,49 @@ static int layout_and_allocate(struct load_info *info)
 
 	layout_symtab(info);
 
+	err = move_module(info);
+	if (err)
+		return err;
+
+	// MORE: memleak and mod relate
+
+	return 0;
+}
+
+static int find_module_sections(struct load_info *info)
+{
 	// TODO:
+	return 0;
+}
+
+static void setup_modinfo(struct load_info *info)
+{
+}
+
+static int simplify_symbols(const struct load_info *info)
+{
+	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
+
+	/* need relocate sh_addr, because here is HOST task, not target task */
+	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_addr;
+
+	ldebug("sym = %lp + %lx - %lx, sh_offset %lx\n",
+		info->hdr, symsec->sh_addr, info->target_addr, symsec->sh_offset);
+
+	unsigned long __unused secbase;
+	unsigned int i;
+	int __unused ret = 0;
+	const struct symbol __unused *symbol;
+
+
+	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
+		const char *name = info->strtab + sym[i].st_name;
+
+		ldebug("%3d/%3d: symbol name = %lx, %s\n",
+			i, symsec->sh_size / sizeof(GElf_Sym), sym[i].st_name, name);
+
+		// TODO:
+	}
 
 	return 0;
 }
@@ -277,6 +379,16 @@ static int load_patch(struct load_info *info)
 	if (err)
 		goto free_copy;
 
+	err = find_module_sections(info);
+	if (err)
+		goto free_copy;
+
+	setup_modinfo(info);
+
+	/* Fix up syms, so that st_value is a pointer to location. */
+	err = simplify_symbols(info);
+	if (err < 0)
+		goto free_copy;
 
 free_copy:
 	free_copy(info);

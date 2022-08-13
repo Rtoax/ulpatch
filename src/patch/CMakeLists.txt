@@ -18,7 +18,7 @@ link_libraries(${ELF} ${PTHREAD} ${JSON_C}
 	elftools_elf
 )
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
+add_definitions(-MD -Wall -Werror -g -ggdb -pg -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
 aux_source_directory(. LIB_SOURCES)

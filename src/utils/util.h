@@ -60,6 +60,11 @@ extern "C" {
 #define __KERNEL_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 #endif
 
+// see linux:include/linux/kernel.h
+/* @a is a power of 2 value */
+#define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
+#define ALIGN_DOWN(x, a)	__ALIGN_KERNEL((x) - ((a) - 1), (a))
+
 // see linux:include/linux/sizes.h
 #define SZ_1				0x00000001
 #define SZ_2				0x00000002
