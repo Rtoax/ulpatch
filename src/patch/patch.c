@@ -161,14 +161,28 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 static __unused int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
+	struct upatch_info *patchinfo;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
 	info->secstrings = (void *)info->hdr
 		+ info->sechdrs[info->hdr->e_shstrndx].sh_offset;
 
+	/* found ".upatch.info" */
 	info->index.info = find_sec(info, SEC_UPATCH_INFO);
-	// MORE info
+	if (info->index.info == 0) {
+		lerror("Not found %s section.\n", SEC_UPATCH_INFO);
+		return -EEXIST;
+	}
+
+	patchinfo = (void *)info->hdr
+		+ info->sechdrs[info->index.info].sh_offset;
+
+	ldebug("%s: off %lx\n", SEC_UPATCH_INFO,
+		info->sechdrs[info->index.info].sh_offset);
+	memshow(patchinfo, sizeof(*patchinfo));
+
+	// TODO+MORE info
 
 	for (i = 1; i < info->hdr->e_shnum; i++) {
 

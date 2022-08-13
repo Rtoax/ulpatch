@@ -6,6 +6,8 @@
 #error "Don not install meta.h directly, install patch.h instead."
 #endif
 
+#include <stdint.h>
+
 /* This header use to Identifier Patch metadata info in target process. If that,
  * the task user address space will mmap serial of pages into target address
  * space.
@@ -13,6 +15,7 @@
  */
 
 #define SEC_UPATCH_STRTAB	".upatch.strtab"
+#define SEC_UPATCH_STRTAB_LABEL	"upatch_strtab"
 #define SEC_UPATCH_INFO	".upatch.info"
 
 
@@ -36,10 +39,25 @@ __asm__ (	\
 	"	.quad 0 \n"	\
 	"	.long 0 \n"	\
 	"	.long 0 \n"	\
-	"	.quad upatch_strtab \n"	\
+	"	.quad " SEC_UPATCH_STRTAB_LABEL " \n"	\
 	"	.quad 0 \n"	\
 	"	.long 0 \n"	\
-	"	.byte 0, 0, 0, 0 \n"	\
+	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
 );
+
+struct upatch_info {
+	unsigned long daddr;
+	unsigned long saddr;
+
+	uint32_t reserve1;
+	uint32_t reserve2;
+
+	/* SEC_UPATCH_STRTAB_LABEL */
+	unsigned long symstr;
+	unsigned long vaddr;
+
+	uint32_t flags;
+	char pad[4];
+};
 
