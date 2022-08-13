@@ -12,6 +12,7 @@
 
 #include <elf/elf_api.h>
 #include <utils/log.h>
+#include <utils/patch.h>
 #include <utils/list.h>
 #include <utils/task.h>
 #include <utils/compiler.h>
@@ -428,6 +429,40 @@ static int simplify_symbols(const struct load_info *info)
 	return ret;
 }
 
+static int apply_relocations(const struct load_info *info)
+{
+	unsigned int i;
+	int err = 0;
+
+	/* Now do relocations. */
+	for (i = 0; i< info->hdr->e_shnum; i++) {
+		unsigned int infosec = info->sechdrs[i].sh_info;
+
+		/* Not a valid relocation section? */
+		if (infosec >= info->hdr->e_shnum)
+			continue;
+
+		/* Don't bother with non-allocated sections */
+		if (!(info->sechdrs[infosec].sh_flags & SHF_ALLOC))
+			continue;
+
+		if (unlikely(info->sechdrs[i].sh_type == SHT_REL)) {
+			// Not support 32bit SHT_REL yet
+			err = -ENOEXEC;
+
+		} else if (info->sechdrs[i].sh_type == SHT_RELA) {
+
+			err = apply_relocate_add(info, info->sechdrs, info->strtab,
+						info->index.sym, i);
+		}
+
+		if (err < 0)
+			break;
+	}
+
+	return err;
+}
+
 static int load_patch(struct load_info *info)
 {
 	long err = 0;
@@ -466,6 +501,12 @@ static int load_patch(struct load_info *info)
 	err = simplify_symbols(info);
 	if (err < 0)
 		goto free_copy;
+
+	err = apply_relocations(info);
+	if (err < 0)
+		goto free_copy;
+
+	// TODO
 
 free_copy:
 	free_copy(info);

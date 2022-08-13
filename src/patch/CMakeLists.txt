@@ -15,6 +15,7 @@ endif()
 
 link_libraries(${ELF} ${PTHREAD} ${JSON_C}
 	elftools_utils
+	elftools_utils_arch
 	elftools_elf
 )
 

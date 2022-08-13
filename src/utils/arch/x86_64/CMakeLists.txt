@@ -6,7 +6,7 @@ include_directories(..)
 
 message(STATUS "=== Compile for x86_64")
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
+add_definitions(-MD -Wall -Werror -g -ggdb -pg -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
 aux_source_directory(. LIB_SOURCES)
