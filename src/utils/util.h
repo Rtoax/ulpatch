@@ -183,7 +183,8 @@ struct mmap_struct {
 	char *filepath;
 	file_type ftype;
 	int fd;
-	int flags;
+	int open_flags;
+	int mmap_flags;
 	int prot;
 	void *mem;
 	size_t size;

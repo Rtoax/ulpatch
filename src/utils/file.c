@@ -175,7 +175,8 @@ int copy_chunked_from_file(void *mem, int mem_len, const char *file)
 	return size;
 }
 
-static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
+static struct mmap_struct *_mmap_file(const char *filepath,
+		int o_flags, int m_flags, int prot)
 {
 	struct mmap_struct *mem = NULL;
 
@@ -188,17 +189,18 @@ static struct mmap_struct *_mmap_file(const char *filepath, int flags, int prot)
 	assert(mem && "malloc fatal.");
 
 	mem->filepath = strdup(filepath);
-	mem->flags = flags;
+	mem->open_flags = o_flags;
+	mem->mmap_flags = m_flags;
 	mem->prot = prot;
 
-	mem->fd = open(filepath, flags);
+	mem->fd = open(filepath, o_flags);
 	if (mem->fd <= 0) {
 		lerror("open %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
 	}
 
 	mem->size = fsize(filepath);
-	mem->mem = mmap(NULL, mem->size, prot, MAP_PRIVATE, mem->fd, 0);
+	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
 	if (mem->mem == MAP_FAILED) {
 		lerror("mmap %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
@@ -224,7 +226,7 @@ static int _munmap_file(struct mmap_struct *mem)
 
 struct mmap_struct *fmmap_rdonly(const char *filepath)
 {
-	return _mmap_file(filepath, O_RDONLY, PROT_READ);
+	return _mmap_file(filepath, O_RDONLY, MAP_PRIVATE, PROT_READ);
 }
 
 int fmunmap(struct mmap_struct *mem)
