@@ -32,6 +32,8 @@ struct load_info {
 	/* the VMA start address in target task/process address space */
 	unsigned long target_addr;
 	struct task *target_task;
+	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
+	char *patch_path;
 
 	GElf_Shdr *sechdrs;
 	char *secstrings, *strtab;

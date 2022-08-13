@@ -25,10 +25,30 @@ static int parse_load_info(struct task *task, const char *obj_file,
 	struct load_info *info)
 {
 	int err = 0;
+	char buffer1[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
+	const char *filename;
 
 	if (!fexist(obj_file)) {
 		return -EEXIST;
 	}
+
+	if (!(task->fto_flag & FTO_PROC)) {
+		lerror("Need FTO_PROC task flag.\n");
+		return -1;
+	}
+
+	filename = fmktempname(buffer1, BUFFER_SIZE,
+		PATCH_VMA_TEMP_PREFIX "XXXXXX");
+	if (!filename) {
+		return -1;
+	}
+
+	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/filename */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, filename);
+
+	info->patch_path = strdup(buffer);
 
 	info->len = fsize(obj_file);
 	if (info->len < sizeof(*(info->hdr))) {
@@ -55,6 +75,7 @@ out:
 
 static void free_copy(struct load_info *info)
 {
+	free(info->patch_path);
 	free(info->hdr);
 }
 
@@ -65,29 +86,11 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 	ssize_t map_len = info->len;
 	unsigned long __unused map_v;
 	int __unused map_fd;
-	char buffer1[BUFFER_SIZE];
-	char buffer[BUFFER_SIZE];
-	const char *filename;
-
-	if (!(task->fto_flag & FTO_PROC)) {
-		lerror("Need FTO_PROC task flag.\n");
-		return -1;
-	}
-
-	filename = fmktempname(buffer1, BUFFER_SIZE,
-		PATCH_VMA_TEMP_PREFIX "XXXXXX");
-	if (!filename) {
-		return -1;
-	}
-
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/filename */
-	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, filename);
 
 	/* attach target task */
 	task_attach(task->pid);
 
-	map_fd = task_open(task, (char *)buffer,
+	map_fd = task_open(task, (char *)info->patch_path,
 				O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (map_fd <= 0) {
 		lerror("remote open failed.\n");
