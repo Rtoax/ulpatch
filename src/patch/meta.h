@@ -46,6 +46,20 @@ __asm__ (	\
 	"	.popsection \n"	\
 );
 
+/* each element point each string in SEC_UPATCH_STRTAB
+ *
+ * @src_func source function
+ * @dst_func destination function
+ * @author Author of this patch
+ */
+struct upatch_strtab {
+	const char *src_func;
+	const char *dst_func;
+	const char *author;
+};
+
+/* Point to SEC_UPATCH_INFO section
+ */
 struct upatch_info {
 	unsigned long daddr;
 	unsigned long saddr;
