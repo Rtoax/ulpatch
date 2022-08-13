@@ -229,6 +229,13 @@ struct mmap_struct *fmmap_rdonly(const char *filepath)
 	return _mmap_file(filepath, O_RDONLY, MAP_PRIVATE, PROT_READ);
 }
 
+struct mmap_struct *fmmap_shmem(const char *filepath)
+{
+	// @PROT_EXEC cause i need it
+	return _mmap_file(filepath, O_RDWR, MAP_SHARED,
+			PROT_READ | PROT_WRITE | PROT_EXEC);
+}
+
 int fmunmap(struct mmap_struct *mem)
 {
 	return _munmap_file(mem);
