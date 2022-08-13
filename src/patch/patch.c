@@ -463,6 +463,16 @@ static int apply_relocations(const struct load_info *info)
 	return err;
 }
 
+static int post_relocation(const struct load_info *info)
+{
+	/* need add_allsyms() ...
+	 */
+
+	// TODO:
+
+	return 0;
+}
+
 static int load_patch(struct load_info *info)
 {
 	long err = 0;
@@ -503,6 +513,10 @@ static int load_patch(struct load_info *info)
 		goto free_copy;
 
 	err = apply_relocations(info);
+	if (err < 0)
+		goto free_copy;
+
+	err = post_relocation(info);
 	if (err < 0)
 		goto free_copy;
 
