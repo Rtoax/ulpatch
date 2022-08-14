@@ -112,15 +112,17 @@ get_vma_type(const char *exe, const char *name)
  * @FTO_SELF task.exe or /proc/PID/exe specify a ELF file, open it or not.
  * @FTO_PROC Create '/proc' like directory under ROOT_DIR. If you need to map
  *            a file into target process address space, the flag is necessary.
+ * @FTO_PATCH parse patch VMA when open a task.
  */
 enum fto_flag {
+	FTO_NONE = 0x0,
 	FTO_SELF = 0x1 << 0,
 	FTO_LIBC = 0x1 << 1,
 	FTO_PROC = 0x1 << 2,
+	FTO_PATCH = 0x1 << 3,
 };
 
-#define FTO_NONE 0x0
-#define FTO_ALL (FTO_SELF|FTO_LIBC|FTO_PROC)
+#define FTO_ALL 0xffffffff
 
 
 /* under ROOT_DIR/PID/ */
