@@ -175,6 +175,40 @@ static unsigned int __perms2prot(char *perms)
 
 static int free_task_vmas(struct task *task);
 
+enum vma_type get_vma_type(const char *exe, const char *name)
+{
+	enum vma_type type = VMA_NONE;
+
+	if (!strcmp(name, exe)) {
+		type = VMA_SELF;
+	} else if (!strncmp(basename((char*)name), "libc", 4)
+		|| !strncmp(basename((char*)name), "libssp", 6)) {
+		type = VMA_LIBC;
+	} else if (!strncmp(basename((char*)name), "libelf", 6)) {
+		type = VMA_LIBELF;
+	} else if (!strcmp(name, "[heap]")) {
+		type = VMA_HEAP;
+	} else if (!strncmp(basename((char*)name), "ld-linux", 8)) {
+		type = VMA_LD;
+	} else if (!strcmp(name, "[stack]")) {
+		type = VMA_STACK;
+	} else if (!strcmp(name, "[vvar]")) {
+		type = VMA_VVAR;
+	} else if (!strcmp(name, "[vdso]")) {
+		type = VMA_VDSO;
+	} else if (!strcmp(name, "[vsyscall]")) {
+		type = VMA_VSYSCALL;
+	} else if (!strncmp(basename((char*)name), "lib", 3)) {
+		type = VMA_LIB_DONT_KNOWN;
+	} else if (strlen(name) == 0) {
+		type = VMA_ANON;
+	} else {
+		type = VMA_NONE;
+	}
+
+	return type;
+}
+
 static int read_task_vmas(struct task *task, bool update)
 {
 	struct vma_struct *vma;

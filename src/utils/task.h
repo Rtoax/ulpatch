@@ -68,41 +68,6 @@ struct vma_struct {
 	struct rb_node node_rb;
 };
 
-static __unused enum vma_type
-get_vma_type(const char *exe, const char *name)
-{
-	enum vma_type type = VMA_NONE;
-
-	if (!strcmp(name, exe)) {
-		type = VMA_SELF;
-	} else if (!strncmp(basename((char*)name), "libc", 4)
-		|| !strncmp(basename((char*)name), "libssp", 6)) {
-		type = VMA_LIBC;
-	} else if (!strncmp(basename((char*)name), "libelf", 6)) {
-		type = VMA_LIBELF;
-	} else if (!strcmp(name, "[heap]")) {
-		type = VMA_HEAP;
-	} else if (!strncmp(basename((char*)name), "ld-linux", 8)) {
-		type = VMA_LD;
-	} else if (!strcmp(name, "[stack]")) {
-		type = VMA_STACK;
-	} else if (!strcmp(name, "[vvar]")) {
-		type = VMA_VVAR;
-	} else if (!strcmp(name, "[vdso]")) {
-		type = VMA_VDSO;
-	} else if (!strcmp(name, "[vsyscall]")) {
-		type = VMA_VSYSCALL;
-	} else if (!strncmp(basename((char*)name), "lib", 3)) {
-		type = VMA_LIB_DONT_KNOWN;
-	} else if (strlen(name) == 0) {
-		type = VMA_ANON;
-	} else {
-		type = VMA_NONE;
-	}
-
-	return type;
-}
-
 /* When task opening, what do you want to do?
  *
  * FTO means Flag of Task when Open.
@@ -191,6 +156,8 @@ struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task *task, size_t size);
 int update_task_vmas(struct task *task);
+
+enum vma_type get_vma_type(const char *exe, const char *name);
 
 int dump_task(const struct task *t);
 
