@@ -14,6 +14,7 @@
  *
  */
 
+#define SEC_UPATCH_MAGIC	".UPATCH"
 #define SEC_UPATCH_STRTAB	".upatch.strtab"
 #define SEC_UPATCH_STRTAB_LABEL	"upatch_strtab"
 #define SEC_UPATCH_INFO	".upatch.info"
@@ -30,6 +31,7 @@
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
 	"upatch_strtab: \n"	\
+	"	.string \"" SEC_UPATCH_MAGIC "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
 	"	.string \"" #dst_func "\" \n"	\
 	"	.string \"" author "\" \n"	\
@@ -53,6 +55,8 @@ __asm__ (	\
  * @author Author of this patch
  */
 struct upatch_strtab {
+	/* Must be SEC_UPATCH_MAGIC */
+	const char *magic;
 	const char *src_func;
 	const char *dst_func;
 	const char *author;

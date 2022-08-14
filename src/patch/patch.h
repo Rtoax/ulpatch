@@ -41,12 +41,14 @@ struct load_info {
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
 	struct upatch_info *info;
+	struct upatch_strtab upatch_strtab;
 
 	struct {
 		unsigned int
 			sym,
 			str,
 			vers,
+			upatch_strtab,
 			info;
 	} index;
 };

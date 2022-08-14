@@ -158,9 +158,35 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 	return 0;
 }
 
+static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
+{
+	const char *p = strtab;
+
+	s->magic = p;
+
+	if (strcmp(s->magic, SEC_UPATCH_MAGIC)) {
+		return -ENOENT;
+	}
+
+	while (*(p++));
+	s->src_func = p;
+
+	while (*(p++));
+	s->dst_func = p;
+
+	while (*(p++));
+	s->author = p;
+
+	ldebug("%s %s %s %s\n",
+		s->magic, s->src_func, s->dst_func, s->author);
+
+	return 0;
+}
+
 static __unused int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
+	int err = 0;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
@@ -180,6 +206,19 @@ static __unused int setup_load_info(struct load_info *info)
 	ldebug("%s: off %lx\n", SEC_UPATCH_INFO,
 		info->sechdrs[info->index.info].sh_offset);
 	memshow(info->info, sizeof(struct upatch_info));
+
+	/* found ".upatch.strtab" */
+	info->index.upatch_strtab = find_sec(info, SEC_UPATCH_STRTAB);
+	const char *upatch_strtab = (void *)info->hdr
+		+ info->sechdrs[info->index.upatch_strtab].sh_offset;
+
+	memshow(upatch_strtab, 32);
+
+	err = parse_upatch_strtab(&info->upatch_strtab, upatch_strtab);
+	if (err) {
+		lerror("Failed parse upatch_strtab.\n");
+		return -ENOENT;
+	}
 
 	// TODO+MORE info
 
