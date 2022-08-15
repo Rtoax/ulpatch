@@ -80,6 +80,11 @@ int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 	return 0;
 }
 
+int is_undef_symbol(const GElf_Sym *sym)
+{
+	return sym->st_shndx == SHN_UNDEF || sym->st_shndx >= SHN_LORESERVE;
+}
+
 #ifdef HAVE_JSON_C_LIBRARIES
 json_object *json_sym(const GElf_Sym *sym, const char *symname,
 	const char *vername)
@@ -345,10 +350,12 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 	return 0;
 }
 
-
-static int cmp_symbol_name(struct rb_node *n1, unsigned long key) {
+// the @key is (unsigned long)symbol
+int cmp_symbol_name(struct rb_node *n1, unsigned long key)
+{
 	struct symbol *s1 = rb_entry(n1, struct symbol, node);
 	struct symbol *s2 = (struct symbol*)key;
+
 	return strcmp(s1->name, s2->name);
 }
 

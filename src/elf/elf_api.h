@@ -352,11 +352,15 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
 void free_symbol(struct symbol *s);
 int link_symbol(struct elf_file *elf, struct symbol *s);
 struct symbol *find_symbol(struct elf_file *elf, const char *name);
+// the @key is (unsigned long)symbol
+int cmp_symbol_name(struct rb_node *n1, unsigned long key);
 
 // stderr@GLIBC_2.2.5
 // symname = stderr
 // vername = GLIBC_2.2.5
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername);
+int is_undef_symbol(const GElf_Sym *sym);
+
 #ifdef HAVE_JSON_C_LIBRARIES
 json_object *json_sym(const GElf_Sym *sym, const char *symname,
 	const char *vername);

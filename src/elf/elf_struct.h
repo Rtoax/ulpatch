@@ -71,7 +71,11 @@ struct symbol {
 	char *name;
 	GElf_Sym sym;
 
-	/* struct elf_file.symbols */
+	/**
+	 * ROOT is one of the following:
+	 * struct elf_file.symbols
+	 * struct task.vma_symbols
+	 */
 	struct rb_node node;
 };
 

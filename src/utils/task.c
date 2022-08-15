@@ -248,6 +248,7 @@ static int __unused vma_peek_phdr(struct vma_struct *vma)
 	unsigned int phsz = 0;
 	int i;
 	bool is_share_lib = true;
+	unsigned long lowest_vaddr = ULONG_MAX;
 
 	/* is ELF or already peek */
 	if (vma->elf != NULL || vma->is_elf) {
@@ -319,6 +320,34 @@ static int __unused vma_peek_phdr(struct vma_struct *vma)
 share_lib:
 	vma->is_share_lib = is_share_lib;
 
+	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
+		GElf_Phdr *phdr = &vma->elf->phdrs[i];
+
+		switch (phdr->p_type) {
+		case PT_LOAD:
+			lowest_vaddr = lowest_vaddr <= phdr->p_vaddr
+					? lowest_vaddr : phdr->p_vaddr;
+			FALLTHROUGH;
+		case PT_GNU_RELRO:
+			break;
+		}
+	}
+
+	if (lowest_vaddr == ULONG_MAX) {
+		lerror("%s: unable to find lowest load address.\n", vma->name_);
+		free(vma->elf->phdrs);
+		free(vma->elf);
+		vma->elf = NULL;
+		vma->is_elf = false;
+		vma->is_share_lib = false;
+		return -1;
+	}
+
+	vma->elf->load_offset = vma->start - lowest_vaddr;
+
+	linfo("%s vma start %lx, load_offset %lx\n",
+		vma->name_, vma->start, vma->elf->load_offset);
+
 	return 0;
 }
 
@@ -329,6 +358,156 @@ static void __unused vma_free_elf(struct vma_struct *vma)
 
 	free(vma->elf->phdrs);
 	free(vma->elf);
+}
+
+struct symbol *task_vma_find_symbol(struct task *task, const char *name)
+{
+	struct symbol tmp = {
+		.name = (char *)name,
+	};
+	struct rb_node *node = rb_search_node(&task->vma_symbols,
+						cmp_symbol_name, (unsigned long)&tmp);
+
+	return node?rb_entry(node, struct symbol, node):NULL;
+}
+
+int task_vma_link_symbol(struct task *task, struct symbol *s)
+{
+	struct rb_node *node = rb_insert_node(&task->vma_symbols, &s->node,
+						cmp_symbol_name, (unsigned long)s);
+	return node?0:-1;
+}
+
+static int vma_load_dynsym(struct vma_struct *vma)
+{
+	if (!vma->is_elf || !vma->elf)
+		return 0;
+
+	struct task *task = vma->task;
+	struct rb_root __unused *root = &task->vma_symbols;
+
+	int err = 0;
+	size_t i;
+	GElf_Dyn *dynamics = NULL;
+	GElf_Phdr *phdr;
+	GElf_Sym *syms = NULL;
+	char *buffer = NULL;
+
+	unsigned long __unused symtab_addr, strtab_addr;
+	unsigned long __unused symtab_sz, strtab_sz;
+
+	symtab_addr = strtab_addr = 0;
+	symtab_sz = strtab_sz = 0;
+
+
+	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
+		if (vma->elf->phdrs[i].p_type == PT_DYNAMIC) {
+			phdr = &vma->elf->phdrs[i];
+			break;
+		}
+	}
+
+	if (i == vma->elf->ehdr.e_phnum) {
+		lerror("No PT_DYNAMIC in %s\n", vma->name_);
+		return -1;
+	}
+
+	dynamics = malloc(phdr->p_memsz);
+	assert(dynamics && "Malloc fatal.");
+
+	err = memcpy_from_task(task, dynamics,
+			vma->elf->load_offset + phdr->p_vaddr, phdr->p_memsz);
+	if (err < phdr->p_memsz) {
+		lerror("Task read mem failed, %lx.\n", vma->start + phdr->p_vaddr);
+		goto out_free;
+	}
+
+	/* For each Dyn */
+	for (i = 0; i < phdr->p_memsz / sizeof(GElf_Dyn); i++) {
+
+		GElf_Dyn *curdyn = dynamics + i;
+
+		switch (curdyn->d_tag) {
+
+		case DT_SYMTAB:
+			symtab_addr = curdyn->d_un.d_ptr;
+			break;
+
+		case DT_STRTAB:
+			strtab_addr = curdyn->d_un.d_ptr;
+			break;
+
+		case DT_STRSZ:
+			strtab_sz = curdyn->d_un.d_val;
+			break;
+
+		case DT_SYMENT:
+			if (curdyn->d_un.d_val != sizeof(GElf_Sym)) {
+				lerror("Dynsym entry size is %ld expected %ld\n",
+					curdyn->d_un.d_val, sizeof(GElf_Sym));
+				goto out_free;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	symtab_sz = (strtab_addr - symtab_addr);
+
+	if (strtab_sz == 0 || symtab_sz == 0) {
+		memshow(dynamics, phdr->p_memsz);
+		lwarning(
+			"No strtab, p_memsz %ld, p_vaddr %lx. "
+			"strtab(%lx) symtab(%lx) %s %lx\n",
+			phdr->p_memsz, phdr->p_vaddr,
+			strtab_addr, symtab_addr, vma->name_, vma->start);
+	}
+
+	buffer = malloc(symtab_sz + strtab_sz);
+	assert(buffer && "Malloc fatal.");
+
+
+	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
+	if (err < strtab_sz + symtab_sz) {
+		lerror("load symtab failed.\n");
+		goto out_free_buffer;
+	}
+
+	ldebug("%s\n", vma->name_);
+	memshow(buffer, strtab_sz + symtab_sz);
+
+	/* For each symbol */
+	syms = (GElf_Sym *)buffer;
+
+	for (i = 0; i < symtab_sz / sizeof(GElf_Sym); i++) {
+
+		struct symbol __unused *s;
+
+		GElf_Sym __unused *sym = syms + i;
+		const char *symname = buffer + symtab_sz + syms[i].st_name;
+
+		if (is_undef_symbol(sym)) {
+			continue;
+		}
+
+		ldebug("%s: %s\n", vma->name_, symname);
+
+#if 0
+		/* allocate a symbol, and add it to task struct */
+		s = alloc_symbol(symname, sym);
+
+		task_vma_link_symbol(task, s);
+#endif
+	}
+
+
+out_free_buffer:
+	free(buffer);
+out_free:
+	free(dynamics);
+
+	return 0;
 }
 
 static int read_task_vmas(struct task *task, bool update)
@@ -549,6 +728,8 @@ struct task *open_task(pid_t pid, int flag)
 
 	read_task_vmas(task, false);
 
+	rb_init(&task->vma_symbols);
+
 	if (!task->libc_vma || !task->stack) {
 		lerror("No libc or stack founded.\n");
 		goto free_task;
@@ -575,6 +756,13 @@ struct task *open_task(pid_t pid, int flag)
 		struct vma_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task) {
 			vma_peek_phdr(tmp_vma);
+		}
+	}
+
+	if (flag & FTO_VMA_ELF_DYNSYM) {
+		struct vma_struct *tmp_vma;
+		task_for_each_vma(tmp_vma, task) {
+			vma_load_dynsym(tmp_vma);
 		}
 	}
 
@@ -614,6 +802,11 @@ struct task *open_task(pid_t pid, int flag)
 free_task:
 	free_task(task);
 	return NULL;
+}
+
+static void rb_free_symbol(struct rb_node *node) {
+	struct symbol *s = rb_entry(node, struct symbol, node);
+	free_symbol(s);
 }
 
 int free_task(struct task *task)
@@ -660,6 +853,9 @@ int free_task(struct task *task)
 				buffer, task->pid, task->exe, strerror(errno));
 		}
 	}
+
+	/* Destroy symbols rb tree */
+	rb_destroy(&task->vma_symbols, rb_free_symbol);
 
 	free_task_vmas(task);
 	free(task->exe);
