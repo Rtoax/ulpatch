@@ -160,19 +160,20 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 		struct symbol *sym;
 		struct task *task = open_task(pid, FTO_LIBC);
 
-#define LIBC_FUNC_FN	puts
+#ifndef LIBC_PUTS_FN
+# error "No macro LIBC_PUTS_FN"
+#endif
+		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
 
-		LIBC_FUNC_FN(__stringify(LIBC_FUNC_FN));
-
-		sym = find_symbol(task->libc_elf, __stringify(LIBC_FUNC_FN));
+		sym = find_symbol(task->libc_elf, __stringify(LIBC_PUTS_FN));
 
 		linfo("%s: st_value %lx, %p\n",
-			__stringify(LIBC_FUNC_FN), sym->sym.st_value, LIBC_FUNC_FN);
+			__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
 
 		/* st_value not equal to ELF address in libc */
-		if (sym->sym.st_value == (unsigned long)LIBC_FUNC_FN) {
+		if (sym->sym.st_value == (unsigned long)LIBC_PUTS_FN) {
 			lerror(" %s's st_value %lx != %p\n",
-				__stringify(LIBC_FUNC_FN), sym->sym.st_value, LIBC_FUNC_FN);
+				__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
 			ret = -1;
 		} else {
 			ret = 0;

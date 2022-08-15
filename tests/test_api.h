@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022 Rong Tao */
+#include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <sys/time.h>
@@ -90,6 +91,9 @@ extern const char *elftools_test_path;
 #endif
 #define PRINTER_FN	print_hello
 int PRINTER_FN(int nloop, const char *content);
+
+
+#define LIBC_PUTS_FN	puts
 
 
 struct test*
