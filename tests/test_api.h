@@ -84,6 +84,13 @@ extern struct list_head test_list[TEST_PRIO_NUM];
 
 extern const char *elftools_test_path;
 
+
+#ifdef PRINTER_FN
+# error "Redefine PRINTER_FN"
+#endif
+#define PRINTER_FN	print_hello
+
+
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 	int expect_ret);

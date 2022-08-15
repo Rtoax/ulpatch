@@ -65,6 +65,7 @@ static char *filter_format = NULL;
 
 static int log_level = LOG_ERR;
 
+
 // For -r, --role
 static enum who {
 	ROLE_NONE,
@@ -72,6 +73,7 @@ static enum who {
 	ROLE_SLEEPER, // be tested
 	ROLE_WAITING, // wait for a while
 	ROLE_TRIGGER, // trigger
+	ROLE_PRINTER, // printer
 	ROLE_MIX, // mix: sleeper, waiting, trigger
 	ROLE_MAX,
 } role = ROLE_TESTER;
@@ -82,11 +84,19 @@ static const char *role_string[ROLE_MAX] = {
 	[ROLE_SLEEPER] = "sleeper",
 	[ROLE_WAITING] = "wait",
 	[ROLE_TRIGGER] = "trigger",
+	[ROLE_PRINTER] = "printer",
 	[ROLE_MIX] = "mix",
 };
 
 static int sleep_usec = 100;
 static char *msgq_file = NULL;
+
+#define PRINT_INTERVAL_SEC	2
+#define PRINT_NLOOP	10
+
+static int print_interval_sec = PRINT_INTERVAL_SEC;
+static int print_nloop_default = PRINT_NLOOP;
+const char *print_content = "Hello";
 
 static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
@@ -140,21 +150,43 @@ static void print_help(int ex)
 	"Test elftools\n"
 	"\n"
 	"Mandatory arguments to long options are mandatory for short options too.\n"
-	"\n"
+	"\n",
+	elftools_test_path
+	);
+
+	printf(
 	"Tests:\n"
 	"\n"
 	" -l, --list-tests    list all tests\n"
 	" -f, --filter-tests  filter out some tests\n"
-	"\n"
+	"\n");
+	printf(
 	"Role:\n"
 	"\n"
 	" -r, --role          who am i, what should i do\n"
 	"                     '%s' test all Tests, see with -l, default.\n"
-	"                     '%s' i will sleep %ds by default, set with -s.\n"
+	"                     '%s' i will sleep %dus by default, set with -s.\n"
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"                     '%s' i will msgsnd(2) a msg, specify by -m.\n"
+	"                     '%s' i will loop print some message.\n"
 	"                     MIX:\n"
 	"                       -r sleeper,sleeper, will launch sleeper twice\n"
+	"\n",
+	role_string[ROLE_TESTER],
+	role_string[ROLE_SLEEPER],
+	sleep_usec,
+	role_string[ROLE_WAITING],
+	role_string[ROLE_TRIGGER],
+	role_string[ROLE_PRINTER]
+	);
+	printf(
+	"   %s arguments:\n"
+	"     --print-nloop    loop of print, default %d\n"
+	"\n",
+	role_string[ROLE_PRINTER],
+	print_nloop_default
+	);
+	printf(
 	"\n"
 	" -s, --usecond       usecond of time, sleep, etc.\n"
 	"                     -r %s, the main thread will sleep -s useconds.\n"
@@ -162,7 +194,12 @@ static void print_help(int ex)
 	" -m, --msgq          key to ftok(3).\n"
 	"                     -r %s, the main thread will wait on msgrcv(2).\n"
 	"                     -r %s, the main thread will msgsnd(2) to msgq.\n"
-	"\n"
+	"\n",
+	role_string[ROLE_SLEEPER],
+	role_string[ROLE_WAITING],
+	role_string[ROLE_TRIGGER]
+	);
+	printf(
 	"Others:\n"
 	"\n"
 	" -L, --log-level     set log level, default(%d)\n"
@@ -174,15 +211,6 @@ static void print_help(int ex)
 	" -v, --version       output version information and exit\n"
 	"\n"
 	"elftools_test %s\n",
-	elftools_test_path,
-	role_string[ROLE_TESTER],
-	role_string[ROLE_SLEEPER],
-	sleep_usec,
-	role_string[ROLE_WAITING],
-	role_string[ROLE_TRIGGER],
-	role_string[ROLE_SLEEPER],
-	role_string[ROLE_WAITING],
-	role_string[ROLE_TRIGGER],
 	log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
@@ -190,6 +218,8 @@ static void print_help(int ex)
 	);
 	exit(ex);
 }
+
+#define ARG_PRINT_NLOOP	99
 
 static int parse_config(int argc, char *argv[])
 {
@@ -199,6 +229,7 @@ static int parse_config(int argc, char *argv[])
 		{"role",	required_argument,	0,	'r'},
 		{"usecond",	required_argument,	0,	's'},
 		{"msgq",	required_argument,	0,	'm'},
+		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
 		{"log-level",		required_argument,	0,	'L'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
@@ -229,6 +260,9 @@ static int parse_config(int argc, char *argv[])
 		case 'm':
 			msgq_file = (char*)optarg;
 			break;
+		case ARG_PRINT_NLOOP:
+			print_nloop_default = atoi(optarg);
+			break;
 		case 'L':
 			log_level = atoi(optarg);
 			break;
@@ -252,6 +286,11 @@ static int parse_config(int argc, char *argv[])
 
 	if (role == ROLE_NONE) {
 		fprintf(stderr, "wrong -r, --role argument.\n");
+		exit(1);
+	}
+
+	if (print_nloop_default <= 0) {
+		fprintf(stderr, "wrong --print-nloop argument.\n");
 		exit(1);
 	}
 
@@ -456,6 +495,25 @@ static void launch_trigger(void)
 	// task_wait_destroy(&wait_here);
 }
 
+#ifndef PRINTER_FN
+# error "Must define PRINTER_FN"
+#endif
+int PRINTER_FN(int nloop, const char *content)
+{
+	return printf("%d %s\n", nloop, print_content);
+}
+
+static void launch_printer(void)
+{
+	int nloop = print_nloop_default;
+
+	while (nloop--) {
+		PRINTER_FN(nloop, print_content);
+		sleep(print_interval_sec);
+	}
+}
+
+
 static void launch_mix_role(enum who r)
 {
 	switch (r) {
@@ -467,6 +525,9 @@ static void launch_mix_role(enum who r)
 		break;
 	case ROLE_TRIGGER:
 		launch_trigger();
+		break;
+	case ROLE_PRINTER:
+		launch_printer();
 		break;
 	case ROLE_MIX:
 	case ROLE_TESTER:
@@ -521,6 +582,7 @@ int main(int argc, char *argv[])
 	case ROLE_SLEEPER:
 	case ROLE_WAITING:
 	case ROLE_TRIGGER:
+	case ROLE_PRINTER:
 		launch_mix_role(role);
 		break;
 	case ROLE_MIX:
