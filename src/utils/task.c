@@ -210,24 +210,31 @@ enum vma_type get_vma_type(const char *exe, const char *name)
 	return type;
 }
 
+/* Only FTO_VMA_ELF flag will load VMA ELF
+ */
 static int __unused vma_peek_phdr(struct vma_struct *vma)
 {
-	int err = 0;
 	GElf_Ehdr ehdr = {};
 	struct task *task = vma->task;
+	unsigned long phaddr;
+	unsigned int phsz = 0;
 
-	/* already peek */
-	if (vma->elf != NULL) {
+	/* is ELF or already peek */
+	if (vma->elf != NULL || vma->is_elf) {
 		return 0;
 	}
 
-	memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr));
+	/* Is not ELF? */
+	if (memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr)) < sizeof(ehdr)) {
+		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+		return -1;
+	}
+
 	if (!check_ehdr_magic_is_ok(&ehdr)) {
-		ldebug("%s is not ELF.\n", vma->name_);
 		return 0;
 	}
 
-	linfo("%lx %s is ELF\n", vma->start, vma->name_);
+	ldebug("%lx %s is ELF\n", vma->start, vma->name_);
 
 	/* VMA is ELF, handle it */
 	vma->elf = malloc(sizeof(struct vma_elf));
@@ -235,7 +242,34 @@ static int __unused vma_peek_phdr(struct vma_struct *vma)
 
 	memcpy(&vma->elf->ehdr, &ehdr, sizeof(ehdr));
 
-	return err;
+	phaddr = vma->start + vma->elf->ehdr.e_phoff;
+	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
+
+	vma->elf->phdrs = malloc(phsz);
+	if (!vma->elf->phdrs) {
+		free(vma->elf);
+		return -1;
+	}
+
+	if (memcpy_from_task(task, vma->elf->phdrs, phaddr, phsz) < phsz) {
+		free(vma->elf->phdrs);
+		free(vma->elf);
+		lerror("Failed to read %s program header.\n", vma->name_);
+		return -1;
+	}
+
+	vma->is_elf = true;
+
+	return 0;
+}
+
+static void __unused vma_free_elf(struct vma_struct *vma)
+{
+	if (!vma->is_elf)
+		return;
+
+	free(vma->elf->phdrs);
+	free(vma->elf);
 }
 
 static int read_task_vmas(struct task *task, bool update)
@@ -523,6 +557,13 @@ int free_task(struct task *task)
 {
 	list_del(&task->node);
 	close(task->proc_mem_fd);
+
+	if (task->fto_flag & FTO_VMA_ELF) {
+		struct vma_struct *tmp_vma;
+		task_for_each_vma(tmp_vma, task) {
+			vma_free_elf(tmp_vma);
+		}
+	}
 
 	if (task->fto_flag & FTO_SELF)
 		elf_file_close(task->exe);

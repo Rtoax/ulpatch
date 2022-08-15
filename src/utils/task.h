@@ -67,6 +67,8 @@ struct vma_struct {
 
 	enum vma_type type;
 
+	bool is_elf;
+
 	/* Only elf has it */
 	struct vma_elf *elf;
 
