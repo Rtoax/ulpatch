@@ -47,6 +47,11 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 		struct task *task = open_task(pid, FTO_SELF);
 
 		sym = find_symbol(task->exe_elf, __stringify(STATIC_FUNC_FN));
+		if (!sym) {
+			lerror("Not found %s.\n", __stringify(STATIC_FUNC_FN));
+			ret = -1;
+			goto out;
+		}
 
 		linfo("%s: st_value %lx, %p\n",
 			__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
@@ -60,6 +65,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 			ret = -1;
 		}
 
+out:
 		task_wait_trigger(&waitqueue);
 
 		waitpid(pid, &status, __WALL);
@@ -103,7 +109,15 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 		struct symbol *sym;
 		struct task *task = open_task(pid, FTO_SELF);
 
+		/* Test1:
+		 * Try find global function
+		 */
 		sym = find_symbol(task->exe_elf, __stringify(PRINTER_FN));
+		if (!sym) {
+			lerror("Not found %s.\n", __stringify(PRINTER_FN));
+			ret = -1;
+			goto out;
+		}
 
 		linfo("%s: st_value %lx, %p\n",
 			__stringify(PRINTER_FN), sym->sym.st_value, PRINTER_FN);
@@ -117,6 +131,32 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 			ret = -1;
 		}
 
+		/* Test2:
+		 * Try find libc function
+		 */
+		// call it, make PLT/GOT done
+		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
+
+		sym = find_symbol(task->exe_elf, __stringify(LIBC_PUTS_FN));
+		if (!sym) {
+			lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
+			ret = -1;
+			goto out;
+		}
+
+		linfo("%s: st_value %lx, %p\n",
+			__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
+
+		/* st_value MUST equal to ELF address */
+		if (sym->sym.st_value == (unsigned long)LIBC_PUTS_FN) {
+			ret = 0;
+		} else {
+			lerror(" %s's st_value %lx != %p\n",
+				__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
+			ret = -1;
+		}
+
+out:
 		task_wait_trigger(&waitqueue);
 
 		waitpid(pid, &status, __WALL);
@@ -166,6 +206,11 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
 
 		sym = find_symbol(task->libc_elf, __stringify(LIBC_PUTS_FN));
+		if (!sym) {
+			lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
+			ret = -1;
+			goto out;
+		}
 
 		linfo("%s: st_value %lx, %p\n",
 			__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
@@ -179,6 +224,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 			ret = 0;
 		}
 
+out:
 		task_wait_trigger(&waitqueue);
 
 		waitpid(pid, &status, __WALL);
