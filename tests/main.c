@@ -91,10 +91,10 @@ static const char *role_string[ROLE_MAX] = {
 static int sleep_usec = 100;
 static char *msgq_file = NULL;
 
-#define PRINT_INTERVAL_SEC	2
+#define PRINT_INTERVAL_USEC	10000
 #define PRINT_NLOOP	10
 
-static int print_interval_sec = PRINT_INTERVAL_SEC;
+static int print_interval_usec = PRINT_INTERVAL_USEC;
 static int print_nloop_default = PRINT_NLOOP;
 const char *print_content = "Hello";
 
@@ -182,9 +182,11 @@ static void print_help(int ex)
 	printf(
 	"   %s arguments:\n"
 	"     --print-nloop    loop of print, default %d\n"
+	"     --print-usec     interval of print, default %d usec\n"
 	"\n",
 	role_string[ROLE_PRINTER],
-	print_nloop_default
+	print_nloop_default,
+	print_interval_usec
 	);
 	printf(
 	"\n"
@@ -220,6 +222,7 @@ static void print_help(int ex)
 }
 
 #define ARG_PRINT_NLOOP	99
+#define ARG_PRINT_INTERVAL_USEC	100
 
 static int parse_config(int argc, char *argv[])
 {
@@ -230,6 +233,7 @@ static int parse_config(int argc, char *argv[])
 		{"usecond",	required_argument,	0,	's'},
 		{"msgq",	required_argument,	0,	'm'},
 		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
+		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
 		{"log-level",		required_argument,	0,	'L'},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
@@ -263,6 +267,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_PRINT_NLOOP:
 			print_nloop_default = atoi(optarg);
 			break;
+		case ARG_PRINT_INTERVAL_USEC:
+			print_interval_usec = atoi(optarg);
+			break;
 		case 'L':
 			log_level = atoi(optarg);
 			break;
@@ -291,6 +298,11 @@ static int parse_config(int argc, char *argv[])
 
 	if (print_nloop_default <= 0) {
 		fprintf(stderr, "wrong --print-nloop argument.\n");
+		exit(1);
+	}
+
+	if (print_interval_usec <= 0) {
+		fprintf(stderr, "wrong --print-usec argument.\n");
 		exit(1);
 	}
 
@@ -500,7 +512,8 @@ static void launch_trigger(void)
 #endif
 int PRINTER_FN(int nloop, const char *content)
 {
-	return printf("%d %s\n", nloop, print_content);
+	return printf("%d %s %s:%p\n",
+		nloop, print_content, __stringify(LIBC_PUTS_FN), LIBC_PUTS_FN);
 }
 
 static void launch_printer(void)
@@ -509,7 +522,7 @@ static void launch_printer(void)
 
 	while (nloop--) {
 		PRINTER_FN(nloop, print_content);
-		sleep(print_interval_sec);
+		usleep(print_interval_usec);
 	}
 }
 

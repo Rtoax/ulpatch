@@ -145,7 +145,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)elftools_test_path,
-			"--role", "sleeper,trigger,sleeper,wait",
+			"--role", "sleeper,trigger,printer,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
 		};
