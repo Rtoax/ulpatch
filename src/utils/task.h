@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
+#include <gelf.h>
 
 #include <utils/util.h>
 #include <utils/rbtree.h>
@@ -48,6 +49,11 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	NULL
 };
 
+struct vma_elf {
+	GElf_Ehdr ehdr;
+	GElf_Phdr *phdrs;
+};
+
 struct vma_struct {
 	unsigned long start, end, offset;
 	unsigned int maj, min, inode;
@@ -61,7 +67,10 @@ struct vma_struct {
 
 	enum vma_type type;
 
-	struct process *task;
+	/* Only elf has it */
+	struct vma_elf *elf;
+
+	struct task *task;
 
 	// struct task.vmas
 	struct list_head node;
@@ -78,8 +87,8 @@ struct vma_struct {
  * @FTO_PROC Create '/proc' like directory under ROOT_DIR. If you need to map
  *            a file into target process address space, the flag is necessary.
  * @FTO_PATCH parse patch VMA when open a task.
- * @FTO_LIBC_VMA different with @FTO_LIBC, it's open target process address
- *               space's libc VMA in memory.
+ * @FTO_VMA_ELF different with @FTO_LIBC, it's open target process address
+ *               space's ELF VMA in memory.
  */
 enum fto_flag {
 	FTO_NONE = 0x0,
@@ -87,7 +96,7 @@ enum fto_flag {
 	FTO_LIBC = 0x1 << 1,
 	FTO_PROC = 0x1 << 2,
 	FTO_PATCH = 0x1 << 3,
-	FTO_LIBC_VMA = 0x1 << 4,
+	FTO_VMA_ELF = 0x1 << 4,
 };
 
 #define FTO_ALL 0xffffffff
@@ -100,13 +109,6 @@ enum fto_flag {
 
 struct elf_file;
 
-
-struct vma_elf {
-	/* Must belongs to a vma_struct */
-	struct vma_struct *vma;
-
-	// TODO: ready to add.
-};
 
 /* This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.

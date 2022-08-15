@@ -54,12 +54,13 @@ int open_pid_mem(pid_t pid)
 	return memfd;
 }
 
-struct vma_struct *alloc_vma()
+struct vma_struct *alloc_vma(struct task *task)
 {
 	struct vma_struct *vma = malloc(sizeof(struct vma_struct));
 	assert(vma && "alloc vma failed.");
 	memset(vma, 0x00, sizeof(struct vma_struct));
 
+	vma->task = task;
 	vma->type = VMA_NONE;
 
 	list_init(&vma->node);
@@ -209,6 +210,34 @@ enum vma_type get_vma_type(const char *exe, const char *name)
 	return type;
 }
 
+static int __unused vma_peek_phdr(struct vma_struct *vma)
+{
+	int err = 0;
+	GElf_Ehdr ehdr = {};
+	struct task *task = vma->task;
+
+	/* already peek */
+	if (vma->elf != NULL) {
+		return 0;
+	}
+
+	memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr));
+	if (!check_ehdr_magic_is_ok(&ehdr)) {
+		ldebug("%s is not ELF.\n", vma->name_);
+		return 0;
+	}
+
+	linfo("%lx %s is ELF\n", vma->start, vma->name_);
+
+	/* VMA is ELF, handle it */
+	vma->elf = malloc(sizeof(struct vma_elf));
+	memset(vma->elf, 0x0, sizeof(struct vma_elf));
+
+	memcpy(&vma->elf->ehdr, &ehdr, sizeof(ehdr));
+
+	return err;
+}
+
 static int read_task_vmas(struct task *task, bool update)
 {
 	struct vma_struct *vma;
@@ -244,7 +273,7 @@ static int read_task_vmas(struct task *task, bool update)
 			return -1;
 		}
 
-		vma = alloc_vma();
+		vma = alloc_vma(task);
 
 		vma->start = start;
 		vma->end = end;
@@ -444,6 +473,14 @@ struct task *open_task(pid_t pid, enum fto_flag flag)
 			goto free_task;
 		}
 	}
+
+	if (flag & FTO_VMA_ELF) {
+		struct vma_struct *tmp_vma;
+		task_for_each_vma(tmp_vma, task) {
+			vma_peek_phdr(tmp_vma);
+		}
+	}
+
 	/* Create a directory under ROOT_DIR */
 	if (flag & FTO_PROC) {
 		FILE *fp;
