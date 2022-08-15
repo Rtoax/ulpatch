@@ -53,7 +53,9 @@ extern "C" {
 
 #if defined(KERNEL_HEADERS_CONST_H)
 #include <linux/const.h>
-#else
+#endif
+
+#if !defined(KERNEL_HEADERS_CONST___ALIGN_KERNEL_H)
 #define __ALIGN_KERNEL(x, a)		__ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
 #define __ALIGN_KERNEL_MASK(x, mask)	(((x) + (mask)) & ~(mask))
 
