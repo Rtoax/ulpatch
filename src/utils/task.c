@@ -523,7 +523,7 @@ static int __get_exe(struct task *task)
 	return 0;
 }
 
-struct task *open_task(pid_t pid, enum fto_flag flag)
+struct task *open_task(pid_t pid, int flag)
 {
 	struct task *task = NULL;
 	int memfd;

@@ -93,14 +93,12 @@ struct vma_struct {
  * @FTO_VMA_ELF different with @FTO_LIBC, it's open target process address
  *               space's ELF VMA in memory.
  */
-enum fto_flag {
-	FTO_NONE = 0x0,
-	FTO_SELF = 0x1 << 0,
-	FTO_LIBC = 0x1 << 1,
-	FTO_PROC = 0x1 << 2,
-	FTO_PATCH = 0x1 << 3,
-	FTO_VMA_ELF = 0x1 << 4,
-};
+#define FTO_NONE	0x0
+#define FTO_SELF	BIT(0)
+#define FTO_LIBC	BIT(1)
+#define FTO_PROC	BIT(2)
+#define FTO_PATCH	BIT(3)
+#define FTO_VMA_ELF	BIT(4)
 
 #define FTO_ALL 0xffffffff
 
@@ -122,7 +120,7 @@ struct task {
 
 	pid_t pid;
 
-	enum fto_flag fto_flag;
+	int fto_flag;
 
 	// realpath of /proc/PID/exe
 	char *exe;
@@ -180,7 +178,7 @@ int dump_task(const struct task *t);
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
 
-struct task *open_task(pid_t pid, enum fto_flag flag);
+struct task *open_task(pid_t pid, int flag);
 int free_task(struct task *task);
 
 int task_attach(pid_t pid);
