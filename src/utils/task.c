@@ -210,6 +210,34 @@ enum vma_type get_vma_type(const char *exe, const char *name)
 	return type;
 }
 
+static bool elf_vma_is_interp_exception(struct vma_struct *vma)
+{
+	char *name = vma->name_;
+
+	/* libc */
+	if (!strncmp(name, "libc", 4) &&
+	    !strncmp(name + strlen(name) - 3, ".so", 3))
+		return true;
+
+	/* some times, libc-xxx.so(like libssp.so.0) is linked to libssp.so.xx
+	 */
+	if (!strncmp(name, "libssp", 6)) {
+		return true;
+	}
+
+	/* libpthread */
+	if (!strncmp(name, "libpthread", 10) &&
+	    !strncmp(name + strlen(name) - 3, ".so", 3))
+		return true;
+
+	/* libdl */
+	if (!strncmp(name, "libdl", 5) &&
+	    !strncmp(name + strlen(name) - 3, ".so", 3))
+		return true;
+
+	return false;
+}
+
 /* Only FTO_VMA_ELF flag will load VMA ELF
  */
 static int __unused vma_peek_phdr(struct vma_struct *vma)
@@ -218,6 +246,8 @@ static int __unused vma_peek_phdr(struct vma_struct *vma)
 	struct task *task = vma->task;
 	unsigned long phaddr;
 	unsigned int phsz = 0;
+	int i;
+	bool is_share_lib = true;
 
 	/* is ELF or already peek */
 	if (vma->elf != NULL || vma->is_elf) {
@@ -259,6 +289,35 @@ static int __unused vma_peek_phdr(struct vma_struct *vma)
 	}
 
 	vma->is_elf = true;
+
+	/* If type of the ELF is not ET_DYN, this is definitely not a shared
+	 * library.
+	 */
+	if (vma->elf->ehdr.e_type != ET_DYN) {
+		is_share_lib = false;
+		goto share_lib;
+	}
+
+	/*
+	 * Now there are possibilities:
+	 *   - either this is really a shared library
+	 *   - or this is a position-independent executable
+	 * To distinguish between them look for INTERP
+	 * program header that mush be present in any valid
+	 * executable or usually don't in shared libraries
+	 * (notable exception - libc)
+	 */
+	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
+		/* Ok, looks like this is an executable */
+		if (vma->elf->phdrs[i].p_type == PT_INTERP &&
+			!elf_vma_is_interp_exception(vma)) {
+			is_share_lib = false;
+			goto share_lib;
+		}
+	}
+
+share_lib:
+	vma->is_share_lib = is_share_lib;
 
 	return 0;
 }
@@ -353,10 +412,14 @@ void print_vma(struct vma_struct *vma)
 		lerror("Invalide pointer.\n");
 		return;
 	}
-	printf("%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s\n",
-			VMA_TYPE_NAME(vma->type),
-			vma->start, vma->end, vma->perms, vma->offset,
-			vma->maj, vma->min, vma->inode, vma->name_);
+	printf(
+		"%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s %s %s\n",
+		VMA_TYPE_NAME(vma->type),
+		vma->start, vma->end, vma->perms, vma->offset,
+		vma->maj, vma->min, vma->inode, vma->name_,
+		vma->is_elf?"E":" ",
+		vma->is_share_lib?"S":" "
+	);
 }
 
 int dump_task(const struct task *task)

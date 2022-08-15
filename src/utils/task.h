@@ -68,6 +68,7 @@ struct vma_struct {
 	enum vma_type type;
 
 	bool is_elf;
+	bool is_share_lib;
 
 	/* Only elf has it */
 	struct vma_elf *elf;

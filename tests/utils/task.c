@@ -64,6 +64,8 @@ TEST(Task,	open_free_fto_flags,	0)
 		ret = -1;
 	}
 
+	dump_task_vmas(task);
+
 	free_task(task);
 
 	return ret;
