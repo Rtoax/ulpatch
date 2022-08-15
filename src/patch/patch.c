@@ -410,13 +410,14 @@ static const struct symbol *resolve_symbol(const struct load_info *info,
 	if (!task)
 		return NULL;
 
-	/* try find symbol in libc.so */
-	if (task->fto_flag & FTO_LIBC) {
-		sym = find_symbol(task->libc_elf, name);
-	}
 	/* try find symbol in SELF */
 	if (task->fto_flag & FTO_SELF) {
 		sym = find_symbol(task->exe_elf, name);
+	}
+
+	/* try find symbol in libc.so */
+	if (task->fto_flag & FTO_LIBC) {
+		sym = find_symbol(task->libc_elf, name);
 	}
 
 	if (!sym) {
