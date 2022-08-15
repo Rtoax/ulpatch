@@ -466,7 +466,7 @@ static int vma_load_dynsym(struct vma_struct *vma)
 
 	buffer = malloc(symtab_sz + strtab_sz);
 	assert(buffer && "Malloc fatal.");
-
+	memset(buffer, 0x0, symtab_sz + strtab_sz);
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err < strtab_sz + symtab_sz) {
@@ -493,12 +493,10 @@ static int vma_load_dynsym(struct vma_struct *vma)
 
 		ldebug("%s: %s\n", vma->name_, symname);
 
-#if 0
 		/* allocate a symbol, and add it to task struct */
 		s = alloc_symbol(symname, sym);
 
 		task_vma_link_symbol(task, s);
-#endif
 	}
 
 
@@ -978,7 +976,7 @@ int memcpy_from_task(struct task *task,
 	if (ret <= 0) {
 		lerror("pread(%d, ...)=%d failed, %s\n",
 			task->proc_mem_fd, ret, strerror(errno));
-		return -errno;
+		return ret;
 	}
 	return ret;
 }
