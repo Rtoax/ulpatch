@@ -89,6 +89,7 @@ extern const char *elftools_test_path;
 # error "Redefine PRINTER_FN"
 #endif
 #define PRINTER_FN	print_hello
+int PRINTER_FN(int nloop, const char *content);
 
 
 struct test*
