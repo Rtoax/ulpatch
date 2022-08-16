@@ -15,7 +15,13 @@ else()
 	aux_source_directory(linenoise LINENOISE_SRC)
 endif()
 
+if(LIBUNWIND_LIBRARIES)
+	find_library(LIBUNWIND unwind /usr/lib64)
+endif()
+
 aux_source_directory(. LIB_SOURCES)
+
+link_libraries(${ELF} ${PTHREAD} ${LIBUNWIND})
 
 add_library(elftools_utils STATIC ${LIB_SOURCES} ${LINENOISE_SRC})
 

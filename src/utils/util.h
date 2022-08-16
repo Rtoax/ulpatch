@@ -119,6 +119,16 @@ extern "C" {
 #define __stringify(x...)	__stringify_1(x)
 
 
+#if defined(HAVE_LIBUNWIND_H)
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+
+void do_backtrace(void);
+#else
+#define do_backtrace() do {} while(0)
+#endif
+
+
 struct list_head {
 	struct list_head *next, *prev;
 };

@@ -976,6 +976,7 @@ int memcpy_from_task(struct task *task,
 	if (ret <= 0) {
 		lerror("pread(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, dst, size, task_src, ret, strerror(errno));
+		do_backtrace();
 		return -errno;
 	}
 	return ret;
@@ -989,6 +990,7 @@ int memcpy_to_task(struct task *task,
 	if (ret <= 0) {
 		lerror("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
+		do_backtrace();
 		return -errno;
 	}
 	return ret;
