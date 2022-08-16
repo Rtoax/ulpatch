@@ -475,7 +475,7 @@ static int vma_load_dynsym(struct vma_struct *vma)
 	}
 
 	ldebug("%s\n", vma->name_);
-	memshow(buffer, strtab_sz + symtab_sz);
+	// memshow(buffer, strtab_sz + symtab_sz);
 
 	/* For each symbol */
 	syms = (GElf_Sym *)buffer;
@@ -974,9 +974,9 @@ int memcpy_from_task(struct task *task,
 	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
 	if (ret <= 0) {
-		lerror("pread(%d, ...)=%d failed, %s\n",
-			task->proc_mem_fd, ret, strerror(errno));
-		return ret;
+		lerror("pread(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
+			task->proc_mem_fd, dst, size, task_src, ret, strerror(errno));
+		return -errno;
 	}
 	return ret;
 }
@@ -987,9 +987,8 @@ int memcpy_to_task(struct task *task,
 	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
 	if (ret <= 0) {
-		lerror("pwrite(%d, ...)=%d failed, %s\n",
-			task->proc_mem_fd, ret, strerror(errno));
-		memshow(src, size);
+		lerror("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
+			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
 		return -errno;
 	}
 	return ret;
