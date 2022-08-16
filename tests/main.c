@@ -65,6 +65,8 @@ static char *filter_format = NULL;
 
 static int log_level = LOG_ERR;
 
+// exit if Error
+static bool error_exit = false;
 
 // For -r, --role
 static enum who {
@@ -207,6 +209,9 @@ static void print_help(int ex)
 	" -L, --log-level     set log level, default(%d)\n"
 	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
+	"\n"
+	"     --error-exit    Exit if error.\n"
+	"\n"
 	" -V, --verbose       output all test logs, if -V arg was set, you may\n"
 	"                     need to set -L, --log-level.\n"
 	" -h, --help          display this help and exit\n"
@@ -223,6 +228,7 @@ static void print_help(int ex)
 
 #define ARG_PRINT_NLOOP	99
 #define ARG_PRINT_INTERVAL_USEC	100
+#define ARG_ERROR_EXIT	101
 
 static int parse_config(int argc, char *argv[])
 {
@@ -235,6 +241,7 @@ static int parse_config(int argc, char *argv[])
 		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
 		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
 		{"log-level",		required_argument,	0,	'L'},
+		{"error-exit",	no_argument,	0,	ARG_ERROR_EXIT},
 		{"verbose",	no_argument,	0,	'V'},
 		{"version",	no_argument,	0,	'v'},
 		{"help",	no_argument,	0,	'h'},
@@ -269,6 +276,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_PRINT_INTERVAL_USEC:
 			print_interval_usec = atoi(optarg);
+			break;
+		case ARG_ERROR_EXIT:
+			error_exit = true;
 			break;
 		case 'L':
 			log_level = atoi(optarg);
@@ -378,11 +388,13 @@ static int operate_test(struct test *test)
 		failed?"Not OK":"OK",
 		"\033[m");
 
-	if (failed && test->prio < TEST_PRIO_MIDDLE) {
-		/**
-		 * Only high priority test return -1
+	if (failed) {
+		/* 1. high priority failed
+		 * 2. ordinary test failed, and set --error-exit argument
 		 */
-		return -1;
+		if (test->prio < TEST_PRIO_MIDDLE || error_exit) {
+			return -1;
+		}
 	}
 
 	return 0;
@@ -428,9 +440,10 @@ static void launch_tester(void)
 			} else {
 				if (filter_out_test(test)) continue;
 				ret = operate_test(test);
-			}
-			if (ret != 0) {
-				goto print_stat;
+				/* if error */
+				if (ret != 0) {
+					goto print_stat;
+				}
 			}
 		}
 	}
