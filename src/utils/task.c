@@ -174,7 +174,7 @@ static unsigned int __perms2prot(char *perms)
 	return prot;
 }
 
-static int free_task_vmas(struct task *task);
+int free_task_vmas(struct task *task);
 
 enum vma_type get_vma_type(const char *exe, const char *name)
 {
@@ -240,7 +240,7 @@ static bool elf_vma_is_interp_exception(struct vma_struct *vma)
 
 /* Only FTO_VMA_ELF flag will load VMA ELF
  */
-static int __unused vma_peek_phdr(struct vma_struct *vma)
+int __unused vma_peek_phdr(struct vma_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
 	struct task *task = vma->task;
@@ -351,7 +351,7 @@ share_lib:
 	return 0;
 }
 
-static void __unused vma_free_elf(struct vma_struct *vma)
+void __unused vma_free_elf(struct vma_struct *vma)
 {
 	if (!vma->is_elf)
 		return;
@@ -378,7 +378,7 @@ int task_vma_link_symbol(struct task *task, struct symbol *s)
 	return node?0:-1;
 }
 
-static int vma_load_dynsym(struct vma_struct *vma)
+int vma_load_dynsym(struct vma_struct *vma)
 {
 	if (!vma->is_elf || !vma->elf)
 		return 0;
@@ -508,7 +508,7 @@ out_free:
 	return 0;
 }
 
-static int read_task_vmas(struct task *task, bool update)
+int read_task_vmas(struct task *task, bool update)
 {
 	struct vma_struct *vma;
 	int mapsfd;
@@ -622,7 +622,7 @@ void dump_task_vmas(struct task *task)
 	}
 }
 
-static int free_task_vmas(struct task *task)
+int free_task_vmas(struct task *task)
 {
 	struct vma_struct *vma, *tmpvma;
 
