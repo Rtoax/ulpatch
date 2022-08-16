@@ -268,6 +268,10 @@ TEST(Ftrace,	init_patch,	0)
 		struct task *task = open_task(pid, FTO_PROC);
 
 		ret = init_patch(task, ELFTOOLS_FTRACE_OBJ_PATH);
+		if (ret == -EEXIST) {
+			fprintf(stderr, "%s not exist. make install\n",
+				ELFTOOLS_FTRACE_OBJ_PATH);
+		}
 
 		dump_task_vmas(task);
 

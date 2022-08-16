@@ -30,6 +30,7 @@ static int parse_load_info(struct task *task, const char *obj_file,
 	const char *filename;
 
 	if (!fexist(obj_file)) {
+		lerror("%s not exist, command 'make install' is needed.\n", obj_file);
 		return -EEXIST;
 	}
 
@@ -628,8 +629,10 @@ int init_patch(struct task *task, const char *obj_file)
 	struct load_info info = {};
 
 	err = parse_load_info(task, obj_file, &info);
-	if (err)
+	if (err) {
+		lerror("Parse %s failed.\n", obj_file);
 		return err;
+	}
 
 	/**
 	 * Create and mmap a temp file into target task, this temp file is under
