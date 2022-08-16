@@ -250,6 +250,17 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	bool is_share_lib = true;
 	unsigned long lowest_vaddr = ULONG_MAX;
 
+	/* Check VMA type */
+	switch (vma->type) {
+	case VMA_VVAR:
+	case VMA_STACK:
+	case VMA_VSYSCALL:
+		lwarning("not support %s, %s\n", VMA_TYPE_NAME(vma->type));
+		return 0;
+	default:
+		break;
+	}
+
 	/* is ELF or already peek */
 	if (vma->elf != NULL || vma->is_elf) {
 		return 0;
@@ -261,6 +272,7 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 		return -1;
 	}
 
+	/* If not ELF, return success */
 	if (!check_ehdr_magic_is_ok(&ehdr)) {
 		return 0;
 	}
@@ -271,10 +283,29 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	vma->elf = malloc(sizeof(struct vma_elf));
 	memset(vma->elf, 0x0, sizeof(struct vma_elf));
 
+	/* Copy ehdr from load var */
 	memcpy(&vma->elf->ehdr, &ehdr, sizeof(ehdr));
 
 	phaddr = vma->start + vma->elf->ehdr.e_phoff;
 	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
+
+	memshow(&vma->elf->ehdr, sizeof(ehdr));
+
+	/* if no program headers, just return. we don't need it, such as:
+	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr
+	 * memshow() like:
+	 *
+	 * |.ELF............|
+	 * |/lib64/./usr/lib|
+	 * |64/.............|
+	 * |................|
+	 */
+	if (phsz == 0) {
+		lwarning("%s: no phdr, e_phoff %lx, skip it.\n",
+			vma->name_, vma->elf->ehdr.e_phoff);
+		free(vma->elf);
+		return 0;
+	}
 
 	vma->elf->phdrs = malloc(phsz);
 	if (!vma->elf->phdrs) {
