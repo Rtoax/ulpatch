@@ -15,13 +15,15 @@ else()
 	aux_source_directory(linenoise LINENOISE_SRC)
 endif()
 
+message(STATUS "=== UTILS Architecture: ${ARCHITECTURE}")
 if(LIBUNWIND_LIBRARIES)
 	find_library(LIBUNWIND unwind /usr/lib64)
+	find_library(LIBUNWIND_ARCH unwind-${ARCHITECTURE} /usr/lib64)
 endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-link_libraries(${ELF} ${PTHREAD} ${LIBUNWIND})
+link_libraries(${ELF} ${PTHREAD} ${LIBUNWIND} ${LIBUNWIND_ARCH})
 
 add_library(elftools_utils STATIC ${LIB_SOURCES} ${LINENOISE_SRC})
 
