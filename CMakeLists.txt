@@ -36,6 +36,7 @@ include(find_gtk)
 #message(STATUS "=== CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 #message(STATUS "=== CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 #message(STATUS "=== CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+#message(STATUS "=== CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 if(ELFUTILS_INCLUDE_DIRS)
 message(STATUS "=== FOUND elfutils-devel")
@@ -113,7 +114,7 @@ TARGETS
 	utask
 	elfshow
 	elftools_test
-RUNTIME DESTINATION /usr/local/bin
+RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 # install object file
