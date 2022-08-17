@@ -250,7 +250,7 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	bool is_share_lib = true;
 	unsigned long lowest_vaddr = ULONG_MAX;
 
-	/* Check VMA type */
+	/* Check VMA type, and skip it */
 	switch (vma->type) {
 	case VMA_VVAR:
 	case VMA_STACK:
@@ -498,6 +498,26 @@ int vma_load_dynsym(struct vma_struct *vma)
 	buffer = malloc(symtab_sz + strtab_sz);
 	assert(buffer && "Malloc fatal.");
 	memset(buffer, 0x0, symtab_sz + strtab_sz);
+
+	ldebug("%s: symtab_addr %lx, load_offset: %lx, vma_start %lx\n",
+		vma->name_,
+		symtab_addr,
+		vma->elf->load_offset,
+		vma->start);
+
+	/* [vdso] need add load_offset or vma start address.
+	 *
+	 * $ readelf -S vdso.so
+	 * There are 16 section headers, starting at offset 0xe98:
+	 * Section Headers:
+	 *  [Nr] Name              Type             Address           Offset
+	 *       Size              EntSize          Flags  Link  Info  Align
+	 *  [ 3] .dynsym           DYNSYM           00000000000001c8  000001c8
+	 *       0000000000000138  0000000000000018   A       4     1     8
+	 */
+	if (vma->type == VMA_VDSO) {
+		symtab_addr += vma->elf->load_offset;
+	}
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err < strtab_sz + symtab_sz) {
