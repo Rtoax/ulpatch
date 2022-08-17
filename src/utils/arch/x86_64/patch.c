@@ -11,6 +11,8 @@
 #include <utils/compiler.h>
 #include <utils/patch.h>
 
+#include <elf/elf_api.h>
+
 
 static int __apply_relocate_add(const struct load_info *info,
 	GElf_Shdr *sechdrs, const char *strtab,
@@ -83,6 +85,21 @@ static int __apply_relocate_add(const struct load_info *info,
 				goto overflow;
 			break;
 
+		case R_X86_64_GOTTPOFF:
+		case R_X86_64_GOTPCREL:
+		case R_X86_64_REX_GOTPCRELX:
+		case R_X86_64_GOTPCRELX:
+			if (is_undef_symbol(sym)) {
+				// TODO
+				// val += sizeof(unsigned long);
+			} else if (GELF_ST_TYPE(sym->st_info) == STT_TLS) {
+				/* This is GOTTPOFF that already points to an appropriate GOT
+				 * entry in the target's memory.
+				 */
+				val = rel->r_addend + info->target_addr - 4;
+			}
+			FALLTHROUGH;
+
 		case R_X86_64_PC32:
 		case R_X86_64_PLT32:
 			if (*(uint32_t *)loc != 0)
@@ -100,6 +117,11 @@ static int __apply_relocate_add(const struct load_info *info,
 				goto invalid_relocation;
 			val -= (uint64_t)loc;
 			write_func(loc, &val, 8);
+			break;
+
+		case R_X86_64_TPOFF64:
+		case R_X86_64_TPOFF32:
+			lerror("TPOFF32/TPOFF64 should not be present\n");
 			break;
 
 		default:
