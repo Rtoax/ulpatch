@@ -379,11 +379,12 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 	return node?rb_entry(node, struct symbol, node):NULL;
 }
 
+/* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
 	struct rb_node *node = rb_insert_node(&elf->symbols, &s->node,
 						cmp_symbol_name, (unsigned long)s);
-	return node?0:-1;
+	return node?-1:0;
 }
 
 void free_symbol(struct symbol *s)

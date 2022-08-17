@@ -241,7 +241,7 @@ out:
 	return ret;
 }
 
-TEST(Ftrace,	init_patch,	0)
+static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 {
 	int ret = -1;
 	int status = 0;
@@ -265,13 +265,16 @@ TEST(Ftrace,	init_patch,	0)
 
 		task_wait_wait(&waitqueue);
 
-		struct task *task = open_task(pid, FTO_PROC);
+		struct task *task = open_task(pid, fto_flags);
 
 		ret = init_patch(task, ELFTOOLS_FTRACE_OBJ_PATH);
 		if (ret == -EEXIST) {
 			fprintf(stderr, "%s not exist. make install\n",
 				ELFTOOLS_FTRACE_OBJ_PATH);
 		}
+
+		if (cb)
+			ret = cb(task);
 
 		dump_task_vmas(task);
 
@@ -291,5 +294,46 @@ TEST(Ftrace,	init_patch,	0)
 	task_wait_destroy(&waitqueue);
 
 	return ret;
+}
+
+TEST(Ftrace,	init_patch,	0)
+{
+	return test_task_patch(FTO_PROC, NULL);
+}
+
+static const char *SYMBOLS[] = {
+//	__stringify(main),
+	__stringify(exit),
+#if defined(__x86_64__)
+	__stringify(mcount),
+#elif defined(__aarch64__)
+	__stringify(_mcount),
+#endif
+};
+
+static int find_task_symbol(struct task *task)
+{
+	int i;
+	int err = 0;
+	struct symbol *sym;
+
+	for (i = 0; i < ARRAY_SIZE(SYMBOLS); i++) {
+		sym = task_vma_find_symbol(task, SYMBOLS[i]);
+
+		linfo("%s %-30s: 0x%lx\n",
+			sym?"Exist":"NoExi",
+			SYMBOLS[i],
+			sym?sym->sym.st_value:0);
+
+		if (!sym)
+			err = -1;
+	}
+
+	return err;
+}
+
+TEST(Ftrace,	find_task_symbol,	0)
+{
+	return test_task_patch(FTO_FTRACE, find_task_symbol);
 }
 

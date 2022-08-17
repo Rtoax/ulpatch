@@ -402,11 +402,19 @@ struct symbol *task_vma_find_symbol(struct task *task, const char *name)
 	return node?rb_entry(node, struct symbol, node):NULL;
 }
 
+/* Insert OK, return 0, else return -1 */
 int task_vma_link_symbol(struct task *task, struct symbol *s)
 {
 	struct rb_node *node = rb_insert_node(&task->vma_symbols, &s->node,
 						cmp_symbol_name, (unsigned long)s);
-	return node?0:-1;
+
+	if (unlikely(node)) {
+		lwarning("%s: symbol %s already exist\n", task->comm, s->name);
+	} else {
+		ldebug("%s: add symbol %s success.\n", task->comm, s->name);
+	}
+
+	return node?-1:0;
 }
 
 int vma_load_dynsym(struct vma_struct *vma)
@@ -538,7 +546,7 @@ int vma_load_dynsym(struct vma_struct *vma)
 		GElf_Sym __unused *sym = syms + i;
 		const char *symname = buffer + symtab_sz + syms[i].st_name;
 
-		if (is_undef_symbol(sym)) {
+		if (is_undef_symbol(sym) || strlen(symname) == 0) {
 			continue;
 		}
 
@@ -546,8 +554,15 @@ int vma_load_dynsym(struct vma_struct *vma)
 
 		/* allocate a symbol, and add it to task struct */
 		s = alloc_symbol(symname, sym);
+		if (!s) {
+			lerror("Alloc symbol failed, %s\n", symname);
+			continue;
+		}
 
-		task_vma_link_symbol(task, s);
+		err = task_vma_link_symbol(task, s);
+		if (err) {
+			free_symbol(s);
+		}
 	}
 
 
