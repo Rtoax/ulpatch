@@ -105,6 +105,7 @@ struct vma_struct {
 
 #define FTO_ALL 0xffffffff
 
+#define FTO_FTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_DYNSYM)
 
 /* under ROOT_DIR/PID/ */
 #define TASK_PROC_COMM	"comm"
@@ -231,4 +232,6 @@ int task_wait_init(struct task_wait *task_wait, char *tmpfile);
 int task_wait_destroy(struct task_wait *task_wait);
 int task_wait_wait(struct task_wait *task_wait);
 int task_wait_trigger(struct task_wait *task_wait);
+
+struct symbol *task_vma_find_symbol(struct task *task, const char *name);
 
