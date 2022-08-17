@@ -5,6 +5,28 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 PROJECT(elftools)
 
+# version number components.
+set(elftools_VERSION_MAJOR 0)
+set(elftools_VERSION_MINOR 1)
+set(elftools_VERSION_PATCH 0)
+
+execute_process(
+	COMMAND git describe --abbrev=4 --dirty --tags
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	OUTPUT_VARIABLE ELFTOOLS_VERSION
+	ERROR_VARIABLE GIT_DESCRIBE_ERROR
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	RESULT_VARIABLE retcode
+)
+
+# If the build is not done from a git repo, get the version information from
+# the version variables in main CMakeLists.txt
+if(NOT "${retcode}" STREQUAL "0")
+set(ELFTOOLS_VERSION "v${elftools_VERSION_MAJOR}.${elftools_VERSION_MINOR}.${elftools_VERSION_PATCH}")
+endif()
+
+add_definitions("-DELFTOOLS_VERSION=\"${ELFTOOLS_VERSION}\"")
+
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")

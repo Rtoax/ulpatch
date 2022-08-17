@@ -15,6 +15,9 @@ const char *elftools_arch(void)
 
 const char *elftools_version(void)
 {
-	return "elftools-0.0.1";
+#if !defined(ELFTOOLS_VERSION)
+# error "Must define string ELFTOOLS_VERSION"
+#endif
+	return ELFTOOLS_VERSION;
 }
 
