@@ -2,7 +2,7 @@
 # Copyright (C) 2022 Rong Tao
 #
 include_directories(.)
-include_directories(..)
+include_directories(../..)
 
 message(STATUS "=== Compile for x86_64")
 

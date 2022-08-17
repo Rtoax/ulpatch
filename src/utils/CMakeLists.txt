@@ -4,8 +4,6 @@
 include_directories(.)
 include_directories(..)
 
-add_subdirectory(arch/)
-
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 

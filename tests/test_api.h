@@ -9,13 +9,13 @@
 #include <utils/compiler.h>
 
 #if defined(__x86_64__)
-#include <utils/arch/x86_64/regs.h>
-#include <utils/arch/x86_64/instruments.h>
-#include <utils/arch/x86_64/ftrace.h>
+#include <arch/x86_64/regs.h>
+#include <arch/x86_64/instruments.h>
+#include <arch/x86_64/ftrace.h>
 #elif defined(__aarch64__)
-#include <utils/arch/aarch64/regs.h>
-#include <utils/arch/aarch64/instruments.h>
-#include <utils/arch/aarch64/ftrace.h>
+#include <arch/aarch64/regs.h>
+#include <arch/aarch64/instruments.h>
+#include <arch/aarch64/ftrace.h>
 #endif
 
 /**

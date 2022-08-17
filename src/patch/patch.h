@@ -13,12 +13,12 @@
 
 
 #if defined(__x86_64__)
-#include <utils/arch/x86_64/instruments.h>
-#include <utils/arch/x86_64/mcount.h>
+#include <arch/x86_64/instruments.h>
+#include <arch/x86_64/mcount.h>
 #elif defined(__aarch64__)
-#include <utils/arch/aarch64/instruments.h>
-#include <utils/arch/aarch64/mcount.h>
-#include <utils/arch/aarch64/ftrace.h>
+#include <arch/aarch64/instruments.h>
+#include <arch/aarch64/mcount.h>
+#include <arch/aarch64/ftrace.h>
 #endif
 
 
