@@ -302,13 +302,9 @@ TEST(Ftrace,	init_patch,	0)
 }
 
 static const char *SYMBOLS[] = {
-//	__stringify(main),
-	__stringify(exit),
-#if defined(__x86_64__)
-	__stringify(mcount),
-#elif defined(__aarch64__)
-	__stringify(_mcount),
-#endif
+#define TEST_SYM(s) __stringify(s),
+#include "../test_symbols.h"
+#undef TEST_SYM
 };
 
 static int find_task_symbol(struct task *task)
