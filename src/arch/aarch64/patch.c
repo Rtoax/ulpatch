@@ -323,9 +323,64 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 					      AARCH64_INSN_IMM_MOVNZ);
 			break;
 
+		/* Immediate instruction relocations. */
+		case R_AARCH64_LD_PREL_LO19:
+			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 19,
+					     AARCH64_INSN_IMM_19);
+			break;
+		case R_AARCH64_ADR_PREL_LO21:
+			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 0, 21,
+					     AARCH64_INSN_IMM_ADR);
+			break;
 
+		case R_AARCH64_ADD_ABS_LO12_NC:
+		case R_AARCH64_LDST8_ABS_LO12_NC:
+			overflow_check = false;
+			ovf = reloc_insn_imm(RELOC_OP_ABS, loc, val, 0, 12,
+					     AARCH64_INSN_IMM_12);
+			break;
+		case R_AARCH64_LDST16_ABS_LO12_NC:
+			overflow_check = false;
+			ovf = reloc_insn_imm(RELOC_OP_ABS, loc, val, 1, 11,
+					     AARCH64_INSN_IMM_12);
+			break;
+		case R_AARCH64_LDST32_ABS_LO12_NC:
+			overflow_check = false;
+			ovf = reloc_insn_imm(RELOC_OP_ABS, loc, val, 2, 10,
+					     AARCH64_INSN_IMM_12);
+			break;
+		case R_AARCH64_LDST64_ABS_LO12_NC:
+			overflow_check = false;
+			ovf = reloc_insn_imm(RELOC_OP_ABS, loc, val, 3, 9,
+					     AARCH64_INSN_IMM_12);
+			break;
+		case R_AARCH64_LDST128_ABS_LO12_NC:
+			overflow_check = false;
+			ovf = reloc_insn_imm(RELOC_OP_ABS, loc, val, 4, 8,
+					     AARCH64_INSN_IMM_12);
+			break;
+		case R_AARCH64_TSTBR14:
+			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 14,
+					     AARCH64_INSN_IMM_14);
+			break;
+		case R_AARCH64_CONDBR19:
+			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 19,
+					     AARCH64_INSN_IMM_19);
+			break;
+
+		case R_AARCH64_JUMP26:
+		case R_AARCH64_CALL26:
+			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 26,
+					     AARCH64_INSN_IMM_26);
+
+			if (ovf == -ERANGE) {
+				lerror("Out of rang.\n");
+			}
+			break;
+
+		case R_AARCH64_ADR_PREL_PG_HI21_NC:
+		case R_AARCH64_ADR_PREL_PG_HI21:
 		// TODO:
-
 
 		default:
 			lerror("unsupported RELA relocation: %llu\n",
