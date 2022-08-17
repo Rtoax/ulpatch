@@ -255,7 +255,7 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	case VMA_VVAR:
 	case VMA_STACK:
 	case VMA_VSYSCALL:
-		lwarning("not support %s, %s\n", VMA_TYPE_NAME(vma->type));
+		lwarning("not support %s\n", VMA_TYPE_NAME(vma->type));
 		return 0;
 	default:
 		break;
