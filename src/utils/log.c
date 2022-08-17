@@ -53,7 +53,8 @@ int _____log(int level, const char *file, const char *func,
 		// like 15:53:52
 		strftime(buffer, 32, "%T", localtime(&timestamp));
 
-		fprintf(fp, "%s %s[%s:%ld] ", buffer, level_prefix[level], func, line);
+		fprintf(fp, "%s %s[%s %s:%ld] ",
+			buffer, level_prefix[level], basename((char *)file), func, line);
 	}
 
 	va_start(va, fmt);
