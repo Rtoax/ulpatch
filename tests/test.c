@@ -129,6 +129,11 @@ int task_wait_trigger(struct task_wait *task_wait)
 	return 0;
 }
 
+#if defined(ldebug)
+#undef ldebug
+#define ldebug(...)
+#endif
+
 int task_wait_request(struct task_wait *task_wait, char request,
 	struct msgbuf *rx_buf, size_t rx_buf_size)
 {
@@ -139,12 +144,15 @@ int task_wait_request(struct task_wait *task_wait, char request,
 		.mtype = MSG_TYPE_REQUEST,
 		.mtext[0] = request,
 	};
+	ldebug("TX request: %d, start\n", request);
 
 	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
 	if (ret < 0) {
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
 			ret, msqid, strerror(errno));
 	}
+
+	ldebug("TX request: %d\n", request);
 
 recv:
 	ret = msgrcv(msqid, rx_buf, rx_buf_size - sizeof(long),
@@ -156,6 +164,7 @@ recv:
 			goto recv;
 		}
 	}
+	ldebug("RX response: %d\n", request);
 
 	return 0;
 }
@@ -171,6 +180,7 @@ int task_wait_response(struct task_wait *task_wait,
 	char buffer[BUFFER_SIZE];
 	struct msgbuf msg, *pmsg;
 
+	ldebug("RX request: %d, start\n");
 recv:
 	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE_REQUEST, 0);
 	if (ret == -1) {
@@ -180,6 +190,7 @@ recv:
 			goto recv;
 		}
 	}
+	ldebug("RX request: %d\n", msg.mtext[0]);
 
 	pmsg = (struct msgbuf *)buffer;
 
@@ -193,6 +204,7 @@ recv:
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
 			ret, msqid, strerror(errno));
 	}
+	ldebug("TX response: %d\n", msg.mtext[0]);
 
 	return 0;
 }

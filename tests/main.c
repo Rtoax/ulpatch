@@ -641,18 +641,49 @@ static struct test_symbol * find_test_symbol(const char *sym)
 	return s;
 }
 
-static void launch_listener(void)
+#define REQUEST_SYM_ADDR	1
+
+static int response_msg(struct msgbuf *buf, size_t buf_len)
 {
+	int ret = 0;
+
 	struct test_symbol *sym = find_test_symbol(listener_request);
 
 	if (!sym) {
 		fprintf(stderr, "%s no exist in tests.\n", listener_request);
+		return sizeof(char);
 	}
 
-	ldebug("LAUNCH: %s %s 0x%lx\n",
-		role_string[ROLE_LISTENER], listener_request, sym->addr);
+	*(unsigned long *)&buf->mtext[1] = sym->addr;
 
-	// TODO
+	/* address + mtext[0] */
+	ret = sizeof(unsigned long) + sizeof(char);
+
+	return ret;
+}
+
+static int listener_rspmsg(char request, struct msgbuf *buf, size_t buf_len)
+{
+	switch (request) {
+	case REQUEST_SYM_ADDR:
+		return response_msg(buf, buf_len);
+	default:
+		break;
+	}
+	return sizeof(char);
+}
+
+static void launch_listener(void)
+{
+	struct task_wait waitqueue;
+
+	ldebug("LAUNCH: %s %s\n", role_string[ROLE_LISTENER], listener_request);
+
+	task_wait_init(&waitqueue, msgq_file);
+
+	task_wait_response(&waitqueue, listener_rspmsg);
+
+	// task_wait_destroy(&waitqueue);
 }
 
 static void sig_handler(int signum)
@@ -965,3 +996,55 @@ TEST(elftools_test,	wait_trigger,	0)
 	return ret;
 }
 
+TEST(elftools_test,	listener,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "listener",
+			"--msgq", waitqueue.tmpfile,
+			"--listener-request", test_symbols[0].sym,
+			NULL,
+		};
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		char buffer[BUFFER_SIZE];
+		struct msgbuf *rx_buf = (void *)buffer;
+
+		task_wait_request(&waitqueue, REQUEST_SYM_ADDR, rx_buf, BUFFER_SIZE);
+
+		unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
+
+		ldebug("%s: addr 0x%lx (0x%lx)\n",
+			test_symbols[0].sym, addr, test_symbols[0].addr);
+
+		/* The address must be equal */
+		if (addr != test_symbols[0].addr)
+			ret = -1;
+
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
+}
