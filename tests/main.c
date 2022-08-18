@@ -106,6 +106,7 @@ static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
 
 const char *listener_request = NULL;
+static int listener_nloop = 1;
 
 // For -V, --verbose
 static bool verbose = false;
@@ -199,8 +200,10 @@ static void print_help(int ex)
 	printf(
 	"   %s arguments:\n"
 	"     --listener-request  request from msgq\n"
+	"     --listener-nloop    request from msgq for times, default %d\n"
 	"\n",
-	role_string[ROLE_LISTENER]
+	role_string[ROLE_LISTENER],
+	listener_nloop
 	);
 	printf(
 	"\n"
@@ -246,6 +249,7 @@ static void print_help(int ex)
 #define ARG_ERROR_EXIT	201
 
 #define ARG_LISTENER_REQUEST	202
+#define ARG_LISTENER_NLOOP	203
 
 
 static int parse_config(int argc, char *argv[])
@@ -259,6 +263,7 @@ static int parse_config(int argc, char *argv[])
 		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
 		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
 		{"listener-request",	required_argument,	0,	ARG_LISTENER_REQUEST},
+		{"listener-nloop",	required_argument,	0,	ARG_LISTENER_NLOOP},
 		{"log-level",		required_argument,	0,	'L'},
 		{"error-exit",	no_argument,	0,	ARG_ERROR_EXIT},
 		{"verbose",	no_argument,	0,	'V'},
@@ -298,6 +303,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_LISTENER_REQUEST:
 			listener_request = optarg;
+			break;
+		case ARG_LISTENER_NLOOP:
+			listener_nloop = atoi(optarg);
 			break;
 		case ARG_ERROR_EXIT:
 			error_exit = true;
@@ -351,6 +359,10 @@ static int parse_config(int argc, char *argv[])
 		}
 		if (!msgq_file) {
 			fprintf(stderr, "Need a ftok(3) file input with -m.\n");
+			exit(1);
+		}
+		if (listener_nloop < 1) {
+			fprintf(stderr, "--listener-nloop need >= 1.\n");
 			exit(1);
 		}
 	}
@@ -695,7 +707,9 @@ static void launch_listener(void)
 
 	task_wait_init(&waitqueue, msgq_file);
 
-	task_wait_response(&waitqueue, listener_rspmsg);
+	while (listener_nloop--) {
+		task_wait_response(&waitqueue, listener_rspmsg);
+	}
 
 	// task_wait_destroy(&waitqueue);
 }
