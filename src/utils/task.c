@@ -9,7 +9,6 @@
 #include <sys/ptrace.h>
 #include <sys/user.h>
 #include <sys/wait.h>
-#include <sys/msg.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <elf.h>
@@ -1447,6 +1446,9 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 
 #define PROG_ID	123
 #define MSG_TYPE_WAIT_TRIGGER	1
+#define MSG_TYPE_REQUEST	2
+#define MSG_TYPE_RESPONSE	3
+
 
 static int create_msqid(const char *file)
 {
@@ -1520,6 +1522,74 @@ int task_wait_trigger(struct task_wait *task_wait)
 	msg.mtext[0] = 'q';
 
 	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
+	if (ret < 0) {
+		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
+			ret, msqid, strerror(errno));
+	}
+
+	return 0;
+}
+
+int task_wait_request(struct task_wait *task_wait, char request,
+	struct msgbuf *rx_buf, size_t rx_buf_size)
+{
+	int ret;
+	int msqid = create_msqid(task_wait->tmpfile);
+
+	struct msgbuf msg = {
+		.mtype = MSG_TYPE_REQUEST,
+		.mtext[0] = request,
+	};
+
+	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
+	if (ret < 0) {
+		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
+			ret, msqid, strerror(errno));
+	}
+
+recv:
+	ret = msgrcv(msqid, rx_buf, rx_buf_size - sizeof(long),
+			MSG_TYPE_RESPONSE, 0);
+	if (ret == -1) {
+		if (errno != ENOMSG) {
+			perror("msgrcv");
+		} else {
+			goto recv;
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * @makemsg create msgbuf, return msg text length
+ */
+int task_wait_response(struct task_wait *task_wait,
+	int (*makemsg)(char request, struct msgbuf *buf, size_t buf_len))
+{
+	int ret, len;
+	int msqid = create_msqid(task_wait->tmpfile);
+	char buffer[BUFFER_SIZE];
+	struct msgbuf msg, *pmsg;
+
+recv:
+	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE_REQUEST, 0);
+	if (ret == -1) {
+		if (errno != ENOMSG) {
+			perror("msgrcv");
+		} else {
+			goto recv;
+		}
+	}
+
+	pmsg = (struct msgbuf *)buffer;
+
+	len = makemsg(msg.mtext[0], pmsg, BUFFER_SIZE);
+
+	pmsg->mtype = MSG_TYPE_RESPONSE;
+	pmsg->mtext[0] = msg.mtext[0];
+
+	ret = msgsnd(msqid, pmsg, len, 0);
 	if (ret < 0) {
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
 			ret, msqid, strerror(errno));
