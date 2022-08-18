@@ -1446,7 +1446,7 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 
 
 #define PROG_ID	123
-#define MSG_TYPE	1
+#define MSG_TYPE_WAIT_TRIGGER	1
 
 static int create_msqid(const char *file)
 {
@@ -1495,7 +1495,7 @@ int task_wait_wait(struct task_wait *task_wait)
 	struct msgbuf msg;
 
 recv:
-	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE, 0);
+	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE_WAIT_TRIGGER, 0);
 	if (ret == -1) {
 		if (errno != ENOMSG) {
 			perror("msgrcv");
@@ -1513,7 +1513,7 @@ int task_wait_trigger(struct task_wait *task_wait)
 	int msqid = create_msqid(task_wait->tmpfile);
 
 	struct msgbuf msg = {
-		.mtype = MSG_TYPE,
+		.mtype = MSG_TYPE_WAIT_TRIGGER,
 		.mtext = {0},
 	};
 
