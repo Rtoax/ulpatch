@@ -82,6 +82,37 @@ TEST(File,	ftype_ELF,	0)
 	return 0;
 }
 
+TEST(File,	fmktempfile,	0)
+{
+	int err = 0;
+	char buffer[BUFFER_SIZE];
+
+	char *name;
+
+	/* Create /tmp/xxx file */
+	name = fmktempfile(buffer, BUFFER_SIZE, NULL);
+	if (!name)
+		err = -1;
+	linfo("fmktempfile: %s\n", name);
+
+	if (!fexist(name))
+		err = -EEXIST;
+
+	unlink(name);
+
+	/* Create /tmp/patch-xxx file */
+	name = fmktempfile(buffer, BUFFER_SIZE, "patch-XXXXXX");
+	if (!name)
+		err = -1;
+	linfo("fmktempfile: %s\n", name);
+	if (!fexist(name))
+		err = -EEXIST;
+
+	unlink(name);
+
+	return err;
+}
+
 TEST(File,	fmktempname,	0)
 {
 	int err = 0;

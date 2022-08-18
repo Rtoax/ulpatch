@@ -141,10 +141,10 @@ int fcopy(const char *srcpath, const char *dstpath)
 	return ret;
 }
 
-char* fmktempname(char *buf, int buf_len, char *seed)
+char* fmktempfile(char *buf, int buf_len, char *seed)
 {
 	int fd;
-	char *_seed = seed?:"/tmp/temp-XXXXXXX";
+	char *_seed = seed?:"/tmp/temp-XXXXXX";
 
 	snprintf(buf, buf_len, _seed);
 
@@ -154,7 +154,15 @@ char* fmktempname(char *buf, int buf_len, char *seed)
 		return NULL;
 	}
 	close(fd);
-	unlink(buf);
+
+	return buf;
+}
+
+char* fmktempname(char *buf, int buf_len, char *seed)
+{
+	char *file = fmktempfile(buf, buf_len, seed);
+
+	unlink(file);
 
 	return basename(buf);
 }
