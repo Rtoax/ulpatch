@@ -622,10 +622,24 @@ struct test_symbol {
 };
 
 static __unused struct test_symbol test_symbols[] = {
-#define TEST_SYM(s) { __stringify(s), (unsigned long)s},
+#define TEST_SYM(s) { __stringify(s), 0 },
 #include "test_symbols.h"
 #undef TEST_SYM
 };
+
+static void init_test_symbols(void)
+{
+	int i;
+#define TEST_SYM_FOR_EACH
+#define TEST_SYM_FOR_EACH_I i
+#define TEST_SYM(s) \
+	if (!strcmp(#s, test_symbols[i].sym)) {	\
+		test_symbols[i].addr = (unsigned long)s;	\
+	}
+#include "test_symbols.h"
+#undef TEST_SYM
+#undef TEST_SYM_FOR_EACH
+}
 
 static struct test_symbol * find_test_symbol(const char *sym)
 {
@@ -712,6 +726,8 @@ int main(int argc, char *argv[])
 		get_proc_pid_exe(getpid(), elftools_test_path_buf, MAX_PATH);
 
 	parse_config(argc, argv);
+
+	init_test_symbols();
 
 	switch (role) {
 	case ROLE_TESTER:
