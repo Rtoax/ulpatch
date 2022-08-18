@@ -1472,19 +1472,10 @@ static int create_msqid(const char *file)
  */
 int task_wait_init(struct task_wait *task_wait, char *tmpfile)
 {
-	int fd;
-
-	sprintf(task_wait->tmpfile, tmpfile?:"/tmp/key-XXXXXXX");
-
 	if (tmpfile)
-		return 0;
-
-	fd = mkstemp(task_wait->tmpfile);
-	if (fd <= 0) {
-		fprintf(stderr, "mkstemp: %s\n", strerror(errno));
-		return -errno;
-	}
-	close(fd);
+		snprintf(task_wait->tmpfile, sizeof(task_wait->tmpfile), tmpfile);
+	else
+		fmktempfile(task_wait->tmpfile, sizeof(task_wait->tmpfile), NULL);
 
 	return 0;
 }
