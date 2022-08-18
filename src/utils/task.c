@@ -1448,6 +1448,26 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 #define PROG_ID	123
 #define MSG_TYPE	1
 
+static int create_msqid(const char *file)
+{
+	int msqid;
+	key_t key;
+
+	while (!fexist(file));
+
+	if ((key = ftok(file, PROG_ID)) < 0) {
+		perror("ftok error");
+		return -1;
+	}
+
+	if ((msqid = msgget(key, IPC_CREAT | 0777)) == -1) {
+		perror("msgget error");
+		return -1;
+	}
+
+	return msqid;
+}
+
 /* key: ftok(2) open/create a tmp file
  */
 int task_wait_init(struct task_wait *task_wait, char *tmpfile)
@@ -1478,23 +1498,10 @@ int task_wait_destroy(struct task_wait *task_wait)
 
 int task_wait_wait(struct task_wait *task_wait)
 {
-	int msqid;
-	key_t key;
 	int ret;
+	int msqid = create_msqid(task_wait->tmpfile);
 
 	struct msgbuf msg;
-
-	while (!fexist(task_wait->tmpfile));
-
-	if ((key = ftok(task_wait->tmpfile, PROG_ID)) < 0) {
-		perror("ftok error");
-		exit(1);
-	}
-
-	if ((msqid = msgget(key, IPC_CREAT | 0777)) == -1) {
-		perror("msgget error");
-		exit(1);
-	}
 
 recv:
 	ret = msgrcv(msqid, &msg, sizeof(msg.mtext), MSG_TYPE, 0);
@@ -1511,26 +1518,16 @@ recv:
 
 int task_wait_trigger(struct task_wait *task_wait)
 {
-	int msqid;
-	key_t key;
 	int ret = 0;
+	int msqid = create_msqid(task_wait->tmpfile);
 
 	struct msgbuf msg = {
 		.mtype = MSG_TYPE,
 		.mtext = {0},
 	};
 
-	if ((key = ftok(task_wait->tmpfile, PROG_ID)) < 0) {
-		perror("ftok error");
-		exit(1);
-	}
-
-	if ((msqid = msgget(key, IPC_CREAT | 0777)) == -1) {
-		perror("msgget error");
-		exit(1);
-	}
-
 	msg.mtext[0] = 'q';
+
 	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
 	if (ret < 0) {
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
