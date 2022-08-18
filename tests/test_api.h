@@ -108,6 +108,9 @@ struct task_wait {
 	char tmpfile[64];
 };
 
+extern void mcount(void);
+extern void _mcount(void);
+
 int task_wait_init(struct task_wait *task_wait, char *tmpfile);
 int task_wait_destroy(struct task_wait *task_wait);
 int task_wait_wait(struct task_wait *task_wait);

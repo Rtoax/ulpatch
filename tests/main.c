@@ -343,9 +343,21 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (role == ROLE_LISTENER && !listener_request) {
-		fprintf(stderr, "%s need set --listener-request\n",
-			role_string[ROLE_LISTENER]);
+	if (role == ROLE_LISTENER) {
+		if (!listener_request) {
+			fprintf(stderr, "%s need set --listener-request\n",
+				role_string[ROLE_LISTENER]);
+			exit(1);
+		}
+		if (!msgq_file) {
+			fprintf(stderr, "Need a ftok(3) file input with -m.\n");
+			exit(1);
+		}
+	}
+
+	if (msgq_file && !fexist(msgq_file)) {
+		fprintf(stderr, "%s not exist.\n", msgq_file);
+		exit(1);
 	}
 
 	return 0;
@@ -603,6 +615,16 @@ static void launch_mix(void)
 		launch_mix_role(who_am_i(str->str));
 	}
 }
+
+static __unused struct {
+	char *function;
+	unsigned long addr;
+
+} test_symbols[] = {
+#define TEST_SYM(s) { __stringify(s), (unsigned long)s},
+#include "test_symbols.h"
+#undef TEST_SYM
+};
 
 static void launch_listener(void)
 {
