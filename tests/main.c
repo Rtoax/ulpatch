@@ -616,20 +616,43 @@ static void launch_mix(void)
 	}
 }
 
-static __unused struct {
-	char *function;
+struct test_symbol {
+	char *sym;
 	unsigned long addr;
+};
 
-} test_symbols[] = {
+static __unused struct test_symbol test_symbols[] = {
 #define TEST_SYM(s) { __stringify(s), (unsigned long)s},
 #include "test_symbols.h"
 #undef TEST_SYM
 };
 
+static struct test_symbol * find_test_symbol(const char *sym)
+{
+	int i;
+	struct test_symbol *s = NULL;
+
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+		if (!strcmp(test_symbols[i].sym, sym)) {
+			s = &test_symbols[i];
+		}
+	}
+
+	return s;
+}
+
 static void launch_listener(void)
 {
-	lerror("LAUNCH: %s %s\n",
-		role_string[ROLE_LISTENER], listener_request);
+	struct test_symbol *sym = find_test_symbol(listener_request);
+
+	if (!sym) {
+		fprintf(stderr, "%s no exist in tests.\n", listener_request);
+	}
+
+	ldebug("LAUNCH: %s %s 0x%lx\n",
+		role_string[ROLE_LISTENER], listener_request, sym->addr);
+
+	// TODO
 }
 
 static void sig_handler(int signum)
