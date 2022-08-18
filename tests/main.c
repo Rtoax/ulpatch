@@ -996,7 +996,8 @@ TEST(elftools_test,	wait_trigger,	0)
 	return ret;
 }
 
-TEST(elftools_test,	listener,	0)
+static int
+test_listener_symbol(char request, char *sym, unsigned long expect_addr)
 {
 	int ret = 0;
 	int status = 0;
@@ -1014,7 +1015,7 @@ TEST(elftools_test,	listener,	0)
 			(char*)elftools_test_path,
 			"--role", "listener",
 			"--msgq", waitqueue.tmpfile,
-			"--listener-request", test_symbols[0].sym,
+			"--listener-request", sym,
 			NULL,
 		};
 		ret = execvp(_argv[0], _argv);
@@ -1032,10 +1033,10 @@ TEST(elftools_test,	listener,	0)
 		unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
 
 		ldebug("%s: addr 0x%lx (0x%lx)\n",
-			test_symbols[0].sym, addr, test_symbols[0].addr);
+			sym, addr, expect_addr);
 
 		/* The address must be equal */
-		if (addr != test_symbols[0].addr)
+		if (addr != expect_addr)
 			ret = -1;
 
 		waitpid(pid, &status, __WALL);
@@ -1048,3 +1049,18 @@ TEST(elftools_test,	listener,	0)
 
 	return ret;
 }
+
+TEST(elftools_test,	listener,	0)
+{
+	int err = 0, i;
+
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+		err = err ? :
+			test_listener_symbol(REQUEST_SYM_ADDR,
+					test_symbols[i].sym,
+					test_symbols[i].addr);
+	}
+
+	return err;
+}
+
