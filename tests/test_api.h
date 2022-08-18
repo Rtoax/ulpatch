@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <sys/time.h>
+#include <sys/msg.h>
 
 #include <utils/list.h>
 #include <utils/compiler.h>
@@ -100,4 +101,19 @@ struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 	int expect_ret);
 void release_tests(void);
+
+/* Add wait api */
+struct task_wait {
+	int msqid;
+	char tmpfile[64];
+};
+
+int task_wait_init(struct task_wait *task_wait, char *tmpfile);
+int task_wait_destroy(struct task_wait *task_wait);
+int task_wait_wait(struct task_wait *task_wait);
+int task_wait_trigger(struct task_wait *task_wait);
+int task_wait_request(struct task_wait *task_wait, char request,
+	struct msgbuf *rx_buf, size_t rx_buf_size);
+int task_wait_response(struct task_wait *task_wait,
+	int (*makemsg)(char request, struct msgbuf *buf, size_t buf_len));
 

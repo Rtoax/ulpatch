@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
-#include <sys/msg.h>
 #include <gelf.h>
 
 #include <utils/util.h>
@@ -222,21 +221,6 @@ int task_syscall(struct task *task, int nr,
 		unsigned long arg1, unsigned long arg2, unsigned long arg3,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res);
-
-/* Add wait api */
-struct task_wait {
-	int msqid;
-	char tmpfile[64];
-};
-
-int task_wait_init(struct task_wait *task_wait, char *tmpfile);
-int task_wait_destroy(struct task_wait *task_wait);
-int task_wait_wait(struct task_wait *task_wait);
-int task_wait_trigger(struct task_wait *task_wait);
-int task_wait_request(struct task_wait *task_wait, char request,
-	struct msgbuf *rx_buf, size_t rx_buf_size);
-int task_wait_response(struct task_wait *task_wait,
-	int (*makemsg)(char request, struct msgbuf *buf, size_t buf_len));
 
 struct symbol *task_vma_find_symbol(struct task *task, const char *name);
 
