@@ -76,6 +76,7 @@ static enum who {
 	ROLE_WAITING, // wait for a while
 	ROLE_TRIGGER, // trigger
 	ROLE_PRINTER, // printer
+	ROLE_LISTENER, // listener
 	ROLE_MIX, // mix: sleeper, waiting, trigger
 	ROLE_MAX,
 } role = ROLE_TESTER;
@@ -87,6 +88,7 @@ static const char *role_string[ROLE_MAX] = {
 	[ROLE_WAITING] = "wait",
 	[ROLE_TRIGGER] = "trigger",
 	[ROLE_PRINTER] = "printer",
+	[ROLE_LISTENER] = "listener",
 	[ROLE_MIX] = "mix",
 };
 
@@ -102,6 +104,8 @@ const char *print_content = "Hello";
 
 static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
+
+const char *listener_request = NULL;
 
 // For -V, --verbose
 static bool verbose = false;
@@ -171,6 +175,7 @@ static void print_help(int ex)
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"                     '%s' i will msgsnd(2) a msg, specify by -m.\n"
 	"                     '%s' i will loop print some message.\n"
+	"                     '%s' i will wait on msgrcv(2) with request, specify by -m.\n"
 	"                     MIX:\n"
 	"                       -r sleeper,sleeper, will launch sleeper twice\n"
 	"\n",
@@ -179,7 +184,8 @@ static void print_help(int ex)
 	sleep_usec,
 	role_string[ROLE_WAITING],
 	role_string[ROLE_TRIGGER],
-	role_string[ROLE_PRINTER]
+	role_string[ROLE_PRINTER],
+	role_string[ROLE_LISTENER]
 	);
 	printf(
 	"   %s arguments:\n"
@@ -191,6 +197,12 @@ static void print_help(int ex)
 	print_interval_usec
 	);
 	printf(
+	"   %s arguments:\n"
+	"     --listener-request  request from msgq\n"
+	"\n",
+	role_string[ROLE_LISTENER]
+	);
+	printf(
 	"\n"
 	" -s, --usecond       usecond of time, sleep, etc.\n"
 	"                     -r %s, the main thread will sleep -s useconds.\n"
@@ -198,10 +210,13 @@ static void print_help(int ex)
 	" -m, --msgq          key to ftok(3).\n"
 	"                     -r %s, the main thread will wait on msgrcv(2).\n"
 	"                     -r %s, the main thread will msgsnd(2) to msgq.\n"
+	"                     -r %s, the main thread will msgrcv(2) a request on msgq.\n"
+	"                            and send response.\n"
 	"\n",
 	role_string[ROLE_SLEEPER],
 	role_string[ROLE_WAITING],
-	role_string[ROLE_TRIGGER]
+	role_string[ROLE_TRIGGER],
+	role_string[ROLE_LISTENER]
 	);
 	printf(
 	"Others:\n"
@@ -226,9 +241,12 @@ static void print_help(int ex)
 	exit(ex);
 }
 
-#define ARG_PRINT_NLOOP	99
-#define ARG_PRINT_INTERVAL_USEC	100
-#define ARG_ERROR_EXIT	101
+#define ARG_PRINT_NLOOP	199
+#define ARG_PRINT_INTERVAL_USEC	200
+#define ARG_ERROR_EXIT	201
+
+#define ARG_LISTENER_REQUEST	202
+
 
 static int parse_config(int argc, char *argv[])
 {
@@ -240,6 +258,7 @@ static int parse_config(int argc, char *argv[])
 		{"msgq",	required_argument,	0,	'm'},
 		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
 		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
+		{"listener-request",	required_argument,	0,	ARG_LISTENER_REQUEST},
 		{"log-level",		required_argument,	0,	'L'},
 		{"error-exit",	no_argument,	0,	ARG_ERROR_EXIT},
 		{"verbose",	no_argument,	0,	'V'},
@@ -276,6 +295,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_PRINT_INTERVAL_USEC:
 			print_interval_usec = atoi(optarg);
+			break;
+		case ARG_LISTENER_REQUEST:
+			listener_request = optarg;
 			break;
 		case ARG_ERROR_EXIT:
 			error_exit = true;
@@ -319,6 +341,11 @@ static int parse_config(int argc, char *argv[])
 	if (sleep_usec <= 0 || sleep_usec > 999000000) {
 		fprintf(stderr, "wrong -s, --usecond argument, 0 < X < 999000000\n");
 		exit(1);
+	}
+
+	if (role == ROLE_LISTENER && !listener_request) {
+		fprintf(stderr, "%s need set --listener-request\n",
+			role_string[ROLE_LISTENER]);
 	}
 
 	return 0;
@@ -557,6 +584,9 @@ static void launch_mix_role(enum who r)
 		break;
 	case ROLE_MIX:
 	case ROLE_TESTER:
+	case ROLE_LISTENER:
+		fprintf(stderr, "Not support %s in mix role.\n", role_string[r]);
+		exit(1);
 	default:
 		print_help(1);
 		break;
@@ -572,6 +602,12 @@ static void launch_mix(void)
 		ldebug("MIX: %s\n", str->str);
 		launch_mix_role(who_am_i(str->str));
 	}
+}
+
+static void launch_listener(void)
+{
+	lerror("LAUNCH: %s %s\n",
+		role_string[ROLE_LISTENER], listener_request);
 }
 
 static void sig_handler(int signum)
@@ -610,6 +646,9 @@ int main(int argc, char *argv[])
 	case ROLE_TRIGGER:
 	case ROLE_PRINTER:
 		launch_mix_role(role);
+		break;
+	case ROLE_LISTENER:
+		launch_listener();
 		break;
 	case ROLE_MIX:
 		launch_mix();
