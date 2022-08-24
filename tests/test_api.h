@@ -96,6 +96,7 @@ int PRINTER_FN(int nloop, const char *content);
 
 #define LIBC_PUTS_FN	puts
 
+#define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
