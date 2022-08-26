@@ -106,10 +106,14 @@ static char elftools_test_path_buf[MAX_PATH];
 const char *elftools_test_path = NULL;
 
 const char *listener_request = NULL;
+static bool listener_request_list = false;
 static int listener_nloop = 1;
 
 // For -V, --verbose
 static bool verbose = false;
+
+static void print_test_symbol(void);
+
 
 static enum who who_am_i(const char *s)
 {
@@ -199,8 +203,12 @@ static void print_help(int ex)
 	);
 	printf(
 	"   %s arguments:\n"
-	"     --listener-request  request from msgq\n"
+	"    Just execute once:\n"
+	"     --listener-request  request from msgq, see --listener-req-list\n"
+	"     --listener-req-list just show support request symbol\n"
 	"     --listener-nloop    request from msgq for times, default %d\n"
+	"\n"
+	"    Execute for loop:\n"
 	"\n",
 	role_string[ROLE_LISTENER],
 	listener_nloop
@@ -249,7 +257,8 @@ static void print_help(int ex)
 #define ARG_ERROR_EXIT	201
 
 #define ARG_LISTENER_REQUEST	202
-#define ARG_LISTENER_NLOOP	203
+#define ARG_LISTENER_REQUEST_LIST	203
+#define ARG_LISTENER_NLOOP	204
 
 
 static int parse_config(int argc, char *argv[])
@@ -263,6 +272,7 @@ static int parse_config(int argc, char *argv[])
 		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
 		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
 		{"listener-request",	required_argument,	0,	ARG_LISTENER_REQUEST},
+		{"listener-req-list",	no_argument,	0,	ARG_LISTENER_REQUEST_LIST},
 		{"listener-nloop",	required_argument,	0,	ARG_LISTENER_NLOOP},
 		{"log-level",		required_argument,	0,	'L'},
 		{"error-exit",	no_argument,	0,	ARG_ERROR_EXIT},
@@ -303,6 +313,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_LISTENER_REQUEST:
 			listener_request = optarg;
+			break;
+		case ARG_LISTENER_REQUEST_LIST:
+			listener_request_list = true;
 			break;
 		case ARG_LISTENER_NLOOP:
 			listener_nloop = atoi(optarg);
@@ -352,6 +365,11 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (role == ROLE_LISTENER) {
+		if (listener_request_list) {
+			print_test_symbol();
+			exit(0);
+		}
+
 		if (!listener_request) {
 			fprintf(stderr, "%s need set --listener-request\n",
 				role_string[ROLE_LISTENER]);
@@ -665,6 +683,17 @@ static struct test_symbol * find_test_symbol(const char *sym)
 	}
 
 	return s;
+}
+
+static void print_test_symbol(void)
+{
+	int i;
+	struct test_symbol *s = NULL;
+
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+		s = &test_symbols[i];
+		fprintf(stdout, "%3d \t %-s\n", i + 1, s->sym);
+	}
 }
 
 #define REQUEST_SYM_ADDR	1
