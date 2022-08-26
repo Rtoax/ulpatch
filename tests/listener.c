@@ -91,6 +91,35 @@ void close_listener(void)
 	unlink(TEST_UNIX_PATH);
 }
 
+int listener_helper_create_test_client(void)
+{
+	int connect_fd, ret = -1;
+	struct sockaddr_un srv_addr;
+
+	connect_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+	if (connect_fd < 0) {
+		lerror("create socket error: %s\n", strerror(errno));
+		return -EINVAL;
+	}
+
+	srv_addr.sun_family = AF_UNIX;
+	strcpy(srv_addr.sun_path, TEST_UNIX_PATH);
+
+	ret = connect(connect_fd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
+	if (ret == -1) {
+		lerror("connect error: %s, %s\n", strerror(errno), ELF_UNIX_PATH);
+		close(connect_fd);
+		exit(1);
+	}
+	return connect_fd;
+}
+
+int listener_helper_close_test_client(int fd)
+{
+	return close(fd);
+}
+
+
 #define MAX_EVENTS	64
 
 struct test_client {
@@ -166,6 +195,11 @@ void listener_main_loop(void *arg)
 							free(client);
 							test_nr_clients--;
 
+							// Only handle one client, then exit
+							if (test_nr_clients == 0) {
+								goto out;
+							}
+
 						/* Handle a client */
 						} else if (event->events & EPOLLIN) {
 							handle_test_client_msg(client);
@@ -175,5 +209,7 @@ void listener_main_loop(void *arg)
 			}
 		}
 	}
+
+out:
 }
 

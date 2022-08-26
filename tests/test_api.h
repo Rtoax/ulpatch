@@ -139,6 +139,9 @@ int init_listener(void);
 void close_listener(void);
 void listener_main_loop(void *arg);
 
+int listener_helper_create_test_client(void);
+int listener_helper_close_test_client(int fd);
+
 
 extern void mcount(void);
 extern void _mcount(void);

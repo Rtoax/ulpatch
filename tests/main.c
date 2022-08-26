@@ -616,6 +616,7 @@ static void launch_printer(void)
 	}
 }
 
+static void launch_listener(void);
 
 static void launch_mix_role(enum who r)
 {
@@ -632,9 +633,11 @@ static void launch_mix_role(enum who r)
 	case ROLE_PRINTER:
 		launch_printer();
 		break;
+	case ROLE_LISTENER:
+		launch_listener();
+		break;
 	case ROLE_MIX:
 	case ROLE_TESTER:
-	case ROLE_LISTENER:
 		fprintf(stderr, "Not support %s in mix role.\n", role_string[r]);
 		exit(1);
 	default:
@@ -800,10 +803,8 @@ int main(int argc, char *argv[])
 	case ROLE_WAITING:
 	case ROLE_TRIGGER:
 	case ROLE_PRINTER:
-		launch_mix_role(role);
-		break;
 	case ROLE_LISTENER:
-		launch_listener();
+		launch_mix_role(role);
 		break;
 	case ROLE_MIX:
 		launch_mix();
@@ -1141,5 +1142,57 @@ TEST(elftools_test,	listener,	0)
 	}
 
 	return err;
+}
+
+TEST(elftools_test,	listener_epoll,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "listener",
+			"--listener-epoll",
+			NULL,
+		};
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		int fd = -1;
+
+		/**
+		 * Wait for server init done. this method is not perfect.
+		 */
+		usleep(1000);
+
+		fd = listener_helper_create_test_client();
+
+		if (fd <= 0)
+			ret = -1;
+
+		listener_helper_close_test_client(fd);
+
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
 }
 
