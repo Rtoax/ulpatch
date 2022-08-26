@@ -211,5 +211,6 @@ void listener_main_loop(void *arg)
 	}
 
 out:
+	return;
 }
 
