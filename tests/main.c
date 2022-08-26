@@ -1176,7 +1176,7 @@ TEST(elftools_test,	listener_epoll,	0)
 		/**
 		 * Wait for server init done. this method is not perfect.
 		 */
-		usleep(1000);
+		usleep(10000);
 
 		fd = listener_helper_create_test_client();
 
