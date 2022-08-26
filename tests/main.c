@@ -108,6 +108,7 @@ const char *elftools_test_path = NULL;
 const char *listener_request = NULL;
 static bool listener_request_list = false;
 static int listener_nloop = 1;
+static bool listener_epoll = false;
 
 // For -V, --verbose
 static bool verbose = false;
@@ -209,6 +210,8 @@ static void print_help(int ex)
 	"     --listener-nloop    request from msgq for times, default %d\n"
 	"\n"
 	"    Execute for loop:\n"
+	"     --listener-epoll    start a loop with epoll(2), see listener.c.\n"
+	"                         if set, other --listener-??? argument skipped.\n"
 	"\n",
 	role_string[ROLE_LISTENER],
 	listener_nloop
@@ -259,6 +262,7 @@ static void print_help(int ex)
 #define ARG_LISTENER_REQUEST	202
 #define ARG_LISTENER_REQUEST_LIST	203
 #define ARG_LISTENER_NLOOP	204
+#define ARG_LISTENER_EPOLL	205
 
 
 static int parse_config(int argc, char *argv[])
@@ -274,6 +278,7 @@ static int parse_config(int argc, char *argv[])
 	{ "listener-request",   required_argument,  0,  ARG_LISTENER_REQUEST },
 	{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
 	{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
+	{ "listener-epoll",     no_argument,        0,  ARG_LISTENER_EPOLL },
 	{ "log-level",          required_argument,  0,  'L' },
 	{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
 	{ "verbose",            no_argument,        0,  'V' },
@@ -319,6 +324,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_LISTENER_NLOOP:
 			listener_nloop = atoi(optarg);
+			break;
+		case ARG_LISTENER_EPOLL:
+			listener_epoll = true;
 			break;
 		case ARG_ERROR_EXIT:
 			error_exit = true;
@@ -370,16 +378,16 @@ static int parse_config(int argc, char *argv[])
 			exit(0);
 		}
 
-		if (!listener_request) {
+		if (!listener_epoll && !listener_request) {
 			fprintf(stderr, "%s need set --listener-request\n",
 				role_string[ROLE_LISTENER]);
 			exit(1);
 		}
-		if (!msgq_file) {
+		if (!listener_epoll && !msgq_file) {
 			fprintf(stderr, "Need a ftok(3) file input with -m.\n");
 			exit(1);
 		}
-		if (listener_nloop < 1) {
+		if (!listener_epoll && listener_nloop < 1) {
 			fprintf(stderr, "--listener-nloop need >= 1.\n");
 			exit(1);
 		}
@@ -728,7 +736,7 @@ static int listener_rspmsg(char request, struct msgbuf *buf, size_t buf_len)
 	return sizeof(char);
 }
 
-static void launch_listener(void)
+static void launch_listener_once(void)
 {
 	struct task_wait waitqueue;
 
@@ -743,11 +751,23 @@ static void launch_listener(void)
 	// task_wait_destroy(&waitqueue);
 }
 
+static void launch_listener(void)
+{
+	if (listener_epoll) {
+		init_listener();
+		listener_main_loop(NULL);
+	} else {
+		launch_listener_once();
+	}
+}
+
 static void sig_handler(int signum)
 {
 	switch (signum) {
 	case SIGINT:
 		fprintf(stderr, "Catch Ctrl-C, bye\n");
+		if (listener_epoll)
+			close_listener();
 		free_strstr_list(&mix_role_list);
 		release_tests();
 		// exit abnormal

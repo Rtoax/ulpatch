@@ -134,6 +134,12 @@ struct task_wait {
 	char tmpfile[64];
 };
 
+
+int init_listener(void);
+void close_listener(void);
+void listener_main_loop(void *arg);
+
+
 extern void mcount(void);
 extern void _mcount(void);
 

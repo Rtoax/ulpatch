@@ -26,7 +26,7 @@ static int epollfd = -1;
 static int listenfd = -1;
 
 
-static int __unused init_listener(void)
+int init_listener(void)
 {
 	int ret = 0;
 	struct epoll_event event;
@@ -84,7 +84,7 @@ static int __unused init_listener(void)
 	return 0;
 }
 
-static void __unused close_listener(void)
+void close_listener(void)
 {
 	close(epollfd);
 	close(listenfd);
