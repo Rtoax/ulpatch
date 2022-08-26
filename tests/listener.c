@@ -91,3 +91,89 @@ static void __unused close_listener(void)
 	unlink(TEST_UNIX_PATH);
 }
 
+#define MAX_EVENTS	64
+
+struct test_client {
+	int connfd;
+
+	struct sockaddr_un addr;
+	/* client list node */
+	struct list_head node;
+};
+
+/* client list head */
+static LIST_HEAD(test_client_list);
+static unsigned int test_nr_clients = 0;
+
+void handle_test_client_msg(struct test_client *client)
+{
+	// TODO
+}
+
+void listener_main_loop(void *arg)
+{
+	int i, ret, nfds;
+	struct epoll_event events[MAX_EVENTS];
+
+	for (;;) {
+		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+		if (nfds == -1) {
+			lerror("epoll_wait: %s\n", strerror(errno));
+			continue;
+		}
+		for (i = 0; i < nfds; i++) {
+			struct epoll_event *event = &events[i];
+
+			/* Add a new client */
+			if (event->data.fd == listenfd) {
+				struct epoll_event event;
+				socklen_t len = sizeof(struct sockaddr_un);
+				struct test_client *client = malloc(sizeof(struct test_client));
+
+				memset(client, 0x0, sizeof(struct test_client));
+
+				client->connfd = accept(listenfd,
+					(struct sockaddr*)&client->addr, &len);
+
+				/* Add new client to epoll */
+				event.events = EPOLLIN;
+				event.data.fd = client->connfd;
+
+				ret = epoll_ctl(epollfd, EPOLL_CTL_ADD,
+							client->connfd, &event);
+				if (ret == -1) {
+					lerror("cannot add fd to epoll, %s\n", strerror(errno));
+					free(client);
+					continue;
+				}
+				list_add(&client->node, &test_client_list);
+				test_nr_clients++;
+
+			/* Handle all client */
+			} else {
+				struct test_client *client, *tmp;
+
+				list_for_each_entry_safe(client, tmp, &test_client_list, node) {
+					if (client->connfd == event->data.fd) {
+						/* Client close */
+						if (event->events & EPOLLHUP) {
+							close(client->connfd);
+
+							epoll_ctl(epollfd, EPOLL_CTL_DEL,
+								client->connfd, NULL);
+
+							list_del(&client->node);
+							free(client);
+							test_nr_clients--;
+
+						/* Handle a client */
+						} else if (event->events & EPOLLIN) {
+							handle_test_client_msg(client);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
