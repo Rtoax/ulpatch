@@ -98,6 +98,31 @@ int PRINTER_FN(int nloop, const char *content);
 
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
+struct clt_msg_hdr {
+	enum {
+		TEST_MT_REQUEST,
+		TEST_MT_RESPONSE,
+	} type;
+
+	enum {
+		TEST_MC_CLOSE, // Tell server can close
+		TEST_MC_SYMBOL,
+	} code;
+
+	size_t size;
+
+	int rslt;
+};
+
+/**
+ * Message between server and client, when elftools_test is ROLE_LISTENER
+ */
+struct clt_msg {
+	struct clt_msg_hdr hdr;
+	char data[];
+};
+
+
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 	int expect_ret);
