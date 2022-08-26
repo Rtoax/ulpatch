@@ -264,22 +264,22 @@ static void print_help(int ex)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{"list-tests",	no_argument,	0,	'l'},
-		{"filter-tests",	required_argument,	0,	'f'},
-		{"role",	required_argument,	0,	'r'},
-		{"usecond",	required_argument,	0,	's'},
-		{"msgq",	required_argument,	0,	'm'},
-		{"print-nloop",	required_argument,	0,	ARG_PRINT_NLOOP},
-		{"print-usec",	required_argument,	0,	ARG_PRINT_INTERVAL_USEC},
-		{"listener-request",	required_argument,	0,	ARG_LISTENER_REQUEST},
-		{"listener-req-list",	no_argument,	0,	ARG_LISTENER_REQUEST_LIST},
-		{"listener-nloop",	required_argument,	0,	ARG_LISTENER_NLOOP},
-		{"log-level",		required_argument,	0,	'L'},
-		{"error-exit",	no_argument,	0,	ARG_ERROR_EXIT},
-		{"verbose",	no_argument,	0,	'V'},
-		{"version",	no_argument,	0,	'v'},
-		{"help",	no_argument,	0,	'h'},
-		{NULL}
+	{ "list-tests",         no_argument,        0,  'l' },
+	{ "filter-tests",       required_argument,  0,  'f' },
+	{ "role",               required_argument,  0,  'r' },
+	{ "usecond",            required_argument,  0,  's' },
+	{ "msgq",               required_argument,  0,  'm' },
+	{ "print-nloop",        required_argument,  0,  ARG_PRINT_NLOOP },
+	{ "print-usec",         required_argument,  0,  ARG_PRINT_INTERVAL_USEC },
+	{ "listener-request",   required_argument,  0,  ARG_LISTENER_REQUEST },
+	{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
+	{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
+	{ "log-level",          required_argument,  0,  'L' },
+	{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
+	{ "verbose",            no_argument,        0,  'V' },
+	{ "version",            no_argument,        0,  'v' },
+	{ "help",               no_argument,        0,  'h' },
+	{ NULL }
 	};
 
 	while (1) {
