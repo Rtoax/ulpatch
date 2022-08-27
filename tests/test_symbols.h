@@ -2,9 +2,9 @@
 /* Copyright (C) 2022 Rong Tao */
 
 #ifdef TEST_SYM_FOR_EACH
-#ifndef TEST_SYM_FOR_EACH_I
-# error "Need define TEST_SYM_FOR_EACH_I"
-#endif
+# ifndef TEST_SYM_FOR_EACH_I
+#  error "Need define TEST_SYM_FOR_EACH_I"
+# endif
 for (TEST_SYM_FOR_EACH_I = 0;
 	 TEST_SYM_FOR_EACH_I < ARRAY_SIZE(test_symbols);
 	 TEST_SYM_FOR_EACH_I++) {
@@ -26,6 +26,6 @@ TEST_SYM(_mcount)
 
 #ifdef TEST_SYM_FOR_EACH
 }
-#undef TEST_SYM_FOR_EACH_I
+# undef TEST_SYM_FOR_EACH_I
 #endif
 
