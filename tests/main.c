@@ -1166,7 +1166,7 @@ TEST(elftools_test,	listener_epoll,	0)
 
 	} else if (pid > 0) {
 
-		int fd = -1;
+		int fd = -1, i, rslt;
 
 		/**
 		 * Wait for server init done. this method is not perfect.
@@ -1178,6 +1178,15 @@ TEST(elftools_test,	listener_epoll,	0)
 		if (fd <= 0)
 			ret = -1;
 
+		for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+			unsigned long addr;
+
+			listener_helper_symbol(fd, test_symbols[i].sym, &addr);
+
+			linfo("%-10s: %lx\n", test_symbols[i].sym, addr);
+		}
+
+		listener_helper_close(fd, &rslt);
 		listener_helper_close_test_client(fd);
 
 		waitpid(pid, &status, __WALL);
