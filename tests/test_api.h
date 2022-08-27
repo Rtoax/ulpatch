@@ -42,6 +42,7 @@ typedef enum {
  *
  */
 struct test {
+	int idx;
 	char *category;
 	char *name;
 	test_prio prio;
@@ -56,6 +57,8 @@ struct test {
 	// if test result is failed, add to 'failed_list'
 	struct list_head failed;
 };
+
+extern int nr_tests;
 
 /**
  * Define a test

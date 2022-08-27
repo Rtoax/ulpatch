@@ -403,7 +403,8 @@ static int parse_config(int argc, char *argv[])
 
 static int show_test(struct test *test)
 {
-	fprintf(stderr, "  %-4d %s.%s\n", test->prio, test->category, test->name);
+	fprintf(stderr, " %4d/%-4d  %-4d %s.%s\n",
+		test->idx, nr_tests, test->prio, test->category, test->name);
 	return 0;
 }
 
@@ -435,7 +436,8 @@ static int operate_test(struct test *test)
 
 	if (!test->test_cb) return -1;
 
-	test_log("=== %s.%s %c",
+	test_log("=== %4d/%-4d %s.%s %c",
+		test->idx, nr_tests,
 		test->category, test->name, verbose?'\n':'\0');
 
 	gettimeofday(&test->start, NULL);
@@ -493,8 +495,8 @@ static void launch_tester(void)
 			"\n"
 			"Show test list\n"
 			"\n"
-			"  %-4s %s.%s\n",
-			"Prio", "Category", "name"
+			" %-10s %-4s %s.%s\n",
+			"Idx/NUM", "Prio", "Category", "name"
 		);
 	}
 
@@ -548,8 +550,8 @@ print_stat:
 				"\n"
 				"Show failed test list\n"
 				"\n"
-				"  %-4s %s.%s\n",
-				"Prio", "Category", "name"
+				" %-10s  %-4s %s.%s\n",
+				"Idx/NUM", "Prio", "Category", "name"
 			);
 			list_for_each_entry(test, &failed_list, failed) {
 				show_test(test);

@@ -9,11 +9,16 @@
 
 #include "test_api.h"
 
+int nr_tests = 0;
+
+
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
 	int expect_ret)
 {
 	struct test *test = malloc(sizeof(struct test));
+
+	test->idx = ++nr_tests;
 	test->category = strdup(category);
 	test->name = strdup(name);
 	test->prio = prio;
