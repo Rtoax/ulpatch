@@ -120,6 +120,7 @@ int listener_helper_close_test_client(int fd)
 }
 
 
+
 #define MAX_EVENTS	64
 
 struct test_client {
@@ -134,9 +135,92 @@ struct test_client {
 static LIST_HEAD(test_client_list);
 static unsigned int test_nr_clients = 0;
 
-void handle_test_client_msg(struct test_client *client)
+static void handle_msg_symbol(struct test_client *client, struct clt_msg *msg)
 {
-	// TODO
+	struct clt_msg ack;
+	const char *s = msg->body.symbol_request.s;
+	struct test_symbol *sym = find_test_symbol(s);
+
+	ack.hdr.type = TEST_MT_RESPONSE;
+	ack.hdr.code = TEST_MC_SYMBOL;
+	ack.body.symbol_response.addr = sym ? sym->addr : 0;
+
+	write(client->connfd, &ack, sizeof(ack));
+}
+
+int listener_helper_close(int fd, int *rslt)
+{
+	struct clt_msg req, rsp;
+
+	req.hdr.type = TEST_MT_REQUEST;
+	req.hdr.code = TEST_MC_CLOSE;
+
+	write(fd, &req, sizeof(req));
+	read(fd, &rsp, sizeof(rsp));
+
+	*rslt = rsp.body.close_response.rslt;
+
+	return 0;
+}
+
+int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
+{
+	struct clt_msg req, rsp;
+
+	req.hdr.type = TEST_MT_REQUEST;
+	req.hdr.code = TEST_MC_SYMBOL;
+
+	strncpy(req.body.symbol_request.s, sym,
+		sizeof(req.body.symbol_request.s) - 1);
+
+	write(fd, &req, sizeof(req));
+	read(fd, &rsp, sizeof(rsp));
+
+	*addr = req.body.symbol_response.addr;
+
+	return 0;
+}
+
+
+static bool listener_need_close = false;
+
+static void recv_test_client_msg(struct test_client *client)
+{
+	size_t nbytes;
+	struct clt_msg msg, ack;
+
+	nbytes = read(client->connfd, &msg, sizeof(msg));
+	if (nbytes <= 0) {
+		lerror("read(2): %s\n", strerror(errno));
+		return;
+	}
+
+	if (msg.hdr.type != TEST_MT_REQUEST) {
+		lerror("Read unknown msg type %d\n", msg.hdr.type);
+		return;
+	}
+
+	switch (msg.hdr.code) {
+
+	case TEST_MC_SYMBOL:
+		handle_msg_symbol(client, &msg);
+		break;
+
+	case TEST_MC_CLOSE:
+		listener_need_close = true;
+
+		ack.hdr.type = TEST_MT_RESPONSE;
+		ack.hdr.code = TEST_MC_CLOSE;
+		ack.body.close_response.rslt = 0;
+
+		write(client->connfd, &ack, sizeof(ack));
+
+		break;
+
+	default:
+		lerror("unknown msg code %d\n", msg.hdr.code);
+		break;
+	}
 }
 
 void listener_main_loop(void *arg)
@@ -145,6 +229,13 @@ void listener_main_loop(void *arg)
 	struct epoll_event events[MAX_EVENTS];
 
 	for (;;) {
+
+		/* check should exit or not */
+		if (listener_need_close) {
+			close_listener();
+			return;
+		}
+
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
 			lerror("epoll_wait: %s\n", strerror(errno));
@@ -202,7 +293,7 @@ void listener_main_loop(void *arg)
 
 						/* Handle a client */
 						} else if (event->events & EPOLLIN) {
-							handle_test_client_msg(client);
+							recv_test_client_msg(client);
 						}
 					}
 				}

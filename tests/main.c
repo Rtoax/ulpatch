@@ -657,11 +657,6 @@ static void launch_mix(void)
 	}
 }
 
-struct test_symbol {
-	char *sym;
-	unsigned long addr;
-};
-
 static __unused struct test_symbol test_symbols[] = {
 #define TEST_SYM(s) { __stringify(s), 0 },
 #include "test_symbols.h"
@@ -682,7 +677,7 @@ static void init_test_symbols(void)
 #undef TEST_SYM_FOR_EACH
 }
 
-static struct test_symbol * find_test_symbol(const char *sym)
+struct test_symbol * find_test_symbol(const char *sym)
 {
 	int i;
 	struct test_symbol *s = NULL;

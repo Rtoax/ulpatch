@@ -98,30 +98,6 @@ int PRINTER_FN(int nloop, const char *content);
 
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
-struct clt_msg_hdr {
-	enum {
-		TEST_MT_REQUEST,
-		TEST_MT_RESPONSE,
-	} type;
-
-	enum {
-		TEST_MC_CLOSE, // Tell server can close
-		TEST_MC_SYMBOL,
-	} code;
-
-	size_t size;
-
-	int rslt;
-};
-
-/**
- * Message between server and client, when elftools_test is ROLE_LISTENER
- */
-struct clt_msg {
-	struct clt_msg_hdr hdr;
-	char data[];
-};
-
 
 struct test*
 create_test(char *category, char *name, test_prio prio, int (*cb)(void),
@@ -134,6 +110,46 @@ struct task_wait {
 	char tmpfile[64];
 };
 
+struct test_symbol {
+	char *sym;
+	unsigned long addr;
+};
+
+struct test_symbol * find_test_symbol(const char *sym);
+
+
+struct clt_msg_hdr {
+	enum {
+		TEST_MT_REQUEST,
+		TEST_MT_RESPONSE,
+	} type;
+
+	enum {
+		TEST_MC_CLOSE, // Tell server can close
+		TEST_MC_SYMBOL,
+	} code;
+};
+
+/**
+ * Message between server and client, when elftools_test is ROLE_LISTENER
+ */
+struct clt_msg {
+	struct clt_msg_hdr hdr;
+	union {
+		struct {
+			char s[128];
+		} symbol_request;
+		struct {
+			unsigned long addr;
+		} symbol_response;
+		struct {
+		} close_request;
+		struct {
+			int rslt;
+		} close_response;
+	} body;
+};
+
 
 int init_listener(void);
 void close_listener(void);
@@ -141,7 +157,8 @@ void listener_main_loop(void *arg);
 
 int listener_helper_create_test_client(void);
 int listener_helper_close_test_client(int fd);
-
+int listener_helper_close(int fd, int *rslt);
+int listener_helper_symbol(int fd, const char *sym, unsigned long *addr);
 
 extern void mcount(void);
 extern void _mcount(void);
