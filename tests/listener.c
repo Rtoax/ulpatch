@@ -232,8 +232,7 @@ void listener_main_loop(void *arg)
 
 		/* check should exit or not */
 		if (listener_need_close) {
-			close_listener();
-			return;
+			goto out;
 		}
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
@@ -302,6 +301,7 @@ void listener_main_loop(void *arg)
 	}
 
 out:
+	close_listener();
 	return;
 }
 
