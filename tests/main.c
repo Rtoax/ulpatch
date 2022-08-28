@@ -660,9 +660,11 @@ static void launch_mix(void)
 }
 
 static __unused struct test_symbol test_symbols[] = {
-#define TEST_SYM(s) { __stringify(s), 0 },
+#define TEST_SYM(s) { __stringify(s), 0, .non_static = false },
+#define TEST_SYM_NON_STATIC(s) { __stringify(s), 0, .non_static = true },
 #include "test_symbols.h"
 #undef TEST_SYM
+#undef TEST_SYM_NON_STATIC
 };
 
 static void init_test_symbols(void)
@@ -674,8 +676,10 @@ static void init_test_symbols(void)
 	if (!strcmp(#s, test_symbols[i].sym)) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
 	}
+#define TEST_SYM_NON_STATIC	TEST_SYM
 #include "test_symbols.h"
 #undef TEST_SYM
+#undef TEST_SYM_NON_STATIC
 #undef TEST_SYM_FOR_EACH
 }
 
@@ -1132,6 +1136,12 @@ TEST(elftools_test,	listener,	0)
 	int err = 0, i;
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+		/**
+		 * Skip 'stdout' non static symbol
+		 */
+		if (test_symbols[i].non_static)
+			continue;
+
 		err = err ? :
 			test_listener_symbol(REQUEST_SYM_ADDR,
 					test_symbols[i].sym,

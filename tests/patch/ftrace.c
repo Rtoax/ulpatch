@@ -303,8 +303,10 @@ TEST(Ftrace,	init_patch,	0)
 
 static const char *SYMBOLS[] = {
 #define TEST_SYM(s) __stringify(s),
+#define TEST_SYM_NON_STATIC(s)
 #include "../test_symbols.h"
 #undef TEST_SYM
+#undef TEST_SYM_NON_STATIC
 };
 
 static int find_task_symbol(struct task *task)

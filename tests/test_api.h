@@ -116,6 +116,10 @@ struct task_wait {
 struct test_symbol {
 	char *sym;
 	unsigned long addr;
+	/**
+	 * see TEST_SYM_NON_STATIC()
+	 */
+	bool non_static;
 };
 
 struct test_symbol * find_test_symbol(const char *sym);

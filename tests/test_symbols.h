@@ -12,10 +12,10 @@ for (TEST_SYM_FOR_EACH_I = 0;
 
 /* Here start to define symbols
  */
-//TEST_SYM(stdout) // not constant
+TEST_SYM_NON_STATIC(stdout) // not constant
 TEST_SYM(exit)
 TEST_SYM(printf)
-//TEST_SYM(errno) // (*__errno_location ()): addr 0x0 (0x0)
+TEST_SYM_NON_STATIC(errno) // (*__errno_location ()): addr 0x0 (0x0)
 
 #if defined(__x86_64__)
 TEST_SYM(mcount)
