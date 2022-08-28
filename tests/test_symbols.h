@@ -15,7 +15,8 @@ for (TEST_SYM_FOR_EACH_I = 0;
 TEST_SYM_NON_STATIC(stdout) // not constant
 TEST_SYM(exit)
 TEST_SYM(printf)
-TEST_SYM_NON_STATIC(errno) // (*__errno_location ()): addr 0x0 (0x0)
+// errno is macro: (*__errno_location ()), do not test it
+// TEST_SYM_NON_STATIC(errno) // (*__errno_location ()): addr 0x0 (0x0)
 
 #if defined(__x86_64__)
 TEST_SYM(mcount)

@@ -303,7 +303,7 @@ TEST(Ftrace,	init_patch,	0)
 
 static const char *SYMBOLS[] = {
 #define TEST_SYM(s) __stringify(s),
-#define TEST_SYM_NON_STATIC(s)
+#define TEST_SYM_NON_STATIC(s) TEST_SYM(s)
 #include "../test_symbols.h"
 #undef TEST_SYM
 #undef TEST_SYM_NON_STATIC
@@ -333,5 +333,92 @@ static int find_task_symbol(struct task *task)
 TEST(Ftrace,	find_task_symbol,	0)
 {
 	return test_task_patch(FTO_FTRACE, find_task_symbol);
+}
+
+TEST(Ftrace,	find_vma_task_symbol,	0)
+{
+	int ret = 0;
+	int status = 0;
+	pid_t pid;
+
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid = fork();
+	if (pid == 0) {
+		int ret;
+
+		char *_argv[] = {
+			(char*)elftools_test_path,
+			"--role", "listener",
+			"--listener-epoll",
+			NULL,
+		};
+		ret = execvp(_argv[0], _argv);
+		if (ret == -1) {
+			exit(1);
+		}
+
+	} else if (pid > 0) {
+
+		int fd = -1, i, rslt;
+
+		/**
+		 * Wait for server init done. this method is not perfect.
+		 */
+		usleep(10000);
+
+		struct task *task = open_task(pid, FTO_FTRACE);
+
+		dump_task_vmas(task);
+
+		fd = listener_helper_create_test_client();
+
+		if (fd <= 0)
+			ret = -1;
+
+		for (i = 0; i < ARRAY_SIZE(SYMBOLS); i++) {
+			unsigned long addr;
+			struct symbol *sym;
+
+			sym = task_vma_find_symbol(task, SYMBOLS[i]);
+			if (!sym) {
+				lerror("Could not find %s in pid %d vma.\n",
+					SYMBOLS[i], task->pid);
+				ret = -EEXIST;
+				continue;
+			}
+
+			listener_helper_symbol(fd, SYMBOLS[i], &addr);
+
+			/**
+			 * TODO
+			 * I don't know why st_value in target vma not equal to addr in
+			 * target task. did i miss some thing?
+			 *
+			 * I should make this test failed, ret = -1;
+			 */
+			linfo("%-10s: %lx vs %lx(vma)\n",
+				SYMBOLS[i], addr, sym->sym.st_value);
+
+			if (addr != sym->sym.st_value) {
+				ret = -1;
+			}
+		}
+
+		listener_helper_close(fd, &rslt);
+		listener_helper_close_test_client(fd);
+
+		waitpid(pid, &status, __WALL);
+		if (status != 0) {
+			ret = -EINVAL;
+		}
+		free_task(task);
+	}
+
+	task_wait_destroy(&waitqueue);
+
+	return ret;
 }
 
