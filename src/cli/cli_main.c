@@ -191,13 +191,13 @@ static void cli_init_help(void)
 static void output_generic_help(void)
 {
 	printf(
-		"elftools %s\n"
-		"To get help about ELFTools commands type:\n"
+		"upatch %s\n"
+		"To get help about UPatch commands type:\n"
 		"      \"help <command>\" for help on <command>\n"
 		"      \"help <tab>\" to get a list of possible help topics\n"
 		"      \"quit\" to exit\n"
 		"\n",
-		elftools_version()
+		upatch_version()
 	);
 }
 
@@ -253,14 +253,14 @@ static void print_cli_logo(void)
 	"\n"
 	"%s\n"
 	"\n"
-	"Welcome to ELFTools Command Line:\n"
+	"Welcome to UPatch Command Line:\n"
 	" Machine: %s\n"
 	"\n"
 	" input 'help' command to show help info"
 	"\n"
 	"\n",
-	elftools_version(),
-	elftools_arch()
+	upatch_version(),
+	upatch_arch()
 	);
 }
 
@@ -270,7 +270,7 @@ void cli_main(int argc, char *argv[])
 	char *line = NULL;
 	char *historyfile = NULL; //TODO
 
-	pthread_setname_np(pthread_self(), "elftools-cli");
+	pthread_setname_np(pthread_self(), "upatch-cli");
 
 	linenoiseSetMultiLine(1);
 	linenoiseSetCompletionCallback(completionCallback);
@@ -294,7 +294,7 @@ void cli_main(int argc, char *argv[])
 	print_cli_logo();
 
 	/* Main loop of linenoise */
-	while ((line = linenoise("elftools> ")) != NULL) {
+	while ((line = linenoise("upatch> ")) != NULL) {
 		int cli_argc;
 		char __unused **cli_argv;
 

@@ -14,15 +14,15 @@ include_directories(.)
 
 
 link_libraries(${ELF} ${RT} ${PTHREAD}
-	elftools_utils
-	elftools_elf
-	elftools_cli
+	upatch_utils
+	upatch_elf
+	upatch_cli
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(elftools_gtk STATIC ${LIB_SOURCES})
+add_library(upatch_gtk STATIC ${LIB_SOURCES})
 
-target_compile_definitions(elftools_gtk PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(upatch_gtk PRIVATE ${UTILS_FLAGS})

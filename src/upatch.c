@@ -63,7 +63,7 @@ static void print_help(void)
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
-	elftools_version()
+	upatch_version()
 	);
 	exit(0);
 }
@@ -93,7 +93,7 @@ static int parse_config(int argc, char *argv[])
 			command_type = CMD_PATCH;
 			break;
 		case 'v':
-			printf("version %s\n", elftools_version());
+			printf("version %s\n", upatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -131,7 +131,7 @@ static void command_patch(void)
 
 int main(int argc, char *argv[])
 {
-	elftools_init();
+	upatch_init();
 
 	parse_config(argc, argv);
 

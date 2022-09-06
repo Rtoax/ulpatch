@@ -30,7 +30,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)elftools_test_path,
+			(char*)upatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -93,7 +93,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)elftools_test_path,
+			(char*)upatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -184,7 +184,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)elftools_test_path,
+			(char*)upatch_test_path,
 			"--role", "sleeper,trigger,printer,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -252,7 +252,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)elftools_test_path,
+			(char*)upatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -267,10 +267,10 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 
 		struct task *task = open_task(pid, fto_flags);
 
-		ret = init_patch(task, ELFTOOLS_FTRACE_OBJ_PATH);
+		ret = init_patch(task, UPATCH_FTRACE_OBJ_PATH);
 		if (ret == -EEXIST) {
 			fprintf(stderr, "%s not exist. make install\n",
-				ELFTOOLS_FTRACE_OBJ_PATH);
+				UPATCH_FTRACE_OBJ_PATH);
 		}
 
 		if (cb)
@@ -350,7 +350,7 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)elftools_test_path,
+			(char*)upatch_test_path,
 			"--role", "listener",
 			"--listener-epoll",
 			NULL,

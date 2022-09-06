@@ -8,12 +8,12 @@ find_library(ELF elf /usr/lib64)
 find_library(PTHREAD pthread /usr/lib64)
 
 link_libraries(${ELF} ${PTHREAD}
-	elftools_elf
-	elftools_patch
-	elftools_patch_obj
-	elftools_utils
-	elftools_utils_arch
-	elftools_cli
+	upatch_elf
+	upatch_patch
+	upatch_patch_obj
+	upatch_utils
+	upatch_utils_arch
+	upatch_cli
 )
 
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
@@ -26,7 +26,7 @@ aux_source_directory(cli DIR_CLI_SRCS)
 aux_source_directory(utils DIR_UTILS_SRCS)
 aux_source_directory(utils/arch DIR_UTILS_SRCS)
 
-add_executable(elftools_test
+add_executable(upatch_test
 	${DIR_SRCS}
 	${DIR_ELF_SRCS}
 	${DIR_PATCH_SRCS}
@@ -34,4 +34,4 @@ add_executable(elftools_test
 	${DIR_UTILS_SRCS}
 )
 
-target_compile_definitions(elftools_test PRIVATE ${TESTS_FLAGS} ${UTILS_FLAGS})
+target_compile_definitions(upatch_test PRIVATE ${TESTS_FLAGS} ${UTILS_FLAGS})

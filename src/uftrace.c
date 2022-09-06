@@ -28,12 +28,12 @@ static struct task *target_task = NULL;
 static const char *patch_object_file = NULL;
 
 /* This is ftrace object file path, during 'make install' install to
- * /usr/share/elftools/, this macro is a absolute path of LSB relocatable file.
+ * /usr/share/upatch/, this macro is a absolute path of LSB relocatable file.
  *
  * see top level of CMakeLists.txt
  */
-#if !defined(ELFTOOLS_FTRACE_OBJ_PATH)
-# error "Need ELFTOOLS_FTRACE_OBJ_PATH"
+#if !defined(UPATCH_FTRACE_OBJ_PATH)
+# error "Need UPATCH_FTRACE_OBJ_PATH"
 #endif
 
 
@@ -70,11 +70,11 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n"
 	" uftrace %s\n",
-	ELFTOOLS_FTRACE_OBJ_PATH,
+	UPATCH_FTRACE_OBJ_PATH,
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
-	elftools_version()
+	upatch_version()
 	);
 	exit(0);
 }
@@ -104,7 +104,7 @@ static int parse_config(int argc, char *argv[])
 			patch_object_file = optarg;
 			break;
 		case 'v':
-			printf("version %s\n", elftools_version());
+			printf("version %s\n", upatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -132,17 +132,17 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (!patch_object_file) {
-		if (!fexist(ELFTOOLS_FTRACE_OBJ_PATH)) {
+		if (!fexist(UPATCH_FTRACE_OBJ_PATH)) {
 			fprintf(stderr,
 				"Default ftrace relocatable object %s is not exist.\n"
-				"Make sure you install elftools correctly.\n",
-				ELFTOOLS_FTRACE_OBJ_PATH
+				"Make sure you install upatch correctly.\n",
+				UPATCH_FTRACE_OBJ_PATH
 			);
 			exit(1);
 		}
 		fprintf(stderr, "WARNING: use default %s.\n",
-			ELFTOOLS_FTRACE_OBJ_PATH);
-		patch_object_file = ELFTOOLS_FTRACE_OBJ_PATH;
+			UPATCH_FTRACE_OBJ_PATH);
+		patch_object_file = UPATCH_FTRACE_OBJ_PATH;
 	}
 
 	if (!fexist(patch_object_file)) {
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 {
 	int __unused ret = 0;
 
-	elftools_init();
+	upatch_init();
 
 	parse_config(argc, argv);
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	init_patch(target_task, ELFTOOLS_FTRACE_OBJ_PATH);
+	init_patch(target_task, UPATCH_FTRACE_OBJ_PATH);
 
 	// MORE
 

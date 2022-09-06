@@ -12,8 +12,8 @@ find_library(JSON_C json-c /usr/lib64)
 endif()
 
 link_libraries(${ELF} ${PTHREAD} ${JSON_C}
-	elftools_utils
-	elftools_patch
+	upatch_utils
+	upatch_patch
 )
 
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
@@ -21,7 +21,7 @@ add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(elftools_elf STATIC ${LIB_SOURCES})
+add_library(upatch_elf STATIC ${LIB_SOURCES})
 
-target_compile_definitions(elftools_elf PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(upatch_elf PRIVATE ${UTILS_FLAGS})
 

@@ -367,7 +367,7 @@ int elf_main(int argc, char *argv[])
 		exit(1);
 	}
 	pthread_setname_np(thread, "elf-main");
-	pthread_setname_np(pthread_self(), "elftools-server");
+	pthread_setname_np(pthread_self(), "upatch-server");
 
 	return 0;
 }

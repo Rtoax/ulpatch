@@ -10,17 +10,17 @@
 #endif
 
 
-/* The ELFTOOLS_TEST macro just for test in elftoos_test target. it'll not
+/* The UPATCH_TEST macro just for test in elftoos_test target. it'll not
  * compile into ftrace-object file.
  */
-#if defined(ELFTOOLS_TEST)
+#if defined(UPATCH_TEST)
 
 #include <utils/task.h>
 #include <utils/log.h>
 
 extern int try_to_wake_up(struct task *task, int mode, int wake_flags);
 
-#endif /* ELFTOOLS_TEST */
+#endif /* UPATCH_TEST */
 
 
 /* for example:
@@ -31,7 +31,7 @@ extern int try_to_wake_up(struct task *task, int mode, int wake_flags);
 int mcount_entry(unsigned long *parent_loc, unsigned long child,
 			struct mcount_regs *regs)
 {
-#if defined(ELFTOOLS_TEST)
+#if defined(UPATCH_TEST)
 
 	lwarning("parent: %p, child: %lx, args: %ld %ld %ld %ld %ld %ld.\n",
 		parent_loc,
@@ -53,7 +53,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 		lwarning("COMM: %s, PID %d\n", task->comm, task->pid);
 	}
 
-#endif /* ELFTOOLS_TEST */
+#endif /* UPATCH_TEST */
 
 	// TODO
 	return 0;
@@ -61,10 +61,10 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 
 unsigned long mcount_exit(long *retval)
 {
-#if defined(ELFTOOLS_TEST)
+#if defined(UPATCH_TEST)
 	printf("CALL mcount_exit.\n");
 
-#endif /* ELFTOOLS_TEST */
+#endif /* UPATCH_TEST */
 
 	// TODO
 	return 0;

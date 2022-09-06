@@ -15,7 +15,7 @@
 #include "compiler.h"
 
 
-void elftools_init(void)
+void upatch_init(void)
 {
 	if (!fexist("/tmp")) {
 		fprintf(stderr, "Need /tmp/\n");

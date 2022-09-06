@@ -16,7 +16,7 @@ void daemonize(void)
 #if 0
 	int fd;
 
-	/* Every output goes to /dev/null. If ElfTools is daemonized but
+	/* Every output goes to /dev/null. If UPatch is daemonized but
 	 * the 'logfile' is set to 'stdout' in the configuration file
 	 * it will not log at all.
 	 */

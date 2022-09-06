@@ -131,7 +131,7 @@ json_object *json_sym(const GElf_Sym *sym, const char *symname,
 
 	/* Foot */
 	json_object_object_add(foot,
-		"Version", json_object_new_string(elftools_version()));
+		"Version", json_object_new_string(upatch_version()));
 
 	return root;
 }

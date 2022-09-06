@@ -24,11 +24,11 @@ find_library(RT rt /usr/lib64)
 find_library(PTHREAD pthread /usr/lib64)
 
 link_libraries(${ELF} ${RT} ${PTHREAD}
-	elftools_utils
-	elftools_utils_arch
-	elftools_elf
-	elftools_cli
-	elftools_gtk
+	upatch_utils
+	upatch_utils_arch
+	upatch_elf
+	upatch_cli
+	upatch_gtk
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)

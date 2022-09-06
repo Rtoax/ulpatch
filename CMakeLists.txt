@@ -3,17 +3,17 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
-PROJECT(elftools)
+PROJECT(upatch)
 
 # version number components.
-set(elftools_VERSION_MAJOR 0)
-set(elftools_VERSION_MINOR 1)
-set(elftools_VERSION_PATCH 0)
+set(upatch_VERSION_MAJOR 0)
+set(upatch_VERSION_MINOR 1)
+set(upatch_VERSION_PATCH 0)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	OUTPUT_VARIABLE ELFTOOLS_VERSION
+	OUTPUT_VARIABLE UPATCH_VERSION
 	ERROR_VARIABLE GIT_DESCRIBE_ERROR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	RESULT_VARIABLE retcode
@@ -22,16 +22,16 @@ execute_process(
 # If the build is not done from a git repo, get the version information from
 # the version variables in main CMakeLists.txt
 if(NOT "${retcode}" STREQUAL "0")
-set(ELFTOOLS_VERSION "v${elftools_VERSION_MAJOR}.${elftools_VERSION_MINOR}.${elftools_VERSION_PATCH}")
+set(UPATCH_VERSION "v${upatch_VERSION_MAJOR}.${upatch_VERSION_MINOR}.${upatch_VERSION_PATCH}")
 endif()
 
-add_definitions("-DELFTOOLS_VERSION=\"${ELFTOOLS_VERSION}\"")
+add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 
-set(ELFTOOLS_SHARE_DIR /usr/share/elftools/)
+set(UPATCH_SHARE_DIR /usr/share/upatch/)
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
 
@@ -124,8 +124,8 @@ if(KERNEL_HEADERS_CONST_H)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" KERNEL_HEADERS_CONST_H)
 endif()
 
-# macro ELFTOOLS_FTRACE_OBJ_PATH="/usr/share/elftools/ftrace-mcount.obj" for example
-set(UTILS_FLAGS "${UTILS_FLAGS}" ELFTOOLS_FTRACE_OBJ_PATH="${ELFTOOLS_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
+# macro UPATCH_FTRACE_OBJ_PATH="/usr/share/upatch/ftrace-mcount.obj" for example
+set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_FTRACE_OBJ_PATH="${UPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
 
 
 set(TESTS_FLAGS)
@@ -150,17 +150,17 @@ TARGETS
 	upatch
 	utask
 	elfshow
-	elftools_test
+	upatch_test
 RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 
 # install object file
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
-install(DIRECTORY DESTINATION ${ELFTOOLS_SHARE_DIR})
+install(DIRECTORY DESTINATION ${UPATCH_SHARE_DIR})
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
-DESTINATION ${ELFTOOLS_SHARE_DIR}
+DESTINATION ${UPATCH_SHARE_DIR}
 )
 
 # uninstall targets

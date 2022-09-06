@@ -90,10 +90,10 @@ TEST(Elf,	find_symbol,	0)
 TEST(Elf,	find_symbol_mcount,	0)
 {
 	int ret = 0;
-	struct elf_file __unused *e = elf_file_open(elftools_test_path);
+	struct elf_file __unused *e = elf_file_open(upatch_test_path);
 
 	if (!e) {
-		lerror("open %s failed.\n", elftools_test_path);
+		lerror("open %s failed.\n", upatch_test_path);
 		ret = -1;
 		goto finish;
 	}
@@ -101,16 +101,16 @@ TEST(Elf,	find_symbol_mcount,	0)
 	struct symbol *s = find_symbol(e, MCOUNT);
 	if (!s) {
 		lwarning("no symbol %s founded in %s.\n",
-			MCOUNT, elftools_test_path);
+			MCOUNT, upatch_test_path);
 		ret = -1;
 		goto finish_close_elf;
 	}
 
 	linfo("%s: %s: st_value: %lx\n",
-		elftools_test_path, MCOUNT, s->sym.st_value);
+		upatch_test_path, MCOUNT, s->sym.st_value);
 
 finish_close_elf:
-	elf_file_close(elftools_test_path);
+	elf_file_close(upatch_test_path);
 
 finish:
 	return ret;

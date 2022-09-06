@@ -1,9 +1,9 @@
-# elftools Install
+# upatch Install
 
-- [Building elftools](#building-elftools)
+- [Building upatch](#building-upatch)
 	- [CentOS](#centos)
 
-# Building elftools
+# Building upatch
 
 ## CentOS
 
@@ -20,7 +20,7 @@ sudo dnf install -y \
 	linenoise-devel \
 	systemtap-sdt-devel \
 	libunwind-devel
-cd elftools
+cd upatch
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..

@@ -87,7 +87,7 @@ static void print_help(void)
 	LOG_DEBUG,
 	config.mode,
 	MODE_SLEEP, MODE_CLI, MODE_GTK,
-	elftools_version()
+	upatch_version()
 	);
 	exit(0);
 }
@@ -115,7 +115,7 @@ static int parse_config(int argc, char *argv[])
 		}
 		switch (c) {
 		case 'v':
-			printf("version %s\n", elftools_version());
+			printf("version %s\n", upatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -230,7 +230,7 @@ int cli_selected_elf_cb(void *arg)
 
 int main(int argc, char *argv[])
 {
-	elftools_init();
+	upatch_init();
 
 	parse_config(argc, argv);
 

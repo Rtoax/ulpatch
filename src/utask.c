@@ -77,7 +77,7 @@ static void print_help(void)
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
-	elftools_version()
+	upatch_version()
 	);
 	exit(0);
 }
@@ -125,7 +125,7 @@ static int parse_config(int argc, char *argv[])
 			output_file = optarg;
 			break;
 		case ARG_VERSION:
-			printf("version %s\n", elftools_version());
+			printf("version %s\n", upatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -279,7 +279,7 @@ static int munmap_an_vma(void)
 
 int main(int argc, char *argv[])
 {
-	elftools_init();
+	upatch_init();
 
 	parse_config(argc, argv);
 

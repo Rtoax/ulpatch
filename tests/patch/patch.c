@@ -44,7 +44,7 @@ static void my_direct_func(void)
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-/* see macro ELFTOOLS_TEST code branch */
+/* see macro UPATCH_TEST code branch */
  __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 {
 	linfo("TTWU emulate.\n");
@@ -142,7 +142,7 @@ static int direct_patch_test(struct patch_test_arg *arg)
 #endif
 
 	// call again, custom_mcount() will be called.
-	// see macro ELFTOOLS_TEST code branch
+	// see macro UPATCH_TEST code branch
 	ret = try_to_wake_up(task, 1, 2);
 
 	free_task(task);

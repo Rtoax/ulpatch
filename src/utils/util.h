@@ -107,7 +107,7 @@ extern "C" {
 
 /* all output need file store here, mkdir(2) it before running.
  */
-#define ROOT_DIR	"/tmp/elftools"
+#define ROOT_DIR	"/tmp/upatch"
 
 
 /* Indirect stringification.  Doing two levels allows the parameter to be a
@@ -140,7 +140,7 @@ typedef enum {
 	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
 } file_type;
 
-// elftools arguments configuration
+// upatch arguments configuration
 struct config {
 	int log_level;
 	enum {
@@ -168,9 +168,9 @@ struct str_node {
 extern struct config config;
 
 
-void elftools_init(void);
-const char *elftools_version(void);
-const char *elftools_arch(void);
+void upatch_init(void);
+const char *upatch_version(void);
+const char *upatch_arch(void);
 
 void daemonize(void);
 

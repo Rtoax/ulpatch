@@ -2,7 +2,7 @@
 /* Copyright (C) 2022 Rong Tao */
 #include "util.h"
 
-const char *elftools_arch(void)
+const char *upatch_arch(void)
 {
 #if defined(__x86_64__)
 	return "x86_64";
@@ -13,11 +13,11 @@ const char *elftools_arch(void)
 #endif
 }
 
-const char *elftools_version(void)
+const char *upatch_version(void)
 {
-#if !defined(ELFTOOLS_VERSION)
-# error "Must define string ELFTOOLS_VERSION"
+#if !defined(UPATCH_VERSION)
+# error "Must define string UPATCH_VERSION"
 #endif
-	return ELFTOOLS_VERSION;
+	return UPATCH_VERSION;
 }
 

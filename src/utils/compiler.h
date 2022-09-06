@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022 Rong Tao */
-#ifndef __ELFTOOLS_UTILS_COMPILER_H
-#define __ELFTOOLS_UTILS_COMPILER_H 1
+#ifndef __UPATCH_UTILS_COMPILER_H
+#define __UPATCH_UTILS_COMPILER_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,4 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __ELFTOOLS_UTILS_COMPILER_H */
+#endif /* __UPATCH_UTILS_COMPILER_H */

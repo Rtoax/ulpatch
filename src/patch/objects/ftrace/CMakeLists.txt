@@ -5,14 +5,14 @@ include_directories(../../../)
 
 enable_language(C ASM)
 
-set(FTRACE_OBJ_TARGET elftools_patch_obj)
+set(FTRACE_OBJ_TARGET upatch_patch_obj)
 
 find_library(ELF elf /usr/lib64)
 find_library(PTHREAD pthread /usr/lib64)
 
 link_libraries(${ELF} ${PTHREAD} ${JSON_C}
-	elftools_utils
-	elftools_elf
+	upatch_utils
+	upatch_elf
 )
 
 add_definitions(-MD -Wall -Werror -O0 -D_GNU_SOURCE
@@ -29,7 +29,7 @@ add_library(${FTRACE_OBJ_TARGET} STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
 
 target_compile_definitions(${FTRACE_OBJ_TARGET} PRIVATE
 	${UTILS_FLAGS}
-	ELFTOOLS_TEST
+	UPATCH_TEST
 )
 
 set(ASM_OPTIONS "-x assembler-with-cpp")
