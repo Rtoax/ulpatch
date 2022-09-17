@@ -7,7 +7,7 @@ PROJECT(upatch)
 
 # version number components.
 set(upatch_VERSION_MAJOR 0)
-set(upatch_VERSION_MINOR 2)
+set(upatch_VERSION_MINOR 3)
 set(upatch_VERSION_PATCH 0)
 
 execute_process(
