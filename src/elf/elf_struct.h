@@ -105,7 +105,6 @@ struct elf_iter {
 
 
 extern struct list_head client_list;
-extern unsigned int nr_clients;
 
 #ifdef __cplusplus
 }

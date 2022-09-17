@@ -16,8 +16,6 @@ sudo dnf install -y \
 	cmake \
 	gcc \
 	elfutils-libelf-devel \
-	json-c-devel \
-	linenoise-devel \
 	systemtap-sdt-devel \
 	libunwind-devel
 cd upatch

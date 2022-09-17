@@ -38,9 +38,6 @@ static __unused int handle_sections(struct elf_file *elf)
 			return -ENOENT;
 		}
 
-		ldebug("section name: %s, %lx\n",
-			elf->shdrnames[iter.i], shdr->sh_type, sh_type_string(shdr));
-
 		// Handle section header by type
 		switch (shdr->sh_type) {
 		case SHT_SYMTAB:
@@ -186,11 +183,11 @@ struct elf_file *elf_file_open(const char *filepath)
 		goto free_elf;
 	}
 	if (elf->ehdr->e_ident[EI_CLASS] != ELFCLASS64) {
-		lerror("unsupport %d\n", ei_class_string(elf->ehdr));
+		lerror("unsupport %d\n", elf->ehdr->e_ident[EI_CLASS]);
 		goto free_elf;
 	}
 	if (elf->ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
-		lerror("unsupport %s\n", ei_data_string(elf->ehdr));
+		lerror("unsupport %d\n", elf->ehdr->e_ident[EI_DATA]);
 		goto free_elf;
 	}
 
@@ -261,8 +258,8 @@ struct elf_file *elf_file_open(const char *filepath)
 		if (elf->ehdr->e_type == ET_REL) {
 			elf->build_id = "REL no Build ID";
 		} else {
-			lerror("No Build ID found in %s,%s, check with 'readelf -n'\n",
-				elf->filepath, e_type_string(elf->ehdr));
+			lerror("No Build ID found in %s,%d, check with 'readelf -n'\n",
+				elf->filepath, elf->ehdr->e_type);
 			goto free_shdrs;
 		}
 	}
@@ -329,126 +326,9 @@ int elf_file_close(const char *filepath)
 	list_del(&elf->node);
 	elf_files_number--;
 
-	struct client *clt;
-	list_for_each_entry(clt, &client_list, node) {
-		if (clt->selected_elf == elf) {
-			clt->selected_elf = NULL;
-		}
-	}
-
 	elf_end(elf->elf);
 	free(elf);
 
 	return 0;
 }
 
-int elf_load_handler(struct client *client, struct cmd_elf *cmd)
-{
-	struct cmd_elf_file *load = cmd_data(cmd);
-	struct elf_file __unused *elf = elf_file_open(load->file);
-
-	return elf?0:-ENOENT;
-}
-
-int elf_delete_handler(struct client *client, struct cmd_elf *cmd)
-{
-	struct cmd_elf_file *load = cmd_data(cmd);
-
-	return elf_file_close(load->file);
-}
-
-int elf_list_handler(struct client *client, struct cmd_elf *cmd)
-{
-	return 0;
-}
-
-int elf_list_handler_ack(struct client *client, struct cmd_elf *msg_ack)
-{
-	struct elf_file *elf = NULL;
-
-	uint32_t count = 0;
-	uint32_t init_len = msg_ack->data_len;
-	struct cmd_elf_ack *ack = cmd_data(msg_ack);
-
-	/* No elf loaded, return */
-	if (elf_files_number <= 0) {
-		char *data = ack_data(ack);
-		/* Number of ELF files */
-		data_add_u32(data, elf_files_number);
-		msg_ack->data_len += sizeof(uint32_t);
-		send_one_ack(client, msg_ack);
-		return 0;
-	}
-
-	list_for_each_entry(elf, &elf_file_list, node) {
-		uint16_t add_len = 0;
-		// see struct cmd_elf_ack.data
-		char *data = ack_data(ack);
-		int32_t data_left_len = BUFFER_SIZE -
-				sizeof(struct cmd_elf) - sizeof(struct cmd_elf_ack);
-
-		/* Number of ELF files */
-		data = data_add_u32(data, elf_files_number);
-		add_len += sizeof(uint32_t);
-		data_left_len -= sizeof(uint32_t);
-
-		/* Index of ELF files */
-		data = data_add_u32(data, ++count);
-		add_len += sizeof(uint32_t);
-		data_left_len -= sizeof(uint32_t);
-
-		/* This client selected? */
-		// 0 - not select, see struct cmd_elf_ack.data
-		data = data_add_u32(data, (client->selected_elf == elf)?1:0);
-		add_len += sizeof(uint32_t);
-		data_left_len -= sizeof(uint32_t);
-
-		uint32_t len = data_add_string((void**)&data, elf->filepath);
-		if (data_left_len < len) {
-			lerror("no space left on buffer.\n");
-			break;
-		}
-
-		add_len += len + 1;
-		data_left_len -= len + 1;
-
-		// Build ID
-		len = data_add_string((void**)&data, elf->build_id);
-		if (data_left_len < len) {
-			lerror("no space left on buffer.\n");
-			break;
-		}
-
-		add_len += len + 1;
-		data_left_len -= len + 1;
-
-		if (data_left_len < 0) {
-			lerror("File name too long, %s\n", elf->filepath);
-			return -EINVAL; /* Invalid argument */
-		}
-
-		msg_ack->cmd = CMD_ELF_LIST;
-		msg_ack->data_len = init_len + add_len;
-		msg_ack->is_ack = 1;
-		msg_ack->has_next = (count == elf_files_number)?0:1;
-
-		send_one_ack(client, msg_ack);
-	}
-
-	return 0;
-}
-
-int elf_select_handler(struct client *client, struct cmd_elf *cmd)
-{
-	struct cmd_elf_file *select = cmd_data(cmd);
-	struct elf_file *elf = NULL;
-
-	list_for_each_entry(elf, &elf_file_list, node) {
-		if (!strcmp(select->file, elf->filepath)) {
-			ldebug("select elf: %s\n", elf->filepath);
-			client->selected_elf = elf;
-			return 0;
-		}
-	}
-	return -ENOENT; /* No such file or directory */
-}

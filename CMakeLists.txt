@@ -51,11 +51,7 @@ include(find_libunwind)
 include(find_capstone)
 include(find_elfutils)
 include(find_kernel_headers)
-include(find_linenoise)
-include(find_json-c)
 include(find_usdt)
-include(find_cunit)
-include(find_gtk)
 
 #message(STATUS "=== CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 #message(STATUS "=== CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -78,12 +74,6 @@ endif()
 if(LIBELF_FOUND)
 message(STATUS "=== FOUND libelf")
 endif()
-if(LIBLINENOISE_FOUND)
-message(STATUS "=== FOUND linenoise")
-endif()
-if(JSON_C_INCLUDE_DIRS)
-message(STATUS "=== FOUND json-c devel")
-endif()
 
 set(UTILS_FLAGS)
 if(ELFUTILS_INCLUDE_DIRS)
@@ -98,16 +88,6 @@ endif()
 if(CAPSTONE_CAPSTONE_H)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" CAPSTONE_CAPSTONE_H)
 endif()
-if(HAVE_LINENOISE)
-	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_LINENOISE)
-endif()
-if(HAVE_JSON_C_H)
-	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_JSON_C_H)
-endif()
-if(JSON_C_LIBRARIES)
-	message(STATUS "=== FOUND json-c library")
-	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_JSON_C_LIBRARIES)
-endif()
 if(HAVE_SDT_H)
 	message(STATUS "=== FOUND sdt.h")
 	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_SDT_H)
@@ -115,9 +95,6 @@ endif()
 if(HAVE_SDT_DTRACE_PROBE)
 	message(STATUS "=== HAVE_SDT_DTRACE_PROBE")
 	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_SDT_DTRACE_PROBE)
-endif()
-if(HAVE_GTK_3_0_H)
-	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_GTK_3_0_H)
 endif()
 
 if(KERNEL_HEADERS_CONST_H)
@@ -129,19 +106,9 @@ set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_FTRACE_OBJ_PATH="${UPATCH_SHARE_DIR}${FT
 
 
 set(TESTS_FLAGS)
-if(CUNIT_INCLUDE_DIRS)
-	message(STATUS "=== FOUND CUnit Dev")
-	set(TESTS_FLAGS "${TESTS_FLAGS}" HAVE_CUNIT)
-endif()
-if(HAVE_CUNIT_BASIC)
-	set(TESTS_FLAGS "${TESTS_FLAGS}" HAVE_CUNIT_BASIC)
-endif()
 
 add_subdirectory(src)
 
-if(BUILD_TESTING)
-add_subdirectory(tests)
-endif()
 
 # install targets
 install(
@@ -149,7 +116,6 @@ TARGETS
 	uftrace
 	upatch
 	utask
-	elfshow
 	upatch_test
 RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )

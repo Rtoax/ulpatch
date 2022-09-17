@@ -8,9 +8,8 @@ enable_language(C ASM)
 set(FTRACE_OBJ_TARGET upatch_patch_obj)
 
 find_library(ELF elf /usr/lib64)
-find_library(PTHREAD pthread /usr/lib64)
 
-link_libraries(${ELF} ${PTHREAD} ${JSON_C}
+link_libraries(${ELF}
 	upatch_utils
 	upatch_elf
 )

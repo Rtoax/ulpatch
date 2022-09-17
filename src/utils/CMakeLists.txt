@@ -7,12 +7,6 @@ include_directories(..)
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type)
 
-if(HAVE_LINENOISE)
-	set(LINENOISE_SRC)
-else()
-	aux_source_directory(linenoise LINENOISE_SRC)
-endif()
-
 message(STATUS "=== UTILS Architecture: ${ARCHITECTURE}")
 if(LIBUNWIND_LIBRARIES)
 	find_library(LIBUNWIND unwind /usr/lib64)
@@ -21,8 +15,8 @@ endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-link_libraries(${ELF} ${PTHREAD} ${LIBUNWIND} ${LIBUNWIND_ARCH})
+link_libraries(${ELF} ${LIBUNWIND} ${LIBUNWIND_ARCH})
 
-add_library(upatch_utils STATIC ${LIB_SOURCES} ${LINENOISE_SRC})
+add_library(upatch_utils STATIC ${LIB_SOURCES})
 
 target_compile_definitions(upatch_utils PRIVATE ${UTILS_FLAGS})

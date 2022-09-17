@@ -6,14 +6,8 @@ include_directories(..)
 add_subdirectory(objects)
 
 find_library(ELF elf /usr/lib64)
-find_library(PTHREAD pthread /usr/lib64)
 
-set(JSON_C)
-if(JSON_C_LIBRARIES)
-find_library(JSON_C json-c /usr/lib64)
-endif()
-
-link_libraries(${ELF} ${PTHREAD} ${JSON_C}
+link_libraries(${ELF}
 	upatch_utils
 	upatch_utils_arch
 	upatch_elf

@@ -9,7 +9,6 @@
 #include <fcntl.h>
 
 #include <elf/elf_api.h>
-#include <cli/cli_api.h>
 
 #include <utils/log.h>
 #include <utils/list.h>

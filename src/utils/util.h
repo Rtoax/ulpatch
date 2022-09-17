@@ -143,13 +143,6 @@ typedef enum {
 // upatch arguments configuration
 struct config {
 	int log_level;
-	enum {
-		ROLE_SERVER, ROLE_CLIENT,
-	} role;
-	enum {
-		MODE_SLEEP, MODE_CLI, MODE_GTK,
-	} mode;
-	bool daemon;
 };
 
 struct nr_idx_bool {

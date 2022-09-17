@@ -1,6 +1,5 @@
 {
 	"files.associations": {
-		"elf_open.h": "c",
 		"elf_struct.h": "c",
 		"stdio.h": "c",
 		"mman.h": "c",
@@ -15,9 +14,7 @@
 		"elf.h": "c",
 		"compiler.h": "c",
 		"elf_api.h": "c",
-		"cli_api.h": "c",
 		"string.h": "c",
-		"linenoise.h": "c",
 		"typeinfo": "c",
 		"rbtree.h": "c",
 		"list.h": "c",

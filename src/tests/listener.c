@@ -107,7 +107,7 @@ int listener_helper_create_test_client(void)
 
 	ret = connect(connect_fd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
 	if (ret == -1) {
-		lerror("connect error: %s, %s\n", strerror(errno), ELF_UNIX_PATH);
+		lerror("connect error: %s, %s\n", strerror(errno), TEST_UNIX_PATH);
 		close(connect_fd);
 		exit(1);
 	}

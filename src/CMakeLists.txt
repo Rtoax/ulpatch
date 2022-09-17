@@ -4,40 +4,22 @@
 add_subdirectory(utils)
 add_subdirectory(elf)
 add_subdirectory(patch)
-add_subdirectory(cli)
-add_subdirectory(gtk)
 add_subdirectory(arch)
 
 find_package(PkgConfig REQUIRED)
 
 include_directories(.)
 
-#pkg_search_module(GTK_3_0 REQUIRED gtk+-3.0)
-
-#message(STATUS "=== GTK_3_0_LIBRARIES: ${GTK_3_0_LIBRARIES}")
-#message(STATUS "=== GTK_3_0_INCLUDE_DIRS: ${GTK_3_0_INCLUDE_DIRS}")
-
-#include_directories(${GTK_3_0_INCLUDE_DIRS})
-
 find_library(ELF elf /usr/lib64)
 find_library(RT rt /usr/lib64)
-find_library(PTHREAD pthread /usr/lib64)
 
-link_libraries(${ELF} ${RT} ${PTHREAD}
+link_libraries(${ELF} ${RT}
 	upatch_utils
 	upatch_utils_arch
 	upatch_elf
-	upatch_cli
-	upatch_gtk
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
-
-# Target: elfshow
-add_executable(elfshow
-	elfshow.c
-)
-target_compile_definitions(elfshow PRIVATE ${UTILS_FLAGS})
 
 # Target: utask
 add_executable(utask
@@ -57,3 +39,6 @@ add_executable(upatch
 )
 target_compile_definitions(upatch PRIVATE ${UTILS_FLAGS})
 
+if(BUILD_TESTING)
+add_subdirectory(tests)
+endif()
