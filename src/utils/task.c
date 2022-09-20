@@ -416,16 +416,44 @@ int task_vma_link_symbol(struct task *task, struct symbol *s)
 	return node?-1:0;
 }
 
+/**
+ * load_self_vma_symbols - load self symbols from ELF file
+ *
+ * @vma - self vma
+ */
 static int load_self_vma_symbols(struct vma_struct *vma)
 {
 	int err = 0;
-#if 0 // TODO: load all symbol string
+	struct task *task = vma->task;
 
-#endif
+	struct symbol *sym, *tmp;
+
+	rbtree_postorder_for_each_entry_safe(sym, tmp,
+		&task->exe_elf->symbols, node) {
+
+		struct symbol *new;
+
+		/* allocate a symbol, and add it to task struct */
+		new = alloc_symbol(sym->name, &sym->sym);
+		if (!new) {
+			lerror("Alloc symbol failed, %s\n", sym->name);
+			continue;
+		}
+
+		ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
+
+		new->vma = vma;
+
+		err = task_vma_link_symbol(task, new);
+		if (err) {
+			free_symbol(new);
+		}
+	}
+
 	return err;
 }
 
-int vma_load_dynsym(struct vma_struct *vma)
+int vma_load_all_symbols(struct vma_struct *vma)
 {
 	if (!vma->is_elf || !vma->elf)
 		return 0;
@@ -447,6 +475,7 @@ int vma_load_dynsym(struct vma_struct *vma)
 	symtab_sz = strtab_sz = 0;
 
 
+	/* load all self symbols */
 	if (vma->type == VMA_SELF) {
 		return load_self_vma_symbols(vma);
 	}
@@ -838,10 +867,10 @@ struct task *open_task(pid_t pid, int flag)
 		}
 	}
 
-	if (flag & FTO_VMA_ELF_DYNSYM) {
+	if (flag & FTO_VMA_ELF_SYMBOLS) {
 		struct vma_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task) {
-			vma_load_dynsym(tmp_vma);
+			vma_load_all_symbols(tmp_vma);
 		}
 	}
 

@@ -93,7 +93,8 @@ struct vma_struct {
  * @FTO_PATCH parse patch VMA when open a task.
  * @FTO_VMA_ELF different with @FTO_LIBC, it's open target process address
  *               space's ELF VMA in memory.
- * @FTO_VMA_ELF_DYNSYM load each ELF VMA's PT_DYNAMIC
+ * @FTO_VMA_ELF_SYMBOLS load each ELF VMA's PT_DYNAMIC, at same time, for load
+ *                all symbols, need to load SELF
  */
 #define FTO_NONE	0x0
 #define FTO_SELF	BIT(0)
@@ -101,11 +102,11 @@ struct vma_struct {
 #define FTO_PROC	BIT(2)
 #define FTO_PATCH	BIT(3)
 #define FTO_VMA_ELF	BIT(4)
-#define FTO_VMA_ELF_DYNSYM	(BIT(5) | FTO_VMA_ELF)
+#define FTO_VMA_ELF_SYMBOLS	(BIT(5) | FTO_VMA_ELF | FTO_SELF)
 
 #define FTO_ALL 0xffffffff
 
-#define FTO_FTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_DYNSYM)
+#define FTO_FTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS)
 
 /* under ROOT_DIR/PID/ */
 #define TASK_PROC_COMM	"comm"
