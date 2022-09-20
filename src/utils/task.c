@@ -288,7 +288,7 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	phaddr = vma->start + vma->elf->ehdr.e_phoff;
 	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
 
-	memshow(&vma->elf->ehdr, sizeof(ehdr));
+	// memshow(&vma->elf->ehdr, sizeof(ehdr));
 
 	/* if no program headers, just return. we don't need it, such as:
 	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr
@@ -416,6 +416,15 @@ int task_vma_link_symbol(struct task *task, struct symbol *s)
 	return node?-1:0;
 }
 
+static int load_self_vma_symbols(struct vma_struct *vma)
+{
+	int err = 0;
+#if 0 // TODO: load all symbol string
+
+#endif
+	return err;
+}
+
 int vma_load_dynsym(struct vma_struct *vma)
 {
 	if (!vma->is_elf || !vma->elf)
@@ -437,6 +446,10 @@ int vma_load_dynsym(struct vma_struct *vma)
 	symtab_addr = strtab_addr = 0;
 	symtab_sz = strtab_sz = 0;
 
+
+	if (vma->type == VMA_SELF) {
+		return load_self_vma_symbols(vma);
+	}
 
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		if (vma->elf->phdrs[i].p_type == PT_DYNAMIC) {

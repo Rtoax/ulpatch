@@ -245,7 +245,6 @@ elf_object_note(struct elf_file *elf, uint32_t namesz, const char *name,
 	switch (type) {
 	case NT_GNU_BUILD_ID:
 		if (strcmp(name, "GNU") == 0 && descsz > 0) {
-			printf("    Build ID: ");
 			uint_fast32_t i;
 			char v[3] = {};
 			char *build_id = malloc(descsz * 2 + 1);
@@ -256,12 +255,10 @@ elf_object_note(struct elf_file *elf, uint32_t namesz, const char *name,
 			//  Build ID: 49c2fad65d0c2df70025644c9bc7485b28bab899
 
 			for (i = 0; i < descsz - 1; ++i) {
-				printf("%02" PRIx8, (uint8_t) desc[i]);
 				sprintf(v, "%02" PRIx8, (uint8_t) desc[i]);
 				build_id[i * 2] = v[0];
 				build_id[i * 2 + 1] = v[1];
 			}
-			printf("%02" PRIx8 "\n", (uint8_t) desc[i]);
 			sprintf(v, "%02" PRIx8, (uint8_t) desc[i]);
 			build_id[i * 2] = v[0];
 			build_id[i * 2 + 1] = v[1];
