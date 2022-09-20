@@ -22,6 +22,7 @@ struct config config = {
 };
 
 static pid_t target_pid = -1;
+static const char *target_func = NULL;
 static struct task *target_task = NULL;
 
 static const char *patch_object_file = NULL;
@@ -53,8 +54,10 @@ static void print_help(void)
 	"\n"
 	" Ftrace argument:\n"
 	"\n"
+	"  -f, --function      tracing funtion specified by this argument.\n"
+	"\n"
 	"  -j, --patch-obj     input a ELF 64-bit LSB relocatable object file.\n"
-	"                      actually, this input is not necessary, but you know\n"
+	"                      actually, this input is not necessary, unless you know\n"
 	"                      how to generate a ftrace relocatable object.\n"
 	"                      default: %s\n"
 	"\n"
@@ -81,23 +84,27 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{"pid",		required_argument,	0,	'p'},
-		{"patch-obj",		required_argument,	0,	'j'},
-		{"version",	no_argument,	0,	'v'},
-		{"help",	no_argument,	0,	'h'},
-		{"log-level",		required_argument,	0,	'l'},
+		{ "pid",            required_argument,  0, 'p' },
+		{ "function",       required_argument,  0, 'f' },
+		{ "patch-obj",      required_argument,  0, 'j' },
+		{ "version",        no_argument,        0, 'v' },
+		{ "help",           no_argument,        0, 'h' },
+		{ "log-level",      required_argument,  0, 'l' },
 	};
 
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:j:vhl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:f:j:vhl:", options, &option_index);
 		if (c < 0) {
 			break;
 		}
 		switch (c) {
 		case 'p':
 			target_pid = atoi(optarg);
+			break;
+		case 'f':
+			target_func = optarg;
 			break;
 		case 'j':
 			patch_object_file = optarg;
@@ -117,6 +124,11 @@ static int parse_config(int argc, char *argv[])
 
 	if (target_pid == -1) {
 		fprintf(stderr, "Specify pid with -p, --pid.\n");
+		exit(1);
+	}
+
+	if (!target_func) {
+		fprintf(stderr, "Specify target function to trace with -f, --function.\n");
 		exit(1);
 	}
 
@@ -162,6 +174,7 @@ static int parse_config(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int __unused ret = 0;
+	struct symbol *target_sym;
 
 	upatch_init();
 
@@ -169,11 +182,18 @@ int main(int argc, char *argv[])
 
 	set_log_level(config.log_level);
 
-	target_task = open_task(target_pid, FTO_ALL);
-
+	target_task = open_task(target_pid, FTO_FTRACE);
 	if (!target_task) {
 		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
 		return 1;
+	}
+
+	target_sym = task_vma_find_symbol(target_task, target_func);
+	if (!target_sym) {
+		fprintf(stderr, "couldn't found symbol '%s'\n", target_func);
+		errno = -ENOENT;
+		ret = 1;
+		goto done;
 	}
 
 	init_patch(target_task, UPATCH_FTRACE_OBJ_PATH);
@@ -182,8 +202,9 @@ int main(int argc, char *argv[])
 
 	delete_patch(target_task);
 
+done:
 	free_task(target_task);
 
-	return 0;
+	return ret;
 }
 
