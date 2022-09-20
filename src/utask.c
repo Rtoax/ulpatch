@@ -299,15 +299,16 @@ static void list_all_symbol(void)
 	struct symbol *sym, *tmp;
 
 	printf(
-	"%-32s %-16s\n",
-	"SYMBOL", "ST_VALUE"
+	"%-8s %-32s %-16s\n",
+	"VMA", "SYMBOL", "ST_VALUE"
 	);
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp,
 		&target_task->vma_symbols, node) {
 
 		printf(
-			"%-32s %#016lx\n",
+			"%-8s %-32s %#016lx\n",
+			sym->vma->name_,
 			sym->name,
 			sym->sym.st_value
 		);
