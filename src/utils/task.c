@@ -558,6 +558,8 @@ int vma_load_dynsym(struct vma_struct *vma)
 			continue;
 		}
 
+		s->vma = vma;
+
 		err = task_vma_link_symbol(task, s);
 		if (err) {
 			free_symbol(s);
@@ -780,6 +782,7 @@ struct task *open_task(pid_t pid, int flag)
 	assert(task && "malloc failed");
 	memset(task, 0x0, sizeof(struct task));
 
+	list_init(&task->node);
 	list_init(&task->vmas);
 	rb_init(&task->vmas_rb);
 
@@ -874,7 +877,10 @@ static void rb_free_symbol(struct rb_node *node) {
 
 int free_task(struct task *task)
 {
-	list_del(&task->node);
+	/* free in open_task(), node == NULL */
+	if (!list_empty(&task->node))
+		list_del(&task->node);
+
 	close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {

@@ -287,6 +287,9 @@ int cmp_symbol_name(struct rb_node *n1, unsigned long key)
 struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 {
 	struct symbol *s = malloc(sizeof(struct symbol));
+
+	memset(s, 0, sizeof(*s));
+
 	s->name = strdup(name);
 	memcpy(&s->sym, sym, sizeof(GElf_Sym));
 
