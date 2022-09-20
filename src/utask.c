@@ -28,6 +28,7 @@ enum {
 	ARG_DUMP_VMA, // dump one vma
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
+	ARG_LIST_SYMBOLS,
 };
 
 static pid_t target_pid = -1;
@@ -37,6 +38,7 @@ static bool flag_dump_vma = false;
 static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
 static unsigned long vma_addr = 0;
+static bool flag_list_symbols = false;
 static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
@@ -67,6 +69,8 @@ static void print_help(void)
 	"                      and witch is mmapped by -f, --map-file.\n"
 	"                      check with -v and -f\n"
 	"\n"
+	"  --symbols           list all symbols\n"
+	"\n"
 	"  -o, --output        specify output filename.\n"
 	"\n"
 	"\n"
@@ -95,6 +99,7 @@ static int parse_config(int argc, char *argv[])
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
+		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
 		{ "version",        no_argument,       0, ARG_VERSION },
 		{ "help",           no_argument,       0, 'h' },
@@ -126,6 +131,9 @@ static int parse_config(int argc, char *argv[])
 			flag_unmap_vma = true;
 			vma_addr = strtoull(optarg, NULL, 16);
 			break;
+		case ARG_LIST_SYMBOLS:
+			flag_list_symbols = true;
+			break;
 		case 'o':
 			output_file = optarg;
 			break;
@@ -142,7 +150,11 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	if (!flag_dump_vmas && !flag_dump_vma && !map_file && !flag_unmap_vma) {
+	if (!flag_dump_vmas &&
+		!flag_dump_vma &&
+		!map_file &&
+		!flag_unmap_vma &&
+		!flag_list_symbols) {
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 		exit(1);
 	}
@@ -282,6 +294,26 @@ static int munmap_an_vma(void)
 	return 0;
 }
 
+static void list_all_symbol(void)
+{
+	struct symbol *sym, *tmp;
+
+	printf(
+	"%-32s %-16s\n",
+	"SYMBOL", "ST_VALUE"
+	);
+
+	rbtree_postorder_for_each_entry_safe(sym, tmp,
+		&target_task->vma_symbols, node) {
+
+		printf(
+			"%-32s %#016lx\n",
+			sym->name,
+			sym->sym.st_value
+		);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	upatch_init();
@@ -312,6 +344,10 @@ int main(int argc, char *argv[])
 	/* dump an VMA */
 	if (flag_dump_vma) {
 		dump_an_vma();
+	}
+
+	if (flag_list_symbols) {
+		list_all_symbol();
 	}
 
 	free_task(target_task);
