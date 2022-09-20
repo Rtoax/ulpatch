@@ -21,8 +21,14 @@ struct config config = {
 	.log_level = -1,
 };
 
-#define ARG_VERSION	100
-
+enum {
+	ARG_VERSION = 200,
+	ARG_LOG_LEVEL,
+	ARG_DUMP_VMAS, // print all vmas
+	ARG_DUMP_VMA, // dump one vma
+	ARG_FILE_MAP_TO_VMA,
+	ARG_FILE_UNMAP_FROM_VMA,
+};
 
 static pid_t target_pid = -1;
 
@@ -50,14 +56,14 @@ static void print_help(void)
 	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
 	"\n"
-	"  -v, --dump-vmas     dump vmas\n"
-	"  -V, --dump-vma      save VMA address space to console or to a file,\n"
+	"  --dump-vmas         dump vmas\n"
+	"  --dump-vma          save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"\n"
-	"  -f, --map-file      mmap a exist file into target process address space\n"
-	"  -u, --unmap-vma     munmap a exist VMA, the argument need input vma address.\n"
+	"  --map-file          mmap a exist file into target process address space\n"
+	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by -f, --map-file.\n"
 	"                      check with -v and -f\n"
 	"\n"
@@ -66,7 +72,7 @@ static void print_help(void)
 	"\n"
 	" Other argument:\n"
 	"\n"
-	"  -l, --log-level     set log level, default(%d)\n"
+	"  --log-level         set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  -h, --help          display this help and exit\n"
@@ -84,21 +90,21 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{"pid",		required_argument,	0,	'p'},
-		{"dump-vmas",	no_argument,	0,	'v'},
-		{"dump-vma",	required_argument,	0,	'V'},
-		{"map-file",		required_argument,	0,	'f'},
-		{"unmap-vma",		required_argument,	0,	'u'},
-		{"output",	required_argument,	0,	'o'},
-		{"version",	no_argument,	0,	ARG_VERSION},
-		{"help",	no_argument,	0,	'h'},
-		{"log-level",		required_argument,	0,	'l'},
+		{ "pid",            required_argument, 0, 'p' },
+		{ "dump-vmas",      no_argument,       0, ARG_DUMP_VMAS },
+		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
+		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
+		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
+		{ "output",         required_argument, 0, 'o' },
+		{ "version",        no_argument,       0, ARG_VERSION },
+		{ "help",           no_argument,       0, 'h' },
+		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
 	};
 
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vV:f:u:o:hl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:o:h", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -106,17 +112,17 @@ static int parse_config(int argc, char *argv[])
 		case 'p':
 			target_pid = atoi(optarg);
 			break;
-		case 'v':
+		case ARG_DUMP_VMAS:
 			flag_dump_vmas = true;
 			break;
-		case 'V':
+		case ARG_DUMP_VMA:
 			flag_dump_vma = true;
 			vma_addr = strtoull(optarg, NULL, 16);
 			break;
-		case 'f':
+		case ARG_FILE_MAP_TO_VMA:
 			map_file = optarg;
 			break;
-		case 'u':
+		case ARG_FILE_UNMAP_FROM_VMA:
 			flag_unmap_vma = true;
 			vma_addr = strtoull(optarg, NULL, 16);
 			break;
@@ -128,7 +134,7 @@ static int parse_config(int argc, char *argv[])
 			exit(0);
 		case 'h':
 			print_help();
-		case 'l':
+		case ARG_LOG_LEVEL:
 			config.log_level = atoi(optarg);
 			break;
 		default:
