@@ -433,6 +433,10 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 
 		struct symbol *new;
 
+		/* skip undefined symbols */
+		if (is_undef_symbol(&sym->sym))
+			continue;
+
 		/* allocate a symbol, and add it to task struct */
 		new = alloc_symbol(sym->name, &sym->sym);
 		if (!new) {
