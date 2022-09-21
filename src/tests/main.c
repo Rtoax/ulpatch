@@ -28,6 +28,8 @@ static LIST_HEAD(failed_list);
 
 static LIST_HEAD(mix_role_list);
 
+int main(int argc, char *argv[]);
+
 static void __ctor(TEST_PRIO_START) __init_test_list(void)
 {
 	int i;

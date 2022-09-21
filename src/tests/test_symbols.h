@@ -24,6 +24,7 @@ TEST_SYM(mcount)
 TEST_SYM(_mcount)
 #endif
 
+TEST_SYM(main)
 
 #ifdef TEST_SYM_FOR_EACH
 }
