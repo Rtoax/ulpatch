@@ -176,7 +176,7 @@ int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
 	write(fd, &req, sizeof(req));
 	read(fd, &rsp, sizeof(rsp));
 
-	*addr = req.body.symbol_response.addr;
+	*addr = rsp.body.symbol_response.addr;
 
 	return 0;
 }
