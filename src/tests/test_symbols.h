@@ -10,21 +10,25 @@ for (TEST_SYM_FOR_EACH_I = 0;
 	 TEST_SYM_FOR_EACH_I++) {
 #endif
 
-/* Here start to define symbols
- */
-TEST_SYM_NON_STATIC(stdout) // not constant
-TEST_SYM(exit)
-TEST_SYM(printf)
-// errno is macro: (*__errno_location ()), do not test it
-// TEST_SYM_NON_STATIC(errno) // (*__errno_location ()): addr 0x0 (0x0)
+/* Here start to define symbols */
+/* not constant */
+TEST_SYM_NON_STATIC(stdin)
+TEST_SYM_NON_STATIC(stdout)
+TEST_SYM_NON_STATIC(stderr)
+
+TEST_DYNSYM(exit)
+TEST_DYNSYM(printf)
 
 #if defined(__x86_64__)
-TEST_SYM(mcount)
+TEST_DYNSYM(mcount)
 #elif defined(__aarch64__)
-TEST_SYM(_mcount)
+TEST_DYNSYM(_mcount)
 #endif
 
-TEST_SYM(main)
+TEST_SYM_SELF(main)
+TEST_SYM_SELF(who_am_i)
+TEST_SYM_SELF(test_list)
+
 
 #ifdef TEST_SYM_FOR_EACH
 }

@@ -301,13 +301,6 @@ TEST(Ftrace,	init_patch,	0)
 	return test_task_patch(FTO_PROC, NULL);
 }
 
-static const char *SYMBOLS[] = {
-#define TEST_SYM(s) __stringify(s),
-#define TEST_SYM_NON_STATIC(s) TEST_SYM(s)
-#include "../test_symbols.h"
-#undef TEST_SYM
-#undef TEST_SYM_NON_STATIC
-};
 
 static int find_task_symbol(struct task *task)
 {
@@ -315,12 +308,13 @@ static int find_task_symbol(struct task *task)
 	int err = 0;
 	struct symbol *sym;
 
-	for (i = 0; i < ARRAY_SIZE(SYMBOLS); i++) {
-		sym = task_vma_find_symbol(task, SYMBOLS[i]);
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+
+		sym = task_vma_find_symbol(task, test_symbols[i].sym);
 
 		linfo("%s %-30s: 0x%lx\n",
 			sym?"Exist":"NoExi",
-			SYMBOLS[i],
+			test_symbols[i].sym,
 			sym?sym->sym.st_value:0);
 
 		if (!sym)
@@ -378,19 +372,19 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 		if (fd <= 0)
 			ret = -1;
 
-		for (i = 0; i < ARRAY_SIZE(SYMBOLS); i++) {
+		for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 			unsigned long addr;
 			struct symbol *sym;
 
-			sym = task_vma_find_symbol(task, SYMBOLS[i]);
+			sym = task_vma_find_symbol(task, test_symbols[i].sym);
 			if (!sym) {
 				lerror("Could not find %s in pid %d vma.\n",
-					SYMBOLS[i], task->pid);
+					test_symbols[i].sym, task->pid);
 				ret = -EEXIST;
 				continue;
 			}
 
-			listener_helper_symbol(fd, SYMBOLS[i], &addr);
+			listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 
 			/**
 			 * TODO
@@ -400,7 +394,7 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 			 * I should make this test failed, ret = -1;
 			 */
 			linfo("%-10s: %lx vs %lx(vma)\n",
-				SYMBOLS[i], addr, sym->sym.st_value);
+				test_symbols[i].sym, addr, sym->sym.st_value);
 
 			if (addr != sym->sym.st_value) {
 				ret = -1;

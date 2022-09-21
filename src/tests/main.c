@@ -661,26 +661,22 @@ static void launch_mix(void)
 	}
 }
 
-static __unused struct test_symbol test_symbols[] = {
-#define TEST_SYM(s) { __stringify(s), 0, .non_static = false },
-#define TEST_SYM_NON_STATIC(s) { __stringify(s), 0, .non_static = true },
-#include "test_symbols.h"
-#undef TEST_SYM
-#undef TEST_SYM_NON_STATIC
-};
+
 
 static void init_test_symbols(void)
 {
 	int i;
 #define TEST_SYM_FOR_EACH
 #define TEST_SYM_FOR_EACH_I i
-#define TEST_SYM(s) \
+#define TEST_DYNSYM(s) \
 	if (!strcmp(#s, test_symbols[i].sym)) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
 	}
-#define TEST_SYM_NON_STATIC	TEST_SYM
+#define TEST_SYM_NON_STATIC(s)	TEST_DYNSYM(s)
+#define TEST_SYM_SELF(s) TEST_DYNSYM(s)
 #include "test_symbols.h"
-#undef TEST_SYM
+#undef TEST_DYNSYM
+#undef TEST_SYM_SELF
 #undef TEST_SYM_NON_STATIC
 #undef TEST_SYM_FOR_EACH
 }
@@ -1138,10 +1134,9 @@ TEST(upatch_test,	listener,	0)
 	int err = 0, i;
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-		/**
-		 * Skip 'stdout' non static symbol
-		 */
-		if (test_symbols[i].non_static)
+
+		/* skip non static symbols */
+		if (test_symbols[i].type == TST_NON_STATIC)
 			continue;
 
 		err = err ? :

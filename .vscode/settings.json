@@ -30,6 +30,7 @@
 		"string_view": "c",
 		"cli-usdt.h": "c",
 		"elf-usdt.h": "c",
-		"*.tcc": "c"
+		"*.tcc": "c",
+		"test_symbols.h": "c"
 	}
 }

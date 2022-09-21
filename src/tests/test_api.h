@@ -116,10 +116,21 @@ struct task_wait {
 struct test_symbol {
 	char *sym;
 	unsigned long addr;
-	/**
-	 * see TEST_SYM_NON_STATIC()
-	 */
-	bool non_static;
+	enum {
+		TST_NON_STATIC,
+		TST_DYNSYM,
+		TST_SELF_SYM,
+	} type;
+};
+
+static struct test_symbol __unused test_symbols[] = {
+#define TEST_SYM_NON_STATIC(s) { __stringify(s), 0, .type = TST_NON_STATIC},
+#define TEST_DYNSYM(s) { __stringify(s), 0, .type = TST_DYNSYM},
+#define TEST_SYM_SELF(s) { __stringify(s), 0, .type = TST_SELF_SYM},
+#include "test_symbols.h"
+#undef TEST_DYNSYM
+#undef TEST_SYM_SELF
+#undef TEST_SYM_NON_STATIC
 };
 
 struct test_symbol * find_test_symbol(const char *sym);
