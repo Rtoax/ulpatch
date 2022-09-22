@@ -68,6 +68,9 @@ int handle_phdrs(struct elf_file *elf);
 		(iter)->i++)
 
 /* ELF Symbol api */
+const char *st_bind_string(const GElf_Sym *sym);
+const char *st_type_string(const GElf_Sym *sym);
+
 GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 	int isym, size_t *nsyms,
 	GElf_Sym *sym_mem, char **symname, char **pversion);

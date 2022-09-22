@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <libgen.h>
 
 #include <elf/elf_api.h>
 
@@ -296,21 +297,34 @@ static int munmap_an_vma(void)
 
 static void list_all_symbol(void)
 {
+	int max_name_len = 0;
 	struct symbol *sym, *tmp;
 
+	/* Get vma name strlen for pretty print */
+	rbtree_postorder_for_each_entry_safe(sym, tmp,
+		&target_task->vma_symbols, node) {
+
+		int len = strlen(basename(sym->vma->name_));
+		if (max_name_len < len)
+			max_name_len = len;
+	}
+
 	printf(
-	"%-8s %-32s %-16s\n",
-	"VMA", "SYMBOL", "ST_VALUE"
+	"%-*s %-16s %-8s %-8s %-8s %-32s\n",
+	max_name_len, "VMA", "ST_VALUE", "ST_SIZE", "BIND", "TYPE", "SYMBOL"
 	);
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp,
 		&target_task->vma_symbols, node) {
 
 		printf(
-			"%-8s %-32s %#016lx\n",
-			sym->vma->name_,
-			sym->name,
-			sym->sym.st_value
+			"%-*s %#016lx %-8ld %-8s %-8s %-32s\n",
+			max_name_len, basename(sym->vma->name_),
+			sym->sym.st_value,
+			sym->sym.st_size,
+			st_bind_string(&sym->sym),
+			st_type_string(&sym->sym),
+			sym->name
 		);
 	}
 }
