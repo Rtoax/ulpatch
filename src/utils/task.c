@@ -371,11 +371,23 @@ share_lib:
 
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->elf->phdrs[i];
+		unsigned long off;
+		struct vma_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
 		case PT_LOAD:
 			lowest_vaddr = lowest_vaddr <= phdr->p_vaddr
 					? lowest_vaddr : phdr->p_vaddr;
+
+			off = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
+
+			list_for_each_entry_safe(sibling, tmpvma,
+				&vma->siblings, siblings) {
+
+				if (sibling->offset == off)
+					sibling->voffset = phdr->p_vaddr;
+			}
+
 			FALLTHROUGH;
 		case PT_GNU_RELRO:
 			break;
@@ -787,9 +799,11 @@ void print_vma(struct vma_struct *vma)
 		return;
 	}
 	printf(
-		"%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s %s %s %s\n",
+		"%10s: %016lx-%016lx %6s %8lx %8lx %4x:%4x %8d %s %s %s %s\n",
 		VMA_TYPE_NAME(vma->type),
-		vma->start, vma->end, vma->perms, vma->offset,
+		vma->start, vma->end, vma->perms,
+		vma->offset,
+		vma->voffset,
 		vma->maj, vma->min, vma->inode, vma->name_,
 		vma->is_elf ? "E" : " ",
 		vma->is_share_lib ? "S" : " ",

@@ -85,6 +85,8 @@ struct vma_struct {
 	 */
 	struct vma_struct *leader;
 	struct list_head siblings;
+
+	unsigned long voffset;
 };
 
 /* When task opening, what do you want to do?
