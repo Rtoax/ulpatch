@@ -320,7 +320,7 @@ static void list_all_symbol(void)
 		printf(
 			"%-*s %#016lx %-8ld %-8s %-8s %-32s\n",
 			max_name_len, basename(sym->vma->name_),
-			sym->sym.st_value,
+			task_vma_symbol_value(sym),
 			sym->sym.st_size,
 			st_bind_string(&sym->sym),
 			st_type_string(&sym->sym),
