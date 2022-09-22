@@ -79,6 +79,12 @@ struct vma_struct {
 	// struct task.vmas
 	struct list_head node;
 	struct rb_node node_rb;
+
+	/* All same name vma in one list, and the first vma is leader.
+	 * if vma == vma->leader means that this vma is leader.
+	 */
+	struct vma_struct *leader;
+	struct list_head siblings;
 };
 
 /* When task opening, what do you want to do?

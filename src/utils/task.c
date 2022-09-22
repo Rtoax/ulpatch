@@ -64,6 +64,9 @@ struct vma_struct *alloc_vma(struct task *task)
 
 	list_init(&vma->node);
 
+	vma->leader = NULL;
+	list_init(&vma->siblings);
+
 	return vma;
 }
 
@@ -83,8 +86,17 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	return 0;
 }
 
-int insert_vma(struct task *task, struct vma_struct *vma)
+int insert_vma(struct task *task, struct vma_struct *vma,
+	struct vma_struct *prev)
 {
+	if (prev && strcmp(prev->name_, vma->name_) == 0) {
+		struct vma_struct *leader = prev->leader;
+
+		vma->leader = leader;
+
+		list_add(&vma->siblings, &leader->siblings);
+	}
+
 	list_add(&vma->node, &task->vmas);
 	rb_insert_node(&task->vmas_rb, &vma->node_rb,
 		__vma_rb_cmp, (unsigned long)vma);
@@ -95,6 +107,9 @@ int unlink_vma(struct task *task, struct vma_struct *vma)
 {
 	list_del(&vma->node);
 	rb_erase(&vma->node_rb, &task->vmas_rb);
+
+	list_del(&vma->siblings);
+
 	return 0;
 }
 
@@ -623,7 +638,7 @@ out_free:
 
 int read_task_vmas(struct task *task, bool update)
 {
-	struct vma_struct *vma;
+	struct vma_struct *vma, *prev = NULL;
 	int mapsfd;
 	FILE *mapsfp;
 
@@ -682,7 +697,11 @@ int read_task_vmas(struct task *task, bool update)
 			task->stack = vma;
 		}
 
-		insert_vma(task, vma);
+		vma->leader = vma;
+
+		insert_vma(task, vma, prev);
+
+		prev = vma;
 	} while (1);
 
 	fclose(mapsfp);
@@ -703,12 +722,13 @@ void print_vma(struct vma_struct *vma)
 		return;
 	}
 	printf(
-		"%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s %s %s\n",
+		"%10s: %016lx-%016lx %6s %8lx %4x:%4x %8d %s %s %s %s\n",
 		VMA_TYPE_NAME(vma->type),
 		vma->start, vma->end, vma->perms, vma->offset,
 		vma->maj, vma->min, vma->inode, vma->name_,
-		vma->is_elf?"E":" ",
-		vma->is_share_lib?"S":" "
+		vma->is_elf ? "E" : " ",
+		vma->is_share_lib ? "S" : " ",
+		vma->leader==vma ? "L" : " "
 	);
 }
 
@@ -733,6 +753,10 @@ void dump_task_vmas(struct task *task)
 	list_for_each_entry(vma, &task->vmas, node) {
 		print_vma(vma);
 	}
+	printf(
+		"\n"
+		"(E)ELF, (S)SharedLib, (L)Leader\n"
+	);
 }
 
 int free_task_vmas(struct task *task)
