@@ -394,7 +394,9 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 			 * I should make this test failed, ret = -1;
 			 */
 			linfo("%-10s: %lx vs %lx(vma)\n",
-				test_symbols[i].sym, addr, sym->sym.st_value);
+				test_symbols[i].sym,
+				addr,
+				task_vma_symbol_value(sym));
 
 			if (addr != sym->sym.st_value) {
 				ret = -1;

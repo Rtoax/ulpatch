@@ -230,4 +230,5 @@ int task_syscall(struct task *task, int nr,
 		unsigned long *res);
 
 struct symbol *task_vma_find_symbol(struct task *task, const char *name);
+unsigned long task_vma_symbol_value(struct symbol *sym);
 

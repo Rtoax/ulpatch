@@ -363,6 +363,10 @@ int __unused vma_peek_phdr(struct vma_struct *vma)
 	}
 
 share_lib:
+
+	is_share_lib |= vma->type == VMA_LIBC;
+	is_share_lib |= vma->type == VMA_LIB_DONT_KNOWN;
+
 	vma->is_share_lib = is_share_lib;
 
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
@@ -403,6 +407,67 @@ void __unused vma_free_elf(struct vma_struct *vma)
 
 	free(vma->elf->phdrs);
 	free(vma->elf);
+}
+
+unsigned long task_vma_symbol_value(struct symbol *sym)
+{
+	unsigned long addr = 0;
+	struct vma_struct *vma_leader = sym->vma;
+
+	if (vma_leader != vma_leader->leader) {
+		lerror("Symbol vma must be leader.\n");
+		return 0;
+	}
+
+	/* After get symbol's st_value from target process's memory, we need to
+	 * handle shared library manually, for example, libc.so LOAD headers:
+	 *
+	 *  $ readelf -l /usr/lib64/libc.so.6
+	 *  ...
+	 *  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
+	 *                 0x0000000000027ed8 0x0000000000027ed8  R      0x1000
+	 *  LOAD           0x0000000000028000 0x0000000000028000 0x0000000000028000
+	 *                 0x00000000001742fc 0x00000000001742fc  R E    0x1000
+	 *  LOAD           0x000000000019d000 0x000000000019d000 0x000000000019d000
+	 *                 0x0000000000057df8 0x0000000000057df8  R      0x1000
+	 *  LOAD           0x00000000001f58d0 0x00000000001f68d0 0x00000000001f68d0
+	 *                 0x0000000000004fb8 0x00000000000126e0  RW     0x1000
+	 *
+	 * That is to say, we have vma start address, LOAD offset and symbol value.
+	 *
+	 *   00007fd4c72f6000 vma start
+	 *   0000000000028000 LOAD offset
+	 *   00007fd4c733d3d0 gdb> p printf
+	 *   000000000006f3d0 symbol 'printf' st_value
+	 *
+	 * How should we get 'printf' function virtual address? That is easy:
+	 *
+	 *   00007fd4c733d3d0 gdb> p printf
+	 * - 00007fd4c72f6000 vma start
+	 * = 00000000000473d0
+	 * + 0000000000028000 LOAD offset
+	 * = 000000000006f3d0 symbol 'printf' st_value
+	 */
+	if (vma_leader->is_share_lib) {
+		unsigned long off = sym->sym.st_value;
+		struct vma_struct *vma, *tmpvma;
+
+		list_for_each_entry_safe(vma, tmpvma,
+			&vma_leader->siblings, siblings) {
+
+			if (off < vma->offset)
+				break;
+		}
+
+		addr = vma->start + (off - vma->offset);
+
+		ldebug("SYMBOL %s addr %lx\n", sym->name, addr);
+
+	} else {
+		addr = sym->sym.st_value;
+	}
+
+	return addr;
 }
 
 struct symbol *task_vma_find_symbol(struct task *task, const char *name)
