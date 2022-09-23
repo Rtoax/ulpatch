@@ -403,6 +403,7 @@ share_lib:
 			lowest_vaddr = lowest_vaddr <= phdr->p_vaddr
 					? lowest_vaddr : phdr->p_vaddr;
 
+			/* Virtual address offset */
 			off = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
 
 			list_for_each_entry_safe(sibling, tmpvma,
@@ -412,6 +413,7 @@ share_lib:
 				if (vma->prot == PROT_NONE)
 					continue;
 
+				/* TODO: How to get the real offset of load */
 				if (sibling->offset == off)
 					sibling->voffset = phdr->p_vaddr;
 			}
@@ -531,7 +533,7 @@ unsigned long task_vma_symbol_value(struct symbol *sym)
 				break;
 		}
 
-		addr = vma->start + (off - vma->offset);
+		addr = vma->start + (off - vma->voffset);
 
 		ldebug("SYMBOL %s addr %lx\n", sym->name, addr);
 
