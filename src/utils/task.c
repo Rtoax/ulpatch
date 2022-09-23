@@ -442,7 +442,12 @@ share_lib:
 
 		case PT_LOAD:
 		case PT_GNU_RELRO:
+			/* leader */
+			if (match_vma_phdr(vma, phdr, vma->elf->load_offset)) {
+				vma->is_matched_phdr = true;
+			}
 
+			/* siblings */
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
 
