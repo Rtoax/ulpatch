@@ -70,6 +70,7 @@ struct vma_struct {
 
 	bool is_elf;
 	bool is_share_lib;
+	bool is_matched_phdr;
 
 	/* Only elf has it */
 	struct vma_elf *elf;

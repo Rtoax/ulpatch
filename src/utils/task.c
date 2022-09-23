@@ -188,6 +188,17 @@ static unsigned int __perms2prot(char *perms)
 	return prot;
 }
 
+static int __prot2flags(unsigned int prot)
+{
+	unsigned int flags = 0;
+
+	flags |= (prot & PROT_READ) ? PF_R : 0;
+	flags |= (prot & PROT_WRITE) ? PF_W : 0;
+	flags |= (prot & PROT_EXEC) ? PF_X : 0;
+
+	return flags;
+}
+
 int free_task_vmas(struct task *task);
 
 enum vma_type get_vma_type(const char *exe, const char *name)
@@ -250,6 +261,19 @@ static bool elf_vma_is_interp_exception(struct vma_struct *vma)
 		return true;
 
 	return false;
+}
+
+static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
+				unsigned long load_offset)
+{
+	unsigned long start = load_offset + phdr->p_vaddr;
+	unsigned long end = start + phdr->p_filesz;
+
+	start = PAGE_DOWN(start);
+	end = PAGE_UP(end);
+
+	return (start == vma->start) && (end == vma->end) &&
+		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 }
 
 /* Only FTO_VMA_ELF flag will load VMA ELF
@@ -409,6 +433,27 @@ share_lib:
 	}
 
 	vma->elf->load_offset = vma->start - lowest_vaddr;
+
+	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
+		GElf_Phdr *phdr = &vma->elf->phdrs[i];
+		struct vma_struct *sibling, *tmpvma;
+
+		switch (phdr->p_type) {
+
+		case PT_LOAD:
+		case PT_GNU_RELRO:
+
+			list_for_each_entry_safe(sibling, tmpvma,
+				&vma->siblings, siblings) {
+
+				if (match_vma_phdr(sibling, phdr, vma->elf->load_offset)) {
+					sibling->is_matched_phdr = true;
+				}
+			}
+
+			break;
+		}
+	}
 
 	linfo("%s vma start %lx, load_offset %lx\n",
 		vma->name_, vma->start, vma->elf->load_offset);
@@ -813,15 +858,16 @@ void print_vma(struct vma_struct *vma)
 		return;
 	}
 	printf(
-		"%10s: %016lx-%016lx %6s %8lx %8lx %4x:%4x %8d %s %s %s %s\n",
+		"%10s: %016lx-%016lx %6s %8lx %8lx %4x:%4x %8d %s %s%s%s%s\n",
 		VMA_TYPE_NAME(vma->type),
 		vma->start, vma->end, vma->perms,
 		vma->offset,
 		vma->voffset,
 		vma->maj, vma->min, vma->inode, vma->name_,
-		vma->is_elf ? "E" : " ",
-		vma->is_share_lib ? "S" : " ",
-		vma->leader==vma ? "L" : " "
+		vma->is_elf ? "E" : "-",
+		vma->is_share_lib ? "S" : "-",
+		vma->is_matched_phdr ? "P" : "-",
+		vma->leader==vma ? "L" : "-"
 	);
 }
 
