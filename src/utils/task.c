@@ -865,16 +865,18 @@ void print_vma(struct vma_struct *vma)
 		return;
 	}
 	printf(
-		"%10s: %016lx-%016lx %6s %8lx %8lx %4x:%4x %8d %s %s%s%s%s\n",
+		"%10s: %016lx-%016lx %6s %s%s%s%s %8lx %8lx %s\n",
 		VMA_TYPE_NAME(vma->type),
-		vma->start, vma->end, vma->perms,
-		vma->offset,
-		vma->voffset,
-		vma->maj, vma->min, vma->inode, vma->name_,
+		vma->start,
+		vma->end,
+		vma->perms,
 		vma->is_elf ? "E" : "-",
 		vma->is_share_lib ? "S" : "-",
 		vma->is_matched_phdr ? "P" : "-",
-		vma->leader==vma ? "L" : "-"
+		vma->leader==vma ? "L" : "-",
+		vma->offset,
+		vma->voffset,
+		vma->name_
 	);
 }
 
@@ -901,7 +903,7 @@ void dump_task_vmas(struct task *task)
 	}
 	printf(
 		"\n"
-		"(E)ELF, (S)SharedLib, (L)Leader\n"
+		"(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n"
 	);
 }
 
