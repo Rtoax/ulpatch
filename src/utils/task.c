@@ -176,7 +176,7 @@ unsigned long find_vma_span_area(struct task *task, size_t size)
 
 static unsigned int __perms2prot(char *perms)
 {
-	unsigned int prot = 0;
+	unsigned int prot = PROT_NONE;
 
 	if (perms[0] == 'r')
 		prot |= PROT_READ;
@@ -384,6 +384,10 @@ share_lib:
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
 
+				/* Ignore vma holes, ---p */
+				if (vma->prot == PROT_NONE)
+					continue;
+
 				if (sibling->offset == off)
 					sibling->voffset = phdr->p_vaddr;
 			}
@@ -466,6 +470,10 @@ unsigned long task_vma_symbol_value(struct symbol *sym)
 
 		list_for_each_entry_safe(vma, tmpvma,
 			&vma_leader->siblings, siblings) {
+
+			/* Ignore vma holes, ---p */
+			if (vma->prot == PROT_NONE)
+				continue;
 
 			if (off < vma->offset)
 				break;
