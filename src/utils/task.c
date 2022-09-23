@@ -737,6 +737,12 @@ int read_task_vmas(struct task *task, bool update)
 		int r;
 		char line[1024];
 
+		start = end = offset = maj = min = inode = 0;
+
+		memset(perms, 0, sizeof(perms));
+		memset(name_, 0, sizeof(name_));
+		memset(line, 0, sizeof(line));
+
 		if (!fgets(line, sizeof(line), mapsfp))
 			break;
 
