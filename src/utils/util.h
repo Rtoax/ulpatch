@@ -5,6 +5,7 @@
 
 #include <errno.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -43,6 +44,14 @@ extern "C" {
 #ifndef ROUND_UP
 #define ROUND_UP(x, m) (((x) + (m) - 1) & ~((m) - 1))
 #endif
+
+#ifndef PAGE_DOWN
+#define PAGE_DOWN(x) ROUND_DOWN(x, getpagesize())
+#endif
+#ifndef PAGE_UP
+#define PAGE_UP(x) ROUND_UP(x, getpagesize())
+#endif
+
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 #endif
