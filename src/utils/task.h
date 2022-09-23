@@ -87,6 +87,9 @@ struct vma_struct {
 	struct vma_struct *leader;
 	struct list_head siblings;
 
+	/* If matched with a phdr, store it(is_matched_phdr) */
+	GElf_Phdr phdr;
+
 	unsigned long voffset;
 };
 

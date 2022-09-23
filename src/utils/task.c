@@ -445,6 +445,7 @@ share_lib:
 			/* leader */
 			if (match_vma_phdr(vma, phdr, vma->elf->load_offset)) {
 				vma->is_matched_phdr = true;
+				memcpy(&vma->phdr, phdr, sizeof(GElf_Phdr));
 			}
 
 			/* siblings */
@@ -453,6 +454,7 @@ share_lib:
 
 				if (match_vma_phdr(sibling, phdr, vma->elf->load_offset)) {
 					sibling->is_matched_phdr = true;
+					memcpy(&sibling->phdr, phdr, sizeof(GElf_Phdr));
 				}
 			}
 
