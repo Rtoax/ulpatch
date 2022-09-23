@@ -34,18 +34,18 @@ enum vma_type {
 
 #define VMA_TYPE_NAME(t) __VMA_TYPE_NAME[t]
 static const char __unused *__VMA_TYPE_NAME[] = {
-	"Unknown",
-	"Self",
+	"unknown",
+	"self",
 	"libc",
 	"libelf",
 	"heap",
 	"ld",
 	"stack",
 	"vvar",
-	"vDSO",
+	"vdso",
 	"vsyscall",
-	"UnknownLib",
-	"Anon",
+	"lib?",
+	"anon",
 	NULL
 };
 
