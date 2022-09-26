@@ -44,9 +44,11 @@ struct elf_file {
 	 */
 	GElf_Word dynsym_shdr_idx;	// SHT_DYNSYM
 	GElf_Word symtab_shdr_idx;	// SHT_SYMTAB
+	GElf_Word plt_shdr_idx;		// SHT_PROGBITS, .plt
 
 	Elf_Data *dynsym_data;
 	Elf_Data *symtab_data;
+	Elf_Data *plt_data;
 	Elf_Data *versym_data;
 	Elf_Data *verneed_data;
 	Elf_Data *verdef_data;

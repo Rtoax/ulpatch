@@ -40,6 +40,14 @@ static __unused int handle_sections(struct elf_file *elf)
 
 		// Handle section header by type
 		switch (shdr->sh_type) {
+		case SHT_PROGBITS:
+			// .plt
+			if (strcmp(elf->shdrnames[iter.i], ".plt") == 0) {
+				ldebug("%s PLT: %d\n", elf->filepath, iter.i);
+				elf->plt_data = elf_getdata(scn, NULL);
+				elf->plt_shdr_idx = iter.i;
+			}
+			break;
 		case SHT_SYMTAB:
 			elf->symtab_data = elf_getdata(scn, NULL);
 			elf->symtab_shdr_idx = iter.i;
