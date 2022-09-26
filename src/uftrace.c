@@ -21,6 +21,11 @@ struct config config = {
 	.log_level = -1,
 };
 
+enum {
+	ARG_LOG_DEBUG = 139,
+	ARG_LOG_ERR,
+};
+
 static pid_t target_pid = -1;
 static const char *target_func = NULL;
 static struct task *target_task = NULL;
@@ -66,8 +71,10 @@ static void print_help(void)
 	"\n"
 	"  -l, --log-level     set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
-	"\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
+	"  --log-debug         set log level to DEBUG(%d)\n"
+	"  --log-error         set log level to ERR(%d)\n"
+	"\n"
 	"  -h, --help          display this help and exit\n"
 	"  -v, --version       output version information and exit\n"
 	"\n"
@@ -76,6 +83,8 @@ static void print_help(void)
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
+	LOG_DEBUG,
+	LOG_ERR,
 	upatch_version()
 	);
 	exit(0);
@@ -116,6 +125,12 @@ static int parse_config(int argc, char *argv[])
 			print_help();
 		case 'l':
 			config.log_level = atoi(optarg);
+			break;
+		case ARG_LOG_DEBUG:
+			config.log_level = LOG_DEBUG;
+			break;
+		case ARG_LOG_ERR:
+			config.log_level = LOG_ERR;
 			break;
 		default:
 			print_help();

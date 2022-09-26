@@ -31,6 +31,15 @@ void set_log_level(int level)
 	log_level = level;
 }
 
+void set_log_debug(void)
+{
+	set_log_level(LOG_DEBUG);
+}
+void set_log_error(void)
+{
+	set_log_level(LOG_ERR);
+}
+
 void set_log_prefix(bool on)
 {
 	prefix_on = !!on;

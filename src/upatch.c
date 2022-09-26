@@ -28,8 +28,11 @@ enum command {
 static pid_t target_pid = -1;
 static struct task *target_task = NULL;
 
-
-#define ARG_PATCH	99
+enum {
+	ARG_PATCH = 139,
+	ARG_LOG_DEBUG,
+	ARG_LOG_ERR,
+};
 
 
 static void print_help(void)
@@ -55,6 +58,9 @@ static void print_help(void)
 	"  -l, --log-level     set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
+	"  --log-debug         set log level to DEBUG(%d)\n"
+	"  --log-error         set log level to ERR(%d)\n"
+	"\n"
 	"  -h, --help          display this help and exit\n"
 	"  -v, --version       output version information and exit\n"
 	"\n"
@@ -62,6 +68,8 @@ static void print_help(void)
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
+	LOG_DEBUG,
+	LOG_ERR,
 	upatch_version()
 	);
 	exit(0);
@@ -70,11 +78,13 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{"pid",		required_argument,	0,	'p'},
-		{"patch",	no_argument,	0,	ARG_PATCH},
-		{"version",	no_argument,	0,	'v'},
-		{"help",	no_argument,	0,	'h'},
-		{"log-level",		required_argument,	0,	'l'},
+		{ "pid",            required_argument, 0, 'p' },
+		{ "patch",          no_argument,       0, ARG_PATCH },
+		{ "version",        no_argument,       0, 'v' },
+		{ "help",           no_argument,       0, 'h' },
+		{ "log-level",      required_argument, 0, 'l' },
+		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
+		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
 	};
 
 	while (1) {
@@ -98,6 +108,12 @@ static int parse_config(int argc, char *argv[])
 			print_help();
 		case 'l':
 			config.log_level = atoi(optarg);
+			break;
+		case ARG_LOG_DEBUG:
+			config.log_level = LOG_DEBUG;
+			break;
+		case ARG_LOG_ERR:
+			config.log_level = LOG_ERR;
 			break;
 		default:
 			print_help();

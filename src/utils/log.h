@@ -23,6 +23,8 @@ _____log(int level, const char *file, const char *func,
 	unsigned long int line, char *fmt, ...);
 
 void set_log_level(int level);
+void set_log_debug(void);
+void set_log_error(void);
 void set_log_prefix(bool on);
 
 #ifdef __cplusplus

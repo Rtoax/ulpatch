@@ -25,6 +25,8 @@ struct config config = {
 enum {
 	ARG_VERSION = 200,
 	ARG_LOG_LEVEL,
+	ARG_LOG_DEBUG,
+	ARG_LOG_ERR,
 	ARG_DUMP_VMAS, // print all vmas
 	ARG_DUMP_VMA, // dump one vma
 	ARG_FILE_MAP_TO_VMA,
@@ -80,6 +82,9 @@ static void print_help(void)
 	"  --log-level         set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
+	"  --log-debug         set log level to DEBUG(%d)\n"
+	"  --log-error         set log level to ERR(%d)\n"
+	"\n"
 	"  -h, --help          display this help and exit\n"
 	"  --version           output version information and exit\n"
 	"\n"
@@ -87,6 +92,8 @@ static void print_help(void)
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
+	LOG_DEBUG,
+	LOG_ERR,
 	upatch_version()
 	);
 	exit(0);
@@ -105,6 +112,8 @@ static int parse_config(int argc, char *argv[])
 		{ "version",        no_argument,       0, ARG_VERSION },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
+		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
+		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
 	};
 
 	while (1) {
@@ -145,6 +154,12 @@ static int parse_config(int argc, char *argv[])
 			print_help();
 		case ARG_LOG_LEVEL:
 			config.log_level = atoi(optarg);
+			break;
+		case ARG_LOG_DEBUG:
+			config.log_level = LOG_DEBUG;
+			break;
+		case ARG_LOG_ERR:
+			config.log_level = LOG_ERR;
 			break;
 		default:
 			print_help();
