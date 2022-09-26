@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022 Rong Tao */
 #include <stdio.h>
-#include "util.h"
 
-static const char *color[] = {
+#include "util.h"
+#include "compiler.h"
+
+
+static const char __unused *color[] = {
 	"\033[48;5;255m",
 	"\033[48;5;252m",
 	"\033[48;5;250m",
@@ -17,6 +20,7 @@ static const char *color[] = {
 	"\033[48;5;234m",
 	"\033[48;5;232m",
 };
+
 
 const char *upatch_arch(void)
 {
@@ -34,13 +38,14 @@ const char *upatch_version(void)
 #if !defined(UPATCH_VERSION)
 # error "Must define string UPATCH_VERSION"
 #endif
+#if 0
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(color); i++) {
 		printf("%s  %s", color[i], "\033[m");
 	}
 	printf("\n");
-
+#endif
 	return UPATCH_VERSION;
 }
 
