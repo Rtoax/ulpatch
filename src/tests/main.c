@@ -257,15 +257,16 @@ static void print_help(int ex)
 	exit(ex);
 }
 
-#define ARG_PRINT_NLOOP	199
-#define ARG_PRINT_INTERVAL_USEC	200
-#define ARG_ERROR_EXIT	201
+enum {
+	ARG_PRINT_NLOOP = 199,
+	ARG_PRINT_INTERVAL_USEC,
+	ARG_ERROR_EXIT,
 
-#define ARG_LISTENER_REQUEST	202
-#define ARG_LISTENER_REQUEST_LIST	203
-#define ARG_LISTENER_NLOOP	204
-#define ARG_LISTENER_EPOLL	205
-
+	ARG_LISTENER_REQUEST,
+	ARG_LISTENER_REQUEST_LIST,
+	ARG_LISTENER_NLOOP,
+	ARG_LISTENER_EPOLL,
+};
 
 static int parse_config(int argc, char *argv[])
 {
