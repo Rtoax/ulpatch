@@ -30,6 +30,7 @@ static struct task *target_task = NULL;
 
 enum {
 	ARG_PATCH = 139,
+	ARG_LOG_LEVEL,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
 };
@@ -55,7 +56,7 @@ static void print_help(void)
 	"\n"
 	" Common argument:\n"
 	"\n"
-	"  -l, --log-level     set log level, default(%d)\n"
+	"  --log-level         set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"
@@ -82,7 +83,7 @@ static int parse_config(int argc, char *argv[])
 		{ "patch",          no_argument,       0, ARG_PATCH },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
-		{ "log-level",      required_argument, 0, 'l' },
+		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
 		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
 		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
 		{ NULL }
@@ -91,7 +92,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vhl:", options, &option_index);
+		c = getopt_long(argc, argv, "p:vh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -107,7 +108,7 @@ static int parse_config(int argc, char *argv[])
 			exit(0);
 		case 'h':
 			print_help();
-		case 'l':
+		case ARG_LOG_LEVEL:
 			config.log_level = atoi(optarg);
 			break;
 		case ARG_LOG_DEBUG:
