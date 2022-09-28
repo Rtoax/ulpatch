@@ -11,6 +11,12 @@
 #include <sys/prctl.h>
 #include <gelf.h>
 
+#ifdef HAVE_BINUTILS_BFD_H
+#include <bfd.h>
+#else
+#error "Must install binutils-devel"
+#endif
+
 #include <utils/util.h>
 #include <utils/rbtree.h>
 #include <utils/list.h>
