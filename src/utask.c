@@ -114,6 +114,7 @@ static int parse_config(int argc, char *argv[])
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
 		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
 		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
+		{ NULL }
 	};
 
 	while (1) {

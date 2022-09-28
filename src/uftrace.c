@@ -99,6 +99,7 @@ static int parse_config(int argc, char *argv[])
 		{ "version",        no_argument,        0, 'v' },
 		{ "help",           no_argument,        0, 'h' },
 		{ "log-level",      required_argument,  0, 'l' },
+		{ NULL }
 	};
 
 	while (1) {
