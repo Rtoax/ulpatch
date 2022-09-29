@@ -35,6 +35,7 @@ enum {
 	ARG_LOG_ERR,
 };
 
+static const char *prog_name = "upatch";
 
 static void print_help(void)
 {
@@ -104,7 +105,7 @@ static int parse_config(int argc, char *argv[])
 			command_type = CMD_PATCH;
 			break;
 		case 'v':
-			printf("version %s\n", upatch_version());
+			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
 		case 'h':
 			print_help();

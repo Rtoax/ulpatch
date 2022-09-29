@@ -42,6 +42,8 @@ static const char *patch_object_file = NULL;
 # error "Need UPATCH_FTRACE_OBJ_PATH"
 #endif
 
+static const char *prog_name = "uftrace";
+
 
 static void print_help(void)
 {
@@ -123,7 +125,7 @@ static int parse_config(int argc, char *argv[])
 			patch_object_file = optarg;
 			break;
 		case 'v':
-			printf("version %s\n", upatch_version());
+			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
 		case 'h':
 			print_help();

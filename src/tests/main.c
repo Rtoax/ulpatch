@@ -117,6 +117,8 @@ static bool verbose = false;
 
 static void print_test_symbol(void);
 
+static const char *prog_name = "upatch_test";
+
 
 static enum who who_am_i(const char *s)
 {
@@ -341,7 +343,7 @@ static int parse_config(int argc, char *argv[])
 			verbose = true;
 			break;
 		case 'v':
-			printf("version %s\n", upatch_version());
+			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
 		case 'h':
 			print_help(0);

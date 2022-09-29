@@ -46,6 +46,8 @@ static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
 
+static const char *prog_name = "utask";
+
 
 static void print_help(void)
 {
@@ -149,7 +151,7 @@ static int parse_config(int argc, char *argv[])
 			output_file = optarg;
 			break;
 		case ARG_VERSION:
-			printf("version %s\n", upatch_version());
+			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
 		case 'h':
 			print_help();
