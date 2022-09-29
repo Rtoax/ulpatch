@@ -23,8 +23,7 @@ struct config config = {
 };
 
 enum {
-	ARG_VERSION = 200,
-	ARG_LOG_LEVEL,
+	ARG_LOG_LEVEL = 200,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
 	ARG_DUMP_VMAS, // print all vmas
@@ -88,7 +87,7 @@ static void print_help(void)
 	"  --log-error         set log level to ERR(%d)\n"
 	"\n"
 	"  -h, --help          display this help and exit\n"
-	"  --version           output version information and exit\n"
+	"  -v, --version       output version information and exit\n"
 	"\n"
 	" utask %s\n",
 	config.log_level,
@@ -111,7 +110,7 @@ static int parse_config(int argc, char *argv[])
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
-		{ "version",        no_argument,       0, ARG_VERSION },
+		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
 		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
@@ -122,7 +121,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:o:h", options, &option_index);
+		c = getopt_long(argc, argv, "p:o:hv", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -150,7 +149,7 @@ static int parse_config(int argc, char *argv[])
 		case 'o':
 			output_file = optarg;
 			break;
-		case ARG_VERSION:
+		case 'v':
 			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
 		case 'h':
