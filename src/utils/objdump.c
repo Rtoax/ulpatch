@@ -103,6 +103,33 @@ static __unused int link_sym(struct rb_root *root, struct objdump_symbol *s)
 	return node?-1:0;
 }
 
+static __unused struct objdump_symbol*
+next_sym(struct rb_root *root, struct objdump_symbol *prev)
+{
+	struct rb_node *next;
+
+	next = prev ? rb_next(&prev->node) : rb_first(root);
+
+	return next ? rb_entry(next, struct objdump_symbol, node) : NULL;
+}
+
+struct objdump_symbol*
+objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
+		struct objdump_symbol *prev)
+{
+	return next_sym(&file->syms[S_T_PLT], prev);
+}
+
+unsigned long objdump_symbol_address(struct objdump_symbol *symbol)
+{
+	return symbol ? symbol->addr : 0;
+}
+
+const char* objdump_symbol_name(struct objdump_symbol *symbol)
+{
+	return symbol ? symbol->sym : NULL;
+}
+
 unsigned long
 objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym)
 {

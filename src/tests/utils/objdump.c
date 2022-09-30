@@ -62,3 +62,47 @@ TEST(Objdump,	load,	0)
 	return ret;
 }
 
+TEST(Objdump,	for_each_plt_symbol_and_search,	0)
+{
+	int ret = 0, i;
+	struct objdump_elf_file *file;
+
+	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
+
+		MODIFY_TEST_FILES(i);
+
+		if (!fexist(test_files[i]))
+			continue;
+
+		file = objdump_elf_load(test_files[i]);
+		if (!file) {
+			ret = -1;
+		} else {
+
+			struct objdump_symbol *symbol;
+
+			for (symbol = objdump_elf_plt_next_symbol(file, NULL);
+				symbol;
+				symbol = objdump_elf_plt_next_symbol(file, symbol)) {
+
+				/* search the address again, double check */
+				unsigned long addr = objdump_elf_plt_symbol_address(file,
+								objdump_symbol_name(symbol));
+				unsigned long addr2 = objdump_symbol_address(symbol);
+
+				ldebug("%08lx %s (%08lx)\n",
+					addr2,
+					objdump_symbol_name(symbol),
+					addr);
+
+				if (addr != addr2)
+					ret = -1;
+			}
+
+			objdump_elf_close(file);
+		}
+	}
+
+	return ret;
+}
+
