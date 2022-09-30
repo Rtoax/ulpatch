@@ -373,8 +373,11 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 			ret = -1;
 
 		for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-			unsigned long addr;
+			unsigned long addr, plt_addr;
 			struct symbol *sym;
+
+			plt_addr = objdump_elf_plt_symbol_address(task->objdump,
+				test_symbols[i].sym);
 
 			sym = task_vma_find_symbol(task, test_symbols[i].sym);
 			if (!sym) {
@@ -393,12 +396,19 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 			 *
 			 * I should make this test failed, ret = -1;
 			 */
-			linfo("%-10s: %lx vs %lx(vma)\n",
+			linfo("%-10s: %lx vs %lx(vma) %lx(plt)\n",
 				test_symbols[i].sym,
 				addr,
-				task_vma_symbol_value(sym));
+				task_vma_symbol_value(sym),
+				plt_addr);
 
-			if (addr != sym->sym.st_value) {
+			/* When relocate, we can use symbol's real virtual address in libc,
+			 * as the same time, we can use the @plt address in target elf file.
+			 */
+			if (addr == 0 ||
+				(addr != sym->sym.st_value && addr != plt_addr)) {
+
+				/* Can't found the symbol address */
 				ret = -1;
 			}
 		}
