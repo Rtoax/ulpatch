@@ -219,6 +219,15 @@ struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size);
 int fmunmap(struct mmap_struct *mem);
 
 
+/* Swap 'objdump' command to C code. */
+struct objdump_elf_file;
+
+struct objdump_elf_file* objdump_elf_load(const char *elf_file);
+int objdump_elf_close(struct objdump_elf_file *file);
+
+int objdump_destroy(void);
+
+
 #ifdef __cplusplus
 }
 #endif
