@@ -82,7 +82,7 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 			continue;
 		}
 
-		linfo("%s: %s %lx\n", file->name, sym, addr);
+		linfo("%s: %#08lx %s\n", basename(file->name), addr, sym);
 	}
 
 	pclose(fp);
