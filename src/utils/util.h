@@ -225,6 +225,9 @@ struct objdump_elf_file;
 struct objdump_elf_file* objdump_elf_load(const char *elf_file);
 int objdump_elf_close(struct objdump_elf_file *file);
 
+unsigned long
+objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym);
+
 int objdump_destroy(void);
 
 

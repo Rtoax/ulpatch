@@ -103,6 +103,20 @@ static __unused int link_sym(struct rb_root *root, struct objdump_symbol *s)
 	return node?-1:0;
 }
 
+unsigned long
+objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym)
+{
+	if (!file)
+		return 0;
+
+	struct objdump_symbol *symbol;
+	struct rb_root *rbroot = &file->syms[S_T_PLT];
+
+	symbol = find_sym(rbroot, sym);
+
+	return symbol ? symbol->addr : 0;
+}
+
 
 static int objdump_elf_load_plt(struct objdump_elf_file *file)
 {
