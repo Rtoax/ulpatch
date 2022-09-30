@@ -181,6 +181,8 @@ struct task {
 	 * struct symbol.node
 	 */
 	struct rb_root vma_symbols;
+
+	struct objdump_elf_file *objdump;
 };
 
 
