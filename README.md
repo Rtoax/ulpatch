@@ -17,6 +17,9 @@ Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compil
 
 ![upatch](docs/images/upatch.svg)
 
+## ElfShow
+
+![elfshow](docs/images/elfshow.svg)
 
 # Code Style
 
