@@ -82,7 +82,23 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 			continue;
 		}
 
-		linfo("%s: %#08lx %s\n", basename(file->name), addr, sym);
+		/* For example:
+		 * 0000000000403030 <gelf_getehdr@plt>:
+		 *
+		 * $addr: 0000000000403030
+		 * $sym:  <gelf_getehdr@plt>:
+		 */
+		char *s = sym + 1;
+		int slen = strlen(s);
+
+		if (!strstr(s, "@plt>:")) {
+			lerror("Wrong format: %s\n", sym);
+			continue;
+		}
+
+		s[slen - strlen("@plt>:")] = '\0';
+
+		linfo("%s: %#08lx %s\n", basename(file->name), addr, s);
 	}
 
 	pclose(fp);
