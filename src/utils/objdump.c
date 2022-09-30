@@ -138,6 +138,7 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 		unsigned long addr;
 		char sym[256];
 		int ret;
+		struct objdump_symbol *symbol;
 
 		if (!fgets(line, sizeof(line), fp))
 			break;
@@ -165,6 +166,10 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 		s[slen - strlen("@plt>:")] = '\0';
 
 		linfo("%s: %#08lx %s\n", basename(file->name), addr, s);
+
+		symbol = alloc_sym(s, addr, S_T_PLT);
+
+		link_sym(&file->syms[S_T_PLT], symbol);
 	}
 
 	pclose(fp);
