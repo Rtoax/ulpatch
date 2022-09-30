@@ -14,7 +14,14 @@ static const char *test_files[] = {
 	"/usr/bin/cat",
 	"/usr/bin/grep",
 	"/usr/bin/vim",
+#define S_UPATCH_TEST_PATH	"0"
+	S_UPATCH_TEST_PATH, // for upatch_test_path
 };
+
+#define MODIFY_TEST_FILES(i) \
+	if (!strcmp(test_files[i], S_UPATCH_TEST_PATH) == 0) { \
+		test_files[i] = upatch_test_path; \
+	}
 
 
 TEST(Objdump,	load_nonexist,	0)
@@ -38,6 +45,8 @@ TEST(Objdump,	load,	0)
 	struct objdump_elf_file *file;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
+
+		MODIFY_TEST_FILES(i);
 
 		if (!fexist(test_files[i]))
 			continue;
