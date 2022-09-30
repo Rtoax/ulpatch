@@ -1055,6 +1055,10 @@ struct task *open_task(pid_t pid, int flag)
 		}
 	}
 
+	if (flag & FTO_SELF_OBJDUMP_PLT) {
+		objdump_elf_load(task->exe);
+	}
+
 	/* Create a directory under ROOT_DIR */
 	if (flag & FTO_PROC) {
 		FILE *fp;
