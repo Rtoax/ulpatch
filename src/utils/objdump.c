@@ -220,11 +220,16 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 
 static struct objdump_elf_file* file_load(const char *filename)
 {
+	int i;
 	struct objdump_elf_file *file;
 
 	file = malloc(sizeof(struct objdump_elf_file));
+	memset(file, 0, sizeof(struct objdump_elf_file));
 
 	strncpy(file->name, filename, MAX_PATH - 1);
+
+	for (i = 0; i < S_T_PLT; i++)
+		rb_init(&file->syms[i]);
 
 	objdump_elf_load_plt(file);
 
