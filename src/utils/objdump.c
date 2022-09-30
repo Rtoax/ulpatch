@@ -14,10 +14,26 @@
 #include "list.h"
 
 
+enum sym_type {
+	S_T_PLT, // @plt
+	S_T_MUM,
+};
+
 struct objdump_elf_file {
 	char name[MAX_PATH];
 	/* head is file_list */
 	struct list_head node;
+
+	struct rb_root syms[S_T_MUM];
+};
+
+struct objdump_symbol {
+	char *sym;
+	unsigned long addr;
+	enum sym_type type;
+
+	/* root is objdump_elf_file.syms[type] */
+	struct rb_node node;
 };
 
 /* We just open few elf files, link list is ok. */
@@ -37,6 +53,56 @@ static struct objdump_elf_file* file_already_load(const char *filename)
 
 	return ret;
 }
+
+// the @key is (unsigned long)objdump_elf_file
+static __unused inline int cmp_sym(struct rb_node *n1, unsigned long key)
+{
+	struct objdump_symbol *s1 = rb_entry(n1, struct objdump_symbol, node);
+	struct objdump_symbol *s2 = (struct objdump_symbol*)key;
+
+	return strcmp(s1->sym, s2->sym);
+}
+
+static __unused struct objdump_symbol *
+alloc_sym(const char *name, unsigned long addr, enum sym_type type)
+{
+	struct objdump_symbol *s = malloc(sizeof(struct objdump_symbol));
+
+	memset(s, 0, sizeof(*s));
+
+	s->sym = strdup(name);
+	s->addr = addr;
+	s->type = type;
+
+	return s;
+}
+
+static __unused void free_sym(struct objdump_symbol *s)
+{
+	free(s->sym);
+	free(s);
+}
+
+static __unused struct objdump_symbol *
+find_sym(struct rb_root *root, const char *sym)
+{
+	struct objdump_symbol tmp = {
+		.sym = (char *)sym,
+	};
+	struct rb_node *node = rb_search_node(root,
+						cmp_sym, (unsigned long)&tmp);
+
+	return node?rb_entry(node, struct objdump_symbol, node):NULL;
+}
+
+/* Insert OK, return 0, else return -1 */
+static __unused int link_sym(struct rb_root *root, struct objdump_symbol *s)
+{
+	struct rb_node *node = rb_insert_node(root, &s->node,
+						cmp_sym, (unsigned long)s);
+	return node?-1:0;
+}
+
 
 static int objdump_elf_load_plt(struct objdump_elf_file *file)
 {
@@ -149,12 +215,26 @@ int objdump_elf_close(struct objdump_elf_file *file)
 	return 0;
 }
 
+
+static void rb_free_sym(struct rb_node *node) {
+	struct objdump_symbol *s = rb_entry(node, struct objdump_symbol, node);
+	free_sym(s);
+}
+
 int objdump_destroy(void)
 {
 	struct objdump_elf_file *f, *tmp;
 
 	list_for_each_entry_safe(f, tmp, &file_list, node) {
+
+		int i;
+
 		list_del(&f->node);
+
+		/* Destroy all type symbols rb tree */
+		for (i = 0; i < S_T_MUM; i++)
+			rb_destroy(&f->syms[i], rb_free_sym);
+
 		free(f);
 	}
 
