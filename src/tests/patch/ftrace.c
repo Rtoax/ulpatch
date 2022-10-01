@@ -324,12 +324,12 @@ static int find_task_symbol(struct task *task)
 	return err;
 }
 
-TEST(Ftrace,	find_task_symbol,	0)
+TEST(Ftrace,	find_task_symbol_list,	0)
 {
 	return test_task_patch(FTO_FTRACE, find_task_symbol);
 }
 
-TEST(Ftrace,	find_vma_task_symbol,	0)
+TEST(Ftrace,	find_task_symbol_value,	0)
 {
 	int ret = 0;
 	int status = 0;
