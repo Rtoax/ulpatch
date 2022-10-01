@@ -1,0 +1,60 @@
+.TH utask 8  "2022-10-01" "USER COMMANDS"
+.SH NAME
+utask \- Dump process information.
+.SH SYNOPSIS
+.B utask
+[\fI\,OPTION\/\fR]... [\fI\,FILE\/\fR]...
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+utask Dump process information.
+
+This program is also a basic command of upatch
+
+.SH REQUIREMENTS
+elfutils-libelf
+.SH ARGUMENTS
+.TP
+\fB\-p\fR, \fB\-\-pid\fR
+Specify a target process's PID.
+.TP
+\fB\-\-dump-vmas\fR
+Dump process's VMA, see also /proc/PID/maps.
+.TP
+\fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
+Dump process's VMA to file or stdout, see also /proc/PID/maps.
+.TP
+\fB\-\-map-file\fR[=\fI\,FILE\/\fR]
+Map a file into target process.
+.TP
+\fB\-\-unmap-file\fR[=\fI\,ADDR\/\fR]
+Unmap a vma from target process.
+.TP
+\fB\-\-symbols\fR
+List all symbols of target process.
+.TP
+\fB\-o\fR, \fB\-\-output\fR
+Specify output.
+.TP
+\fB\-\-log-level\fR[=\fI\,LEVEL\/\fR]
+Specify a log level.
+.TP
+\fB\-\-log-debug\fR
+Set log level to DEBUG.
+.TP
+\fB\-\-log-error\fR
+Set log level to ERROR.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show help information.
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Show version information.
+.SH OS
+Linux
+.SH STABILITY
+Unstable - in development.
+.SH AUTHOR
+Written by Rong Tao
+.SH SEE ALSO
+upatch(8), uftrace(8)
