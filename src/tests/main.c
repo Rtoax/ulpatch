@@ -243,6 +243,8 @@ static void print_help(int ex)
 	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"\n"
+	" --log-prefix-off    turn log prefix off. default is open\n"
+	"\n"
 	"     --error-exit    Exit if error.\n"
 	"\n"
 	" -V, --verbose       output all test logs, if -V arg was set, you may\n"
@@ -263,6 +265,8 @@ enum {
 	ARG_PRINT_NLOOP = 199,
 	ARG_PRINT_INTERVAL_USEC,
 	ARG_ERROR_EXIT,
+
+	ARG_LOG_PREFIX_OFF,
 
 	ARG_LISTENER_REQUEST,
 	ARG_LISTENER_REQUEST_LIST,
@@ -285,6 +289,7 @@ static int parse_config(int argc, char *argv[])
 	{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
 	{ "listener-epoll",     no_argument,        0,  ARG_LISTENER_EPOLL },
 	{ "log-level",          required_argument,  0,  'L' },
+	{ "log-prefix-off",     no_argument,        0,  ARG_LOG_PREFIX_OFF },
 	{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
 	{ "verbose",            no_argument,        0,  'V' },
 	{ "version",            no_argument,        0,  'v' },
@@ -338,6 +343,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case 'L':
 			log_level = atoi(optarg);
+			break;
+		case ARG_LOG_PREFIX_OFF:
+			set_log_prefix(false);
 			break;
 		case 'V':
 			verbose = true;
