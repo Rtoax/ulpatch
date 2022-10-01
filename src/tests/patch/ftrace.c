@@ -395,8 +395,10 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 
 			/* TODO: i'm not sure this is a correct method to get symbol
 			 * address value. */
-			linfo("%-10s: %lx vs %lx(vma) %lx(alias) %lx(plt)\n",
+			linfo("%-10s %s(alias)\n"
+				"%016lx(proc) %016lx(vma) %016lx(alias) %016lx(plt)\n",
 				test_symbols[i].sym,
+				test_symbols[i].alias ?: "",
 				addr,
 				task_vma_symbol_value(sym),
 				alias_sym ? task_vma_symbol_value(alias_sym) : 0,
