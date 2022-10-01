@@ -23,9 +23,9 @@ for (TEST_SYM_FOR_EACH_I = 0;
  * So, if we found the wrong value with symbol 'stdout', try '_IO_2_1_stdout_'
  * again, maybe we can get what we want.
  */
-TEST_SYM_NON_STATIC(stdin)
-TEST_SYM_NON_STATIC(stdout)
-TEST_SYM_NON_STATIC(stderr)
+TEST_SYM_NON_STATIC(stdin, _IO_2_1_stdin_)
+TEST_SYM_NON_STATIC(stdout, _IO_2_1_stdout_)
+TEST_SYM_NON_STATIC(stderr, _IO_2_1_stderr_)
 
 TEST_DYNSYM(exit)
 TEST_DYNSYM(printf)

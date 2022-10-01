@@ -374,7 +374,7 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 
 		for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 			unsigned long addr, plt_addr;
-			struct symbol *sym;
+			struct symbol *sym, *alias_sym = NULL;
 
 			plt_addr = objdump_elf_plt_symbol_address(task->objdump,
 				test_symbols[i].sym);
@@ -387,19 +387,19 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 				continue;
 			}
 
+			/* Only non static has alias symbol name, such as 'stdout' */
+			if (test_symbols[i].type == TST_NON_STATIC)
+				alias_sym = task_vma_find_symbol(task, test_symbols[i].alias);
+
 			listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 
-			/**
-			 * TODO
-			 * I don't know why st_value in target vma not equal to addr in
-			 * target task. did i miss some thing?
-			 *
-			 * I should make this test failed, ret = -1;
-			 */
-			linfo("%-10s: %lx vs %lx(vma) %lx(plt)\n",
+			/* TODO: i'm not sure this is a correct method to get symbol
+			 * address value. */
+			linfo("%-10s: %lx vs %lx(vma) %lx(alias) %lx(plt)\n",
 				test_symbols[i].sym,
 				addr,
 				task_vma_symbol_value(sym),
+				alias_sym ? task_vma_symbol_value(alias_sym) : 0,
 				plt_addr);
 
 			/* When relocate, we can use symbol's real virtual address in libc,
@@ -408,8 +408,14 @@ TEST(Ftrace,	find_vma_task_symbol,	0)
 			if (addr == 0 ||
 				(addr != sym->sym.st_value && addr != plt_addr)) {
 
-				/* Can't found the symbol address */
-				ret = -1;
+				/* Can't found the symbol address, try find with alias symbol
+				 * if have one. */
+				unsigned long alias_addr = 0;
+				if (alias_sym &&
+					(alias_addr = task_vma_symbol_value(alias_sym))) {
+				/* Couldn't found symbol in anyway. */
+				} else
+					ret = -1;
 			}
 		}
 

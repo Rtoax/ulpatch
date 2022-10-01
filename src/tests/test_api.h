@@ -115,6 +115,9 @@ struct task_wait {
 
 struct test_symbol {
 	char *sym;
+	/* store alias, for example:
+	 * 'stdout' is '_IO_2_1_stdout_' in libc. */
+	char *alias;
 	unsigned long addr;
 	enum {
 		TST_NON_STATIC,
@@ -124,7 +127,12 @@ struct test_symbol {
 };
 
 static struct test_symbol __unused test_symbols[] = {
-#define TEST_SYM_NON_STATIC(s) { __stringify(s), 0, .type = TST_NON_STATIC},
+#define TEST_SYM_NON_STATIC(s, a) { \
+		.sym = __stringify(s), \
+		.alias = __stringify(a), \
+		.addr = 0, \
+		.type = TST_NON_STATIC \
+	},
 #define TEST_DYNSYM(s) { __stringify(s), 0, .type = TST_DYNSYM},
 #define TEST_SYM_SELF(s) { __stringify(s), 0, .type = TST_SELF_SYM},
 #include "test_symbols.h"

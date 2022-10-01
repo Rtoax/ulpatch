@@ -675,7 +675,7 @@ static void init_test_symbols(void)
 	if (!strcmp(#s, test_symbols[i].sym)) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
 	}
-#define TEST_SYM_NON_STATIC(s)	TEST_DYNSYM(s)
+#define TEST_SYM_NON_STATIC(s, a)	TEST_DYNSYM(s)
 #define TEST_SYM_SELF(s) TEST_DYNSYM(s)
 #include "test_symbols.h"
 #undef TEST_DYNSYM
