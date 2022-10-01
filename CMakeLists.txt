@@ -30,6 +30,7 @@ add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
+set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 
 set(UPATCH_SHARE_DIR /usr/share/upatch/)
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
@@ -138,6 +139,11 @@ PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
 DESTINATION ${UPATCH_SHARE_DIR}
 )
+
+if (ENABLE_MAN)
+	set(CMAKE_INSTALL_MANDIR "/usr/share/man/")
+	add_subdirectory(man)
+endif(ENABLE_MAN)
 
 # uninstall targets
 if(NOT TARGET uninstall)
