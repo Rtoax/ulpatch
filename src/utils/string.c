@@ -62,7 +62,7 @@ int memshow(const void *data, int data_len)
 }
 
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
-int startswith (const char *str, const char *prefix)
+int upatch_startswith(const char *str, const char *prefix)
 {
 	return strncmp(str, prefix, strlen (prefix)) == 0;
 }
