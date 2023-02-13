@@ -1,5 +1,5 @@
 
-CFLAGS = -lopcodes -Wall -Werror
+CFLAGS = -lopcodes -Wall -O0 -g -ggdb
 
 all:
 	gcc disasm-tst0.c $(CFLAGS) -o disasm-tst0.out

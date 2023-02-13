@@ -10,10 +10,8 @@
 #define get_elf_backend_data(abfd) \
    xvec_get_elf_backend_data ((abfd)->xvec)
 
-#if 0
 static bfd_vma start_address = (bfd_vma)-1;
 static bfd_vma stop_address = (bfd_vma)-1;
-#endif
 
 /* The number of zeroes we want to see before we start skipping them.
    The number is arbitrarily chosen.  */
@@ -188,10 +186,368 @@ compare_relocs(const void *ap, const void *bp)
 		return 0;
 }
 
+static inline bool
+sym_ok (bool want_section,
+	bfd *abfd ATTRIBUTE_UNUSED,
+	long place,
+	asection *sec,
+	struct disassemble_info *inf)
+{
+  if (want_section)
+    {
+      /* NB: An object file can have different sections with the same
+	 section name.  Compare compare section pointers if they have
+	 the same owner.  */
+      if (sorted_syms[place]->section->owner == sec->owner
+	  && sorted_syms[place]->section != sec)
+	return false;
+
+      /* Note - we cannot just compare section pointers because they could
+	 be different, but the same...  Ie the symbol that we are trying to
+	 find could have come from a separate debug info file.  Under such
+	 circumstances the symbol will be associated with a section in the
+	 debug info file, whilst the section we want is in a normal file.
+	 So the section pointers will be different, but the section names
+	 will be the same.  */
+      if (strcmp (bfd_section_name (sorted_syms[place]->section),
+		  bfd_section_name (sec)) != 0)
+	return false;
+    }
+
+  return inf->symbol_is_valid (sorted_syms[place], inf);
+}
+
+/* Locate a symbol given a bfd and a section (from INFO->application_data),
+   and a VMA.  If INFO->application_data->require_sec is TRUE, then always
+   require the symbol to be in the section.  Returns NULL if there is no
+   suitable symbol.  If PLACE is not NULL, then *PLACE is set to the index
+   of the symbol in sorted_syms.  */
+
+static asymbol *
+find_symbol_for_address (bfd_vma vma,
+			 struct disassemble_info *inf,
+			 long *place)
+{
+  /* @@ Would it speed things up to cache the last two symbols returned,
+     and maybe their address ranges?  For many processors, only one memory
+     operand can be present at a time, so the 2-entry cache wouldn't be
+     constantly churned by code doing heavy memory accesses.  */
+
+  /* Indices in `sorted_syms'.  */
+  long min = 0;
+  long max_count = sorted_symcount;
+  long thisplace;
+  struct objdump_disasm_info *aux;
+  bfd *abfd;
+  asection *sec;
+  unsigned int opb;
+  bool want_section;
+  long rel_count;
+
+  if (sorted_symcount < 1)
+    return NULL;
+
+  aux = (struct objdump_disasm_info *) inf->application_data;
+  abfd = aux->abfd;
+  sec = inf->section;
+  opb = inf->octets_per_byte;
+
+  /* Perform a binary search looking for the closest symbol to the
+     required value.  We are searching the range (min, max_count].  */
+  while (min + 1 < max_count)
+    {
+      asymbol *sym;
+
+      thisplace = (max_count + min) / 2;
+      sym = sorted_syms[thisplace];
+
+      if (bfd_asymbol_value (sym) > vma)
+	max_count = thisplace;
+      else if (bfd_asymbol_value (sym) < vma)
+	min = thisplace;
+      else
+	{
+	  min = thisplace;
+	  break;
+	}
+    }
+
+  /* The symbol we want is now in min, the low end of the range we
+     were searching.  If there are several symbols with the same
+     value, we want the first one.  */
+  thisplace = min;
+  while (thisplace > 0
+	 && (bfd_asymbol_value (sorted_syms[thisplace])
+	     == bfd_asymbol_value (sorted_syms[thisplace - 1])))
+    --thisplace;
+
+  /* Prefer a symbol in the current section if we have multple symbols
+     with the same value, as can occur with overlays or zero size
+     sections.  */
+  min = thisplace;
+  while (min < max_count
+	 && (bfd_asymbol_value (sorted_syms[min])
+	     == bfd_asymbol_value (sorted_syms[thisplace])))
+    {
+      if (sym_ok (true, abfd, min, sec, inf))
+	{
+	  thisplace = min;
+
+	  if (place != NULL)
+	    *place = thisplace;
+
+	  return sorted_syms[thisplace];
+	}
+      ++min;
+    }
+
+  /* If the file is relocatable, and the symbol could be from this
+     section, prefer a symbol from this section over symbols from
+     others, even if the other symbol's value might be closer.
+
+     Note that this may be wrong for some symbol references if the
+     sections have overlapping memory ranges, but in that case there's
+     no way to tell what's desired without looking at the relocation
+     table.
+
+     Also give the target a chance to reject symbols.  */
+  want_section = (aux->require_sec
+		  || ((abfd->flags & HAS_RELOC) != 0
+		      && vma >= bfd_section_vma (sec)
+		      && vma < (bfd_section_vma (sec)
+				+ bfd_section_size (sec) / opb)));
+
+  if (! sym_ok (want_section, abfd, thisplace, sec, inf))
+    {
+      long i;
+      long newplace = sorted_symcount;
+
+      for (i = min - 1; i >= 0; i--)
+	{
+	  if (sym_ok (want_section, abfd, i, sec, inf))
+	    {
+	      if (newplace == sorted_symcount)
+		newplace = i;
+
+	      if (bfd_asymbol_value (sorted_syms[i])
+		  != bfd_asymbol_value (sorted_syms[newplace]))
+		break;
+
+	      /* Remember this symbol and keep searching until we reach
+		 an earlier address.  */
+	      newplace = i;
+	    }
+	}
+
+      if (newplace != sorted_symcount)
+	thisplace = newplace;
+      else
+	{
+	  /* We didn't find a good symbol with a smaller value.
+	     Look for one with a larger value.  */
+	  for (i = thisplace + 1; i < sorted_symcount; i++)
+	    {
+	      if (sym_ok (want_section, abfd, i, sec, inf))
+		{
+		  thisplace = i;
+		  break;
+		}
+	    }
+	}
+
+      if (! sym_ok (want_section, abfd, thisplace, sec, inf))
+	/* There is no suitable symbol.  */
+	return NULL;
+    }
+
+  /* If we have not found an exact match for the specified address
+     and we have dynamic relocations available, then we can produce
+     a better result by matching a relocation to the address and
+     using the symbol associated with that relocation.  */
+  rel_count = inf->dynrelcount;
+  if (!want_section
+      && sorted_syms[thisplace]->value != vma
+      && rel_count > 0
+      && inf->dynrelbuf != NULL
+      && inf->dynrelbuf[0]->address <= vma
+      && inf->dynrelbuf[rel_count - 1]->address >= vma
+      /* If we have matched a synthetic symbol, then stick with that.  */
+      && (sorted_syms[thisplace]->flags & BSF_SYNTHETIC) == 0)
+    {
+      arelent **  rel_low;
+      arelent **  rel_high;
+
+      rel_low = inf->dynrelbuf;
+      rel_high = rel_low + rel_count - 1;
+      while (rel_low <= rel_high)
+	{
+	  arelent **rel_mid = &rel_low[(rel_high - rel_low) / 2];
+	  arelent * rel = *rel_mid;
+
+	  if (rel->address == vma)
+	    {
+	      /* Absolute relocations do not provide a more helpful
+		 symbolic address.  Find a non-absolute relocation
+		 with the same address.  */
+	      arelent **rel_vma = rel_mid;
+	      for (rel_mid--;
+		   rel_mid >= rel_low && rel_mid[0]->address == vma;
+		   rel_mid--)
+		rel_vma = rel_mid;
+
+	      for (; rel_vma <= rel_high && rel_vma[0]->address == vma;
+		   rel_vma++)
+		{
+		  rel = *rel_vma;
+		  if (rel->sym_ptr_ptr != NULL
+		      && ! bfd_is_abs_section ((* rel->sym_ptr_ptr)->section))
+		    {
+		      if (place != NULL)
+			* place = thisplace;
+		      return * rel->sym_ptr_ptr;
+		    }
+		}
+	      break;
+	    }
+
+	  if (vma < rel->address)
+	    rel_high = rel_mid;
+	  else if (vma >= rel_mid[1]->address)
+	    rel_low = rel_mid + 1;
+	  else
+	    break;
+	}
+    }
+
+  if (place != NULL)
+    *place = thisplace;
+
+  return sorted_syms[thisplace];
+}
+
 static void
 disassemble_section(bfd *abfd, asection *section, void *inf)
 {
-	fprintf(stderr, "disassemble_section TODO\n");
+	bfd_vma sign_adjust = 0;
+	struct disassemble_info *pinfo = (struct disassemble_info *) inf;
+	unsigned long addr_offset;
+	bfd_size_type datasize = 0;
+	unsigned int opb = pinfo->octets_per_byte;
+	bfd_byte *data = NULL;
+	bfd_vma stop_offset;
+	asymbol *sym = NULL;
+	long place = 0;
+
+	datasize = bfd_section_size(section);
+	if (datasize == 0)
+		return;
+
+	if (start_address == (bfd_vma)-1
+		|| start_address < section->vma)
+		addr_offset = 0;
+	else
+		addr_offset = start_address - section->vma;
+
+	if (stop_address == (bfd_vma)-1)
+		stop_offset = datasize / opb;
+
+	if (addr_offset >= stop_offset)
+		return;
+
+	if (!bfd_malloc_and_get_section(abfd, section, &data)) {
+		fprintf(stderr, "Reading seciton %s failed because: %s\n",
+			section->name, bfd_errmsg(bfd_get_error()));
+	}
+
+	pinfo->buffer = data;
+	pinfo->buffer_vma = section->vma;
+	pinfo->buffer_length = datasize;
+	pinfo->section = section;
+
+	sym = (asymbol *) find_symbol_for_address(section->vma + addr_offset,
+							(struct disassemble_info *)inf, &place);
+
+	while (addr_offset < stop_offset) {
+		bfd_vma addr;
+		asymbol *nextsym;
+		bfd_vma nextstop_offset;
+
+		addr = section->vma + addr_offset;
+		addr = ((addr & ((sign_adjust << 1) - 1)) ^ sign_adjust) - sign_adjust;
+
+		if (sym != NULL && bfd_asymbol_value(sym) < addr) {
+			int x;
+			for (x = place;
+				(x < sorted_symcount &&
+					(bfd_asymbol_value(sorted_syms[x]) <= addr));
+				++x)
+				continue;
+
+			pinfo->symbols = sorted_syms + place;
+			pinfo->num_symbols = x - place;
+			pinfo->symtab_pos = place;
+
+		} else {
+			pinfo->symbols = NULL;
+			pinfo->num_symbols = 0;
+			pinfo->symtab_pos = -1;
+		}
+
+		printf("%s: addr %lx\n", section->name, addr);
+
+		if (sym != NULL) {
+			for (++place; place < sorted_symcount; place++) {
+				sym = sorted_syms[place];
+				if (bfd_asymbol_value(sym) != addr)
+					break;
+				if (pinfo->symbol_is_valid(sym, pinfo))
+					continue;
+				if (strcmp(bfd_section_name(sym->section),
+						bfd_section_name(section)) != 0)
+					break;
+
+				printf("SYM: addr %lx\n", addr);
+			}
+		}
+
+		if (sym != NULL && bfd_asymbol_value(sym) > addr)
+			nextsym = sym;
+		else if (sym == NULL)
+			nextsym = NULL;
+		else {
+#define is_valid_next_sym(SYM) \
+  (strcmp (bfd_section_name ((SYM)->section), bfd_section_name (section)) == 0 \
+   && (bfd_asymbol_value (SYM) > bfd_asymbol_value (sym)) \
+   && pinfo->symbol_is_valid (SYM, pinfo))
+
+			while (place < sorted_symcount
+				&& !is_valid_next_sym(sorted_syms[place]))
+				++place;
+
+			if (place >= sorted_symcount)
+				nextsym = NULL;
+			else
+				nextsym = sorted_syms[place];
+		}
+
+		if (sym != NULL && bfd_asymbol_value(sym) > addr)
+			nextstop_offset = bfd_asymbol_value(sym) - section->vma;
+		else if (nextsym == NULL)
+			nextstop_offset = stop_offset;
+		else
+			nextstop_offset = bfd_asymbol_value(nextsym) - section->vma;
+
+		if (nextstop_offset > stop_offset
+			|| nextstop_offset <= addr_offset)
+			nextstop_offset = stop_offset;
+
+		/* TODO: Do Print */
+
+		addr_offset = nextstop_offset;
+		sym = nextsym;
+	}
+
+	free(data);
 }
 
 static void disassemble_data(bfd *abfd)
