@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <bfd.h>
 #include <dis-asm.h>
+#include <demangle.h>
 
 #include "elfcomm.h"
 
@@ -56,6 +57,9 @@ static asymbol **sorted_syms;
 
 static const char * disasm_sym;     /* Disassembly start symbol.  */
 
+static int demangle_flags = DMGL_ANSI | DMGL_PARAMS;
+
+static int do_demangle;
 static int prefix_addresses;
 static int exit_status = 0;
 
@@ -425,6 +429,114 @@ find_symbol_for_address (bfd_vma vma,
   return sorted_syms[thisplace];
 }
 
+/* Print an address (VMA) to the output stream in INFO.
+   If SKIP_ZEROES is TRUE, omit leading zeroes.  */
+
+static void
+objdump_print_value (bfd *abfd, bfd_vma vma, struct disassemble_info *inf,
+		     bool skip_zeroes)
+{
+  char buf[30];
+  char *p;
+
+  bfd_sprintf_vma (abfd, buf, vma);
+  if (! skip_zeroes)
+    p = buf;
+  else
+    {
+      for (p = buf; *p == '0'; ++p)
+	;
+      if (*p == '\0')
+	--p;
+    }
+  printf("%s", p);
+}
+
+/* Print the name of a symbol.  */
+
+static void
+objdump_print_symname (bfd *abfd, struct disassemble_info *inf,
+		       asymbol *sym)
+{
+  char *alloc;
+  const char *name, *version_string = NULL;
+  bool hidden = false;
+
+  alloc = NULL;
+  name = bfd_asymbol_name (sym);
+  if (do_demangle && name[0] != '\0')
+    {
+      /* Demangle the name.  */
+      alloc = bfd_demangle (abfd, name, demangle_flags);
+      if (alloc != NULL)
+	name = alloc;
+    }
+
+  if ((sym->flags & (BSF_SECTION_SYM | BSF_SYNTHETIC)) == 0)
+    version_string = bfd_get_symbol_version_string (abfd, sym, true,
+						    &hidden);
+
+  if (bfd_is_und_section (bfd_asymbol_section (sym)))
+    hidden = true;
+
+//  name = sanitize_string (name);
+
+  if (inf != NULL)
+    {
+		printf("%s", name);
+      if (version_string && *version_string != '\0')
+		printf(hidden ? "@%s" : "@@%s", version_string);
+    }
+  else
+    {
+      printf ("%s", name);
+      if (version_string && *version_string != '\0')
+	printf (hidden ? "@%s" : "@@%s", version_string);
+    }
+
+  if (alloc != NULL)
+    free (alloc);
+}
+
+static void
+objdump_print_addr_with_sym(bfd *abfd, asection *sec, asymbol *sym,
+	bfd_vma vma, struct disassemble_info *inf, bool skip_zeroes)
+{
+	objdump_print_value(abfd, vma, inf, skip_zeroes);
+
+	if (sym == NULL) {
+		bfd_vma secaddr;
+
+		printf("<%s", bfd_section_name(sec));
+
+		secaddr = bfd_section_vma(sec);
+
+		if (vma < secaddr) {
+			objdump_print_value(abfd, secaddr - vma, inf, true);
+		} else if (vma > secaddr) {
+			objdump_print_value(abfd, vma - secaddr, inf, true);
+		} else
+			printf(">");
+	} else {
+		printf("<");
+
+		objdump_print_symname(abfd, inf, sym);
+
+		if (bfd_asymbol_value(sym) == vma)
+			;
+		else if ((bfd_get_file_flags(abfd) & (EXEC_P | DYNAMIC))
+			&& bfd_is_und_section(sym->section))
+			;
+		else if (bfd_asymbol_value(sym) > vma) {
+			objdump_print_value(abfd, bfd_asymbol_value(sym) - vma, inf, true);
+		} else if (vma > bfd_asymbol_value(sym)) {
+			objdump_print_value(abfd, vma - bfd_asymbol_value(sym), inf, true);
+		}
+
+		printf(">\n");
+	}
+}
+
 static void
 disassemble_section(bfd *abfd, asection *section, void *inf)
 {
@@ -493,7 +605,7 @@ disassemble_section(bfd *abfd, asection *section, void *inf)
 			pinfo->symtab_pos = -1;
 		}
 
-		printf("%s: addr %lx\n", section->name, addr);
+		objdump_print_addr_with_sym(abfd, section, sym, addr, pinfo, false);
 
 		if (sym != NULL) {
 			for (++place; place < sorted_symcount; place++) {
@@ -506,7 +618,8 @@ disassemble_section(bfd *abfd, asection *section, void *inf)
 						bfd_section_name(section)) != 0)
 					break;
 
-				printf("SYM: addr %lx\n", addr);
+				objdump_print_addr_with_sym(abfd, section, sym, addr, pinfo,
+					false);
 			}
 		}
 
@@ -541,8 +654,10 @@ disassemble_section(bfd *abfd, asection *section, void *inf)
 			|| nextstop_offset <= addr_offset)
 			nextstop_offset = stop_offset;
 
-		/* TODO: Do Print */
-
+		if (abfd && sym && sym->name) {
+			/* TODO: Do Print */
+		}
+		
 		addr_offset = nextstop_offset;
 		sym = nextsym;
 	}
