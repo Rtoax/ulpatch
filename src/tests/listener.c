@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022 Rong Tao */
+/* Copyright (C) 2022-2023 Rong Tao */
 #include <stdlib.h>
 #include <getopt.h>
 #include <assert.h>
