@@ -537,6 +537,22 @@ objdump_print_addr_with_sym(bfd *abfd, asection *sec, asymbol *sym,
 	}
 }
 
+static int
+compare_symbols(const void *ap, const void *bp)
+{
+	const asymbol *a = (const asymbol *)ap;
+	const asymbol *b = (const asymbol *)bp;
+
+	if (bfd_asymbol_value(a) > bfd_asymbol_value(b))
+		return 1;
+	else if (bfd_asymbol_value(a) < bfd_asymbol_value(b))
+		return -1;
+	else
+		return 0;
+
+	// TODO
+}
+
 static void
 disassemble_section(bfd *abfd, asection *section, void *inf)
 {
@@ -575,6 +591,10 @@ disassemble_section(bfd *abfd, asection *section, void *inf)
 	pinfo->buffer_vma = section->vma;
 	pinfo->buffer_length = datasize;
 	pinfo->section = section;
+
+	if (sorted_symcount > 1)
+		qsort(sorted_syms, sorted_symcount, sizeof(asymbol *),
+			compare_symbols);
 
 	sym = (asymbol *) find_symbol_for_address(section->vma + addr_offset,
 							(struct disassemble_info *)inf, &place);
