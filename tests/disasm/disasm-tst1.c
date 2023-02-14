@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include <bfd.h>
 #include <dis-asm.h>
 
@@ -170,12 +171,59 @@ static void dump_bfd(bfd *abfd, bool is_mainfile)
 	synthcount = 0;
 }
 
+static char *elf_filename = NULL;
+
+static void usage(int eval)
+{
+	printf("\n");
+	printf(" -h, --help   show help info\n");
+	printf(" -f, --file   specify elf file\n");
+	printf("\n");
+
+	exit(eval);
+}
+
+static void parse_config(int argc, char *argv[])
+{
+	struct option options[] = {
+	{ "help",       no_argument,       0, 'h' },
+	{ "file",       required_argument, 0, 'f' },
+	{ NULL }
+	};
+
+	while (1) {
+		int c;
+		int option_index = 0;
+		c = getopt_long(argc, argv, "hf:", options, &option_index);
+		if (c < 0) {
+			break;
+		}
+		switch (c) {
+		case 'h':
+			usage(0);
+			break;
+		case 'f':
+			elf_filename = optarg;
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (!elf_filename) {
+		fprintf(stderr, "Must specify -f, --file argument.\n");
+		exit(1);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	bfd *file;
 	char **matching;
 
-	char *filename = argv[0];
+	parse_config(argc, argv);
+
+	char *filename = elf_filename;
 	char *target = NULL;
 
 	file = bfd_openr(filename, target);
