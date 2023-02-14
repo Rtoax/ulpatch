@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <bfd.h>
@@ -75,9 +76,15 @@ static asymbol **slurp_dynamic_symtab(bfd *abfd)
 	return sy;
 }
 
+static inline bool
+_startswith(const char *str, const char *prefix)
+{
+	return strncmp(str, prefix, strlen(prefix)) == 0;
+}
+
 static bool is_significant_symbol_name(const char * name)
 {
-	return startswith(name, ".plt") || startswith(name, ".got");
+	return _startswith(name, ".plt") || _startswith(name, ".got");
 }
 
 static long remove_useless_symbols(asymbol **symbols, long count)
