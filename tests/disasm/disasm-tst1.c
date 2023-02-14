@@ -55,7 +55,7 @@ static asymbol **slurp_dynamic_symtab(bfd *abfd)
 	dynsymcount = 0;
 	long storage = bfd_get_dynamic_symtab_upper_bound(abfd);
 	if (storage < 0) {
-		if (!(bfd_get_file_flags (abfd) & DYNAMIC)) {
+		if (!(bfd_get_file_flags(abfd) & DYNAMIC)) {
 			fprintf(stderr, "%s: not a dynamic object", bfd_get_filename(abfd));
 			return NULL;
 		}
@@ -114,12 +114,12 @@ static void disassemble_data(bfd *abfd)
 	int i;
 
 	sorted_symcount = symcount ? symcount : dynsymcount;
-	sorted_syms = (asymbol **) malloc ((sorted_symcount + synthcount)
-		* sizeof (asymbol *));
+	sorted_syms = (asymbol **) malloc((sorted_symcount + synthcount)
+		* sizeof(asymbol *));
 
 	if (sorted_symcount != 0) {
 		memcpy(sorted_syms, symcount ? syms : dynsyms,
-			sorted_symcount * sizeof (asymbol *));
+			sorted_symcount * sizeof(asymbol *));
 
 		sorted_symcount = remove_useless_symbols(sorted_syms, sorted_symcount);
 	}
