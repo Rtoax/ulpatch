@@ -63,6 +63,11 @@ static int do_demangle;
 static int prefix_addresses;
 static int exit_status = 0;
 
+static asymbol *
+find_symbol_for_address (bfd_vma vma,
+			 struct disassemble_info *inf,
+			 long *place);
+
 static asymbol **slurp_symtab(bfd *abfd)
 {
 	symcount = 0;
@@ -160,9 +165,7 @@ objdump_symbol_at_address(bfd_vma vma, struct disassemble_info *inf)
 {
 	asymbol *sym = NULL;
 
-	//sym = find_symbol_for_address(vma, inf, NULL);
-	fprintf(stderr, "objdump_symbol_at_address TODO\n");
-	abort();
+	sym = find_symbol_for_address(vma, inf, NULL);
 	if (sym != NULL && bfd_asymbol_value(sym) == vma)
 		return sym;
 
@@ -595,6 +598,12 @@ disassemble_section(bfd *abfd, asection *section, void *inf)
 	if (sorted_symcount > 1)
 		qsort(sorted_syms, sorted_symcount, sizeof(asymbol *),
 			compare_symbols);
+
+	int i;
+	for (i = 0; i < sorted_symcount; i++) {
+		asymbol *s = sorted_syms[i];
+		printf("SYM: %#016lx  %s\n", bfd_asymbol_value(s), s->name);
+	}
 
 	sym = (asymbol *) find_symbol_for_address(section->vma + addr_offset,
 							(struct disassemble_info *)inf, &place);
