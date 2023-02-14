@@ -12,10 +12,13 @@ if(LIBUNWIND_LIBRARIES)
 	find_library(LIBUNWIND unwind /usr/lib64)
 	find_library(LIBUNWIND_ARCH unwind-${ARCHITECTURE} /usr/lib64)
 endif()
+if(BINUTILS_BFD_LIBRARIES)
+	find_library(BFD bfd /usr/lib64)
+endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-link_libraries(${ELF} ${LIBUNWIND} ${LIBUNWIND_ARCH})
+link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH})
 
 add_library(upatch_utils STATIC ${LIB_SOURCES})
 

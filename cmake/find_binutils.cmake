@@ -14,9 +14,17 @@ find_path(BINUTILS_INCLUDE_DIRS
   PATHS
     ENV CPATH)
 
+find_library(BINUTILS_BFD_LIBRARIES
+  NAMES
+    bfd
+  PATHS
+    ENV LIBRARY_PATH
+    ENV LD_LIBRARY_PATH)
+
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils-devel development package"
+  BINUTILS_BFD_LIBRARIES
   BINUTILS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
@@ -28,5 +36,9 @@ int main() {
 }" BINUTILS_BFD_H)
 SET(CMAKE_REQUIRED_LIBRARIES)
 
-mark_as_advanced(BINUTILS_INCLUDE_DIRS BINUTILS_BFD_H)
+mark_as_advanced(
+	BINUTILS_INCLUDE_DIRS
+	BINUTILS_BFD_LIBRARIES
+	BINUTILS_BFD_H
+)
 
