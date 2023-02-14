@@ -109,6 +109,29 @@ static long remove_useless_symbols(asymbol **symbols, long count)
 	return out_ptr - symbols;
 }
 
+static bool asymbol_is_plt(asymbol *sym)
+{
+	return strstr(sym->name, "@plt") ? true : false;
+}
+
+static const char* asymbol_pure_name(asymbol *sym, char *buf, int blen)
+{
+	char *name = strstr(sym->name, "@");
+	if (!name)
+		return sym->name;
+
+	unsigned int len = name - sym->name;
+	if (len > blen) {
+		fprintf(stderr, "Too short buffer length.\n");
+		return NULL;
+	}
+
+	strncpy(buf, sym->name, len);
+	buf[len] = '\0';
+
+	return buf;
+}
+
 static void disassemble_data(bfd *abfd)
 {
 	int i;
@@ -131,7 +154,11 @@ static void disassemble_data(bfd *abfd)
 
 	for (i = 0; i < sorted_symcount; i++) {
 		asymbol *s = sorted_syms[i];
-		printf("SYM: %#016lx  %s\n", bfd_asymbol_value(s), s->name);
+		char buf[256];
+
+		printf("SYM: %#016lx  %s %s\n", bfd_asymbol_value(s),
+			asymbol_pure_name(s, buf, sizeof(buf)),
+			asymbol_is_plt(s) ? "PLT" : "");
 	}
 
 	free(sorted_syms);
