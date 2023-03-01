@@ -910,6 +910,50 @@ void dump_task_vmas(struct task *task)
 	);
 }
 
+int dump_task_vma_to_file(const char *ofile, struct task *task,
+		unsigned long addr)
+{
+	size_t vma_size = 0;
+	void *mem = NULL;
+
+	/* default is stdout */
+	int nbytes;
+	int fd = fileno(stdout);
+
+	if (ofile) {
+		fd = open(ofile, O_CREAT | O_RDWR, 0664);
+		if (fd <= 0) {
+			fprintf(stderr, "open %s: %s\n", ofile, strerror(errno));
+			return -1;
+		}
+	}
+	struct vma_struct *vma = find_vma(task, addr);
+	if (!vma) {
+		fprintf(stderr, "vma not exist.\n");
+		return -1;
+	}
+
+	vma_size = vma->end - vma->start;
+
+	mem = malloc(vma_size);
+
+	memcpy_from_task(task, mem, vma->start, vma_size);
+
+	/* write to file or stdout */
+	nbytes = write(fd, mem, vma_size);
+	if (nbytes != vma_size) {
+		fprintf(stderr, "write failed, %s.\n", strerror(errno));
+		free(mem);
+		return -1;
+	}
+
+	free(mem);
+	if (fd != fileno(stdout))
+		close(fd);
+
+	return 0;
+}
+
 int free_task_vmas(struct task *task)
 {
 	struct vma_struct *vma, *tmpvma;

@@ -208,6 +208,8 @@ int dump_task(const struct task *t);
 
 void print_vma(struct vma_struct *vma);
 void dump_task_vmas(struct task *task);
+int dump_task_vma_to_file(const char *ofile, struct task *task,
+		unsigned long addr);
 
 struct task *open_task(pid_t pid, int flag);
 int free_task(struct task *task);

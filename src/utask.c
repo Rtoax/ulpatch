@@ -200,49 +200,6 @@ static int parse_config(int argc, char *argv[])
 	return 0;
 }
 
-static int dump_an_vma(void)
-{
-	size_t vma_size = 0;
-	void *mem = NULL;
-
-	/* default is stdout */
-	int nbytes;
-	int fd = fileno(stdout);
-
-	if (output_file) {
-		fd = open(output_file, O_CREAT | O_RDWR, 0664);
-		if (fd <= 0) {
-			fprintf(stderr, "open %s: %s\n", output_file, strerror(errno));
-			return -1;
-		}
-	}
-	struct vma_struct *vma = find_vma(target_task, vma_addr);
-	if (!vma) {
-		fprintf(stderr, "vma not exist.\n");
-		return -1;
-	}
-
-	vma_size = vma->end - vma->start;
-
-	mem = malloc(vma_size);
-
-	memcpy_from_task(target_task, mem, vma->start, vma_size);
-
-	/* write to file or stdout */
-	nbytes = write(fd, mem, vma_size);
-	if (nbytes != vma_size) {
-		fprintf(stderr, "write failed, %s.\n", strerror(errno));
-		free(mem);
-		return -1;
-	}
-
-	free(mem);
-	if (fd != fileno(stdout))
-		close(fd);
-
-	return 0;
-}
-
 static int mmap_a_file(void)
 {
 	int ret = 0;
@@ -376,7 +333,7 @@ int main(int argc, char *argv[])
 
 	/* dump an VMA */
 	if (flag_dump_vma) {
-		dump_an_vma();
+		dump_task_vma_to_file(output_file, target_task, vma_addr);
 	}
 
 	if (flag_list_symbols) {
