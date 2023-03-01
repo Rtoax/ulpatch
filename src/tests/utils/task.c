@@ -521,3 +521,23 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 	return ret;
 }
 
+TEST(Task,	dump_task_vma_to_file,	0)
+{
+	struct task *task = open_task(getpid(), FTO_NONE);
+	unsigned long addr;
+	struct vma_struct *vma;
+
+	task_for_each_vma(vma, task) {
+		/* Make sure the address is within the VMA range */
+		addr = vma->start;
+
+		/* Only VDSO code is tested here, there is no need to test them
+		 * all, right! Note that this test will overwrite vdso.so files
+		 * in the current directory */
+		if (!strcmp(vma->name_, "[vdso]"))
+			dump_task_vma_to_file("vdso.so", task, addr);
+	}
+
+	return free_task(task);
+}
+
