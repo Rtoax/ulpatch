@@ -918,18 +918,21 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 
 	/* default is stdout */
 	int nbytes;
+
+	/* If no output file name is specified, then the default output to stdout
+	 * can be output using redirection. */
 	int fd = fileno(stdout);
 
 	if (ofile) {
 		fd = open(ofile, O_CREAT | O_RDWR, 0664);
 		if (fd <= 0) {
-			fprintf(stderr, "open %s: %s\n", ofile, strerror(errno));
+			lerror("open %s: %s\n", ofile, strerror(errno));
 			return -1;
 		}
 	}
 	struct vma_struct *vma = find_vma(task, addr);
 	if (!vma) {
-		fprintf(stderr, "vma not exist.\n");
+		lerror("vma not exist.\n");
 		return -1;
 	}
 
@@ -942,7 +945,7 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 	/* write to file or stdout */
 	nbytes = write(fd, mem, vma_size);
 	if (nbytes != vma_size) {
-		fprintf(stderr, "write failed, %s.\n", strerror(errno));
+		lerror("write failed, %s.\n", strerror(errno));
 		free(mem);
 		return -1;
 	}
