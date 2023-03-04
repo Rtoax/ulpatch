@@ -2,4 +2,5 @@
 # Copyright (C) 2022-2023 Rong Tao
 #
 add_subdirectory(ftrace)
+add_subdirectory(upatch-hello)
 

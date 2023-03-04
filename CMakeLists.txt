@@ -33,8 +33,10 @@ set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 
 set(UPATCH_SHARE_DIR /usr/share/upatch/)
-# see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
+# see src/patch/objects/ftrace/CMakeLists.txt
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
+# see src/patch/objects/upatch-hello/CMakeLists.txt
+set(UPATCH_HELLO_OBJ upatch-hello.obj)
 
 # check processor architecture
 # only support x86_64 and aarch64 right now.
@@ -114,6 +116,8 @@ endif()
 
 # macro UPATCH_FTRACE_OBJ_PATH="/usr/share/upatch/ftrace-mcount.obj" for example
 set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_FTRACE_OBJ_PATH="${UPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
+# macro UPATCH_HELLO_OBJ_PATH="/usr/share/upatch/upatch-hello.obj" for example
+set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_HELLO_OBJ_PATH="${UPATCH_SHARE_DIR}${UPATCH_HELLO_OBJ}")
 
 
 set(TESTS_FLAGS)
@@ -137,6 +141,7 @@ install(DIRECTORY DESTINATION ${UPATCH_SHARE_DIR})
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
+	${PROJECT_SOURCE_DIR}/src/patch/objects/upatch-hello/${UPATCH_HELLO_OBJ}
 DESTINATION ${UPATCH_SHARE_DIR}
 )
 
