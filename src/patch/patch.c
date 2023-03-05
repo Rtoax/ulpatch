@@ -20,6 +20,19 @@
 #include "patch.h"
 
 
+static void free_info(struct load_info *info)
+{
+	if (info->patch_mmap) {
+		fmunmap(info->patch_mmap);
+		info->patch_mmap = NULL;
+	}
+
+	if (info->patch_path) {
+		free(info->patch_path);
+		info->patch_path = NULL;
+	}
+}
+
 // see linux:kernel/module.c
 static int parse_load_info(struct task *task, const char *obj_file,
 	struct load_info *info)
@@ -94,22 +107,8 @@ out:
 	return err;
 
 free_out:
-	fmunmap(info->patch_mmap);
-	free(info->patch_path);
+	free_info(info);
 	return err;
-}
-
-static void free_copy(struct load_info *info)
-{
-	if (info->patch_mmap) {
-		fmunmap(info->patch_mmap);
-		info->patch_mmap = NULL;
-	}
-
-	if (info->patch_path) {
-		free(info->patch_path);
-		info->patch_path = NULL;
-	}
 }
 
 static __unused int
@@ -622,7 +621,7 @@ static int load_patch(struct load_info *info)
 	// TODO
 
 free_copy:
-	free_copy(info);
+	free_info(info);
 	return err;
 }
 
@@ -644,7 +643,7 @@ int init_patch(struct task *task, const char *obj_file)
 	 */
 	err = create_mmap_vma_file(task, &info);
 	if (err) {
-		free_copy(&info);
+		free_info(&info);
 		return err;
 	}
 
