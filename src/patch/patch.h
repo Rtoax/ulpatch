@@ -78,6 +78,10 @@ unsigned long mcount_exit(long *retval);
 
 struct task;
 
+int parse_load_info(const char *obj_from, const char *obj_to,
+	struct load_info *info);
+int setup_load_info(struct load_info *info);
+
 int init_patch(struct task *task, const char *obj_file);
 int delete_patch(struct task *task);
 

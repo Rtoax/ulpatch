@@ -34,39 +34,21 @@ static void free_info(struct load_info *info)
 }
 
 // see linux:kernel/module.c
-static int parse_load_info(struct task *task, const char *obj_file,
+int parse_load_info(const char *obj_from, const char *obj_to,
 	struct load_info *info)
 {
 	int err = 0;
-	char buffer1[BUFFER_SIZE];
-	char buffer[BUFFER_SIZE];
-	const char *filename;
 
-	if (!fexist(obj_file)) {
-		lerror("%s not exist, command 'make install' is needed.\n", obj_file);
+	if (!fexist(obj_from)) {
+		lerror("%s not exist, command 'make install' is needed.\n", obj_from);
 		return -EEXIST;
 	}
 
-	if (!(task->fto_flag & FTO_PROC)) {
-		lerror("Need FTO_PROC task flag.\n");
-		return -1;
-	}
+	info->patch_path = strdup(obj_to);
 
-	filename = fmktempname(buffer1, BUFFER_SIZE,
-		PATCH_VMA_TEMP_PREFIX "XXXXXX");
-	if (!filename) {
-		return -1;
-	}
-
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/filename */
-	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, filename);
-
-	info->patch_path = strdup(buffer);
-
-	info->len = fsize(obj_file);
+	info->len = fsize(obj_from);
 	if (info->len < sizeof(*(info->hdr))) {
-		lerror("%s truncated.\n", obj_file);
+		lerror("%s truncated.\n", obj_from);
 		err = -ENOEXEC;
 		goto out;
 	}
@@ -82,17 +64,16 @@ static int parse_load_info(struct task *task, const char *obj_file,
 
 	/* copy from file */
 	if (copy_chunked_from_file(info->patch_mmap->mem, info->len,
-			obj_file) != info->len) {
+			obj_from) != info->len) {
 		lerror("copy chunk failed.\n");
 		err = -EFAULT;
 		goto out;
 	}
 
 	info->hdr = info->patch_mmap->mem;
-	info->target_task = task;
 
 	if (!check_ehdr_magic_is_ok(info->hdr)) {
-		lerror("Invalid ELF format: %s\n", obj_file);
+		lerror("Invalid ELF format: %s\n", obj_from);
 		err = -1;
 		goto free_out;
 	}
@@ -202,7 +183,7 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	return 0;
 }
 
-static __unused int setup_load_info(struct load_info *info)
+int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
 	int err = 0;
@@ -644,11 +625,33 @@ int init_patch(struct task *task, const char *obj_file)
 	int err;
 	struct load_info info = {};
 
-	err = parse_load_info(task, obj_file, &info);
+	char buffer1[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
+	const char *copy_obj;
+
+
+	if (!(task->fto_flag & FTO_PROC)) {
+		lerror("Need FTO_PROC task flag.\n");
+		return -1;
+	}
+
+	copy_obj = fmktempname(buffer1, BUFFER_SIZE,
+				PATCH_VMA_TEMP_PREFIX "XXXXXX");
+	if (!copy_obj) {
+		return -1;
+	}
+
+	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, copy_obj);
+
+	err = parse_load_info(obj_file, buffer, &info);
 	if (err) {
 		lerror("Parse %s failed.\n", obj_file);
 		return err;
 	}
+
+	info.target_task = task;
 
 	/**
 	 * Create and mmap a temp file into target task, this temp file is under
