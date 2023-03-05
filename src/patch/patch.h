@@ -30,7 +30,7 @@ struct load_info {
 	unsigned long len;
 
 	/* the VMA start address in target task/process address space */
-	unsigned long target_addr;
+	unsigned long target_hdr;
 	struct task *target_task;
 	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
 	char *patch_path;

@@ -126,7 +126,7 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 	}
 
 	/* save the address */
-	info->target_addr = map_v;
+	info->target_hdr = map_v;
 
 	update_task_vmas(task);
 
@@ -183,6 +183,11 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	return 0;
 }
 
+/**
+ * Set up our basic convenience variables (pointers to section headers,
+ * search for module section index etc), and do some basic section
+ * verification.
+ */
 int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
@@ -232,6 +237,7 @@ int setup_load_info(struct load_info *info)
 
 	// TODO+MORE info
 
+	/* Find internal symbols and strings. */
 	for (i = 1; i < info->hdr->e_shnum; i++) {
 
 		if (info->sechdrs[i].sh_type == SHT_SYMTAB) {
@@ -248,6 +254,7 @@ int setup_load_info(struct load_info *info)
 		}
 	}
 
+	/* Object/Patch has no symbols (stripped?) */
 	if (info->index.sym == 0) {
 		lwarning("patch has no symbols (stripped).\n");
 		return -ENOEXEC;
@@ -294,12 +301,27 @@ static int rewrite_section_headers(struct load_info *info)
 			return -ENOEXEC;
 		}
 
-		/* Update sh_addr to point to target task address space. */
-		shdr->sh_addr = (size_t)info->target_addr + shdr->sh_offset;
+		/**
+		 * Update sh_addr to point to target task address space.
+		 *
+		 *  +---+
+		 *  |   | <--- hdr(current task), target_hdr(target task)
+		 *  |   |
+		 *  |   |
+		 *  |   |   shdr->sh_offset
+		 *  |   |
+		 *  |   |
+		 *  |   | <--- shdr->sh_addr
+		 *  |   |
+		 *  +---+
+		 */
+		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
 	}
 
+	/* Track but don't keep info or other sections. */
 	info->sechdrs[info->index.info].sh_flags &= ~(unsigned long)SHF_ALLOC;
-	// MORE sechdrs
+
+	/* MORE: sechdrs */
 
 	return 0;
 }
@@ -311,108 +333,12 @@ static int rewrite_section_headers(struct load_info *info)
 #define SHF_RO_AFTER_INIT	0x00200000
 #endif
 
-static void layout_sections(struct load_info *info)
-{
-	static __unused unsigned long const masks[][2] = {
-		/* NOTE: all executable code must be the first section
-		 * in this array; otherwise modify the text_size
-		 * finder in the two loops below */
-		{ SHF_EXECINSTR | SHF_ALLOC, ARCH_SHF_SMALL },
-		{ SHF_ALLOC, SHF_WRITE | ARCH_SHF_SMALL },
-		{ SHF_RO_AFTER_INIT | SHF_ALLOC, ARCH_SHF_SMALL },
-		{ SHF_WRITE | SHF_ALLOC, ARCH_SHF_SMALL },
-		{ ARCH_SHF_SMALL | SHF_ALLOC, 0 }
-	};
-
-	// TODO: i don't know what happen here
-}
-
-static void layout_symtab(struct load_info *info)
-{
-	GElf_Shdr __unused *symsect = info->sechdrs + info->index.sym;
-	GElf_Shdr __unused *strsect = info->sechdrs + info->index.str;
-
-	const GElf_Sym __unused *src;
-	unsigned int __unused i, nsrc, ndst, strtab_size = 0;
-
-	symsect->sh_flags |= SHF_ALLOC;
-	//symsect->sh_entsize = get_offset()
-
-	ldebug("\t%s\n", info->secstrings + symsect->sh_name);
-
-	src = (void *)info->hdr + symsect->sh_offset;
-	nsrc = symsect->sh_size / sizeof(*src);
-
-	/* Compute total space required for the core symbols' strtab. */
-	for (ndst = i = 0; i < nsrc; i++) {
-	}
-
-	// TODO: not consider symtab yet
-}
-
-static __unused int move_module(struct load_info *info)
-{
-	int i;
-	void __unused *ptr = info->hdr;
-
-	ldebug("final section addresses:\n");
-
-	for (i = 0; i < info->hdr->e_shnum; i++) {
-		void __unused *dest;
-		GElf_Shdr *shdr = &info->sechdrs[i];
-
-		if (!(shdr->sh_flags & SHF_ALLOC))
-			continue;
-
-		/* Update sh_addr to point to target task address space.
-		 * already do in rewrite_section_headers(),
-		 */
-		// shdr->sh_addr += (unsigned long)info->target_addr;
-
-		ldebug("\t0x%lx %s\n",
-			(long)shdr->sh_addr, info->secstrings + shdr->sh_name);
-	}
-
-	return 0;
-}
-
-static int layout_and_allocate(struct load_info *info)
-{
-	unsigned int __unused ndx;
-	int __unused err;
-
-
-	/* Determine total sizes, and put offsets in sh_entsize.  For now
-	   this is done generically; there doesn't appear to be any
-	   special cases for the architectures. */
-	layout_sections(info);
-
-	layout_symtab(info);
-
-	err = move_module(info);
-	if (err)
-		return err;
-
-	// MORE: memleak and mod relate
-
-	return 0;
-}
-
-static int find_module_sections(struct load_info *info)
-{
-	// TODO:
-	return 0;
-}
-
-static void setup_modinfo(struct load_info *info)
-{
-}
 
 /* try find symbol in current patch, otherwise, search in libc and target task
  * symtab.
  */
-static const struct symbol *resolve_symbol(const struct load_info *info,
-			const char *name)
+static const struct symbol *
+resolve_symbol(const struct load_info *info, const char *name)
 {
 	const struct symbol *sym = NULL;
 	const struct task *task = info->target_task;
@@ -437,51 +363,45 @@ static const struct symbol *resolve_symbol(const struct load_info *info,
 	return sym;
 }
 
-static const struct symbol *
-resolve_symbol_wait(const struct load_info *info, const char *name)
-{
-	const struct symbol *symbol;
-
-	symbol = resolve_symbol(info, name);
-
-	return symbol;
-}
-
+/* Change all symbols so that st_value encodes the pointer directly. */
 static int simplify_symbols(const struct load_info *info)
 {
 	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
 
 	/* need relocate sh_addr, because here is HOST task, not target task */
-	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_addr;
+	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
 
 	ldebug("sym = %lp + %lx - %lx, sh_offset %lx\n",
-		info->hdr, symsec->sh_addr, info->target_addr, symsec->sh_offset);
+		info->hdr, symsec->sh_addr, info->target_hdr, symsec->sh_offset);
 
-	unsigned long __unused secbase;
+	unsigned long secbase;
 	unsigned int i;
-	int __unused ret = 0;
-	const struct symbol __unused *symbol;
+	int ret = 0;
+	const struct symbol *symbol;
 
 
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
 
 		switch (sym[i].st_shndx) {
-
 		case SHN_COMMON:
+			/* Ignore common symbols */
+			if (!strncmp(name, "__gnu_lto", 9))
+				break;
 			ldebug("Common symbol: %s\n", name);
 			lwarning("please compile with -fno-common.\n");
 			ret = -ENOEXEC;
 			break;
 
 		case SHN_ABS:
-			ldebug("Absolute symbol: 0x%08lx\n",
-				(long)sym[i].st_value);
+			/* Don't need to do anything */
+			ldebug("Absolute symbol: 0x%08lx\n", (long)sym[i].st_value);
 			break;
 
 		case SHN_UNDEF:
-			ldebug("Solve UNDEF sym %s\n", name);
-			symbol = resolve_symbol_wait(info, name);
+			ldebug("Resolve UNDEF sym %s\n", name);
+			symbol = resolve_symbol(info, name);
+			/* Ok if resolved.  */
 			if (symbol) {
 				sym[i].st_value = symbol->sym.st_value;
 			}
@@ -492,7 +412,7 @@ static int simplify_symbols(const struct load_info *info)
 			}
 
 			/* Not found symbol in any where */
-			ret = symbol ?0:-ENOENT;
+			ret = symbol ? 0 : -ENOENT;
 
 			lwarning("Unknown symbol %s (err %d)\n", name, ret);
 
@@ -501,6 +421,7 @@ static int simplify_symbols(const struct load_info *info)
 		default:
 			ldebug("OK, the symbol in this patch. %s\n", name);
 
+			/* The address in the target process */
 			secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
 
 			sym[i].st_value += secbase;
@@ -511,6 +432,13 @@ static int simplify_symbols(const struct load_info *info)
 	return ret;
 }
 
+/**
+ * Relocation is the process of connecting symbolic references with symbolic
+ * definitions.
+ *
+ * refs:
+ * [0] https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/6n33n7fct/index.html
+ */
 static int apply_relocations(const struct load_info *info)
 {
 	unsigned int i;
@@ -531,7 +459,7 @@ static int apply_relocations(const struct load_info *info)
 		if (unlikely(info->sechdrs[i].sh_type == SHT_REL)) {
 			// Not support 32bit SHT_REL yet
 			err = -ENOEXEC;
-
+			break;
 		} else if (info->sechdrs[i].sh_type == SHT_RELA) {
 
 			err = apply_relocate_add(info, info->sechdrs, info->strtab,
@@ -560,11 +488,11 @@ static int kick_target_process(const struct load_info *info)
 	ssize_t n;
 	int err = 0;
 	struct task *task = info->target_task;
-	unsigned long target_addr = info->target_addr;
+	unsigned long target_hdr = info->target_hdr;
 
 	/* copy patch to target address space
 	 */
-	n = memcpy_to_task(task, target_addr, info->hdr, info->len);
+	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
 	if (n < info->len) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
@@ -581,19 +509,12 @@ static int load_patch(struct load_info *info)
 	if (err)
 		goto free_copy;
 
+	/* TODO: Blacklists */
+	/* TODO: Sign check */
+
 	err = rewrite_section_headers(info);
 	if (err)
 		goto free_copy;
-
-	err = layout_and_allocate(info);
-	if (err)
-		goto free_copy;
-
-	err = find_module_sections(info);
-	if (err)
-		goto free_copy;
-
-	setup_modinfo(info);
 
 	/* Fix up syms, so that st_value is a pointer to location. */
 	err = simplify_symbols(info);

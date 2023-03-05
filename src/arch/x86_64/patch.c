@@ -21,14 +21,28 @@ static int __apply_relocate_add(const struct load_info *info,
 {
 	unsigned int i;
 
-	long target_offset = (long)info->hdr - (long)info->target_addr;
+	/**
+	 * Object file is indicated by '#', address space is represented by '|--|'
+	 *
+	 *                                     hdr
+	 *                                     |
+	 * HostTask    |-----------------------###########----------|
+	 *                                     |    ^
+	 *                      |<-- t_off  -->|    sh_addr
+	 *                      |
+	 * TargetTask  |--------###########-------------------------|
+	 *                      |    ^
+	 *              target_hdr   |
+	 *                          rel
+	 */
+	long t_off = (long)info->hdr - (long)info->target_hdr;
 
 	/* sh_addr now point to target process address space, so need to relocate
 	 * to current process. */
-	Elf64_Rela __unused *rel = (void *)sechdrs[relsec].sh_addr + target_offset;
-	Elf64_Sym __unused *sym;
-	void __unused *loc;
-	uint64_t __unused val;
+	Elf64_Rela *rel = (void *)sechdrs[relsec].sh_addr + t_off;
+	Elf64_Sym *sym;
+	void *loc;
+	uint64_t val;
 
 	ldebug("Applying relocate section %u to %u\n",
 		relsec, sechdrs[relsec].sh_info);
@@ -38,15 +52,15 @@ static int __apply_relocate_add(const struct load_info *info,
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 
 		/* This is where to make the change, so, here need to relocate to
-		 * current process address space (use info->target_addr and info->hdr)
+		 * current process address space (use info->target_hdr and info->hdr)
 		 */
-		loc = (void *)(sechdrs[sechdrs[relsec].sh_info].sh_addr + target_offset
+		loc = (void *)(sechdrs[sechdrs[relsec].sh_info].sh_addr + t_off
 			+ rel[i].r_offset);
 
 		/* This is the symbol it is referring to.  Note that all
 		 * undefined symbols have been resolved.
 		 */
-		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + target_offset
+		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off
 			+ ELF64_R_SYM(rel[i].r_info));
 
 		ldebug("type %d st_value %Lx r_addend %Lx loc %Lx\n",
@@ -96,7 +110,7 @@ static int __apply_relocate_add(const struct load_info *info,
 				/* This is GOTTPOFF that already points to an appropriate GOT
 				 * entry in the target's memory.
 				 */
-				val = rel->r_addend + info->target_addr - 4;
+				val = rel->r_addend + info->target_hdr - 4;
 			}
 			FALLTHROUGH;
 
