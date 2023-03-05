@@ -78,8 +78,24 @@ static int parse_load_info(struct task *task, const char *obj_file,
 	info->hdr = info->patch_mmap->mem;
 	info->target_task = task;
 
-out:
+	if (!check_ehdr_magic_is_ok(info->hdr)) {
+		lerror("Invalid ELF format: %s\n", obj_file);
+		err = -1;
+		goto free_out;
+	}
+	if (info->hdr->e_shoff >= info->len
+		|| (info->hdr->e_shnum * sizeof(GElf_Shdr) >
+			info->len - info->hdr->e_shoff)) {
+		lerror("Bad section header.\n");
+		goto free_out;
+	}
 
+out:
+	return err;
+
+free_out:
+	fmunmap(info->patch_mmap);
+	free(info->patch_path);
 	return err;
 }
 
@@ -567,18 +583,6 @@ static int kick_target_process(const struct load_info *info)
 static int load_patch(struct load_info *info)
 {
 	long err = 0;
-
-	/* check ELF header */
-	if (!check_ehdr_magic_is_ok(info->hdr)) {
-		lerror("Invalid ELF header.\n");
-		goto free_copy;
-	}
-	if (info->hdr->e_shoff >= info->len
-		|| (info->hdr->e_shnum * sizeof(GElf_Shdr) >
-			info->len - info->hdr->e_shoff)) {
-		lerror("Bad section header.\n");
-		goto free_copy;
-	}
 
 	err = setup_load_info(info);
 	if (err)
