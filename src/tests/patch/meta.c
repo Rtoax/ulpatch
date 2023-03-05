@@ -21,7 +21,7 @@ int i_am_a_patch(void)
 	return 1;
 }
 
-UPATCH_INFO(patch_me, i_am_a_patch, "Rong Tao");
+UPATCH_INFO(upatch, patch_me, i_am_a_patch, "Rong Tao");
 
 TEST(Patch_meta,	macro__UPATCH_INFO,	0)
 {

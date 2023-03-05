@@ -185,6 +185,9 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	}
 
 	while (*(p++));
+	s->patch_type = p;
+
+	while (*(p++));
 	s->src_func = p;
 
 	while (*(p++));
@@ -193,8 +196,8 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	while (*(p++));
 	s->author = p;
 
-	ldebug("%s %s %s %s\n",
-		s->magic, s->src_func, s->dst_func, s->author);
+	ldebug("%s %s %s %s %s\n",
+		s->magic, s->patch_type, s->src_func, s->dst_func, s->author);
 
 	return 0;
 }
@@ -228,11 +231,21 @@ static __unused int setup_load_info(struct load_info *info)
 	const char *upatch_strtab = (void *)info->hdr
 		+ info->sechdrs[info->index.upatch_strtab].sh_offset;
 
-	memshow(upatch_strtab, 32);
+	memshow(upatch_strtab, 64);
 
 	err = parse_upatch_strtab(&info->upatch_strtab, upatch_strtab);
 	if (err) {
 		lerror("Failed parse upatch_strtab.\n");
+		return -ENOENT;
+	}
+
+	/* Get patch type */
+	if (!strcmp(info->upatch_strtab.patch_type, UPATCH_TYPE_PATCH_STR))
+		info->type = UPATCH_TYPE_PATCH;
+	else if (!strcmp(info->upatch_strtab.patch_type, UPATCH_TYPE_FTRACE_STR))
+		info->type = UPATCH_TYPE_FTRACE;
+	else {
+		lerror("Unknown upatch type %s.\n", info->upatch_strtab.patch_type);
 		return -ENOENT;
 	}
 

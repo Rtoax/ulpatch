@@ -41,6 +41,7 @@ struct load_info {
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
 	struct upatch_info *info;
+	enum patch_type type;
 	struct upatch_strtab upatch_strtab;
 
 	struct {

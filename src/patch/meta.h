@@ -19,19 +19,29 @@
 #define SEC_UPATCH_STRTAB_LABEL	"upatch_strtab"
 #define SEC_UPATCH_INFO	".upatch.info"
 
+/* patch_type */
+enum patch_type {
+	UPATCH_TYPE_UNKNOWN,
+	UPATCH_TYPE_PATCH,
+	UPATCH_TYPE_FTRACE,
+};
+#define UPATCH_TYPE_FTRACE_STR	"uftrace"
+#define UPATCH_TYPE_PATCH_STR	"upatch"
 
 /* Every patch has this information, it's metadata for each patch.
  *
+ * @patch_type: the Patch type, see UPATCH_TYPE_PATCH, etc.
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
  *
  */
-#define UPATCH_INFO(src_func, dst_func, author)	\
+#define UPATCH_INFO(patch_type, src_func, dst_func, author)	\
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
 	"upatch_strtab: \n"	\
 	"	.string \"" SEC_UPATCH_MAGIC "\" \n"	\
+	"	.string \"" #patch_type "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
 	"	.string \"" #dst_func "\" \n"	\
 	"	.string \"" author "\" \n"	\
@@ -50,6 +60,7 @@ __asm__ (	\
 
 /* each element point each string in SEC_UPATCH_STRTAB
  *
+ * @patch_type patch type, see UPATCH_TYPE_PATCH, etc.
  * @src_func source function
  * @dst_func destination function
  * @author Author of this patch
@@ -57,6 +68,7 @@ __asm__ (	\
 struct upatch_strtab {
 	/* Must be SEC_UPATCH_MAGIC */
 	const char *magic;
+	const char *patch_type;
 	const char *src_func;
 	const char *dst_func;
 	const char *author;

@@ -71,8 +71,8 @@ unsigned long mcount_exit(long *retval)
 }
 
 #if defined(__x86_64__)
-UPATCH_INFO(mcount, _ftrace_mcount, "Rong Tao");
+UPATCH_INFO(uftrace, mcount, _ftrace_mcount, "Rong Tao");
 #elif defined(__aarch64__)
-UPATCH_INFO(_mcount, _ftrace_mcount, "Rong Tao");
+UPATCH_INFO(uftrace, _mcount, _ftrace_mcount, "Rong Tao");
 #endif
 

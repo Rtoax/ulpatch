@@ -13,11 +13,14 @@
 
 
 /* see: root CMakeLists.txt */
-static const char *upatch_objs[] = {
+static const struct upatch_object {
+	enum patch_type type;
+	char *path;
+} upatch_objs[] = {
 	/* /usr/share/upatch/ftrace-mcount.obj */
-	UPATCH_FTRACE_OBJ_PATH,
+	{UPATCH_TYPE_FTRACE,	UPATCH_FTRACE_OBJ_PATH},
 	/* /usr/share/upatch/upatch-hello.obj */
-	UPATCH_HELLO_OBJ_PATH,
+	{UPATCH_TYPE_PATCH,	UPATCH_HELLO_OBJ_PATH},
 };
 
 
@@ -26,10 +29,10 @@ TEST(Object,	check_objs_exist,	0)
 	int i, ret = 0;
 
 	for (i = 0; i < ARRAY_SIZE(upatch_objs); i++) {
-		if (!fexist(upatch_objs[i])) {
+		if (!fexist(upatch_objs[i].path)) {
 			ret = -EEXIST;
 			fprintf(stderr, "\n%s is not exist, maybe: make install\n",
-				upatch_objs[i]);
+				upatch_objs[i].path);
 		}
 	}
 
