@@ -14,10 +14,8 @@
 #include <elf/elf_api.h>
 
 
-static int __apply_relocate_add(const struct load_info *info,
-	GElf_Shdr *sechdrs, const char *strtab,
-	unsigned int symindex, unsigned int relsec,
-	void *(*write_func)(void *dest, const void *src, size_t len))
+int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
+	const char *strtab, unsigned int symindex, unsigned int relsec)
 {
 	unsigned int i;
 
@@ -36,6 +34,8 @@ static int __apply_relocate_add(const struct load_info *info,
 	 *                          rel
 	 */
 	long t_off = (long)info->hdr - (long)info->target_hdr;
+
+	void *(*write_func)(void *, const void *, size_t) = memcpy;
 
 	/* sh_addr now point to target process address space, so need to relocate
 	 * to current process. */
@@ -160,18 +160,5 @@ overflow:
 		(int)ELF64_R_TYPE(rel[i].r_info), val);
 	lerror("likely not compiled with -mcmodel=kernel.\n");
 	return -ENOEXEC;
-}
-
-int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-	const char *strtab, unsigned int symindex, unsigned int relsec)
-{
-	int ret;
-
-	void *(*write_fn)(void *, const void *, size_t) = memcpy;
-
-	ret = __apply_relocate_add(info, sechdrs, strtab, symindex, relsec,
-			write_fn);
-
-	return ret;
 }
 
