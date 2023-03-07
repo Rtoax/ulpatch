@@ -352,8 +352,14 @@ resolve_symbol(const struct load_info *info, const char *name)
 	}
 
 	/* try find symbol in libc.so */
-	if (task->fto_flag & FTO_LIBC) {
+	if (!sym && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
+	}
+
+	/* try find symbol in other libraries mapped in target process address
+	 * space */
+	if (!sym && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
+		sym = task_vma_find_symbol((struct task *)task, name);
 	}
 
 	if (!sym) {
