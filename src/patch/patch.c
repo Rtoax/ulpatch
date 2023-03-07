@@ -208,9 +208,13 @@ int setup_load_info(struct load_info *info)
 	info->info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
-	ldebug("%s: off %lx\n", SEC_UPATCH_INFO,
-		info->sechdrs[info->index.info].sh_offset);
+	ldebug("%s: off %lx (%s)\n", SEC_UPATCH_INFO,
+		info->sechdrs[info->index.info].sh_offset, info->name);
 	memshow(info->info, sizeof(struct upatch_info));
+	/* see UPATCH_INFO macro */
+	ldebug("UPATCH INFO: pad: %u %u %u %u\n",
+		info->info->pad[0], info->info->pad[1],
+		info->info->pad[2], info->info->pad[3]);
 
 	/* found ".upatch.strtab" */
 	info->index.upatch_strtab = find_sec(info, SEC_UPATCH_STRTAB);

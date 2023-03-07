@@ -47,12 +47,10 @@ __asm__ (	\
 	"	.string \"" author "\" \n"	\
 	"	.popsection \n"	\
 	"	.pushsection " SEC_UPATCH_INFO ", \"aw\", @progbits\n"	\
-	"	.quad " #dst_func " \n"	\
-	"	.quad 0 \n"	\
-	"	.long 0 \n"	\
-	"	.long 0 \n"	\
-	"	.quad " SEC_UPATCH_STRTAB_LABEL " \n"	\
-	"	.quad 0 \n"	\
+	"	.quad 0 # target function address\n"	\
+	"	.quad 0 # patch function address\n"	\
+	"	.quad 0 # virtual address to modify in target process\n"	\
+	"	.quad 0 # original value\n"	\
 	"	.long 0 \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
@@ -74,18 +72,42 @@ struct upatch_strtab {
 	const char *author;
 };
 
-/* Point to SEC_UPATCH_INFO section
+/**
+ * Point to SEC_UPATCH_INFO section
+ *
+ * Example:
+ *
+ * 0000000000405fe0 <hello>:
+ *  405fe0:	55                   	push   %rbp
+ *  405fe1:	48 89 e5             	mov    %rsp,%rbp
+ *  405fe4:	41 57                	push   %r15
+ *  ...
+ * 0000000000408060 <new_hello>:
+ *  408060:	55                   	push   %rbp
+ *  408061:	48 89 e5             	mov    %rsp,%rbp
+ *  408064:	41 57                	push   %r15
+ *
+ * After patching:
+ * 0000000000405fe0 <hello>:
+ *  405fe0:	75 xx xx xx xx          jmp    new_hello
+ *  ...
+ * 0000000000408060 <new_hello>:
+ *  408060:	55                   	push   %rbp
+ *  408061:	48 89 e5             	mov    %rsp,%rbp
+ *  408064:	41 57                	push   %r15
+ *
+ * Then:
+ * target_func_addr = 0x405fe0
+ * patch_func_addr  = 0x408060
+ * virtual_addr     = 0x405fe1
+ * orig_value       = 0x55 48 89 e5 41 ...
  */
 struct upatch_info {
-	unsigned long daddr;
-	unsigned long saddr;
+	unsigned long target_func_addr;
+	unsigned long patch_func_addr;
 
-	uint32_t reserve1;
-	uint32_t reserve2;
-
-	/* SEC_UPATCH_STRTAB_LABEL */
-	unsigned long symstr;
-	unsigned long vaddr;
+	unsigned long virtual_addr;
+	unsigned long orig_value;
 
 	uint32_t flags;
 	char pad[4];
