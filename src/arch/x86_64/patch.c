@@ -99,6 +99,8 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 				goto overflow;
 			break;
 
+		/* FIXME: Newest kernel already remove {GOTTPOFF, GOTPCREL,
+		 * REX_GOTPCRELX, GOTPCRELX} cases */
 		case R_X86_64_GOTTPOFF:
 		case R_X86_64_GOTPCREL:
 		case R_X86_64_REX_GOTPCRELX:
@@ -120,10 +122,6 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 				goto invalid_relocation;
 			val -= (uint64_t)loc;
 			write_func(loc, &val, 4);
-#if 0
-			if ((int64_t)val != *(int32_t *)loc)
-				goto overflow;
-#endif
 			break;
 
 		case R_X86_64_PC64:
@@ -133,6 +131,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			write_func(loc, &val, 8);
 			break;
 
+		/* FIXME: Newest kernel already remove {TPOFF64, TPOFF32} cases */
 		case R_X86_64_TPOFF64:
 		case R_X86_64_TPOFF32:
 			lerror("TPOFF32/TPOFF64 should not be present\n");
