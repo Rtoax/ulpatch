@@ -5,4 +5,10 @@
 
 /* TODO */
 
-UPATCH_INFO(upatch, FIXME, FIXME, "Rong Tao");
+void new_hello_world(void)
+{
+	printf("Hello World from upatch.\n");
+}
+
+UPATCH_INFO(upatch, new_hello_world, hello_world, "Rong Tao");
+
