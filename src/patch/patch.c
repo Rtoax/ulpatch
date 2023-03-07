@@ -359,6 +359,13 @@ resolve_symbol(const struct load_info *info, const char *name)
 		}
 	}
 
+	/* try find symbol address from @plt */
+	if (task->fto_flag & FTO_SELF_PLT) {
+		addr = objdump_elf_plt_symbol_address(task->objdump, name);
+		if (addr)
+			goto found;
+	}
+
 	/* try find symbol in libc.so */
 	if (!sym && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
