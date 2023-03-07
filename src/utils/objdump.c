@@ -49,7 +49,7 @@ struct objdump_elf_file {
 };
 
 struct objdump_symbol {
-	char *sym;
+	char *name;
 	unsigned long addr;
 	enum sym_type type;
 
@@ -81,7 +81,7 @@ static __unused inline int cmp_sym(struct rb_node *n1, unsigned long key)
 	struct objdump_symbol *s1 = rb_entry(n1, struct objdump_symbol, node);
 	struct objdump_symbol *s2 = (struct objdump_symbol*)key;
 
-	return strcmp(s1->sym, s2->sym);
+	return strcmp(s1->name, s2->name);
 }
 
 static __unused struct objdump_symbol *
@@ -91,7 +91,7 @@ alloc_sym(const char *name, unsigned long addr, enum sym_type type)
 
 	memset(s, 0, sizeof(*s));
 
-	s->sym = strdup(name);
+	s->name = strdup(name);
 	s->addr = addr;
 	s->type = type;
 
@@ -100,15 +100,15 @@ alloc_sym(const char *name, unsigned long addr, enum sym_type type)
 
 static __unused void free_sym(struct objdump_symbol *s)
 {
-	free(s->sym);
+	free(s->name);
 	free(s);
 }
 
 static __unused struct objdump_symbol *
-find_sym(struct rb_root *root, const char *sym)
+find_sym(struct rb_root *root, const char *name)
 {
 	struct objdump_symbol tmp = {
-		.sym = (char *)sym,
+		.name = (char *)name,
 	};
 	struct rb_node *node = rb_search_node(root,
 						cmp_sym, (unsigned long)&tmp);
@@ -148,11 +148,11 @@ unsigned long objdump_symbol_address(struct objdump_symbol *symbol)
 
 const char* objdump_symbol_name(struct objdump_symbol *symbol)
 {
-	return symbol ? symbol->sym : NULL;
+	return symbol ? symbol->name : NULL;
 }
 
 unsigned long
-objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym)
+objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *name)
 {
 	if (!file)
 		return 0;
@@ -160,7 +160,7 @@ objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym)
 	struct objdump_symbol *symbol;
 	struct rb_root *rbroot = &file->rb_tree_syms[S_T_PLT];
 
-	symbol = find_sym(rbroot, sym);
+	symbol = find_sym(rbroot, name);
 
 	return symbol ? symbol->addr : 0;
 }
