@@ -334,39 +334,56 @@ static int rewrite_section_headers(struct load_info *info)
 #endif
 
 
-/* try find symbol in current patch, otherwise, search in libc and target task
+/**
+ * Try find symbol in current patch, otherwise, search in libc and target task
  * symtab.
+ *
+ * @return: 0-failed
  */
-static const struct symbol *
+static const unsigned long
 resolve_symbol(const struct load_info *info, const char *name)
 {
 	const struct symbol *sym = NULL;
 	const struct task *task = info->target_task;
+	unsigned long addr = 0;
 
 	if (!task)
-		return NULL;
+		return 0;
 
 	/* try find symbol in SELF */
 	if (task->fto_flag & FTO_SELF) {
 		sym = find_symbol(task->exe_elf, name);
+		if (sym) {
+			addr = sym->sym.st_value;
+			goto found;
+		}
 	}
 
 	/* try find symbol in libc.so */
 	if (!sym && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
+		if (sym) {
+			addr = sym->sym.st_value;
+			goto found;
+		}
 	}
 
 	/* try find symbol in other libraries mapped in target process address
 	 * space */
 	if (!sym && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
 		sym = task_vma_find_symbol((struct task *)task, name);
+		if (sym) {
+			addr = sym->sym.st_value;
+			goto found;
+		}
 	}
 
 	if (!sym) {
 		lerror("Not find symbol in libc and %s\n", task->exe);
 	}
 
-	return sym;
+found:
+	return addr;
 }
 
 /* Change all symbols so that st_value encodes the pointer directly. */
@@ -383,7 +400,6 @@ static int simplify_symbols(const struct load_info *info)
 	unsigned long secbase;
 	unsigned int i;
 	int ret = 0;
-	const struct symbol *symbol;
 
 
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
@@ -406,19 +422,19 @@ static int simplify_symbols(const struct load_info *info)
 
 		case SHN_UNDEF:
 			ldebug("Resolve UNDEF sym %s\n", name);
-			symbol = resolve_symbol(info, name);
+			const unsigned long symbol_addr = resolve_symbol(info, name);
 			/* Ok if resolved.  */
-			if (symbol) {
-				sym[i].st_value = symbol->sym.st_value;
+			if (symbol_addr) {
+				sym[i].st_value = symbol_addr;
 			}
 
 			/* Ok if weak.  */
-			if (!symbol && GELF_ST_BIND(sym[i].st_info) == STB_WEAK) {
+			if (!symbol_addr && GELF_ST_BIND(sym[i].st_info) == STB_WEAK) {
 				break;
 			}
 
 			/* Not found symbol in any where */
-			ret = symbol ? 0 : -ENOENT;
+			ret = symbol_addr ? 0 : -ENOENT;
 
 			lwarning("Unknown symbol %s (err %d)\n", name, ret);
 
