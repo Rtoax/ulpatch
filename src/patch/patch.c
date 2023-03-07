@@ -33,6 +33,28 @@ static void free_info(struct load_info *info)
 	}
 }
 
+/* Upatch is single thread, thus, this api is ok. */
+static char* make_pid_objname_unsafe(pid_t pid)
+{
+	static char name[BUFFER_SIZE];
+	char buffer1[BUFFER_SIZE];
+	const char *s;
+	int ret;
+
+make:
+	s = fmktempname(buffer1, BUFFER_SIZE, PATCH_VMA_TEMP_PREFIX "XXXXXX");
+	if (!s)
+		goto make;
+
+	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file */
+	ret = snprintf(name, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
+	if (ret <= 0)
+		goto make;
+
+	return name;
+}
+
 // see linux:kernel/module.c
 int parse_load_info(const char *obj_from, const char *obj_to,
 	struct load_info *info)
@@ -577,35 +599,22 @@ free_copy:
 int init_patch(struct task *task, const char *obj_file)
 {
 	int err;
-	struct load_info info = {};
-
-	char buffer1[BUFFER_SIZE];
-	char buffer[BUFFER_SIZE];
-	const char *copy_obj;
-
+	struct load_info info = {
+		.target_task = task,
+	};
 
 	if (!(task->fto_flag & FTO_PROC)) {
 		lerror("Need FTO_PROC task flag.\n");
 		return -1;
 	}
 
-	copy_obj = fmktempname(buffer1, BUFFER_SIZE,
-				PATCH_VMA_TEMP_PREFIX "XXXXXX");
-	if (!copy_obj) {
-		return -1;
-	}
+	const char *obj_to = make_pid_objname_unsafe(task->pid);
 
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file */
-	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", task->pid, copy_obj);
-
-	err = parse_load_info(obj_file, buffer, &info);
+	err = parse_load_info(obj_file, obj_to, &info);
 	if (err) {
 		lerror("Parse %s failed.\n", obj_file);
 		return err;
 	}
-
-	info.target_task = task;
 
 	/**
 	 * Create and mmap a temp file into target task, this temp file is under
