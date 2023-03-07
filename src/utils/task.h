@@ -124,8 +124,9 @@ struct vma_struct {
 
 #define FTO_ALL 0xffffffff
 
-#define FTO_FTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS \
+#define FTO_UFTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS \
 					| FTO_SELF_OBJDUMP_PLT)
+#define FTO_UPATCH	FTO_UFTRACE
 
 /* under ROOT_DIR/PID/ */
 #define TASK_PROC_COMM	"comm"

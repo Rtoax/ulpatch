@@ -326,7 +326,7 @@ static int find_task_symbol(struct task *task)
 
 TEST(Ftrace,	find_task_symbol_list,	0)
 {
-	return test_task_patch(FTO_FTRACE, find_task_symbol);
+	return test_task_patch(FTO_UFTRACE, find_task_symbol);
 }
 
 TEST(Ftrace,	find_task_symbol_value,	0)
@@ -363,7 +363,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 		 */
 		usleep(10000);
 
-		struct task *task = open_task(pid, FTO_FTRACE);
+		struct task *task = open_task(pid, FTO_UFTRACE);
 
 		dump_task_vmas(task);
 
