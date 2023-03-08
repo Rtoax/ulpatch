@@ -20,6 +20,7 @@
 #include "patch.h"
 
 
+/* free load_info */
 static void free_info(struct load_info *info)
 {
 	if (info->patch_mmap) {
@@ -42,14 +43,17 @@ static char* make_pid_objname_unsafe(pid_t pid)
 	int ret;
 
 make:
+	/* make patch-XXXXXX temp file name */
 	s = fmktempname(buffer1, BUFFER_SIZE, PATCH_VMA_TEMP_PREFIX "XXXXXX");
 	if (!s)
 		goto make;
 
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file */
+	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems like:
+	 * /tmp/upatch/5465/map_files/patch-AbIRYY */
 	ret = snprintf(name, BUFFER_SIZE - 1,
 		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
 	if (ret <= 0)
+		/* try again */
 		goto make;
 
 	return name;
@@ -61,6 +65,7 @@ int parse_load_info(const char *obj_from, const char *obj_to,
 {
 	int err = 0;
 
+	/* source object file must exist. */
 	if (!fexist(obj_from)) {
 		lerror("%s not exist, command 'make install' is needed.\n", obj_from);
 		return -EEXIST;
@@ -75,8 +80,7 @@ int parse_load_info(const char *obj_from, const char *obj_to,
 		goto out;
 	}
 
-	lwarning("mmap shmem: %s %d\n", info->patch_path, info->len);
-
+	/* allocate memory for object file */
 	info->patch_mmap = fmmap_shmem_create(info->patch_path, info->len);
 	if (!info->patch_mmap) {
 		lerror("%s: fmmap failed.\n", info->patch_path);
@@ -92,6 +96,7 @@ int parse_load_info(const char *obj_from, const char *obj_to,
 		goto out;
 	}
 
+	/* This is the header of brand new object ELF file. */
 	info->hdr = info->patch_mmap->mem;
 
 	if (!check_ehdr_magic_is_ok(info->hdr)) {
@@ -230,9 +235,6 @@ int setup_load_info(struct load_info *info)
 	info->info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
-	ldebug("%s: off %lx (%s)\n", SEC_UPATCH_INFO,
-		info->sechdrs[info->index.info].sh_offset, info->name);
-	memshow(info->info, sizeof(struct upatch_info));
 	/* see UPATCH_INFO macro */
 	ldebug("UPATCH INFO: pad: %u %u %u %u\n",
 		info->info->pad[0], info->info->pad[1],
