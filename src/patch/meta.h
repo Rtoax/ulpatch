@@ -39,7 +39,7 @@ enum patch_type {
 #define UPATCH_INFO(patch_type, src_func, dst_func, author)	\
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
-	"upatch_strtab: \n"	\
+	SEC_UPATCH_STRTAB_LABEL ": \n"	\
 	"	.string \"" SEC_UPATCH_MAGIC "\" \n"	\
 	"	.string \"" #patch_type "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
