@@ -22,7 +22,7 @@
 #endif
 
 
-// see linux:kernel/module-internal.h
+/* see linux:kernel/module-internal.h */
 struct load_info {
 	const char *name;
 
@@ -86,4 +86,3 @@ int init_patch(struct task *task, const char *obj_file);
 int delete_patch(struct task *task);
 
 #endif /* __ELF_UPATCH_H */
-

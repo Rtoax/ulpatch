@@ -17,7 +17,7 @@
 
 #include "patch.h"
 
-const static char __unused *___ftrace_entry_funcs[] = {
+const static char *___ftrace_entry_funcs[] = {
     "__cyg_profile_func_enter",
     "__fentry__",
     "mcount",
@@ -25,7 +25,7 @@ const static char __unused *___ftrace_entry_funcs[] = {
     "__gnu_mcount_nc",
 };
 
-// If compile with -pg, there might be hava mcount()
+/* If compile with -pg, there might be hava mcount() */
 bool is_ftrace_entry(char *func)
 {
 	int i;

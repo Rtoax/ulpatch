@@ -119,13 +119,13 @@ free_out:
 	return err;
 }
 
-static __unused int
+static int
 create_mmap_vma_file(struct task *task, struct load_info *info)
 {
 	int ret = 0;
 	ssize_t map_len = info->len;
-	unsigned long __unused map_v;
-	int __unused map_fd;
+	unsigned long map_v;
+	int map_fd;
 
 	/* attach target task */
 	task_attach(task->pid);
@@ -315,7 +315,7 @@ static long __unused get_offset(unsigned int *size, GElf_Shdr *sechdr,
 
 static int rewrite_section_headers(struct load_info *info)
 {
-	unsigned int __unused i;
+	unsigned int i;
 
 	/* This should always be true, but let's be sure. */
 	info->sechdrs[0].sh_addr = 0;
@@ -547,8 +547,7 @@ static int kick_target_process(const struct load_info *info)
 	struct task *task = info->target_task;
 	unsigned long target_hdr = info->target_hdr;
 
-	/* copy patch to target address space
-	 */
+	/* copy patch to target address space */
 	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
 	if (n < info->len) {
 		lerror("failed kick target process.\n");
@@ -597,7 +596,7 @@ free_copy:
 	return err;
 }
 
-// looks like init_module() in kernel
+/* looks like init_module() in kernel */
 int init_patch(struct task *task, const char *obj_file)
 {
 	int err;
@@ -631,8 +630,7 @@ int init_patch(struct task *task, const char *obj_file)
 	return load_patch(&info);
 }
 
-/* delete last patched patch, so, don't need any other arguments
- */
+/* delete last patched patch, so, don't need any other arguments */
 int delete_patch(struct task *task)
 {
 	// TODO:

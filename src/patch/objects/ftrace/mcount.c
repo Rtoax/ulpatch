@@ -10,7 +10,8 @@
 #endif
 
 
-/* The UPATCH_TEST macro just for test in elftoos_test target. it'll not
+/**
+ * The UPATCH_TEST macro just for test in elftoos_test target. it'll not
  * compile into ftrace-object file.
  */
 #if defined(UPATCH_TEST)

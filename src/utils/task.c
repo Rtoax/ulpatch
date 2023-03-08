@@ -278,7 +278,7 @@ static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
 
 /* Only FTO_VMA_ELF flag will load VMA ELF
  */
-int __unused vma_peek_phdr(struct vma_struct *vma)
+int vma_peek_phdr(struct vma_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
 	struct task *task = vma->task;
@@ -468,7 +468,7 @@ share_lib:
 	return 0;
 }
 
-void __unused vma_free_elf(struct vma_struct *vma)
+void vma_free_elf(struct vma_struct *vma)
 {
 	if (!vma->is_elf)
 		return;
@@ -618,7 +618,6 @@ int vma_load_all_symbols(struct vma_struct *vma)
 		return 0;
 
 	struct task *task = vma->task;
-	struct rb_root __unused *root = &task->vma_symbols;
 
 	int err = 0;
 	size_t i;
@@ -627,8 +626,8 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	GElf_Sym *syms = NULL;
 	char *buffer = NULL;
 
-	unsigned long __unused symtab_addr, strtab_addr;
-	unsigned long __unused symtab_sz, strtab_sz;
+	unsigned long symtab_addr, strtab_addr;
+	unsigned long symtab_sz, strtab_sz;
 
 	symtab_addr = strtab_addr = 0;
 	symtab_sz = strtab_sz = 0;
@@ -741,9 +740,9 @@ int vma_load_all_symbols(struct vma_struct *vma)
 
 	for (i = 0; i < symtab_sz / sizeof(GElf_Sym); i++) {
 
-		struct symbol __unused *s;
+		struct symbol *s;
 
-		GElf_Sym __unused *sym = syms + i;
+		GElf_Sym *sym = syms + i;
 		const char *symname = buffer + symtab_sz + syms[i].st_name;
 
 		if (is_undef_symbol(sym) || strlen(symname) == 0) {
@@ -830,15 +829,14 @@ int read_task_vmas(struct task *task, bool update)
 		strncpy(vma->name_, name_, sizeof(vma->name_));
 		vma->type = get_vma_type(task->exe, name_);
 
-		// Find libc.so
-		if (!task->libc_vma
-			&& vma->type == VMA_LIBC
+		/* Find libc.so */
+		if (!task->libc_vma	&& vma->type == VMA_LIBC
 			&& vma->prot & PROT_EXEC) {
 			ldebug("Get libc:\n");
 			task->libc_vma = vma;
 		}
 
-		// Find [stack]
+		/* Find [stack] */
 		if (!task->stack && vma->type == VMA_STACK) {
 			task->stack = vma;
 		}
@@ -1131,8 +1129,7 @@ struct task *open_task(pid_t pid, int flag)
 		}
 	}
 
-	/* All success, add task to global list
-	 */
+	/* All success, add task to global list */
 	list_add(&task->node, &tasks_list);
 
 	return task;
@@ -1259,7 +1256,7 @@ int task_detach(pid_t pid)
 	return rv;
 }
 
-static int __unused pid_write(int pid, void *dest, const void *src, size_t len)
+static __unused int pid_write(int pid, void *dest, const void *src, size_t len)
 {
 	int ret = -1;
 	unsigned char *s = (unsigned char *) src;
@@ -1290,7 +1287,7 @@ err:
 	return ret;
 }
 
-static int __unused pid_read(int pid, void *dst, const void *src, size_t len)
+static __unused int pid_read(int pid, void *dst, const void *src, size_t len)
 {
 	int sz = len / sizeof(void *);
 	unsigned char *s = (unsigned char *)src;
@@ -1443,7 +1440,7 @@ int task_syscall(struct task *task, int nr,
 		unsigned long *res)
 {
 	int ret;
-	struct user_regs_struct old_regs, regs, __unused syscall_regs;
+	struct user_regs_struct old_regs, regs, syscall_regs;
 	unsigned char __syscall[] = {SYSCALL_INSTR};
 
 #if defined(__aarch64__)

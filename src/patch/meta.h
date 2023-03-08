@@ -10,9 +10,7 @@
 
 /* This header use to Identifier Patch metadata info in target process. If that,
  * the task user address space will mmap serial of pages into target address
- * space.
- *
- */
+ * space. */
 
 #define SEC_UPATCH_MAGIC	".UPATCH"
 #define SEC_UPATCH_STRTAB	".upatch.strtab"
@@ -28,13 +26,13 @@ enum patch_type {
 #define UPATCH_TYPE_FTRACE_STR	"uftrace"
 #define UPATCH_TYPE_PATCH_STR	"upatch"
 
-/* Every patch has this information, it's metadata for each patch.
+/**
+ * Every patch has this information, it's metadata for each patch.
  *
  * @patch_type: the Patch type, see UPATCH_TYPE_PATCH, etc.
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
- *
  */
 #define UPATCH_INFO(patch_type, src_func, dst_func, author)	\
 __asm__ (	\
@@ -56,7 +54,8 @@ __asm__ (	\
 	"	.popsection \n"	\
 );
 
-/* each element point each string in SEC_UPATCH_STRTAB
+/**
+ * each element point each string in SEC_UPATCH_STRTAB
  *
  * @patch_type patch type, see UPATCH_TYPE_PATCH, etc.
  * @src_func source function
