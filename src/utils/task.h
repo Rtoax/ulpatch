@@ -140,26 +140,25 @@ struct elf_file;
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
 struct task {
-	// /proc/PID/comm
+	/* /proc/[PID]/comm */
 	char comm[128];
 
 	pid_t pid;
 
 	int fto_flag;
 
-	// realpath of /proc/PID/exe
+	/* realpath of /proc/PID/exe */
 	char *exe;
 
-	/* If FTO_SELF set, load SELF ELF file when open.
-	 */
+	/* If FTO_SELF set, load SELF ELF file when open. */
 	struct elf_file *exe_elf;
 
-	// open(2) /proc/PID/mem
+	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
 	struct list_head node;
 
-	// struct vma_struct.node
+	/* struct vma_struct.node */
 	struct list_head vmas;
 	struct rb_root vmas_rb;
 
@@ -224,7 +223,7 @@ int memcpy_from_task(struct task *task,
 		void *dst, unsigned long remote_src, ssize_t size);
 
 /* syscalls based on task_syscall() */
-// if mmap file, need to update_task_vmas() manual
+/* if mmap file, need to update_task_vmas() manual */
 unsigned long task_mmap(struct task *task,
 	unsigned long addr, size_t length, int prot, int flags,
 	int fd, off_t offset);

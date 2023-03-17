@@ -26,7 +26,9 @@
 #include "arch/aarch64/instruments.h"
 #endif
 
+
 LIST_HEAD(tasks_list);
+
 
 int open_pid_maps(pid_t pid)
 {
@@ -244,8 +246,7 @@ static bool elf_vma_is_interp_exception(struct vma_struct *vma)
 	    !strncmp(name + strlen(name) - 3, ".so", 3))
 		return true;
 
-	/* some times, libc-xxx.so(like libssp.so.0) is linked to libssp.so.xx
-	 */
+	/* some times, libc-xxx.so(like libssp.so.0) is linked to libssp.so.xx  */
 	if (!strncmp(name, "libssp", 6)) {
 		return true;
 	}
@@ -276,8 +277,7 @@ static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 }
 
-/* Only FTO_VMA_ELF flag will load VMA ELF
- */
+/* Only FTO_VMA_ELF flag will load VMA ELF */
 int vma_peek_phdr(struct vma_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
@@ -326,8 +326,6 @@ int vma_peek_phdr(struct vma_struct *vma)
 
 	phaddr = vma->start + vma->elf->ehdr.e_phoff;
 	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
-
-	// memshow(&vma->elf->ehdr, sizeof(ehdr));
 
 	/* if no program headers, just return. we don't need it, such as:
 	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr
@@ -733,7 +731,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	}
 
 	ldebug("%s\n", vma->name_);
-	// memshow(buffer, strtab_sz + symtab_sz);
+	memshow(buffer, strtab_sz + symtab_sz);
 
 	/* For each symbol */
 	syms = (GElf_Sym *)buffer;
@@ -783,7 +781,7 @@ int read_task_vmas(struct task *task, bool update)
 
 	if (update) free_task_vmas(task);
 
-	// open(2) /proc/PID/maps
+	/* open(2) /proc/[PID]/maps */
 	mapsfd = open_pid_maps(task->pid);
 	if (mapsfd <= 0) {
 		return -1;
