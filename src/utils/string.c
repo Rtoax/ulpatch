@@ -12,18 +12,19 @@
 
 #include "list.h"
 
+
 int memshow(const void *data, int data_len)
 {
 	if (!data || data_len <= 0) return -EINVAL;
 
-	int i, iline;
+	int i, iline, len = 0;
 	const int align = 16;
 
 	for (iline = 0; iline * align < data_len; iline++) {
 
 		unsigned char *line = (unsigned char *)data + iline * align;
 
-		printf("%08x  ", iline * align);
+		len += printf("%08x  ", iline * align);
 
 		for (i = 0; i < align; i++) {
 			char *e = " ";
@@ -33,13 +34,13 @@ int memshow(const void *data, int data_len)
 				e = "  ";
 
 			if (len >= data_len) {
-				printf("%2s%s", "", e);
+				len += printf("%2s%s", "", e);
 			} else {
-				printf("%02x%s", line[i], e);
+				len += printf("%02x%s", line[i], e);
 			}
 		}
 
-		printf("  |");
+		len += printf("  |");
 
 		for (i = 0; i < align; i++) {
 			char e = '.';
@@ -49,16 +50,16 @@ int memshow(const void *data, int data_len)
 				e = line[i];
 
 			if (len >= data_len) {
-				printf(" ");
+				len += printf(" ");
 			} else {
-				printf("%c", e);
+				len += printf("%c", e);
 			}
 		}
 
-		printf("|\n");
+		len += printf("|\n");
 	}
 
-	return 0;
+	return len;
 }
 
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
