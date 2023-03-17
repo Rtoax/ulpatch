@@ -65,7 +65,7 @@ convert(Elf *core, Elf_Type type, uint_fast16_t count,
 		.d_version = EV_CURRENT,
 	};
 
-	// not support 32bit yet
+	/* not support 32bit yet */
 	Elf_Data *d = (gelf_getclass(core) == ELFCLASS32
 		? elf32_xlatetom : elf64_xlatetom)
 			(&valuedata, &indata, elf_getident (core, NULL)[EI_DATA]);

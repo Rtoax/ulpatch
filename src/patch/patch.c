@@ -59,7 +59,7 @@ make:
 	return name;
 }
 
-// see linux:kernel/module.c
+/* see linux:kernel/module.c */
 int parse_load_info(const char *obj_from, const char *obj_to,
 	struct load_info *info)
 {
@@ -532,10 +532,7 @@ static int apply_relocations(const struct load_info *info)
 
 static int post_relocation(const struct load_info *info)
 {
-	/* need add_allsyms() ...
-	 */
-
-	// TODO:
+	/* TODO: need add_allsyms() */
 
 	return 0;
 }

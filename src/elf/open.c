@@ -38,15 +38,15 @@ static __unused int handle_sections(struct elf_file *elf)
 			return -ENOENT;
 		}
 
-		// Handle section header by type
+		/* Handle section header by type */
 		switch (shdr->sh_type) {
 		case SHT_PROGBITS:
-			// .plt
+			/* .plt */
 			if (strcmp(elf->shdrnames[iter.i], ".plt") == 0) {
 				ldebug("%s PLT: %d\n", elf->filepath, iter.i);
 				elf->plt_data = elf_getdata(scn, NULL);
 				elf->plt_shdr_idx = iter.i;
-			// .got
+			/* .got */
 			} else if (strcmp(elf->shdrnames[iter.i], ".got") == 0) {
 				ldebug("%s GOT: %d\n", elf->filepath, iter.i);
 				elf->got_data = elf_getdata(scn, NULL);
@@ -72,7 +72,7 @@ static __unused int handle_sections(struct elf_file *elf)
 			break;
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
-		// readelf --section-groups
+		/* readelf --section-groups */
 		case SHT_GROUP:
 		default:
 			break;
@@ -88,7 +88,7 @@ static __unused int handle_sections(struct elf_file *elf)
 
 			if (!runshdr) continue;
 
-			// Handle section header by type
+			/* Handle section header by type */
 			switch (runshdr->sh_type) {
 
 			/* Bingo, found the version information.  Now get the data.  */
@@ -172,8 +172,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	elf->size = size;
 	strncpy(elf->filepath, filepath, sizeof(elf->filepath) - 1);
 
-	/* Init symbols red black tree
-	 */
+	/* Init symbols red black tree */
 	rb_init(&elf->symbols);
 
 

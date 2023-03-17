@@ -21,8 +21,8 @@ const char *st_bind_string(const GElf_Sym *sym)
 	case STB_WEAK:    return "WEAK";	/* Weak symbol */
 	case STB_NUM:     return "NUM";		/* Number of defined types.  */
 	case STB_LOOS:    return "LOOS";	/* Start of OS-specific */
-	// same as STB_LOOS
-	//case STB_GNU_UNIQUE:  return "GNU_UNIQUE";/* Unique symbol.  */
+	/* same as STB_LOOS */
+	// case STB_GNU_UNIQUE:  return "GNU_UNIQUE";/* Unique symbol.  */
 	case STB_HIOS:    return "HIOS";	/* End of OS-specific */
 	case STB_LOPROC:  return "LOPROC";	/* Start of processor-specific */
 	case STB_HIPROC:  return "HIPROC";	/* End of processor-specific */
@@ -42,7 +42,7 @@ const char *st_type_string(const GElf_Sym *sym)
 	case STT_TLS:     return "TLS";		/* Symbol is thread-local data object*/
 	case STT_NUM:     return "NUM";		/* Number of defined types.  */
 	case STT_LOOS:    return "LOOS";	/* Start of OS-specific */
-	// same as STT_LOOS
+	/* same as STT_LOOS */
 	//case STT_GNU_IFUNC: return "GNU_IFUNC";/* Symbol is indirect code object */
 	case STT_HIOS:    return "HIOS";	/* End of OS-specific */
 	case STT_LOPROC:  return "LOPROC";	/* Start of processor-specific */
@@ -62,9 +62,11 @@ const char *st_visibility_string(const GElf_Sym *sym)
 	return "UNKNOWN";
 }
 
-// stderr@GLIBC_2.2.5
-// symname = stderr
-// vername = GLIBC_2.2.5
+/**
+ * stderr@GLIBC_2.2.5
+ * symname = stderr
+ * vername = GLIBC_2.2.5
+ */
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 {
 	printf(
@@ -121,7 +123,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 		" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
 	}
 
-	// Get symbol name string
+	/* Get symbol name string */
 	*symname = elf_strptr(elf->elf, shdr->sh_link, sym->st_name);
 
 	if (elf->versym_data != NULL) {
@@ -254,13 +256,11 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 
 		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
 
-		/* save symbol to rbtree
-		 */
+		/* save symbol to rbtree */
 		struct symbol *s = alloc_symbol(symname, sym);
 		link_symbol(elf, s);
 
-		/* make some special handle
-		 */
+		/* make some special handle */
 		switch (GELF_ST_TYPE(sym->st_info)) {
 		case STT_FUNC:
 			if (is_ftrace_entry(symname)) {
@@ -275,7 +275,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 	return 0;
 }
 
-// the @key is (unsigned long)symbol
+/* the @key is (unsigned long)symbol */
 int cmp_symbol_name(struct rb_node *n1, unsigned long key)
 {
 	struct symbol *s1 = rb_entry(n1, struct symbol, node);

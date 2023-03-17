@@ -219,7 +219,7 @@ static const char *r_aarch64_name(int r)
 }
 #endif
 
-// GELF_R_TYPE (rel->r_info)
+/* GELF_R_TYPE (rel->r_info) */
 const char *rela_type_string(int r)
 {
 #if defined(__x86_64__)
@@ -237,8 +237,7 @@ void print_rela(GElf_Rela *rela)
 }
 
 
-/* Don't output
- */
+/* Don't output */
 #define printf(...) \
 	({int __ret = 0; __ret;})
 
@@ -362,8 +361,8 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 						(long int) GELF_R_SYM (rel->r_info));
 				}
 
-			} // sym == NULL
-			else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION) {
+			/* sym == NULL */
+			} else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION) {
 				printf("  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
 					class == ELFCLASS32 ? 10 : 18,
 					rel->r_offset,
@@ -373,7 +372,8 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 					rel->r_addend,
 					elf_strptr (elf->elf, symshdr->sh_link, sym->st_name));
 
-			} else { // STT_SECTION
+			/* STT_SECTION */
+			} else {
 
 				/* This is a relocation against a STT_SECTION symbol.  */
 				GElf_Shdr secshdr_mem;

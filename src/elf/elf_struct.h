@@ -63,7 +63,7 @@ struct elf_file {
 	 */
 	struct rb_root symbols;
 
-	// has fentry, mcount(), etc.
+	/* has fentry, mcount(), etc. */
 	bool support_ftrace;
 
 	/* List all elf files */

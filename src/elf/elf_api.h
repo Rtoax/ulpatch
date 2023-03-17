@@ -22,12 +22,12 @@ struct file_info {
 	file_type type;
 	const char *name;
 	bool client_select;
-	// If ELF
+	/* If ELF, else = NULL */
 	const char *elf_build_id;
 };
 
 
-// see elfutils/src/readelf.c
+/* see elfutils/src/readelf.c */
 #ifdef __linux__
 #define CORE_SIGILL  SIGILL
 #define CORE_SIGBUS  SIGBUS
@@ -105,20 +105,18 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
 void free_symbol(struct symbol *s);
 int link_symbol(struct elf_file *elf, struct symbol *s);
 struct symbol *find_symbol(struct elf_file *elf, const char *name);
-// the @key is (unsigned long)symbol
 int cmp_symbol_name(struct rb_node *n1, unsigned long key);
 
-// stderr@GLIBC_2.2.5
-// symname = stderr
-// vername = GLIBC_2.2.5
+/**
+ * stderr@GLIBC_2.2.5
+ * symname = stderr
+ * vername = GLIBC_2.2.5
+ */
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername);
 int is_undef_symbol(const GElf_Sym *sym);
 
-
-
 /* ELF Note api */
 int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
-
 
 /* ELF Rela api */
 int handle_relocs(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);

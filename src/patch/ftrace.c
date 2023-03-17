@@ -17,6 +17,7 @@
 
 #include "patch.h"
 
+
 const static char *___ftrace_entry_funcs[] = {
     "__cyg_profile_func_enter",
     "__fentry__",
@@ -40,6 +41,4 @@ bool is_ftrace_entry(char *func)
 
 	return ret;
 }
-
-
 
