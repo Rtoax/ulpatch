@@ -97,9 +97,11 @@ int parse_strstr(char *src, struct list_head *list)
 	char *newstr = strdup(src);
 	char *p = newstr;
 
-	// a,b,c,,d,e,,,
-	// >>
-	// a b c d e
+	/**
+	 * a,b,c,,d,e,,,
+	 * >>
+	 * a b c d e
+	 */
 	while (*p) {
 		char *name = p;
 
