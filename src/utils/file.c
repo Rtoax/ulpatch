@@ -49,7 +49,7 @@ static int _file_type_mem(struct mmap_struct *mem)
 	file_type type = FILE_UNKNOWN;
 	GElf_Ehdr *ehdr = mem->mem;
 
-	if (check_ehdr_magic_is_ok(ehdr)) {
+	if (ehdr_magic_ok(ehdr)) {
 		type = FILE_ELF;
 		if (ehdr->e_type == ET_REL)
 			type |= FILE_ELF_RELO;

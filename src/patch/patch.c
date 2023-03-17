@@ -99,7 +99,7 @@ int parse_load_info(const char *obj_from, const char *obj_to,
 	/* This is the header of brand new object ELF file. */
 	info->hdr = info->patch_mmap->mem;
 
-	if (!check_ehdr_magic_is_ok(info->hdr)) {
+	if (!ehdr_magic_ok(info->hdr)) {
 		lerror("Invalid ELF format: %s\n", obj_from);
 		err = -1;
 		goto free_out;

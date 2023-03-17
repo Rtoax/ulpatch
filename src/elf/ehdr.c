@@ -10,7 +10,8 @@
 #include <utils/util.h>
 #include <utils/log.h>
 
-bool check_ehdr_magic_is_ok(const GElf_Ehdr *ehdr)
+
+bool ehdr_magic_ok(const GElf_Ehdr *ehdr)
 {
     if (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
         ehdr->e_ident[EI_MAG1] != ELFMAG1 ||

@@ -311,7 +311,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	}
 
 	/* If not ELF, return success */
-	if (!check_ehdr_magic_is_ok(&ehdr)) {
+	if (!ehdr_magic_ok(&ehdr)) {
 		return 0;
 	}
 
