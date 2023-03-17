@@ -21,7 +21,7 @@
 
 
 enum sym_type {
-	S_T_PLT, // @plt
+	S_T_PLT, /* @plt */
 	S_T_MUM,
 };
 

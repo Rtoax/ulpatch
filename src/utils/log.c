@@ -59,7 +59,7 @@ int _____log(int level, const char *file, const char *func,
 		char buffer[32];
 		time_t timestamp = time(NULL);
 
-		// like 15:53:52
+		/* like 15:53:52 */
 		strftime(buffer, 32, "%T", localtime(&timestamp));
 
 		fprintf(fp, "%s %s[%s %s:%ld] ",

@@ -71,12 +71,12 @@ extern "C" {
 #define __KERNEL_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 #endif
 
-// see linux:include/linux/kernel.h
+/* see linux:include/linux/kernel.h */
 /* @a is a power of 2 value */
 #define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
 #define ALIGN_DOWN(x, a)	__ALIGN_KERNEL((x) - ((a) - 1), (a))
 
-// see linux:include/linux/sizes.h
+/* see linux:include/linux/sizes.h */
 #define SZ_1				0x00000001
 #define SZ_2				0x00000002
 #define SZ_4				0x00000004
@@ -145,11 +145,11 @@ struct list_head {
 typedef enum {
 	FILE_UNKNOWN = 0,
 	FILE_ELF = 0x1 << 0,
-	// ELF LSB relocatable
+	/* ELF LSB relocatable */
 	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
 } file_type;
 
-// upatch arguments configuration
+/* upatch arguments configuration */
 struct config {
 	int log_level;
 };
@@ -161,12 +161,12 @@ struct nr_idx_bool {
 };
 
 struct str_node {
-	// list: pre_load_files
+	/* list: pre_load_files */
 	struct list_head node;
-	char *str; // malloc, strdup
+	char *str; /* malloc, strdup */
 };
 
-// Global configuration
+/* Global configuration */
 extern struct config config;
 
 

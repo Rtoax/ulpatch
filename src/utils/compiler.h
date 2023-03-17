@@ -59,7 +59,7 @@ extern "C" {
 #define unlikely(x)  __builtin_expect(!!(x), 0)
 #endif
 
-// Forced inlining
+/* Forced inlining */
 #ifndef force_inline
 #define force_inline __attribute__ ((__always_inline__))
 #endif
@@ -68,13 +68,13 @@ extern "C" {
 
 #define CTOR_PRIO_1	101
 #define CTOR_PRIO_USER	105
-// value: 101 ~ 200, 101 first
+/* value: 101 ~ 200, 101 first */
 #define __ctor(value) __attribute__((constructor(value)))
 
 #define __section(sec) __attribute__((section(sec)))
 
-// Or use pragma:
-// #pragma GCC optimize("O0")
+/* Or use pragma:
+ * #pragma GCC optimize("O0") */
 #define __opt_O0 __attribute__((optimize("-O0")))
 #define __opt_O1 __attribute__((optimize("-O1")))
 #define __opt_O2 __attribute__((optimize("-O2")))

@@ -83,7 +83,7 @@ struct vma_struct {
 
 	struct task *task;
 
-	// struct task.vmas
+	/* struct task.vmas */
 	struct list_head node;
 	struct rb_node node_rb;
 

@@ -245,7 +245,7 @@ struct mmap_struct *fmmap_rdonly(const char *filepath)
 
 struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size)
 {
-	// @PROT_EXEC cause i need it
+	/* @PROT_EXEC cause i need it */
 	return _mmap_file(filepath, O_RDWR | O_CREAT | O_TRUNC, MAP_SHARED,
 			PROT_READ | PROT_WRITE | PROT_EXEC, size);
 }
