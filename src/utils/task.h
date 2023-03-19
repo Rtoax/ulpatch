@@ -85,6 +85,7 @@ struct vma_struct {
 
 	/* struct task.vmas */
 	struct list_head node;
+	/* struct task.vmas_rb */
 	struct rb_node node_rb;
 
 	/* All same name vma in one list, and the first vma is leader.
@@ -157,10 +158,12 @@ struct task {
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
+	/* Global tasks_list */
 	struct list_head node;
 
 	/* struct vma_struct.node */
 	struct list_head vmas;
+	/* struct vma_struct.node_rb */
 	struct rb_root vmas_rb;
 
 	struct vma_struct *libc_vma;
