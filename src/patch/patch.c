@@ -245,7 +245,7 @@ int setup_load_info(struct load_info *info)
 	const char *upatch_strtab = (void *)info->hdr
 		+ info->sechdrs[info->index.upatch_strtab].sh_offset;
 
-	memshow(upatch_strtab, 64);
+	memshowinlog(LOG_INFO, upatch_strtab, 64);
 
 	err = parse_upatch_strtab(&info->upatch_strtab, upatch_strtab);
 	if (err) {

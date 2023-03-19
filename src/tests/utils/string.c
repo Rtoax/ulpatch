@@ -26,9 +26,12 @@ TEST(Utils,	memshow,	0)
 {
 
 #define TEST_DATA	"Hello World"
-	memshow(TEST_DATA, sizeof(TEST_DATA));
+	memshowinlog(LOG_INFO, TEST_DATA, sizeof(TEST_DATA));
 
-	memshow(docs, sizeof(docs));
+	memshow(get_log_fp(), docs, sizeof(docs));
+
+	/* print nothing */
+	memshow(NULL, docs, sizeof(docs));
 
 	return 0;
 }

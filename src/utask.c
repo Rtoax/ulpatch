@@ -183,6 +183,11 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
+	if (flag_dump_vma && !output_file) {
+		fprintf(stderr, "--dump-vma need output file(-o).\n");
+		exit(1);
+	}
+
 	if (map_file && !fexist(map_file)) {
 		fprintf(stderr, "%s is not exist.\n", map_file);
 		exit(1);

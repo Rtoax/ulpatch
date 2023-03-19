@@ -9,6 +9,7 @@
 #include <utils/log.h>
 
 #include "compiler.h"
+#include "util.h"
 
 
 static const char *level_prefix[] = {
@@ -24,6 +25,7 @@ static const char *level_prefix[] = {
 
 static int log_level = LOG_DEBUG;
 static bool prefix_on = true;
+static FILE *log_fp = NULL;
 
 
 void set_log_level(int level)
@@ -45,11 +47,23 @@ void set_log_prefix(bool on)
 	prefix_on = !!on;
 }
 
+void set_log_fp(FILE *fp)
+{
+	log_fp = fp;
+}
+
+FILE *get_log_fp(void)
+{
+	if (!log_fp)
+		set_log_fp(stdout);
+	return log_fp;
+}
+
 int _____log(int level, const char *file, const char *func,
 		unsigned long int line, char *fmt, ...)
 {
 	int n = 0;
-	FILE *fp = stdout;
+	FILE *fp = get_log_fp();
 	va_list va;
 
 	if (level > log_level)
@@ -73,5 +87,13 @@ int _____log(int level, const char *file, const char *func,
 	va_end(va);
 
 	return n;
+}
+
+int memshowinlog(int level, const void *data, int data_len)
+{
+	if (level > log_level)
+		return 0;
+
+	return memshow(get_log_fp(), data, data_len);
 }
 

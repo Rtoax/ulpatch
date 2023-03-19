@@ -111,14 +111,14 @@ static int direct_patch_test(struct patch_test_arg *arg)
 	}
 
 	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
-	memshow((void*)ip, MCOUNT_INSN_SIZE);
+	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 
-	memshow((void*)ip, MCOUNT_INSN_SIZE);
+	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
 
 #elif defined(__aarch64__)
 
@@ -132,12 +132,12 @@ static int direct_patch_test(struct patch_test_arg *arg)
 	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n",
 		pc, new, aarch64_func_bl_offset(try_to_wake_up));
 
-	memshow((void*)pc, MCOUNT_INSN_SIZE);
+	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
 
 	/* application the patch */
 	ftrace_modify_code(task, pc, 0, new, false);
 
-	memshow((void*)pc, MCOUNT_INSN_SIZE);
+	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
 
 #endif
 

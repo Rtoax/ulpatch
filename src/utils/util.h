@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -176,7 +177,8 @@ const char *upatch_arch(void);
 
 void daemonize(void);
 
-int memshow(const void *data, int data_len);
+int memshow(FILE *fp, const void *data, int data_len);
+int memshowinlog(int level, const void *data, int data_len);
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int upatch_startswith(const char *str, const char *prefix);
 

@@ -2,6 +2,7 @@
 /* Copyright (C) 2022-2023 Rong Tao */
 #pragma once
 
+#include <stdio.h>
 #include <syslog.h>
 #include <stdbool.h>
 
@@ -22,6 +23,8 @@ int
 _____log(int level, const char *file, const char *func,
 	unsigned long int line, char *fmt, ...);
 
+void set_log_fp(FILE *fp);
+FILE *get_log_fp(void);
 void set_log_level(int level);
 void set_log_debug(void);
 void set_log_error(void);

@@ -47,7 +47,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	ldebug("Applying relocate section %u to %u\n",
 		relsec, sechdrs[relsec].sh_info);
 
-	memshow(rel, sechdrs[relsec].sh_size);
+	memshowinlog(LOG_INFO, rel, sechdrs[relsec].sh_size);
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 

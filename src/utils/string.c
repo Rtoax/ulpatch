@@ -12,19 +12,24 @@
 
 #include "list.h"
 
-
-int memshow(const void *data, int data_len)
+/**
+ * @fp - if NULL, return directly
+ */
+int memshow(FILE *fp, const void *data, int data_len)
 {
 	if (!data || data_len <= 0) return -EINVAL;
 
 	int i, iline, len = 0;
 	const int align = 16;
 
+	if (!fp)
+		return 0;
+
 	for (iline = 0; iline * align < data_len; iline++) {
 
 		unsigned char *line = (unsigned char *)data + iline * align;
 
-		len += printf("%08x  ", iline * align);
+		len += fprintf(fp, "%08x  ", iline * align);
 
 		for (i = 0; i < align; i++) {
 			char *e = " ";
@@ -34,13 +39,13 @@ int memshow(const void *data, int data_len)
 				e = "  ";
 
 			if (len >= data_len) {
-				len += printf("%2s%s", "", e);
+				len += fprintf(fp, "%2s%s", "", e);
 			} else {
-				len += printf("%02x%s", line[i], e);
+				len += fprintf(fp, "%02x%s", line[i], e);
 			}
 		}
 
-		len += printf("  |");
+		len += fprintf(fp, "  |");
 
 		for (i = 0; i < align; i++) {
 			char e = '.';
@@ -50,13 +55,13 @@ int memshow(const void *data, int data_len)
 				e = line[i];
 
 			if (len >= data_len) {
-				len += printf(" ");
+				len += fprintf(fp, " ");
 			} else {
-				len += printf("%c", e);
+				len += fprintf(fp, "%c", e);
 			}
 		}
 
-		len += printf("|\n");
+		len += fprintf(fp, "|\n");
 	}
 
 	return len;

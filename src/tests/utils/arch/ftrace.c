@@ -20,7 +20,7 @@ TEST(Arch_ftrace,	ftrace_call_replace,	0)
 	// new = e8 ff ff ff ff
 	const char *new = ftrace_call_replace(&insn, -4, 0);
 
-	memshow(new, sizeof(insn));
+	memshowinlog(LOG_INFO, new, sizeof(insn));
 
 	return memcmp((void *)new, expect, sizeof(insn));
 }

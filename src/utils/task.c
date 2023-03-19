@@ -692,7 +692,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	symtab_sz = (strtab_addr - symtab_addr);
 
 	if (strtab_sz == 0 || symtab_sz == 0) {
-		memshow(dynamics, phdr->p_memsz);
+		memshowinlog(LOG_INFO, dynamics, phdr->p_memsz);
 		lwarning(
 			"No strtab, p_memsz %ld, p_vaddr %lx. "
 			"strtab(%lx) symtab(%lx) %s %lx\n",
@@ -731,7 +731,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	}
 
 	ldebug("%s\n", vma->name_);
-	memshow(buffer, strtab_sz + symtab_sz);
+	memshowinlog(LOG_INFO, buffer, strtab_sz + symtab_sz);
 
 	/* For each symbol */
 	syms = (GElf_Sym *)buffer;
