@@ -135,6 +135,10 @@ static int parse_config(int argc, char *argv[])
 		case ARG_DUMP_VMA:
 			flag_dump_vma = true;
 			vma_addr = strtoull(optarg, NULL, 16);
+			if (vma_addr == 0) {
+				fprintf(stderr, "Wrong address for --dump-vma.\n");
+				exit(1);
+			}
 			break;
 		case ARG_FILE_MAP_TO_VMA:
 			map_file = optarg;
@@ -154,6 +158,7 @@ static int parse_config(int argc, char *argv[])
 			exit(0);
 		case 'h':
 			print_help();
+			break;
 		case ARG_LOG_LEVEL:
 			config.log_level = atoi(optarg);
 			break;
@@ -165,6 +170,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		default:
 			print_help();
+			break;
 		}
 	}
 
@@ -307,9 +313,9 @@ static void list_all_symbol(void)
 
 int main(int argc, char *argv[])
 {
-	upatch_init();
-
 	parse_config(argc, argv);
+
+	upatch_init();
 
 	set_log_level(config.log_level);
 

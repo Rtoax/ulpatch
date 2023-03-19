@@ -129,6 +129,7 @@ static int parse_config(int argc, char *argv[])
 			exit(0);
 		case 'h':
 			print_help();
+			break;
 		case ARG_LOG_LEVEL:
 			config.log_level = atoi(optarg);
 			break;
@@ -140,6 +141,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		default:
 			print_help();
+			break;
 		}
 	}
 
@@ -197,9 +199,9 @@ int main(int argc, char *argv[])
 	int __unused ret = 0;
 	struct symbol *target_sym;
 
-	upatch_init();
-
 	parse_config(argc, argv);
+
+	upatch_init();
 
 	set_log_level(config.log_level);
 
