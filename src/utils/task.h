@@ -135,13 +135,14 @@ struct vma_struct {
 
 struct elf_file;
 
+#define TASK_COMM_LEN	128
 
 /* This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
 struct task {
 	/* /proc/[PID]/comm */
-	char comm[128];
+	char comm[TASK_COMM_LEN];
 
 	pid_t pid;
 
