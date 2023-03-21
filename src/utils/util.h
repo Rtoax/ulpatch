@@ -171,7 +171,8 @@ struct str_node {
 extern struct config config;
 
 
-void upatch_init(void);
+void upatch_env_init(void);
+
 const char *upatch_version(void);
 const char *upatch_arch(void);
 

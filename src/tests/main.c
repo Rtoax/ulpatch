@@ -794,7 +794,7 @@ static void sig_handler(int signum)
  */
 int main(int argc, char *argv[])
 {
-	upatch_init();
+	upatch_env_init();
 
 	signal(SIGINT, sig_handler);
 

@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	upatch_init();
+	upatch_env_init();
 
 	set_log_level(config.log_level);
 
