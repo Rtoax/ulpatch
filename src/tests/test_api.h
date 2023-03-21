@@ -24,7 +24,7 @@
  *
  */
 typedef enum {
-// constructor priorities from 0 to 100 are reserved for the implementation
+/* constructor priorities from 0 to 100 are reserved for the implementation */
 #define TEST_PRIO_START	CTOR_PRIO_USER
 	TEST_HIGHEST = 1,
 #define TEST_PRIO_HIGHEST	TEST_PRIO_START + TEST_HIGHEST
@@ -49,12 +49,12 @@ struct test {
 	int (*test_cb)(void);
 	int expect_ret;
 
-	// record testing time spend
+	/* record testing time spend */
 	struct timeval start, end;
 	suseconds_t spend_us;
 
 	struct list_head node;
-	// if test result is failed, add to 'failed_list'
+	/* if test result is failed, add to 'failed_list' */
 	struct list_head failed;
 };
 
@@ -73,15 +73,15 @@ extern int nr_tests;
 	}	\
 	int test_ ##Category ##_##Name(void)
 
-// Highest prio TEST
+/* Highest prio TEST */
 #define TEST_HIGHEST(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_HIGHEST, Ret)
 
-// Normal prio TEST
+/* Normal prio TEST */
 #define TEST(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_MIDDLE, Ret)
 
-// Lower prio TEST
+/* Lower prio TEST */
 #define TEST_LOWER(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_LOWER, Ret)
 
@@ -151,7 +151,7 @@ struct clt_msg_hdr {
 	} type;
 
 	enum {
-		TEST_MC_CLOSE, // Tell server can close
+		TEST_MC_CLOSE, /* Tell server can close */
 		TEST_MC_SYMBOL,
 	} code;
 };

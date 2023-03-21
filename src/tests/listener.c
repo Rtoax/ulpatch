@@ -285,7 +285,7 @@ void listener_main_loop(void *arg)
 							free(client);
 							test_nr_clients--;
 
-							// Only handle one client, then exit
+							/* Only handle one client, then exit */
 							if (test_nr_clients == 0) {
 								goto out;
 							}
