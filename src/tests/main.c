@@ -55,22 +55,22 @@ static void __ctor(TEST_PRIO_START) __init_test_list(void)
 	fprintf(stderr, "\033[m");
 
 
-// 0-success, 1-failed
+/* 0-success, 1-failed */
 static unsigned long stat_count[2] = {0};
 
 static unsigned long total_spent_us = 0;
 
-// For -l, --list-tests
+/* For -l, --list-tests */
 static bool just_list_tests = false;
-// For -f, --filter-tests
+/* For -f, --filter-tests */
 static char *filter_format = NULL;
 
 static int log_level = LOG_ERR;
 
-// exit if Error
+/* exit if Error */
 static bool error_exit = false;
 
-// For -r, --role
+/* For -r, --role */
 static enum who {
 	ROLE_NONE,
 	ROLE_TESTER, // testing all Tests
@@ -112,7 +112,7 @@ static bool listener_request_list = false;
 static int listener_nloop = 1;
 static bool listener_epoll = false;
 
-// For -V, --verbose
+/* For -V, --verbose */
 static bool verbose = false;
 
 static void print_test_symbol(void);
@@ -438,7 +438,7 @@ static bool filter_out_test(struct test *test)
 		}
 	}
 
-	// Default: test all
+	/* Default: test all */
 	return false;
 }
 
@@ -455,7 +455,7 @@ static int operate_test(struct test *test)
 
 	gettimeofday(&test->start, NULL);
 
-	// Exe test entry
+	/* Exe test entry */
 	ret = test->test_cb();
 	if (ret == test->expect_ret) {
 		stat_count[0]++;
@@ -520,9 +520,9 @@ static void launch_tester(void)
 			close(fd);
 	}
 
-	// for each priority
+	/* for each priority */
 	for (i = 0; i < TEST_PRIO_NUM; i++) {
-		// for each test entry
+		/* for each test entry */
 		list_for_each_entry(test, &test_list[i], node) {
 			int ret;
 
@@ -783,7 +783,7 @@ static void sig_handler(int signum)
 			close_listener();
 		free_strstr_list(&mix_role_list);
 		release_tests();
-		// exit abnormal
+		/* exit abnormal */
 		exit(1);
 		break;
 	}
@@ -889,7 +889,7 @@ TEST(upatch_test,	wait,	0)
 
 	} else if (pid > 0) {
 
-		// do something
+		/* do something */
 		ldebug("PARENT: msgsnd to child.\n");
 		task_wait_trigger(&waitqueue);
 		ldebug("PARENT: send done.\n");
@@ -932,7 +932,7 @@ TEST(upatch_test,	trigger,	0)
 
 	} else if (pid > 0) {
 
-		// do something
+		/* do something */
 		ldebug("PARENT: waiting.\n");
 		task_wait_wait(&waitqueue);
 		ldebug("PARENT: get msg.\n");
@@ -975,7 +975,7 @@ TEST(upatch_test,	wait_wait_wait,	0)
 
 	} else if (pid > 0) {
 
-		// do something
+		/* do something */
 		ldebug("PARENT: msgsnd to child.\n");
 		task_wait_trigger(&waitqueue);
 		task_wait_trigger(&waitqueue);
@@ -1020,7 +1020,7 @@ TEST(upatch_test,	trigger_trigger_trigger,	0)
 
 	} else if (pid > 0) {
 
-		// do something
+		/* do something */
 		ldebug("PARENT: wait child.\n");
 		task_wait_wait(&waitqueue);
 		task_wait_wait(&waitqueue);
@@ -1065,7 +1065,7 @@ TEST(upatch_test,	wait_trigger,	0)
 
 	} else if (pid > 0) {
 
-		// do something
+		/* do something */
 		ldebug("PARENT: do some thing.\n");
 		task_wait_trigger(&waitqueue);
 		usleep(1000);
