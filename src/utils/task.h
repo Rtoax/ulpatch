@@ -162,7 +162,7 @@ struct task {
 	struct list_head node;
 
 	/* struct vma_struct.node */
-	struct list_head vmas;
+	struct list_head vma_list;
 	/* struct vma_struct.node_rb */
 	struct rb_root vmas_rb;
 

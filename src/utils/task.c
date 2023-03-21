@@ -99,7 +99,7 @@ int insert_vma(struct task *task, struct vma_struct *vma,
 		list_add(&vma->siblings, &leader->siblings);
 	}
 
-	list_add(&vma->node, &task->vmas);
+	list_add(&vma->node, &task->vma_list);
 	rb_insert_node(&task->vmas_rb, &vma->node_rb,
 		__vma_rb_cmp, (unsigned long)vma);
 	return 0;
@@ -897,7 +897,7 @@ void dump_task_vmas(struct task *task)
 {
 	struct vma_struct *vma;
 
-	list_for_each_entry(vma, &task->vmas, node) {
+	list_for_each_entry(vma, &task->vma_list, node) {
 		print_vma(vma);
 	}
 	printf(
@@ -957,12 +957,12 @@ int free_task_vmas(struct task *task)
 {
 	struct vma_struct *vma, *tmpvma;
 
-	list_for_each_entry_safe(vma, tmpvma, &task->vmas, node) {
+	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node) {
 		unlink_vma(task, vma);
 		free_vma(vma);
 	}
 
-	list_init(&task->vmas);
+	list_init(&task->vma_list);
 	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
@@ -1047,7 +1047,7 @@ struct task *open_task(pid_t pid, int flag)
 	memset(task, 0x0, sizeof(struct task));
 
 	list_init(&task->node);
-	list_init(&task->vmas);
+	list_init(&task->vma_list);
 	rb_init(&task->vmas_rb);
 
 	task->fto_flag = flag;
