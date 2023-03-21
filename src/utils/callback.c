@@ -15,11 +15,8 @@ struct callback {
 };
 
 
-#define INIT_CB_CHAIN(name)	LIST_HEAD(name)
-
-
-static __unused int insert_callback(struct list_head *chain,
-	int (*cb)(void *arg), void *cb_arg)
+int insert_callback(struct callback_chain *chain,
+		int (*cb)(void *arg), void *cb_arg)
 {
 	if (!chain || !cb)
 		return -ENOENT;
@@ -31,25 +28,25 @@ static __unused int insert_callback(struct list_head *chain,
 	new->cb = cb;
 	new->cb_arg = cb_arg;
 
-	list_add(&new->node, chain);
+	list_add(&new->node, &chain->head);
 
 	return 0;
 }
 
-static __unused void launch_chain(struct list_head *chain)
+void callback_launch_chain(struct callback_chain *chain)
 {
 	struct callback *cb, *tmp;
 
-	list_for_each_entry_safe(cb, tmp, chain, node) {
+	list_for_each_entry_safe(cb, tmp, &chain->head, node) {
 		cb->cb(cb->cb_arg);
 	}
 }
 
-static __unused int destroy_chain(struct list_head *chain)
+int destroy_callback_chain(struct callback_chain *chain)
 {
 	struct callback *cb, *tmp;
 
-	list_for_each_entry_safe(cb, tmp, chain, node) {
+	list_for_each_entry_safe(cb, tmp, &chain->head, node) {
 		list_del(&cb->node);
 		free(cb);
 	}

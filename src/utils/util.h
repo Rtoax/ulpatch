@@ -241,6 +241,16 @@ const char* objdump_symbol_name(struct objdump_symbol *symbol);
 
 int objdump_destroy(void);
 
+/* callback chain */
+struct callback_chain {
+	struct list_head head;
+};
+
+int insert_callback(struct callback_chain *chain,
+		int (*cb)(void *arg), void *cb_arg);
+void callback_launch_chain(struct callback_chain *chain);
+int destroy_callback_chain(struct callback_chain *chain);
+
 
 #ifdef __cplusplus
 }
