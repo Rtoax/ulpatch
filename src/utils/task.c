@@ -64,7 +64,7 @@ struct vma_struct *alloc_vma(struct task *task)
 	vma->task = task;
 	vma->type = VMA_NONE;
 
-	list_init(&vma->node);
+	list_init(&vma->node_list);
 
 	vma->leader = NULL;
 	list_init(&vma->siblings);
@@ -99,7 +99,7 @@ int insert_vma(struct task *task, struct vma_struct *vma,
 		list_add(&vma->siblings, &leader->siblings);
 	}
 
-	list_add(&vma->node, &task->vma_list);
+	list_add(&vma->node_list, &task->vma_list);
 	rb_insert_node(&task->vmas_rb, &vma->node_rb,
 		__vma_rb_cmp, (unsigned long)vma);
 	return 0;
@@ -107,7 +107,7 @@ int insert_vma(struct task *task, struct vma_struct *vma,
 
 int unlink_vma(struct task *task, struct vma_struct *vma)
 {
-	list_del(&vma->node);
+	list_del(&vma->node_list);
 	rb_erase(&vma->node_rb, &task->vmas_rb);
 
 	list_del(&vma->siblings);
@@ -897,7 +897,7 @@ void dump_task_vmas(struct task *task)
 {
 	struct vma_struct *vma;
 
-	list_for_each_entry(vma, &task->vma_list, node) {
+	list_for_each_entry(vma, &task->vma_list, node_list) {
 		print_vma(vma);
 	}
 	printf(
@@ -957,7 +957,7 @@ int free_task_vmas(struct task *task)
 {
 	struct vma_struct *vma, *tmpvma;
 
-	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node) {
+	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node_list) {
 		unlink_vma(task, vma);
 		free_vma(vma);
 	}

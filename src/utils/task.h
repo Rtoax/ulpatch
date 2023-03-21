@@ -83,8 +83,8 @@ struct vma_struct {
 
 	struct task *task;
 
-	/* struct task.vmas */
-	struct list_head node;
+	/* struct task.vma_list */
+	struct list_head node_list;
 	/* struct task.vmas_rb */
 	struct rb_node node_rb;
 
@@ -161,7 +161,7 @@ struct task {
 	/* Global tasks_list */
 	struct list_head node;
 
-	/* struct vma_struct.node */
+	/* struct vma_struct.node_list */
 	struct list_head vma_list;
 	/* struct vma_struct.node_rb */
 	struct rb_root vmas_rb;
