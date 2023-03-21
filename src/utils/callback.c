@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2023 Rong Tao */
-#pragma once
-
-#include <assert.h>
+#include <errno.h>
+#include <malloc.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
+
 
 struct callback {
 	void *cb_arg;
@@ -21,10 +21,12 @@ struct callback {
 static __unused int insert_callback(struct list_head *chain,
 	int (*cb)(void *arg), void *cb_arg)
 {
-	assert(cb && "callback is NULL");
+	if (!chain || !cb)
+		return -ENOENT;
 
 	struct callback *new = malloc(sizeof(struct callback));
-	assert(new && "Malloc fatal.");
+	if (!new)
+		return -ENOMEM;
 
 	new->cb = cb;
 	new->cb_arg = cb_arg;
