@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2023 Rong Tao */
+/* Copyright (C) 2022-2023 CESTC, Co. Rong Tao <rongtao@cestc.cn> */
 #include <utils/log.h>
 #include <utils/rbtree.h>
 #include <elf/elf_api.h>

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2022 Rong Tao
+# Copyright (C) 2022 CESTC, Co. Rong Tao <rongtao@cestc.cn>
 #
 ifdef UPATCH_HELLO_OBJ
 TARGETS = $(UPATCH_HELLO_OBJ)
