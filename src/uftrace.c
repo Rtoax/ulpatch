@@ -68,8 +68,9 @@ static void print_help(void)
 	"                      actually, this input is not necessary, unless you know\n"
 	"                      how to generate a ftrace relocatable object.\n"
 	"                      default: %s\n"
-	"\n"
-	"\n"
+	"\n",
+	UPATCH_FTRACE_OBJ_PATH);
+	printf(
 	" Common argument:\n"
 	"\n"
 	"  --log-level         set log level, default(%d)\n"
@@ -77,19 +78,19 @@ static void print_help(void)
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"
 	"  --log-error         set log level to ERR(%d)\n"
-	"\n"
-	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
-	"\n"
-	" uftrace %s\n",
-	UPATCH_FTRACE_OBJ_PATH,
+	"\n",
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
 	LOG_DEBUG,
-	LOG_ERR,
-	upatch_version()
-	);
+	LOG_ERR);
+	printf(
+	"  -h, --help          display this help and exit\n"
+	"  -v, --version       output version information and exit\n"
+	"\n");
+	printf(
+	" uftrace %s\n",
+	upatch_version());
 	exit(0);
 }
 

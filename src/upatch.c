@@ -54,7 +54,8 @@ static void print_help(void)
 	" Operate argument:\n"
 	"\n"
 	"  --patch             patch a object file into target task\n"
-	"\n"
+	"\n");
+	printf(
 	" Common argument:\n"
 	"\n"
 	"  --log-level         set log level, default(%d)\n"
@@ -62,16 +63,18 @@ static void print_help(void)
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"
 	"  --log-error         set log level to ERR(%d)\n"
-	"\n"
-	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
-	"\n"
-	" upatch %s\n",
+	"\n",
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
 	LOG_DEBUG,
-	LOG_ERR,
+	LOG_ERR);
+	printf(
+	"  -h, --help          display this help and exit\n"
+	"  -v, --version       output version information and exit\n"
+	"\n");
+	printf(
+	" upatch %s\n",
 	upatch_version()
 	);
 	exit(0);
