@@ -26,7 +26,7 @@ enum {
 	ARG_LOG_LEVEL = 200,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
-	ARG_DUMP_VMAS, // print all vmas
+	ARG_VMAS, // print all vmas
 	ARG_DUMP_VMA, // dump one vma
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
@@ -35,7 +35,7 @@ enum {
 
 static pid_t target_pid = -1;
 
-static bool flag_dump_vmas = false;
+static bool flag_print_vmas = false;
 static bool flag_dump_vma = false;
 static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
@@ -62,7 +62,7 @@ static void print_help(void)
 	"\n"
 	"  -p, --pid           specify a process identifier(pid_t)\n"
 	"\n"
-	"  --dump-vmas         dump vmas\n"
+	"  --vmas              print all vmas\n"
 	"  --dump-vma          save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
@@ -71,7 +71,7 @@ static void print_help(void)
 	"  --map-file          mmap a exist file into target process address space\n"
 	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by --map-file.\n"
-	"                      check with --dump-vmas and --map-file.\n"
+	"                      check with --vmas and --map-file.\n"
 	"\n"
 	"  --symbols           list all symbols\n"
 	"\n"
@@ -107,7 +107,7 @@ static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
-		{ "dump-vmas",      no_argument,       0, ARG_DUMP_VMAS },
+		{ "vmas",           no_argument,       0, ARG_VMAS },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
@@ -132,8 +132,8 @@ static int parse_config(int argc, char *argv[])
 		case 'p':
 			target_pid = atoi(optarg);
 			break;
-		case ARG_DUMP_VMAS:
-			flag_dump_vmas = true;
+		case ARG_VMAS:
+			flag_print_vmas = true;
 			break;
 		case ARG_DUMP_VMA:
 			flag_dump_vma = true;
@@ -177,7 +177,7 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	if (!flag_dump_vmas &&
+	if (!flag_print_vmas &&
 		!flag_dump_vma &&
 		!map_file &&
 		!flag_unmap_vma &&
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* dump target task VMAs from /proc/PID/maps */
-	if (flag_dump_vmas)
+	if (flag_print_vmas)
 		dump_task_vmas(target_task);
 
 	/* dump an VMA */
