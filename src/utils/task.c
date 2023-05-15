@@ -906,10 +906,9 @@ void dump_task_vmas(struct task *task)
 	);
 }
 
-int dump_task_vma_to_file(const char *ofile, struct task *task,
-		unsigned long addr)
+int dump_task_addr_to_file(const char *ofile, struct task *task,
+		unsigned long addr, unsigned long size)
 {
-	size_t vma_size = 0;
 	void *mem = NULL;
 
 	/* default is stdout */
@@ -932,15 +931,13 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 		return -1;
 	}
 
-	vma_size = vma->end - vma->start;
+	mem = malloc(size);
 
-	mem = malloc(vma_size);
-
-	memcpy_from_task(task, mem, vma->start, vma_size);
+	memcpy_from_task(task, mem, addr, size);
 
 	/* write to file or stdout */
-	nbytes = write(fd, mem, vma_size);
-	if (nbytes != vma_size) {
+	nbytes = write(fd, mem, size);
+	if (nbytes != size) {
 		lerror("write failed, %s.\n", strerror(errno));
 		free(mem);
 		return -1;
@@ -951,6 +948,21 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 		close(fd);
 
 	return 0;
+}
+
+int dump_task_vma_to_file(const char *ofile, struct task *task,
+		unsigned long addr)
+{
+	size_t vma_size = 0;
+	struct vma_struct *vma = find_vma(task, addr);
+	if (!vma) {
+		lerror("vma not exist.\n");
+		return -1;
+	}
+
+	vma_size = vma->end - vma->start;
+
+	return dump_task_addr_to_file(ofile, task, vma->start, vma_size);
 }
 
 int free_task_vmas(struct task *task)
