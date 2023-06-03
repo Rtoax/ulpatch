@@ -66,8 +66,12 @@ extern "C" {
 #endif
 
 #if !defined(KERNEL_HEADERS_CONST___ALIGN_KERNEL_H)
-#define __ALIGN_KERNEL(x, a)		__ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
-#define __ALIGN_KERNEL_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+#if !defined(__ALIGN_KERNEL)
+# define __ALIGN_KERNEL(x, a)		__ALIGN_KERNEL_MASK(x, (typeof(x))(a) - 1)
+#endif
+#if !defined(__ALIGN_KERNEL_MASK)
+# define __ALIGN_KERNEL_MASK(x, mask)	(((x) + (mask)) & ~(mask))
+#endif
 
 #define __KERNEL_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 #endif
