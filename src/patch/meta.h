@@ -34,6 +34,7 @@ enum patch_type {
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
  */
+#if defined(__x86_64__)
 #define UPATCH_INFO(patch_type, src_func, dst_func, author)	\
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
@@ -53,6 +54,12 @@ __asm__ (	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
 );
+#elif defined(__aarch64__)
+/* FIXME: */
+#define UPATCH_INFO(patch_type, src_func, dst_func, author)
+#else
+# error Not support arch
+#endif
 
 /**
  * each element point each string in SEC_UPATCH_STRTAB
