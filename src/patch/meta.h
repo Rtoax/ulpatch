@@ -34,8 +34,7 @@ enum patch_type {
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
  */
-#if defined(__x86_64__)
-#define UPATCH_INFO(patch_type, src_func, dst_func, author)	\
+#define UPATCH_INFO(patch_type, src_func, dst_func, author) \
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
 	SEC_UPATCH_STRTAB_LABEL ": \n"	\
@@ -46,20 +45,14 @@ __asm__ (	\
 	"	.string \"" author "\" \n"	\
 	"	.popsection \n"	\
 	"	.pushsection " SEC_UPATCH_INFO ", \"aw\", @progbits\n"	\
-	"	.quad 0 # target function address\n"	\
-	"	.quad 0 # patch function address\n"	\
-	"	.quad 0 # virtual address to modify in target process\n"	\
-	"	.quad 0 # original value\n"	\
+	"	.quad 0\n" /* target function address */	\
+	"	.quad 0\n" /* patch function address */	\
+	"	.quad 0\n" /* virtual address to modify in target process */	\
+	"	.quad 0\n" /* original value */	\
 	"	.long 0 \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
 );
-#elif defined(__aarch64__)
-/* FIXME: */
-#define UPATCH_INFO(patch_type, src_func, dst_func, author)
-#else
-# error Not support arch
-#endif
 
 /**
  * each element point each string in SEC_UPATCH_STRTAB
