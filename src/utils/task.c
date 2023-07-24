@@ -857,13 +857,17 @@ int update_task_vmas(struct task *task)
 	return read_task_vmas(task, true);
 }
 
-void print_vma(struct vma_struct *vma)
+void print_vma(FILE *fp, struct vma_struct *vma)
 {
 	if (!vma) {
 		lerror("Invalide pointer.\n");
 		return;
 	}
-	printf(
+
+	if (!fp)
+		fp = stdout;
+
+	fprintf(fp,
 		"%10s: %016lx-%016lx %6s %s%s%s%s %8lx %8lx %s\n",
 		VMA_TYPE_NAME(vma->type),
 		vma->start,
@@ -872,7 +876,7 @@ void print_vma(struct vma_struct *vma)
 		vma->is_elf ? "E" : "-",
 		vma->is_share_lib ? "S" : "-",
 		vma->is_matched_phdr ? "P" : "-",
-		vma->leader==vma ? "L" : "-",
+		vma->leader == vma ? "L" : "-",
 		vma->offset,
 		vma->voffset,
 		vma->name_
@@ -898,7 +902,7 @@ void dump_task_vmas(struct task *task)
 	struct vma_struct *vma;
 
 	list_for_each_entry(vma, &task->vma_list, node_list) {
-		print_vma(vma);
+		print_vma(stdout, vma);
 	}
 	printf(
 		"\n"
@@ -1415,7 +1419,7 @@ int wait_for_stop(struct task *task)
 	while (1) {
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
-			print_vma(task->libc_vma);
+			print_vma(stderr, task->libc_vma);
 			lerror("ptrace(PTRACE_CONT, %d, ...) %s\n",
 				pid, strerror(ESRCH));
 			return -1;

@@ -146,7 +146,7 @@ TEST(Task,	for_each_vma,	0)
 	struct vma_struct *vma;
 
 	task_for_each_vma(vma, task) {
-		print_vma(vma);
+		print_vma(stdout, vma);
 	}
 
 	return free_task(task);
@@ -165,7 +165,7 @@ TEST(Task,	find_vma,	0)
 			ret = -1;
 			goto failed;
 		}
-		print_vma(find);
+		print_vma(stdout, find);
 	}
 
 failed:
