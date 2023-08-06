@@ -131,9 +131,11 @@ TARGETS
 	uftrace
 	upatch
 	utask
-	upatch_test
 RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
+if (BUILD_TESTING)
+install(TARGETS upatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif()
 
 # install object file
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
