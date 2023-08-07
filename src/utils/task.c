@@ -307,7 +307,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	/* Is not ELF? */
 	if (memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr)) < sizeof(ehdr)) {
 		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
-		return -1;
+		return -EAGAIN;
 	}
 
 	/* If not ELF, return success */
@@ -319,6 +319,9 @@ int vma_peek_phdr(struct vma_struct *vma)
 
 	/* VMA is ELF, handle it */
 	vma->elf = malloc(sizeof(struct vma_elf));
+	if (!vma->elf)
+		return -ENOMEM;
+
 	memset(vma->elf, 0x0, sizeof(struct vma_elf));
 
 	/* Copy ehdr from load var */
@@ -346,14 +349,14 @@ int vma_peek_phdr(struct vma_struct *vma)
 	vma->elf->phdrs = malloc(phsz);
 	if (!vma->elf->phdrs) {
 		free(vma->elf);
-		return -1;
+		return -ENOMEM;
 	}
 
 	if (memcpy_from_task(task, vma->elf->phdrs, phaddr, phsz) < phsz) {
 		free(vma->elf->phdrs);
 		free(vma->elf);
 		lerror("Failed to read %s program header.\n", vma->name_);
-		return -1;
+		return -EAGAIN;
 	}
 
 	vma->is_elf = true;
