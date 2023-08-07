@@ -276,7 +276,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 		if (cb)
 			ret = cb(task);
 
-		dump_task_vmas(task);
+		dump_task_vmas(task, true);
 
 		delete_patch(task);
 
@@ -365,7 +365,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 
 		struct task *task = open_task(pid, FTO_UFTRACE);
 
-		dump_task_vmas(task);
+		dump_task_vmas(task, true);
 
 		fd = listener_helper_create_test_client();
 

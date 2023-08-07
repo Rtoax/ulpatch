@@ -64,7 +64,7 @@ TEST(Task,	open_free_fto_flags,	0)
 		ret = -1;
 	}
 
-	dump_task_vmas(task);
+	dump_task_vmas(task, true);
 
 	free_task(task);
 
@@ -93,7 +93,7 @@ TEST(Task,	dump_task,	0)
 	struct task *task = open_task(getpid(), FTO_NONE);
 
 	dump_task(task);
-	dump_task_vmas(task);
+	dump_task_vmas(task, true);
 
 	return free_task(task);
 }
@@ -146,7 +146,7 @@ TEST(Task,	for_each_vma,	0)
 	struct vma_struct *vma;
 
 	task_for_each_vma(vma, task) {
-		print_vma(stdout, vma);
+		print_vma(stdout, vma, true);
 	}
 
 	return free_task(task);
@@ -165,7 +165,7 @@ TEST(Task,	find_vma,	0)
 			ret = -1;
 			goto failed;
 		}
-		print_vma(stdout, find);
+		print_vma(stdout, find, true);
 	}
 
 failed:
@@ -247,13 +247,13 @@ TEST(Task,	mmap_malloc,	0)
 
 		struct task *task = open_task(pid, FTO_NONE);
 
-		// dump_task_vmas(task);
+		// dump_task_vmas(task, true);
 
 		ret = task_attach(pid);
 		addr = task_malloc(task, 64);
 		ldebug("task %lx, addr = %lx\n", task, addr);
 
-		dump_task_vmas(task);
+		dump_task_vmas(task, true);
 
 		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
@@ -379,7 +379,7 @@ static int test_mmap_file(struct task *task, int prot)
 	ldebug("New mmap. %lx\n", map_v);
 
 	update_task_vmas(task);
-	dump_task_vmas(task);
+	dump_task_vmas(task, true);
 
 	ldebug("unmmap. %lx\n", map_v);
 	task_munmap(task, map_v, map_len);
@@ -418,7 +418,7 @@ static int task_mmap_file(int prot)
 
 		struct task *task = open_task(pid, FTO_NONE);
 
-		dump_task_vmas(task);
+		dump_task_vmas(task, true);
 
 		task_attach(pid);
 		ret = test_mmap_file(task, prot);
@@ -478,13 +478,13 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 
 		struct task *task = open_task(pid, FTO_NONE);
 
-		// dump_task_vmas(task);
+		// dump_task_vmas(task, true);
 
 		ret = task_attach(pid);
 		addr = task_malloc(task, 64);
 		ldebug("task %lx, addr = %lx\n", task, addr);
 
-		dump_task_vmas(task);
+		dump_task_vmas(task, true);
 
 		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 

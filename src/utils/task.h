@@ -210,8 +210,8 @@ enum vma_type get_vma_type(const char *exe, const char *name);
 
 int dump_task(const struct task *t);
 
-void print_vma(FILE *fp, struct vma_struct *vma);
-void dump_task_vmas(struct task *task);
+void print_vma(FILE *fp, struct vma_struct *vma, bool detail);
+void dump_task_vmas(struct task *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task *task,

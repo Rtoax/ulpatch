@@ -860,7 +860,7 @@ int update_task_vmas(struct task *task)
 	return read_task_vmas(task, true);
 }
 
-void print_vma(FILE *fp, struct vma_struct *vma)
+void print_vma(FILE *fp, struct vma_struct *vma, bool detail)
 {
 	if (!vma) {
 		lerror("Invalide pointer.\n");
@@ -884,6 +884,14 @@ void print_vma(FILE *fp, struct vma_struct *vma)
 		vma->voffset,
 		vma->name_
 	);
+
+	if (detail) {
+		/* TODO: Add more informations */
+		fprintf(fp,
+			"%10s  load_offset = 0x%lx\n", "",
+			vma->elf ? vma->elf->load_offset : 0
+		);
+	}
 }
 
 int dump_task(const struct task *task)
@@ -900,12 +908,12 @@ int dump_task(const struct task *task)
 	return 0;
 }
 
-void dump_task_vmas(struct task *task)
+void dump_task_vmas(struct task *task, bool detail)
 {
 	struct vma_struct *vma;
 
 	list_for_each_entry(vma, &task->vma_list, node_list) {
-		print_vma(stdout, vma);
+		print_vma(stdout, vma, detail);
 	}
 	printf(
 		"\n"
@@ -1422,7 +1430,7 @@ int wait_for_stop(struct task *task)
 	while (1) {
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
-			print_vma(stderr, task->libc_vma);
+			print_vma(stderr, task->libc_vma, false);
 			lerror("ptrace(PTRACE_CONT, %d, ...) %s\n",
 				pid, strerror(ESRCH));
 			return -1;

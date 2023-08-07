@@ -47,6 +47,8 @@ static struct task *target_task = NULL;
 
 static const char *prog_name = "utask";
 
+static bool verbose = false;
+
 
 static void print_help(void)
 {
@@ -63,6 +65,7 @@ static void print_help(void)
 	"  -p, --pid           specify a process identifier(pid_t)\n"
 	"\n"
 	"  --vmas              print all vmas\n"
+	"                      show detail if specify verbose argument.\n"
 	"  --dump-vma          save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
@@ -93,6 +96,7 @@ static void print_help(void)
 	LOG_DEBUG,
 	LOG_ERR);
 	printf(
+	"  -V, --verbose       show detail\n"
 	"  -h, --help          display this help and exit\n"
 	"  -v, --version       output version information and exit\n"
 	"\n");
@@ -114,6 +118,7 @@ static int parse_config(int argc, char *argv[])
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
 		{ "version",        no_argument,       0, 'v' },
+		{ "verbose",        no_argument,       0, 'V' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
 		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
@@ -124,7 +129,7 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:o:hv", options, &option_index);
+		c = getopt_long(argc, argv, "p:o:hvV", options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -159,6 +164,9 @@ static int parse_config(int argc, char *argv[])
 		case 'v':
 			printf("%s %s\n", prog_name, upatch_version());
 			exit(0);
+		case 'V':
+			verbose = true;
+			break;
 		case 'h':
 			print_help();
 			break;
@@ -343,7 +351,7 @@ int main(int argc, char *argv[])
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)
-		dump_task_vmas(target_task);
+		dump_task_vmas(target_task, verbose);
 
 	/* dump an VMA */
 	if (flag_dump_vma) {
