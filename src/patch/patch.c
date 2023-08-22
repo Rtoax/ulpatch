@@ -12,12 +12,11 @@
 
 #include <elf/elf_api.h>
 #include <utils/log.h>
-#include <utils/patch.h>
 #include <utils/list.h>
 #include <utils/task.h>
 #include <utils/compiler.h>
 
-#include "patch.h"
+#include <patch/patch.h>
 
 
 /* free load_info */

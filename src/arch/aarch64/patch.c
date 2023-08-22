@@ -8,8 +8,8 @@
 #include <utils/util.h>
 #include <utils/log.h>
 #include <utils/task.h>
-#include <utils/patch.h>
 #include <utils/compiler.h>
+#include <patch/patch.h>
 
 
 enum aarch64_reloc_op {

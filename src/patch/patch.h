@@ -85,4 +85,7 @@ int setup_load_info(struct load_info *info);
 int init_patch(struct task *task, const char *obj_file);
 int delete_patch(struct task *task);
 
+int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
+	const char *strtab,	unsigned int symindex, unsigned int relsec);
+
 #endif /* __ELF_UPATCH_H */

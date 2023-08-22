@@ -9,7 +9,7 @@
 #include <utils/log.h>
 #include <utils/task.h>
 #include <utils/compiler.h>
-#include <utils/patch.h>
+#include <patch/patch.h>
 
 #include <elf/elf_api.h>
 
