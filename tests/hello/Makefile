@@ -1,8 +1,9 @@
 
-all: hello
+TARGETS := hello
 
-hello:
-	gcc main.c -o hello -pg
+hello: hello.o
+
+build: ${TARGETS}
 
 clean:
-	rm -f hello
+	rm -f $(TARGETS)
