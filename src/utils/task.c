@@ -912,13 +912,10 @@ void dump_task_vmas(struct task *task, bool detail)
 {
 	struct vma_struct *vma;
 
-	list_for_each_entry(vma, &task->vma_list, node_list) {
+	list_for_each_entry(vma, &task->vma_list, node_list)
 		print_vma(stdout, vma, detail);
-	}
-	printf(
-		"\n"
-		"(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n"
-	);
+
+	printf("\n(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n");
 }
 
 int dump_task_addr_to_file(const char *ofile, struct task *task,
