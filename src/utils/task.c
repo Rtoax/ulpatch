@@ -1108,16 +1108,14 @@ struct task *open_task(pid_t pid, int flag)
 
 	if (flag & FTO_VMA_ELF) {
 		struct vma_struct *tmp_vma;
-		task_for_each_vma(tmp_vma, task) {
+		task_for_each_vma(tmp_vma, task)
 			vma_peek_phdr(tmp_vma);
-		}
 	}
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
 		struct vma_struct *tmp_vma;
-		task_for_each_vma(tmp_vma, task) {
+		task_for_each_vma(tmp_vma, task)
 			vma_load_all_symbols(tmp_vma);
-		}
 	}
 
 	if (flag & FTO_SELF_PLT) {
@@ -1176,9 +1174,8 @@ int free_task(struct task *task)
 
 	if (task->fto_flag & FTO_VMA_ELF) {
 		struct vma_struct *tmp_vma;
-		task_for_each_vma(tmp_vma, task) {
+		task_for_each_vma(tmp_vma, task)
 			vma_free_elf(tmp_vma);
-		}
 	}
 
 	if (task->fto_flag & FTO_SELF)
