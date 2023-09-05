@@ -6,6 +6,12 @@ UPatch
 UPatch is open source ELF tool. Based on [elfutils](https://sourceware.org/git/elfutils.git).
 
 
+# Support Architecture
+
+- [ ] `x86_64`: ready to go
+- [ ] `aarch64`: ready to go
+
+
 # Theroy
 
 ## Ftrace
