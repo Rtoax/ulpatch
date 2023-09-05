@@ -1,9 +1,12 @@
+TARGETS := disasm-tst0
+TARGETS += disasm-tst1
 
 CFLAGS = -lopcodes -Wall -O0 -g -ggdb
 
-all:
-	gcc disasm-tst0.c $(CFLAGS) -o disasm-tst0.out
-	gcc disasm-tst1.c $(CFLAGS) -o disasm-tst1.out
+build: ${TARGETS}
+
+disasm-tst0: disasm-tst0.o
+disasm-tst1: disasm-tst1.o
 
 clean:
 	rm -f *.out *.o *.d
