@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2023 CESTC, Co. Rong Tao <rongtao@cestc.cn> */
+/* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
 #ifndef _UTIL_H
 #define _UTIL_H
 
