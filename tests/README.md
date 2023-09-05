@@ -1,7 +1,7 @@
 tests
 =====
 
-This directory have lots of test to test ftrace and upatch.
+Store lots of tests to test utask, uftrace and upatch.
 
 
 # Tests
