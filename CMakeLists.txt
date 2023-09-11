@@ -30,6 +30,7 @@ add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
+set(BUILD_UFTRACE ON CACHE BOOL "Build uftrace")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 
 set(UPATCH_SHARE_DIR /usr/share/upatch/)
@@ -126,13 +127,11 @@ add_subdirectory(src)
 
 
 # install targets
-install(
-TARGETS
-	uftrace
-	upatch
-	utask
-RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-)
+if (BUILD_UFTRACE)
+install(TARGETS uftrace RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif()
+install(TARGETS utask RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS upatch RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 if (BUILD_TESTING)
 install(TARGETS upatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()

@@ -17,6 +17,7 @@ UPatch is open source ELF tool. Based on [elfutils](https://sourceware.org/git/e
 ## Ftrace
 
 Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compile option.
+`BUILD_UFTRACE` decides whether to compile `uftrace`.
 
 
 ## Upatch

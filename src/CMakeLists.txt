@@ -28,10 +28,12 @@ add_executable(utask
 target_compile_definitions(utask PRIVATE ${UTILS_FLAGS})
 
 # Target: uftrace
+if (BUILD_UFTRACE)
 add_executable(uftrace
 	uftrace.c
 )
 target_compile_definitions(uftrace PRIVATE ${UTILS_FLAGS})
+endif()
 
 # Target: upatch
 add_executable(upatch
