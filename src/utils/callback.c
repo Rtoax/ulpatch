@@ -37,9 +37,8 @@ void callback_launch_chain(struct callback_chain *chain)
 {
 	struct callback *cb, *tmp;
 
-	list_for_each_entry_safe(cb, tmp, &chain->head, node) {
+	list_for_each_entry_safe(cb, tmp, &chain->head, node)
 		cb->cb(cb->cb_arg);
-	}
 }
 
 int destroy_callback_chain(struct callback_chain *chain)
@@ -50,7 +49,6 @@ int destroy_callback_chain(struct callback_chain *chain)
 		list_del(&cb->node);
 		free(cb);
 	}
-
 	return 0;
 }
 
