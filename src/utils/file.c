@@ -41,7 +41,7 @@ int fsize(const char *filepath)
 
 bool fexist(const char *filepath)
 {
-	return access(filepath, F_OK) == 0? true:false;
+	return access(filepath, F_OK) == 0 ? true : false;
 }
 
 static int _file_type_mem(struct mmap_struct *mem)
@@ -161,23 +161,18 @@ char* fmktempfile(char *buf, int buf_len, char *seed)
 char* fmktempname(char *buf, int buf_len, char *seed)
 {
 	char *file = fmktempfile(buf, buf_len, seed);
-
 	unlink(file);
-
 	return basename(buf);
 }
 
-/* Load a @file to @mem, make sure @file exist in file system
- */
+/* Load a @file to @mem, make sure @file exist in file system */
 int copy_chunked_from_file(void *mem, int mem_len, const char *file)
 {
 	FILE *fp;
 	int size = MIN(mem_len, fsize(file));
 
 	fp = fopen(file, "r");
-
 	fread(mem, size, 1, fp);
-
 	fclose(fp);
 
 	return size;

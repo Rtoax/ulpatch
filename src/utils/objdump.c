@@ -398,9 +398,8 @@ struct objdump_elf_file* objdump_elf_load(const char *elf_file)
 	}
 
 	file = file_already_load(elf_file);
-	if (!file) {
+	if (!file)
 		file = file_load(elf_file);
-	}
 
 	return file;
 }
@@ -427,7 +426,6 @@ int objdump_destroy(void)
 	struct objdump_elf_file *f, *tmp;
 
 	list_for_each_entry_safe(f, tmp, &file_list, node) {
-
 		int i;
 
 		list_del(&f->node);

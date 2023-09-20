@@ -255,7 +255,6 @@ int insert_callback(struct callback_chain *chain,
 void callback_launch_chain(struct callback_chain *chain);
 int destroy_callback_chain(struct callback_chain *chain);
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -77,13 +77,15 @@ int _____log(int level, const char *file, const char *func,
 		strftime(buffer, 32, "%T", localtime(&timestamp));
 
 		fprintf(fp, "%s %s[%s %s:%ld] ",
-			buffer, level_prefix[level], basename((char *)file), func, line);
+			buffer,
+			level_prefix[level],
+			basename((char *)file),
+			func,
+			line);
 	}
 
 	va_start(va, fmt);
-
 	n += vfprintf(fp, fmt, va);
-
 	va_end(va);
 
 	return n;
@@ -93,7 +95,6 @@ int memshowinlog(int level, const void *data, int data_len)
 {
 	if (level > log_level)
 		return 0;
-
 	return memshow(get_log_fp(), data, data_len);
 }
 
