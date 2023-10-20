@@ -6,4 +6,4 @@ hello: hello.o
 build: ${TARGETS}
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) *.o
