@@ -9,6 +9,8 @@
 
 #include <elf/elf_api.h>
 
+#include <patch/patch.h>
+
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
@@ -20,13 +22,14 @@ struct config config = {
 };
 
 enum {
-	ARG_PATCH = 139,
-	ARG_LOG_LEVEL,
+	ARG_LOG_LEVEL = 139,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
 };
 
 static const char *prog_name = "upinfo";
+
+static char *patch_file = NULL;
 
 static void print_help(void)
 {
@@ -40,7 +43,7 @@ static void print_help(void)
 	"\n"
 	" Option argument:\n"
 	"\n"
-	"  --patch             specify an patch file to check\n"
+	"  -i, --patch         specify an patch file to check\n"
 	"\n");
 	printf(
 	" Common argument:\n"
@@ -70,7 +73,7 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{ "patch",          no_argument,       0, ARG_PATCH },
+		{ "patch",          required_argument, 0, 'i' },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
@@ -82,12 +85,13 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "vh", options, &option_index);
+		c = getopt_long(argc, argv, "i:vh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
 		switch (c) {
-		case ARG_PATCH:
+		case 'i':
+			patch_file = optarg;
 			break;
 		case 'v':
 			printf("%s %s\n", prog_name, upatch_version());
@@ -110,14 +114,32 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
+	if (!patch_file) {
+		fprintf(stderr, "Must specify --patch\n");
+		exit(1);
+	}
+	if (!fexist(patch_file)) {
+		fprintf(stderr, "%s is not exist\n", patch_file);
+		exit(1);
+	}
+
 	return 0;
 }
 
 int main(int argc, char *argv[])
 {
+	int err;
+	struct load_info info;
+
 	parse_config(argc, argv);
 
 	set_log_level(config.log_level);
+
+	err = parse_load_info(patch_file, "temp.up", &info);
+	if (err) {
+		lerror("Parse %s failed.\n", patch_file);
+		return err;
+	}
 
 	return 0;
 }

@@ -18,7 +18,7 @@ endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH})
+link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} upatch_elf)
 
 add_library(upatch_utils STATIC ${LIB_SOURCES})
 
