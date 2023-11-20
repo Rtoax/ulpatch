@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
+/* Copyright (C) 2023 Rong Tao <rtoax@foxmail.com> */
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -19,15 +19,6 @@ struct config config = {
 	.log_level = -1,
 };
 
-enum command {
-	CMD_NONE,
-	CMD_PATCH,
-} command_type = CMD_NONE;
-
-
-static pid_t target_pid = -1;
-static struct task *target_task = NULL;
-
 enum {
 	ARG_PATCH = 139,
 	ARG_LOG_LEVEL,
@@ -35,13 +26,13 @@ enum {
 	ARG_LOG_ERR,
 };
 
-static const char *prog_name = "upatch";
+static const char *prog_name = "upinfo";
 
 static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: upatch [OPTION]... [FILE]...\n"
+	" Usage: upinfo [OPTION]... [FILE]...\n"
 	"\n"
 	" User space patch\n"
 	"\n"
@@ -49,11 +40,7 @@ static void print_help(void)
 	"\n"
 	" Option argument:\n"
 	"\n"
-	"  -p, --pid           specify a process identifier(pid_t)\n"
-	"\n"
-	" Operate argument:\n"
-	"\n"
-	"  --patch             patch an object file into target task\n"
+	"  --patch             specify an patch file to check\n"
 	"\n");
 	printf(
 	" Common argument:\n"
@@ -74,7 +61,7 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n");
 	printf(
-	" upatch %s\n",
+	" upinfo %s\n",
 	upatch_version()
 	);
 	exit(0);
@@ -83,7 +70,6 @@ static void print_help(void)
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-		{ "pid",            required_argument, 0, 'p' },
 		{ "patch",          no_argument,       0, ARG_PATCH },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
@@ -96,16 +82,12 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vh", options, &option_index);
+		c = getopt_long(argc, argv, "vh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
 		switch (c) {
-		case 'p':
-			target_pid = atoi(optarg);
-			break;
 		case ARG_PATCH:
-			command_type = CMD_PATCH;
 			break;
 		case 'v':
 			printf("%s %s\n", prog_name, upatch_version());
@@ -128,55 +110,14 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	if (command_type == CMD_NONE) {
-		fprintf(stderr, "Nothing to do, check -h, --help.\n");
-		exit(1);
-	}
-
-	if (target_pid == -1) {
-		fprintf(stderr, "Specify pid with -p, --pid.\n");
-		exit(1);
-	}
-
-	if (!proc_pid_exist(target_pid)) {
-		fprintf(stderr, "pid %d not exist.\n", target_pid);
-		exit(1);
-	}
-
 	return 0;
-}
-
-static void command_patch(void)
-{
-	fprintf(stdout, "TODO: finish me.\n");
-	// TODO
 }
 
 int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
 
-	upatch_env_init();
-
 	set_log_level(config.log_level);
-
-	target_task = open_task(target_pid, FTO_ALL);
-
-	if (!target_task) {
-		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
-		return 1;
-	}
-
-	switch (command_type) {
-	case CMD_PATCH:
-		command_patch();
-		break;
-	case CMD_NONE:
-	default:
-		fprintf(stderr, "What to do.\n");
-	}
-
-	free_task(target_task);
 
 	return 0;
 }

@@ -43,6 +43,12 @@ add_executable(upatch
 )
 target_compile_definitions(upatch PRIVATE ${UTILS_FLAGS})
 
+# Target: upinfo
+add_executable(upinfo
+	upinfo.c
+)
+target_compile_definitions(upinfo PRIVATE ${UTILS_FLAGS})
+
 if(BUILD_TESTING)
 add_subdirectory(tests)
 endif()
