@@ -20,7 +20,7 @@
 
 
 /* free load_info */
-static void free_info(struct load_info *info)
+void release_load_info(struct load_info *info)
 {
 	if (info->patch_mmap) {
 		fmunmap(info->patch_mmap);
@@ -114,7 +114,7 @@ out:
 	return err;
 
 free_out:
-	free_info(info);
+	release_load_info(info);
 	return err;
 }
 
@@ -588,7 +588,7 @@ static int load_patch(struct load_info *info)
 	// TODO
 
 free_copy:
-	free_info(info);
+	release_load_info(info);
 	return err;
 }
 
@@ -619,7 +619,7 @@ int init_patch(struct task *task, const char *obj_file)
 	 */
 	err = create_mmap_vma_file(task, &info);
 	if (err) {
-		free_info(&info);
+		release_load_info(&info);
 		return err;
 	}
 

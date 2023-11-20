@@ -141,6 +141,24 @@ int main(int argc, char *argv[])
 		return err;
 	}
 
+	setup_load_info(&info);
+
+	printf("%-16s : %s\n", "Magic", info.upatch_strtab.magic);
+	printf("%-16s : %d\n", "Type", info.type);
+	printf("%-16s : %s\n", "SrcFunc", info.upatch_strtab.src_func);
+	printf("%-16s : %s\n", "DstFunc", info.upatch_strtab.dst_func);
+	printf("%-16s : %s\n", "Author", info.upatch_strtab.author);
+
+	printf("TargetAddr : %#016lx\n", info.info->target_func_addr);
+	printf("PatchAddr  : %#016lx\n", info.info->patch_func_addr);
+	printf("VirtAddr   : %#016lx\n", info.info->virtual_addr);
+	printf("OrigVal    : %#016lx\n", info.info->orig_value);
+	printf("Flags      : %#08x\n",  info.info->flags);
+	printf("Pad[4]     : [%d,%d,%d,%d]\n",
+		info.info->pad[0], info.info->pad[1],
+		info.info->pad[2], info.info->pad[3]);
+
+	release_load_info(&info);
 	return 0;
 }
 
