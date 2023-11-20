@@ -2,15 +2,13 @@
 /* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
 #pragma once
 
-#ifndef __ELF_UPATCH_H
-#error "Don not install meta.h directly, install patch.h instead."
-#endif
-
-#include <stdint.h>
-
 /* This header use to Identifier Patch metadata info in target process. If that,
  * the task user address space will mmap serial of pages into target address
- * space. */
+ * space.
+ *
+ * No other header files can be included in this source file, this is pure C
+ * code.
+ */
 
 #define SEC_UPATCH_MAGIC	".UPATCH"
 #define SEC_UPATCH_STRTAB	".upatch.strtab"
@@ -108,7 +106,7 @@ struct upatch_info {
 	unsigned long virtual_addr;
 	unsigned long orig_value;
 
-	uint32_t flags;
+	unsigned int flags;
 	char pad[4];
 };
 

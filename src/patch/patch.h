@@ -4,6 +4,7 @@
 #define __ELF_UPATCH_H 1
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <gelf.h>
 
 #include <utils/util.h>

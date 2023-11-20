@@ -33,6 +33,7 @@ set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 set(BUILD_UFTRACE ON CACHE BOOL "Build uftrace")
 set(BUILD_UTASK ON CACHE BOOL "Build utask")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
+set(CMAKE_INSTALL_PREFIX /usr)
 
 set(UPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/upatch/)
 set(UPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/upatch/)
@@ -144,6 +145,11 @@ endif()
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
 install(DIRECTORY DESTINATION ${UPATCH_SHARE_DIR})
 install(DIRECTORY DESTINATION ${UPATCH_INCLUDE_DIR})
+install(
+FILES
+	${PROJECT_SOURCE_DIR}/src/patch/meta.h
+DESTINATION ${UPATCH_INCLUDE_DIR}
+)
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
