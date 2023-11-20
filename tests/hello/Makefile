@@ -1,9 +1,25 @@
 
+DHR_META=/usr/include/upatch/meta.h
+HAVE_INSTALLED=$(shell if [[ -e ${DHR_META} ]]; then echo YES; fi)
+ifeq (${HAVE_INSTALLED},YES)
+$(info Already install upatch)
+else
+$(error Please install upatch first)
+endif
+
 TARGETS := hello
+
+build: patch.up ${TARGETS}
 
 hello: hello.o
 
-build: ${TARGETS}
+%.o: %.c
+	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	$(CC) $(CFLAGS) -o $(@) -c $(<)
+
+%.up: %.o
+	@echo -e "Gen upatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	mv $(<) $(@)
 
 clean:
-	rm -f $(TARGETS) *.o
+	rm -f $(TARGETS) *.o *.up
