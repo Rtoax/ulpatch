@@ -1164,6 +1164,34 @@ static void rb_free_symbol(struct rb_node *node) {
 	free_symbol(s);
 }
 
+static void free_task_proc(struct task *task)
+{
+	char buffer[BUFFER_SIZE];
+
+	/* ROOT_DIR/PID/TASK_PROC_COMM */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
+	if (unlink(buffer) != 0) {
+		lerror("unlink(%s) for %d:%s failed, %s.\n",
+			buffer, task->pid, task->exe, strerror(errno));
+	}
+
+	/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
+	snprintf(buffer, BUFFER_SIZE - 1,
+		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
+	if (rmdir(buffer) != 0) {
+		lerror("rmdir(%s) for %d:%s failed, %s.\n",
+			buffer, task->pid, task->exe, strerror(errno));
+	}
+
+	/* ROOT_DIR/PID */
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+	if (rmdir(buffer) != 0) {
+		lerror("rmdir(%s) for %d:%s failed, %s.\n",
+			buffer, task->pid, task->exe, strerror(errno));
+	}
+}
+
 int free_task(struct task *task)
 {
 	/* free in open_task(), node == NULL */
@@ -1184,32 +1212,8 @@ int free_task(struct task *task)
 	if (task->fto_flag & FTO_LIBC)
 		elf_file_close(task->libc_vma->name_);
 
-	if (task->fto_flag & FTO_PROC) {
-		char buffer[BUFFER_SIZE];
-
-		/* ROOT_DIR/PID/TASK_PROC_COMM */
-		snprintf(buffer, BUFFER_SIZE - 1,
-			ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
-		if (unlink(buffer) != 0) {
-			lerror("unlink(%s) for %d:%s failed, %s.\n",
-				buffer, task->pid, task->exe, strerror(errno));
-		}
-
-		/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-		snprintf(buffer, BUFFER_SIZE - 1,
-			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
-		if (rmdir(buffer) != 0) {
-			lerror("rmdir(%s) for %d:%s failed, %s.\n",
-				buffer, task->pid, task->exe, strerror(errno));
-		}
-
-		/* ROOT_DIR/PID */
-		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
-		if (rmdir(buffer) != 0) {
-			lerror("rmdir(%s) for %d:%s failed, %s.\n",
-				buffer, task->pid, task->exe, strerror(errno));
-		}
-	}
+	if (task->fto_flag & FTO_PROC)
+		free_task_proc(task);
 
 	/* Destroy symbols rb tree */
 	rb_destroy(&task->vma_symbols, rb_free_symbol);
