@@ -46,6 +46,23 @@ TEST(File,	fsize,	0)
 	return ret;
 }
 
+TEST(File,	ftouch_remove,	0)
+{
+	int ret = 0, i;
+	char *files[] = {
+		"a",
+		"b",
+		"c",
+	};
+
+	for (i = 0; i < ARRAY_SIZE(files); i++) {
+		ret |= ftouch(files[i]);
+		ret |= fremove(files[i]);
+	}
+
+	return ret;
+}
+
 TEST(File,	fmmap_rdonly,	0)
 {
 	int ret = 0, i;

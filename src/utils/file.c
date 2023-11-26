@@ -45,6 +45,50 @@ bool fexist(const char *filepath)
 	return access(filepath, F_OK) == 0 ? true : false;
 }
 
+int fremove(const char *filepath)
+{
+	int ret = 0;
+	struct stat st;
+
+	if (!filepath)
+		return -1;
+	if (!fexist(filepath))
+		return 0;
+
+	lstat(filepath, &st);
+
+	if (S_ISDIR(st.st_mode))
+		ret = rmdir(filepath);
+	else
+		ret = unlink(filepath);
+
+	return ret;
+}
+
+int ftouch(const char *filepath)
+{
+	struct stat st;
+	int fd;
+
+	if (!filepath)
+		return -1;
+
+	lstat(filepath, &st);
+
+	if (fexist(filepath) && S_ISREG(st.st_mode))
+		return 0;
+	else if (fexist(filepath))
+		return -1;
+
+	fd = open(filepath, O_WRONLY | O_EXCL | O_CREAT, 0644);
+	if (fd <= 0) {
+		ldebug("touch %s failed\n", filepath);
+		return -errno;
+	}
+	close(fd);
+	return 0;
+}
+
 static int _file_type_mem(struct mmap_struct *mem)
 {
 	file_type type = FILE_UNKNOWN;

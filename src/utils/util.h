@@ -215,6 +215,8 @@ struct mmap_struct {
  */
 int fsize(const char *filepath);
 bool fexist(const char *filepath);
+int ftouch(const char *filepath);
+int fremove(const char *filepath);
 file_type ftype(const char *filepath);
 int fcopy(const char *srcpath, const char *dstpath);
 char* fmktempfile(char *buf, int buf_len, char *seed);
