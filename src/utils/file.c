@@ -21,6 +21,7 @@
 #include "task.h"
 #include "util.h"
 
+
 int fsize(const char *filepath)
 {
 	int ret, fd;
@@ -178,8 +179,9 @@ int copy_chunked_from_file(void *mem, int mem_len, const char *file)
 	return size;
 }
 
-static struct mmap_struct *_mmap_file(const char *filepath,
-		int o_flags, int m_flags, int prot, size_t truncate_size)
+static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
+				      int m_flags, int prot,
+				      size_t truncate_size)
 {
 	struct mmap_struct *mem = NULL;
 
@@ -205,7 +207,7 @@ static struct mmap_struct *_mmap_file(const char *filepath,
 	if (truncate_size)
 		ftruncate(mem->fd, truncate_size);
 
-	mem->size = truncate_size?:fsize(filepath);
+	mem->size = truncate_size ?: fsize(filepath);
 	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
 	if (mem->mem == MAP_FAILED) {
 		lerror("mmap %s failed, %s\n", filepath, strerror(errno));
