@@ -4,15 +4,18 @@
 #include <unistd.h>
 
 
+static unsigned long count = 0;
+
 void print_hello(void)
 {
-	printf("Hello World.\n");
+	printf("Hello World. %d\n", count);
 }
 
 int main(int argc, char *argv[])
 {
 	while (1) {
 		print_hello();
+		count++;
 		sleep(1);
 	}
 

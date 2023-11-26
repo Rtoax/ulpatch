@@ -9,6 +9,8 @@
 
 #include <elf/elf_api.h>
 
+#include <patch/patch.h>
+
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
@@ -27,6 +29,7 @@ enum command {
 
 static pid_t target_pid = -1;
 static struct task *target_task = NULL;
+static char *patch_file = NULL;
 
 enum {
 	ARG_PATCH = 139,
@@ -36,6 +39,9 @@ enum {
 };
 
 static const char *prog_name = "upatch";
+
+int check_patch_file(const char *file);
+
 
 static void print_help(void)
 {
@@ -53,7 +59,8 @@ static void print_help(void)
 	"\n"
 	" Operate argument:\n"
 	"\n"
-	"  --patch             patch an object file into target task\n"
+	"  --patch             patch an object file into target task, and patch\n"
+	"                      the patch.\n"
 	"\n");
 	printf(
 	" Common argument:\n"
@@ -82,9 +89,11 @@ static void print_help(void)
 
 static int parse_config(int argc, char *argv[])
 {
+	int ret;
+
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
-		{ "patch",          no_argument,       0, ARG_PATCH },
+		{ "patch",          required_argument, 0, ARG_PATCH },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
@@ -106,6 +115,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_PATCH:
 			command_type = CMD_PATCH;
+			patch_file = strdup(optarg);
 			break;
 		case 'v':
 			printf("%s %s\n", prog_name, upatch_version());
@@ -143,13 +153,60 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
+	/* check patch file */
+	if (command_type == CMD_PATCH) {
+		ret = check_patch_file(patch_file);
+		if (ret) {
+			fprintf(stderr, "Check %s failed.\n", patch_file);
+			exit(1);
+		}
+	}
+
 	return 0;
 }
 
-static void command_patch(void)
+int check_patch_file(const char *file)
 {
-	fprintf(stdout, "TODO: finish me.\n");
+	int err = 0;
+	struct load_info info;
+
+	if (!file)
+		return -EEXIST;
+
+	if (file && !fexist(file)) {
+		ldebug("%s is not exist.\n", file);
+		return -EEXIST;
+	}
+	err = parse_load_info(patch_file, "temp.up", &info);
+	if (err) {
+		lerror("Parse %s failed.\n", patch_file);
+		return err;
+	}
+
+	err = setup_load_info(&info);
+	if (err) {
+		ldebug("Load %s failed\n", file);
+		err = -ENODATA;
+		goto release;
+	}
+
+	if (strcmp(info.upatch_strtab.magic, SEC_UPATCH_MAGIC)) {
+		ldebug("%s is not upatch file.\n", file);
+		err = -ENODATA;
+	}
+
+release:
+	release_load_info(&info);
+	return err;
+}
+
+static int command_patch(void)
+{
+	init_patch(target_task, patch_file);
+
 	// TODO
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -177,6 +234,8 @@ int main(int argc, char *argv[])
 	}
 
 	free_task(target_task);
+	if (patch_file)
+		free(patch_file);
 
 	return 0;
 }
