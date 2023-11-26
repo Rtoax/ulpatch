@@ -1164,7 +1164,7 @@ static void rb_free_symbol(struct rb_node *node) {
 	free_symbol(s);
 }
 
-static void free_task_proc(struct task *task)
+static void __unused clean_task_proc(struct task *task)
 {
 	char buffer[BUFFER_SIZE];
 
@@ -1179,6 +1179,10 @@ static void free_task_proc(struct task *task)
 	/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
 	snprintf(buffer, BUFFER_SIZE - 1,
 		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
+	/**
+	 * If process patched, we should not remove the proc directory,
+	 * and rmdir can't remove the directory has file in it.
+	 */
 	if (rmdir(buffer) != 0) {
 		lerror("rmdir(%s) for %d:%s failed, %s.\n",
 			buffer, task->pid, task->exe, strerror(errno));
@@ -1191,6 +1195,12 @@ static void free_task_proc(struct task *task)
 			buffer, task->pid, task->exe, strerror(errno));
 	}
 }
+
+/**
+ * TODO: Couldn't remove the proc if this process patched
+ */
+static void free_task_proc(struct task *task)
+{}
 
 int free_task(struct task *task)
 {
