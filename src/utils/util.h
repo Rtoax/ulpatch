@@ -177,6 +177,9 @@ extern struct config config;
 
 void upatch_env_init(void);
 
+int upatch_version_major(void);
+int upatch_version_minor(void);
+int upatch_version_patch(void);
 const char *upatch_version(void);
 const char *upatch_arch(void);
 

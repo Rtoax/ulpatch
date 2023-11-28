@@ -17,6 +17,30 @@ const char *upatch_arch(void)
 #endif
 }
 
+int upatch_version_major(void)
+{
+#if !defined(UPATCH_VERSION_MAJOR)
+# error "Must define string UPATCH_VERSION_MAJOR"
+#endif
+	return UPATCH_VERSION_MAJOR;
+}
+
+int upatch_version_minor(void)
+{
+#if !defined(UPATCH_VERSION_MINOR)
+# error "Must define string UPATCH_VERSION_MINOR"
+#endif
+	return UPATCH_VERSION_MINOR;
+}
+
+int upatch_version_patch(void)
+{
+#if !defined(UPATCH_VERSION_PATCH)
+# error "Must define string UPATCH_VERSION_PATCH"
+#endif
+	return UPATCH_VERSION_PATCH;
+}
+
 const char *upatch_version(void)
 {
 #if !defined(UPATCH_VERSION)

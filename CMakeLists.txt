@@ -25,6 +25,9 @@ if(NOT "${retcode}" STREQUAL "0")
 set(UPATCH_VERSION "v${upatch_VERSION_MAJOR}.${upatch_VERSION_MINOR}.${upatch_VERSION_PATCH}")
 endif()
 
+add_definitions("-DUPATCH_VERSION_MAJOR=${upatch_VERSION_MAJOR}")
+add_definitions("-DUPATCH_VERSION_MINOR=${upatch_VERSION_MINOR}")
+add_definitions("-DUPATCH_VERSION_PATCH=${upatch_VERSION_PATCH}")
 add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)

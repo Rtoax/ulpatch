@@ -11,7 +11,13 @@
 
 TEST(Utils,	upatch_version,	0)
 {
+	int ret = 0;
+
+	ret += upatch_version_major() != UPATCH_VERSION_MAJOR;
+	ret += upatch_version_minor() != UPATCH_VERSION_MINOR;
+	ret += upatch_version_patch() != UPATCH_VERSION_PATCH;
+
 	printf("%s\n", upatch_version());
-	return 0;
+	return ret;
 }
 
