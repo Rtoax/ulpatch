@@ -24,6 +24,9 @@ enum patch_type {
 #define UPATCH_TYPE_FTRACE_STR	"uftrace"
 #define UPATCH_TYPE_PATCH_STR	"upatch"
 
+/* Use to check support version or not. */
+#define UPATCH_FILE_VERSION	"1"
+
 /**
  * Every patch has this information, it's metadata for each patch.
  *
@@ -48,6 +51,7 @@ __asm__ (	\
 	"	.quad 0\n" /* virtual address to modify in target process */	\
 	"	.quad 0\n" /* original value */	\
 	"	.long 0 \n"	\
+	"	.long " UPATCH_FILE_VERSION " \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
 );
@@ -107,6 +111,8 @@ struct upatch_info {
 	unsigned long orig_value;
 
 	unsigned int flags;
+	unsigned int upatch_version;
+
 	char pad[4];
 };
 

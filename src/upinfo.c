@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
 	printf("VirtAddr   : %#016lx\n", info.info->virtual_addr);
 	printf("OrigVal    : %#016lx\n", info.info->orig_value);
 	printf("Flags      : %#08x\n",  info.info->flags);
+	printf("Version    : %#08x\n",  info.info->upatch_version);
 	printf("Pad[4]     : [%d,%d,%d,%d]\n",
 		info.info->pad[0], info.info->pad[1],
 		info.info->pad[2], info.info->pad[3]);
