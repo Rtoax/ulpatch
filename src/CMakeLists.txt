@@ -6,7 +6,8 @@ add_subdirectory(elf)
 add_subdirectory(patch)
 add_subdirectory(arch)
 
-find_package(PkgConfig REQUIRED)
+# No need right now
+#find_package(PkgConfig REQUIRED)
 
 include_directories(.)
 
