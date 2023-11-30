@@ -118,19 +118,18 @@ free_out:
 	return err;
 }
 
-static int
-create_mmap_vma_file(struct task *task, struct load_info *info)
+static int create_mmap_vma_file(struct task *task, struct load_info *info)
 {
 	int ret = 0;
 	ssize_t map_len = info->len;
 	unsigned long map_v;
 	int map_fd;
+	int prot;
 
 	/* attach target task */
 	task_attach(task->pid);
 
-	map_fd = task_open(task, (char *)info->patch_path,
-				O_RDWR, 0644);
+	map_fd = task_open(task, (char *)info->patch_path, O_RDWR, 0644);
 	if (map_fd <= 0) {
 		lerror("remote open failed.\n");
 		return -1;
@@ -142,27 +141,23 @@ create_mmap_vma_file(struct task *task, struct load_info *info)
 		goto close_ret;
 	}
 
-	map_v = task_mmap(task,
-				0UL, map_len,
-				PROT_READ | PROT_WRITE | PROT_EXEC,
-				MAP_SHARED, map_fd, 0);
+	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+	map_v = task_mmap(task, 0UL, map_len, prot, MAP_SHARED, map_fd, 0);
 	if (!map_v) {
 		lerror("remote mmap failed.\n");
+		ret = -EFAULT;
 		goto close_ret;
 	}
 
-	/* save the address */
+	/* save the target mmap address */
 	info->target_hdr = map_v;
 
 	update_task_vmas(task);
-
 	ldebug("Done to create patch vma, addr 0x%lx\n", map_v);
 
 close_ret:
 	task_close(task, map_fd);
-
 	task_detach(task->pid);
-
 	return ret;
 }
 
