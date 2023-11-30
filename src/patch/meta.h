@@ -12,8 +12,7 @@
 
 #define SEC_UPATCH_MAGIC	".UPATCH"
 #define SEC_UPATCH_STRTAB	".upatch.strtab"
-#define SEC_UPATCH_STRTAB_LABEL	"upatch_strtab"
-#define SEC_UPATCH_INFO	".upatch.info"
+#define SEC_UPATCH_INFO		".upatch.info"
 
 /* patch_type */
 enum patch_type {
@@ -38,7 +37,7 @@ enum patch_type {
 #define UPATCH_INFO(patch_type, src_func, dst_func, author) \
 __asm__ (	\
 	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
-	SEC_UPATCH_STRTAB_LABEL ": \n"	\
+	"upatch_strtab: \n"	\
 	"	.string \"" SEC_UPATCH_MAGIC "\" \n"	\
 	"	.string \"" #patch_type "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
