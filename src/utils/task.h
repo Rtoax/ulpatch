@@ -158,9 +158,6 @@ struct task {
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
-	/* Global tasks_list */
-	struct list_head node;
-
 	/* struct vma_struct.node_list */
 	struct list_head vma_list;
 	/* struct vma_struct.node_rb */

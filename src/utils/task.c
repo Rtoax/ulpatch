@@ -27,9 +27,6 @@
 #endif
 
 
-LIST_HEAD(tasks_list);
-
-
 int open_pid_maps(pid_t pid)
 {
 	int ret;
@@ -1070,7 +1067,6 @@ struct task *open_task(pid_t pid, int flag)
 	assert(task && "malloc failed");
 	memset(task, 0x0, sizeof(struct task));
 
-	list_init(&task->node);
 	list_init(&task->vma_list);
 	rb_init(&task->vmas_rb);
 
@@ -1149,9 +1145,6 @@ struct task *open_task(pid_t pid, int flag)
 		}
 	}
 
-	/* All success, add task to global list */
-	list_add(&task->node, &tasks_list);
-
 	return task;
 
 free_task:
@@ -1204,10 +1197,6 @@ static void free_task_proc(struct task *task)
 
 int free_task(struct task *task)
 {
-	/* free in open_task(), node == NULL */
-	if (!list_empty(&task->node))
-		list_del(&task->node);
-
 	close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {
