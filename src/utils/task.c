@@ -753,13 +753,11 @@ out_free:
 	return 0;
 }
 
-int read_task_vmas(struct task *task, bool update)
+int read_task_vmas(struct task *task)
 {
 	struct vma_struct *vma, *prev = NULL;
 	int mapsfd;
 	FILE *mapsfp;
-
-	if (update) free_task_vmas(task);
 
 	/* open(2) /proc/[PID]/maps */
 	mapsfd = open_pid_maps(task->pid);
@@ -829,7 +827,8 @@ int read_task_vmas(struct task *task, bool update)
 
 int update_task_vmas(struct task *task)
 {
-	return read_task_vmas(task, true);
+	free_task_vmas(task);
+	return read_task_vmas(task);
 }
 
 void print_vma(FILE *fp, struct vma_struct *vma, bool detail)
@@ -1048,7 +1047,7 @@ struct task *open_task(pid_t pid, int flag)
 	__get_exe(task);
 	task->proc_mem_fd = memfd;
 
-	read_task_vmas(task, false);
+	read_task_vmas(task);
 
 	rb_init(&task->vma_symbols);
 

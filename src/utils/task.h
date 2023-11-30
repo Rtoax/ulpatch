@@ -201,7 +201,9 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
 struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task *task, size_t size);
+int read_task_vmas(struct task *task);
 int update_task_vmas(struct task *task);
+int free_task_vmas(struct task *task);
 
 enum vma_type get_vma_type(const char *exe, const char *name);
 
