@@ -135,21 +135,18 @@ static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 
 struct vma_struct *find_vma(struct task *task, unsigned long vaddr)
 {
-	struct rb_node * rnode =
-		rb_search_node(&task->vmas_rb, __find_vma_cmp, vaddr);
-	if (rnode) {
+	struct rb_node *rnode = rb_search_node(&task->vmas_rb, __find_vma_cmp,
+						vaddr);
+	if (rnode)
 		return rb_entry(rnode, struct vma_struct, node_rb);
-	}
 	return NULL;
 }
 
 struct vma_struct *next_vma(struct task *task, struct vma_struct *prev)
 {
 	struct rb_node *next;
-
-	next = prev?rb_next(&prev->node_rb):rb_first(&task->vmas_rb);
-
-	return  next?rb_entry(next, struct vma_struct, node_rb):NULL;
+	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vmas_rb);
+	return  next ? rb_entry(next, struct vma_struct, node_rb) : NULL;
 }
 
 unsigned long find_vma_span_area(struct task *task, size_t size)
@@ -161,13 +158,11 @@ unsigned long find_vma_span_area(struct task *task, size_t size)
 		ivma = rb_entry(rnode, struct vma_struct, node_rb);
 		struct rb_node *next_node = rb_next(rnode);
 		struct vma_struct *next_vma;
-		if (!next_node) {
+		if (!next_node)
 			return 0;
-		}
 		next_vma = rb_entry(next_node, struct vma_struct, node_rb);
-		if (next_vma->start - ivma->end >= size) {
+		if (next_vma->start - ivma->end >= size)
 			return ivma->end;
-		}
 	}
 	lerror("No space fatal in target process, pid %d\n", task->pid);
 	return 0;
@@ -297,9 +292,8 @@ int vma_peek_phdr(struct vma_struct *vma)
 	}
 
 	/* is ELF or already peek */
-	if (vma->elf != NULL || vma->is_elf) {
+	if (vma->elf != NULL || vma->is_elf)
 		return 0;
-	}
 
 	/* Is not ELF? */
 	if (memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr)) < sizeof(ehdr)) {
@@ -308,9 +302,8 @@ int vma_peek_phdr(struct vma_struct *vma)
 	}
 
 	/* If not ELF, return success */
-	if (!ehdr_magic_ok(&ehdr)) {
+	if (!ehdr_magic_ok(&ehdr))
 		return 0;
-	}
 
 	ldebug("%lx %s is ELF\n", vma->start, vma->name_);
 
@@ -533,37 +526,36 @@ unsigned long task_vma_symbol_value(struct symbol *sym)
 
 		ldebug("SYMBOL %s addr %lx\n", sym->name, addr);
 
-	} else {
+	} else
 		addr = sym->sym.st_value;
-	}
 
 	return addr;
 }
 
 struct symbol *task_vma_find_symbol(struct task *task, const char *name)
 {
+	struct rb_node *node;
 	struct symbol tmp = {
 		.name = (char *)name,
 	};
-	struct rb_node *node = rb_search_node(&task->vma_symbols,
-						cmp_symbol_name, (unsigned long)&tmp);
 
-	return node?rb_entry(node, struct symbol, node):NULL;
+	node = rb_search_node(&task->vma_symbols, cmp_symbol_name,
+			      (unsigned long)&tmp);
+	return node ? rb_entry(node, struct symbol, node) : NULL;
 }
 
 /* Insert OK, return 0, else return -1 */
 int task_vma_link_symbol(struct task *task, struct symbol *s)
 {
-	struct rb_node *node = rb_insert_node(&task->vma_symbols, &s->node,
-						cmp_symbol_name, (unsigned long)s);
+	struct rb_node *node;
 
-	if (unlikely(node)) {
+	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
+			      (unsigned long)s);
+	if (unlikely(node))
 		lwarning("%s: symbol %s already exist\n", task->comm, s->name);
-	} else {
+	else
 		ldebug("%s: add symbol %s success.\n", task->comm, s->name);
-	}
-
-	return node?-1:0;
+	return node ? -1 : 0;
 }
 
 /**
@@ -578,9 +570,8 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 
 	struct symbol *sym, *tmp;
 
-	rbtree_postorder_for_each_entry_safe(sym, tmp,
-		&task->exe_elf->symbols, node) {
-
+	rbtree_postorder_for_each_entry_safe(sym, tmp, &task->exe_elf->symbols,
+					     node) {
 		struct symbol *new;
 
 		/* skip undefined symbols */
@@ -602,9 +593,8 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 		new->vma = vma;
 
 		err = task_vma_link_symbol(task, new);
-		if (err) {
+		if (err)
 			free_symbol(new);
-		}
 	}
 
 	return err;
@@ -632,9 +622,8 @@ int vma_load_all_symbols(struct vma_struct *vma)
 
 
 	/* load all self symbols */
-	if (vma->type == VMA_SELF) {
+	if (vma->type == VMA_SELF)
 		return load_self_vma_symbols(vma);
-	}
 
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		if (vma->elf->phdrs[i].p_type == PT_DYNAMIC) {
@@ -652,7 +641,8 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	assert(dynamics && "Malloc fatal.");
 
 	err = memcpy_from_task(task, dynamics,
-			vma->elf->load_offset + phdr->p_vaddr, phdr->p_memsz);
+			       vma->elf->load_offset + phdr->p_vaddr,
+			       phdr->p_memsz);
 	if (err < phdr->p_memsz) {
 		lerror("Task read mem failed, %lx.\n", vma->start + phdr->p_vaddr);
 		goto out_free;
@@ -660,23 +650,18 @@ int vma_load_all_symbols(struct vma_struct *vma)
 
 	/* For each Dyn */
 	for (i = 0; i < phdr->p_memsz / sizeof(GElf_Dyn); i++) {
-
 		GElf_Dyn *curdyn = dynamics + i;
 
 		switch (curdyn->d_tag) {
-
 		case DT_SYMTAB:
 			symtab_addr = curdyn->d_un.d_ptr;
 			break;
-
 		case DT_STRTAB:
 			strtab_addr = curdyn->d_un.d_ptr;
 			break;
-
 		case DT_STRSZ:
 			strtab_sz = curdyn->d_un.d_val;
 			break;
-
 		case DT_SYMENT:
 			if (curdyn->d_un.d_val != sizeof(GElf_Sym)) {
 				lerror("Dynsym entry size is %ld expected %ld\n",
@@ -720,9 +705,8 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	 *  [ 3] .dynsym           DYNSYM           00000000000001c8  000001c8
 	 *       0000000000000138  0000000000000018   A       4     1     8
 	 */
-	if (vma->type == VMA_VDSO) {
+	if (vma->type == VMA_VDSO)
 		symtab_addr += vma->elf->load_offset;
-	}
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err < strtab_sz + symtab_sz) {
@@ -743,9 +727,8 @@ int vma_load_all_symbols(struct vma_struct *vma)
 		GElf_Sym *sym = syms + i;
 		const char *symname = buffer + symtab_sz + syms[i].st_name;
 
-		if (is_undef_symbol(sym) || strlen(symname) == 0) {
+		if (is_undef_symbol(sym) || strlen(symname) == 0)
 			continue;
-		}
 
 		ldebug("%s: %s\n", vma->name_, symname);
 
@@ -759,17 +742,14 @@ int vma_load_all_symbols(struct vma_struct *vma)
 		s->vma = vma;
 
 		err = task_vma_link_symbol(task, s);
-		if (err) {
+		if (err)
 			free_symbol(s);
-		}
 	}
-
 
 out_free_buffer:
 	free(buffer);
 out_free:
 	free(dynamics);
-
 	return 0;
 }
 
@@ -783,9 +763,8 @@ int read_task_vmas(struct task *task, bool update)
 
 	/* open(2) /proc/[PID]/maps */
 	mapsfd = open_pid_maps(task->pid);
-	if (mapsfd <= 0) {
+	if (mapsfd <= 0)
 		return -1;
-	}
 	lseek(mapsfd, 0, SEEK_SET);
 
 	mapsfp = fdopen(mapsfd, "r");
@@ -828,27 +807,23 @@ int read_task_vmas(struct task *task, bool update)
 		vma->type = get_vma_type(task->exe, name_);
 
 		/* Find libc.so */
-		if (!task->libc_vma	&& vma->type == VMA_LIBC
-			&& vma->prot & PROT_EXEC) {
+		if (!task->libc_vma && vma->type == VMA_LIBC &&
+		    vma->prot & PROT_EXEC) {
 			ldebug("Get libc:\n");
 			task->libc_vma = vma;
 		}
 
 		/* Find [stack] */
-		if (!task->stack && vma->type == VMA_STACK) {
+		if (!task->stack && vma->type == VMA_STACK)
 			task->stack = vma;
-		}
 
 		vma->leader = vma;
-
 		insert_vma(task, vma, prev);
-
 		prev = vma;
 	} while (1);
 
 	fclose(mapsfp);
 	close(mapsfd);
-
 	return 0;
 }
 
@@ -995,7 +970,6 @@ int free_task_vmas(struct task *task)
 bool proc_pid_exist(pid_t pid)
 {
 	char path[128];
-
 	snprintf(path, sizeof(path), "/proc/%d", pid);
 	return fexist(path);
 }
@@ -1058,10 +1032,8 @@ struct task *open_task(pid_t pid, int flag)
 	int memfd;
 
 	memfd = open_pid_mem(pid);
-	if (memfd <= 0) {
+	if (memfd <= 0)
 		return NULL;
-	}
-
 
 	task = malloc(sizeof(struct task));
 	assert(task && "malloc failed");
@@ -1152,7 +1124,8 @@ free_task:
 	return NULL;
 }
 
-static void rb_free_symbol(struct rb_node *node) {
+static void rb_free_symbol(struct rb_node *node)
+{
 	struct symbol *s = rb_entry(node, struct symbol, node);
 	free_symbol(s);
 }
@@ -1162,31 +1135,28 @@ static void __unused clean_task_proc(struct task *task)
 	char buffer[BUFFER_SIZE];
 
 	/* ROOT_DIR/PID/TASK_PROC_COMM */
-	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
-	if (unlink(buffer) != 0) {
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/" TASK_PROC_COMM,
+		 task->pid);
+	if (unlink(buffer) != 0)
 		lerror("unlink(%s) for %d:%s failed, %s.\n",
 			buffer, task->pid, task->exe, strerror(errno));
-	}
 
 	/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-	snprintf(buffer, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
+	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
+		 task->pid);
 	/**
 	 * If process patched, we should not remove the proc directory,
 	 * and rmdir can't remove the directory has file in it.
 	 */
-	if (rmdir(buffer) != 0) {
-		lerror("rmdir(%s) for %d:%s failed, %s.\n",
-			buffer, task->pid, task->exe, strerror(errno));
-	}
+	if (rmdir(buffer) != 0)
+		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
+			task->exe, strerror(errno));
 
 	/* ROOT_DIR/PID */
 	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
-	if (rmdir(buffer) != 0) {
-		lerror("rmdir(%s) for %d:%s failed, %s.\n",
-			buffer, task->pid, task->exe, strerror(errno));
-	}
+	if (rmdir(buffer) != 0)
+		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
+			task->exe, strerror(errno));
 }
 
 /**
@@ -1219,9 +1189,7 @@ int free_task(struct task *task)
 
 	free_task_vmas(task);
 	free(task->exe);
-
 	free(task);
-
 	return 0;
 }
 
