@@ -1582,11 +1582,10 @@ unsigned long task_mmap(struct task *task,
 	int ret;
 	unsigned long result;
 
-	ret = task_syscall(task,
-			__NR_mmap, addr, length, prot, flags, fd, offset, &result);
-	if (ret < 0) {
+	ret = task_syscall(task, __NR_mmap, addr, length, prot, flags, fd,
+			   offset, &result);
+	if (ret < 0)
 		return 0;
-	}
 	return result;
 }
 
@@ -1595,11 +1594,9 @@ int task_munmap(struct task *task, unsigned long addr, size_t size)
 	int ret;
 	unsigned long result;
 
-	ret = task_syscall(task,
-			__NR_munmap, addr, size, 0, 0, 0, 0, &result);
-	if (ret < 0) {
+	ret = task_syscall(task, __NR_munmap, addr, size, 0, 0, 0, 0, &result);
+	if (ret < 0)
 		return -1;
-	}
 	return result;
 }
 
@@ -1608,11 +1605,9 @@ int task_msync(struct task *task, unsigned long addr, size_t length, int flags)
 	int ret;
 	unsigned long result;
 
-	ret = task_syscall(task,
-			__NR_msync, addr, length, flags, 0, 0, 0, &result);
-	if (ret < 0) {
+	ret = task_syscall(task, __NR_msync, addr, length, flags, 0, 0, 0, &result);
+	if (ret < 0)
 		return -1;
-	}
 	return result;
 }
 
@@ -1646,45 +1641,27 @@ int task_free(struct task *task, unsigned long addr, size_t length)
 
 int task_open(struct task *task, char *pathname, int flags, mode_t mode)
 {
-	char maybeislink[MAX_PATH], path[MAX_PATH];
-	int ret;
+	int __unused ret;
 	unsigned long result;
 
-	unsigned long remote_fileaddr;
-	ssize_t remote_filename_len = 0;
+	unsigned long name;
+	ssize_t name_len = 0;
 
-	if (!(flags|O_CREAT)) {
-		ret = readlink(pathname, maybeislink, sizeof(maybeislink));
-		if (ret < 0) {
-			lwarning("readlink(3) failed.\n");
-			return -1;
-		}
-		maybeislink[ret] = '\0';
-		if (!realpath(maybeislink, path)) {
-			lwarning("realpath(3) failed.\n");
-			return -1;
-		}
-		ldebug("%s -> %s -> %s\n", pathname, maybeislink, path);
-		pathname = path;
-	}
-	remote_filename_len = strlen(pathname) + 1;
 
-	remote_fileaddr = task_malloc(task, remote_filename_len);
-
-	memcpy_to_task(task, remote_fileaddr, pathname, remote_filename_len);
+	name_len = strlen(pathname) + 1;
+	name = task_malloc(task, name_len);
+	memcpy_to_task(task, name, pathname, name_len);
 
 #if defined(__x86_64__)
-	ret = task_syscall(task,
-			__NR_open, remote_fileaddr, flags, mode, 0, 0, 0, &result);
+	ret = task_syscall(task, __NR_open, name, flags, mode, 0, 0, 0, &result);
 #elif defined(__aarch64__)
-	ret = task_syscall(task,
-			__NR_openat, AT_FDCWD, remote_fileaddr, flags, mode, 0, 0, &result);
+	ret = task_syscall(task, __NR_openat, AT_FDCWD, name, flags, mode, 0, 0,
+			   &result);
 #else
 # error "Error arch"
 #endif
 
-	task_free(task, remote_fileaddr, remote_filename_len);
-
+	task_free(task, name, name_len);
 	return result;
 }
 
@@ -1692,23 +1669,18 @@ int task_close(struct task *task, int remote_fd)
 {
 	int ret;
 	unsigned long result;
-	ret = task_syscall(task,
-			__NR_close, remote_fd, 0, 0, 0, 0, 0, &result);
-	if (ret < 0) {
-		return 0;
-	}
-	return result;
+	ret = task_syscall(task, __NR_close, remote_fd, 0, 0, 0, 0, 0, &result);
+	return result | ret;
 }
 
 int task_ftruncate(struct task *task, int remote_fd, off_t length)
 {
 	int ret;
 	unsigned long result;
-	ret = task_syscall(task,
-			__NR_ftruncate, remote_fd, length, 0, 0, 0, 0, &result);
-	if (ret < 0) {
+	ret = task_syscall(task, __NR_ftruncate, remote_fd, length, 0, 0, 0, 0,
+			   &result);
+	if (ret < 0)
 		return 0;
-	}
 	return result;
 }
 
@@ -1722,16 +1694,15 @@ int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
 	remote_statbuf = task_malloc(task, sizeof(struct stat));
 
 	/* Call fstat(2) */
-	ret_fstat = task_syscall(task,
-			__NR_fstat, remote_fd, remote_statbuf, 0, 0, 0, 0, &result);
-	if (ret_fstat < 0) {
+	ret_fstat = task_syscall(task, __NR_fstat, remote_fd, remote_statbuf,
+				 0, 0, 0, 0, &result);
+	if (ret_fstat < 0)
 		lerror("fstat failed, ret %d, %ld\n", ret_fstat, result);
-	}
 
 	ret = memcpy_from_task(task, statbuf, remote_statbuf, sizeof(struct stat));
-	if (ret != sizeof(struct stat)) {
+	if (ret != sizeof(struct stat))
 		lerror("failed copy struct stat.\n");
-	}
+
 	task_free(task, remote_statbuf, sizeof(struct stat));
 
 	return ret_fstat;
@@ -1743,11 +1714,10 @@ int task_prctl(struct task *task, int option, unsigned long arg2,
 	int ret;
 	unsigned long result;
 
-	ret = task_syscall(task,
-		__NR_prctl, option, arg2, arg3, arg4, arg5, 0, &result);
-	if (ret < 0) {
+	ret = task_syscall(task, __NR_prctl, option, arg2, arg3, arg4, arg5, 0,
+			   &result);
+	if (ret < 0)
 		return 0;
-	}
 	return result;
 }
 
