@@ -2,8 +2,10 @@
 /* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
 #include <stdarg.h>
 #include <libgen.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <utils/log.h>
@@ -65,6 +67,7 @@ int _____log(int level, const char *file, const char *func,
 	int n = 0;
 	FILE *fp = get_log_fp();
 	va_list va;
+	int _en = errno;
 
 	if (level > log_level)
 		return 0;
@@ -76,12 +79,16 @@ int _____log(int level, const char *file, const char *func,
 		/* like 15:53:52 */
 		strftime(buffer, 32, "%T", localtime(&timestamp));
 
-		fprintf(fp, "%s %s[%s %s:%ld] ",
+		fprintf(fp, "%s %s[%s %s:%ld]",
 			buffer,
 			level_prefix[level],
 			basename((char *)file),
 			func,
 			line);
+		if (level <= LOG_ERR && _en != 0)
+			fprintf(fp, "[%s]", strerror(_en));
+
+		fprintf(fp, " ");
 	}
 
 	va_start(va, fmt);
