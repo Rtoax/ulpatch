@@ -20,6 +20,7 @@ hello: hello.o
 %.up: %.o
 	@echo -e "Gen upatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	mv $(<) $(@)
+	readelf --relocs $(@)
 
 clean:
 	rm -f $(TARGETS) *.o *.up
