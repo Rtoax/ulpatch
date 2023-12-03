@@ -53,7 +53,7 @@ __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 	return ret;
 }
 
-static int direct_patch_test(struct patch_test_arg *arg)
+static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
@@ -157,7 +157,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 		.replace = REPLACE_MCOUNT,
 	};
 
-	return direct_patch_test(&arg);
+	return direct_patch_ftrace_test(&arg);
 }
 
 TEST(Patch,	ftrace_object,	0)
@@ -167,7 +167,7 @@ TEST(Patch,	ftrace_object,	0)
 		.replace = REPLACE_MCOUNT,
 	};
 
-	return direct_patch_test(&arg);
+	return direct_patch_ftrace_test(&arg);
 }
 
 #if defined(__x86_64__)
@@ -178,7 +178,50 @@ TEST(Patch,	ftrace_nop,	0)
 		.replace = REPLACE_NOP,
 	};
 
-	return direct_patch_test(&arg);
+	return direct_patch_ftrace_test(&arg);
 }
 #endif
+
+int upatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
+{
+#define UPATCH_TTWU_RET	0xdead1234
+	linfo("TTWU emulate, patched.\n");
+	return UPATCH_TTWU_RET;
+}
+
+TEST(Patch,	direct_patch_upatch,	0)
+{
+	int ret = 0;
+	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
+
+#if defined(__x86_64__)
+	union text_poke_insn insn;
+	const char *new = NULL;
+	unsigned long ip = (unsigned long)try_to_wake_up;
+	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
+
+	new = upatch_jmpq_replace(&insn, ip, addr);
+
+	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip);
+	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
+
+	try_to_wake_up(task, 1, 1);
+
+	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
+	if (ret != MCOUNT_INSN_SIZE) {
+		lerror("failed to memcpy.\n");
+	}
+
+	/* This will called patched function upatch_try_to_wake_up() */
+	ret = try_to_wake_up(task, 1, 1);
+	if (ret != UPATCH_TTWU_RET)
+		ret = -1;
+	else
+		ret = 0;
+#else
+	lerror("Only support x86_64 yet.\n");
+	ret = -1;
+#endif
+	return ret;
+}
 

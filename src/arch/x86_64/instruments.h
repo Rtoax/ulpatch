@@ -63,4 +63,6 @@ void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
 		const void *addr, const void *dest);
 
 uint32_t x86_64_func_callq_offset(void *func);
+const char *upatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,
+			unsigned long addr);
 

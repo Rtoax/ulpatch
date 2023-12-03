@@ -14,6 +14,12 @@
 #include <elf/elf_api.h>
 
 
+const char *upatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,
+			unsigned long addr)
+{
+	return text_gen_insn(insn, INST_JMPQ, (void *)ip, (void *)addr);
+}
+
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	const char *strtab, unsigned int symindex, unsigned int relsec)
 {
