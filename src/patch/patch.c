@@ -183,6 +183,7 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	s->magic = p;
 
 	if (strcmp(s->magic, SEC_UPATCH_MAGIC)) {
+		lerror("No magic %s found.\n", SEC_UPATCH_MAGIC);
 		return -ENOENT;
 	}
 
@@ -198,8 +199,8 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	while (*(p++));
 	s->author = p;
 
-	ldebug("%s %s %s %s %s\n",
-		s->magic, s->patch_type, s->src_func, s->dst_func, s->author);
+	ldebug("%s %s %s %s %s\n", s->magic, s->patch_type, s->src_func,
+		s->dst_func, s->author);
 
 	return 0;
 }
@@ -531,6 +532,25 @@ static int post_relocation(const struct load_info *info)
 	return 0;
 }
 
+static int solve_patch_symbols(struct load_info *info)
+{
+	struct task *task = info->target_task;
+	struct symbol *sym;
+	const char *dst_func;
+
+	dst_func = info->upatch_strtab.dst_func;
+	sym = task_vma_find_symbol(task, dst_func);
+	if (!sym) {
+		lerror("Couldn't found %s in target process.\n", dst_func);
+		return -ENOENT;
+	}
+
+	/* TODO: Fix other symbols */
+
+	info->info->target_func_addr = sym->sym.st_value;
+	return 0;
+}
+
 static int kick_target_process(const struct load_info *info)
 {
 	ssize_t n;
@@ -573,6 +593,10 @@ static int load_patch(struct load_info *info)
 		goto free_copy;
 
 	err = post_relocation(info);
+	if (err < 0)
+		goto free_copy;
+
+	err = solve_patch_symbols(info);
 	if (err < 0)
 		goto free_copy;
 

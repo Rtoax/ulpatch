@@ -13,6 +13,8 @@ void print_hello(void)
 
 int main(int argc, char *argv[])
 {
+	printf("print_hello: %#016x\n", print_hello);
+
 	while (1) {
 		print_hello();
 		count++;
