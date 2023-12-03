@@ -160,6 +160,9 @@ unsigned long find_vma_span_area(struct task *task, size_t size)
 		struct vma_struct *next_vma;
 		if (!next_node)
 			return 0;
+
+		ldebug("vma: %lx-%lx %s\n", ivma->start, ivma->end, ivma->name_);
+
 		next_vma = rb_entry(next_node, struct vma_struct, node_rb);
 		if (next_vma->start - ivma->end >= size)
 			return ivma->end;

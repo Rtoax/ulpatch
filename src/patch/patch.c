@@ -125,7 +125,7 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 {
 	int ret = 0;
 	ssize_t map_len = info->len;
-	unsigned long map_v;
+	unsigned long map_v, addr;
 	int map_fd;
 	int prot;
 
@@ -144,8 +144,10 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 		goto close_ret;
 	}
 
+	addr = find_vma_span_area(task, map_len);
+
 	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
-	map_v = task_mmap(task, 0UL, map_len, prot, MAP_SHARED, map_fd, 0);
+	map_v = task_mmap(task, addr, map_len, prot, MAP_SHARED, map_fd, 0);
 	if (!map_v) {
 		lerror("remote mmap failed.\n");
 		ret = -EFAULT;
@@ -615,8 +617,11 @@ static int kick_target_process(const struct load_info *info)
 	task_attach(task->pid);
 
 #if defined(__x86_64__)
-	// TODO: Segmentation fault (core dumped)
-	//n = memcpy_to_task(task, info->info->virtual_addr, (void *)new_insn, insn_sz);
+	n = memcpy_to_task(task, info->info->virtual_addr, (void *)new_insn, insn_sz);
+	if (n < insn_sz) {
+		lerror("failed kick target process.\n");
+		err = -ENOEXEC;
+	}
 #endif
 
 	task_detach(task->pid);
