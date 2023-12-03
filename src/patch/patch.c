@@ -571,6 +571,8 @@ static int solve_patch_symbols(struct load_info *info)
 
 	info->info->target_func_addr = sym->sym.st_value;
 	info->info->patch_func_addr = sym_src_func->st_value;
+	/* Replace from start of target function */
+	info->info->virtual_addr = info->info->target_func_addr;
 
 	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->info->target_func_addr);
 	ldebug("Found %s symbol address %#016lx.\n", src_func, info->info->patch_func_addr);
@@ -583,6 +585,25 @@ static int kick_target_process(const struct load_info *info)
 	int err = 0;
 	struct task *task = info->target_task;
 	unsigned long target_hdr = info->target_hdr;
+	size_t insn_sz = 0;
+
+#if defined(__x86_64__)
+	union text_poke_insn insn;
+	const char __unused *new_insn = NULL;
+	new_insn = upatch_jmpq_replace(&insn, info->info->virtual_addr,
+					info->info->patch_func_addr);
+	insn_sz = CALL_INSN_SIZE;
+#else
+	lerror("not support expect x86_64 yet.\n");
+	exit(1);
+#endif
+
+	n = memcpy_from_task(task, &info->info->orig_value,
+				info->info->virtual_addr, insn_sz);
+	if (n < insn_sz) {
+		lerror("Backup original instructions failed.\n");
+		/* TODO */
+	}
 
 	/* copy patch to target address space */
 	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
@@ -590,6 +611,15 @@ static int kick_target_process(const struct load_info *info)
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
 	}
+
+	task_attach(task->pid);
+
+#if defined(__x86_64__)
+	// TODO: Segmentation fault (core dumped)
+	//n = memcpy_to_task(task, info->info->virtual_addr, (void *)new_insn, insn_sz);
+#endif
+
+	task_detach(task->pid);
 
 	return err;
 }
