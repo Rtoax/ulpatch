@@ -72,9 +72,12 @@ FILE *get_log_fp(void)
 
 #define INNER_VFPRINTF(fp, fmt, va) ({ \
 	int ____n; \
+	va_list ____va; \
 	____n = vfprintf(fp, fmt, va); \
 	if (level <= LOG_ERR) { \
-		vfprintf(stderr, fmt, va); \
+		va_start(____va, fmt); \
+		vfprintf(stderr, fmt, ____va); \
+		va_end(____va); \
 	} \
 	____n; \
 })
