@@ -141,10 +141,16 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 	ret = task_ftruncate(task, map_fd, map_len);
 	if (ret != 0) {
 		lerror("remote ftruncate failed.\n");
+		ret = -EFAULT;
 		goto close_ret;
 	}
 
 	addr = find_vma_span_area(task, map_len);
+	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
+		lerror("Not found 4 bytes length span area in memory space.\n");
+		ret = -EFAULT;
+		goto close_ret;
+	}
 
 	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
 	map_v = task_mmap(task, addr, map_len, prot, MAP_SHARED, map_fd, 0);
