@@ -7,7 +7,7 @@ pid=$(pidof hello)
 
 make
 
-upatch -p ${pid} --patch patch.up --log-level=9
+upatch -p ${pid} --patch patch.up
 cat /proc/${pid}/maps
 
 patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )

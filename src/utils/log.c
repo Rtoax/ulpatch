@@ -61,6 +61,24 @@ FILE *get_log_fp(void)
 	return log_fp;
 }
 
+#define INNER_FPRINTF(fp, fmt...) ({ \
+	int ____n; \
+	____n = fprintf(fp, fmt); \
+	if (level <= LOG_ERR) { \
+		fprintf(stderr, fmt); \
+	} \
+	____n; \
+})
+
+#define INNER_VFPRINTF(fp, fmt, va) ({ \
+	int ____n; \
+	____n = vfprintf(fp, fmt, va); \
+	if (level <= LOG_ERR) { \
+		vfprintf(stderr, fmt, va); \
+	} \
+	____n; \
+})
+
 int _____log(int level, const char *file, const char *func,
 		unsigned long int line, char *fmt, ...)
 {
@@ -79,20 +97,20 @@ int _____log(int level, const char *file, const char *func,
 		/* like 15:53:52 */
 		strftime(buffer, 32, "%T", localtime(&timestamp));
 
-		fprintf(fp, "%s %s[%s %s:%ld]",
+		INNER_FPRINTF(fp, "%s %s[%s %s:%ld]",
 			buffer,
 			level_prefix[level],
 			basename((char *)file),
 			func,
 			line);
 		if (level <= LOG_ERR && _en != 0)
-			fprintf(fp, "[%s]", strerror(_en));
+			INNER_FPRINTF(fp, "[%s]", strerror(_en));
 
-		fprintf(fp, " ");
+		INNER_FPRINTF(fp, " ");
 	}
 
 	va_start(va, fmt);
-	n += vfprintf(fp, fmt, va);
+	n += INNER_VFPRINTF(fp, fmt, va);
 	va_end(va);
 
 	return n;
