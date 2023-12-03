@@ -537,20 +537,43 @@ static int post_relocation(const struct load_info *info)
 
 static int solve_patch_symbols(struct load_info *info)
 {
+	int i;
 	struct task *task = info->target_task;
 	struct symbol *sym;
-	const char *dst_func;
+	const char *dst_func, *src_func;
+	GElf_Sym *sym_src_func = NULL;
 
 	dst_func = info->upatch_strtab.dst_func;
+	src_func = info->upatch_strtab.src_func;
+
 	sym = task_vma_find_symbol(task, dst_func);
 	if (!sym) {
 		lerror("Couldn't found %s in target process.\n", dst_func);
 		return -ENOENT;
 	}
 
-	/* TODO: Fix other symbols */
+	GElf_Shdr *symsec = (GElf_Shdr *)&info->sechdrs[info->index.sym];
+	GElf_Sym *syms = (GElf_Sym *)((void *)info->hdr + symsec->sh_offset);
+
+	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
+		GElf_Sym *sym = &syms[i];
+		char *name = info->strtab + sym->st_name;
+		ldebug("patch: %s\n", name);
+
+		if (!strcmp(src_func, name))
+			sym_src_func = sym;
+	}
+
+	if (!sym_src_func) {
+		lerror("Couldn't found %s in target process.\n", src_func);
+		return -ENOENT;
+	}
 
 	info->info->target_func_addr = sym->sym.st_value;
+	info->info->patch_func_addr = sym_src_func->st_value;
+
+	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->info->target_func_addr);
+	ldebug("Found %s symbol address %#016lx.\n", src_func, info->info->patch_func_addr);
 	return 0;
 }
 
