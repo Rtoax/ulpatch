@@ -33,15 +33,12 @@ add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
-set(BUILD_UFTRACE ON CACHE BOOL "Build uftrace")
 set(BUILD_UTASK ON CACHE BOOL "Build utask")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 set(CMAKE_INSTALL_PREFIX /usr)
 
 set(UPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/upatch/)
 set(UPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/upatch/)
-# see src/patch/objects/ftrace/CMakeLists.txt
-set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
 # see src/patch/objects/upatch-hello/CMakeLists.txt
 set(UPATCH_HELLO_OBJ upatch-hello.obj)
 
@@ -121,8 +118,6 @@ if(KERNEL_HEADERS_CONST_H)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" KERNEL_HEADERS_CONST_H)
 endif()
 
-# macro UPATCH_FTRACE_OBJ_PATH="/usr/share/upatch/ftrace-mcount.obj" for example
-set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_FTRACE_OBJ_PATH="${UPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
 # macro UPATCH_HELLO_OBJ_PATH="/usr/share/upatch/upatch-hello.obj" for example
 set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_HELLO_OBJ_PATH="${UPATCH_SHARE_DIR}${UPATCH_HELLO_OBJ}")
 
@@ -133,12 +128,7 @@ add_subdirectory(src)
 
 
 # install targets
-if (BUILD_UFTRACE)
-install(TARGETS uftrace RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-endif()
-if (BUILD_UFTRACE)
 install(TARGETS utask RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-endif()
 install(TARGETS upatch RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(TARGETS upinfo RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 if (BUILD_TESTING)
@@ -156,7 +146,6 @@ DESTINATION ${UPATCH_INCLUDE_DIR}
 )
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
 	${PROJECT_SOURCE_DIR}/src/patch/objects/upatch-hello/${UPATCH_HELLO_OBJ}
 DESTINATION ${UPATCH_SHARE_DIR}
 )

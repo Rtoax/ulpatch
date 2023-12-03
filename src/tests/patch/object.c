@@ -17,8 +17,6 @@ static const struct upatch_object {
 	enum patch_type type;
 	char *path;
 } upatch_objs[] = {
-	/* /usr/share/upatch/ftrace-mcount.obj */
-	{UPATCH_TYPE_FTRACE,	UPATCH_FTRACE_OBJ_PATH},
 	/* /usr/share/upatch/upatch-hello.obj */
 	{UPATCH_TYPE_PATCH,	UPATCH_HELLO_OBJ_PATH},
 };
