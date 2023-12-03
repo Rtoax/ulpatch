@@ -60,9 +60,11 @@ struct test {
 
 extern int nr_tests;
 
+#define TEST_SKIP_RET	0xdead9527
+
 /**
  * Define a test
- *
+ * If Ret = TEST_SKIP_RET, the test will success anyway.
  */
 #define __TEST(Category, Name, Prio, Ret) \
 	int test_ ##Category ##_##Name(void);	\

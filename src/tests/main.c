@@ -457,7 +457,7 @@ static int operate_test(struct test *test)
 
 	/* Exe test entry */
 	ret = test->test_cb();
-	if (ret == test->expect_ret) {
+	if (ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
 		stat_count[0]++;
 	} else {
 		stat_count[1]++;

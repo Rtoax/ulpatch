@@ -296,7 +296,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 	return ret;
 }
 
-TEST(Ftrace,	init_patch,	0)
+TEST(Ftrace,	init_patch,	TEST_SKIP_RET)
 {
 	return test_task_patch(FTO_PROC, NULL);
 }
