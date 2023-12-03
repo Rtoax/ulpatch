@@ -18,6 +18,9 @@
 
 #include <patch/patch.h>
 
+#ifndef SHF_RELA_LIVEPATCH
+#define SHF_RELA_LIVEPATCH      0x00100000
+#endif
 
 /* free load_info */
 void release_load_info(struct load_info *info)
@@ -169,8 +172,7 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 		GElf_Shdr *shdr = &info->sechdrs[i];
 
 		/* Alloc bit cleared means "ignore it." */
-		if ((shdr->sh_flags & SHF_ALLOC)
-			&& strcmp(info->secstrings + shdr->sh_name, name) == 0)
+		if (strcmp(info->secstrings + shdr->sh_name, name) == 0)
 			return i;
 	}
 	return 0;
@@ -343,6 +345,7 @@ static int rewrite_section_headers(struct load_info *info)
 
 	/* Track but don't keep info or other sections. */
 	info->sechdrs[info->index.info].sh_flags &= ~(unsigned long)SHF_ALLOC;
+	info->sechdrs[info->index.info].sh_flags |= SHF_RELA_LIVEPATCH;
 
 	/* MORE: sechdrs */
 
