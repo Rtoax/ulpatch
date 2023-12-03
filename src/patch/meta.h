@@ -49,7 +49,7 @@ __asm__ (	\
 	"	.quad 0\n" /* patch function address */	\
 	"	.quad 0\n" /* virtual address to modify in target process */	\
 	"	.quad 0\n" /* original value */	\
-	"	.long 0 \n"	\
+	"	.long 0\n" /* flag */	\
 	"	.long " UPATCH_FILE_VERSION " \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
