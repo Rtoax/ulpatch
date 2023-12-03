@@ -23,10 +23,20 @@ add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
 # Target: utask
+if (BUILD_UFTRACE)
 add_executable(utask
 	utask.c
 )
 target_compile_definitions(utask PRIVATE ${UTILS_FLAGS})
+endif()
+
+# Target: uftrace
+if (BUILD_UFTRACE)
+add_executable(uftrace
+	uftrace.c
+)
+target_compile_definitions(uftrace PRIVATE ${UTILS_FLAGS})
+endif()
 
 # Target: upatch
 add_executable(upatch
