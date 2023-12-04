@@ -37,4 +37,4 @@ $(TARGETS): %:
 	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
 
 clean:
-	rm -f $(TARGETS) *.o *.up
+	rm -f $(TARGETS) *.o *.up core.*
