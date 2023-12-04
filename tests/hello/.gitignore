@@ -2,3 +2,4 @@ hello
 *.o
 *.d
 *.up
+core.*
