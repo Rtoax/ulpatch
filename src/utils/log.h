@@ -25,6 +25,7 @@ _____log(int level, const char *file, const char *func,
 
 void set_log_fp(FILE *fp);
 FILE *get_log_fp(void);
+int get_log_level(void);
 void set_log_level(int level);
 void set_log_debug(void);
 void set_log_error(void);

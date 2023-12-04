@@ -20,6 +20,20 @@ const char *upatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,
 	return text_gen_insn(insn, INST_JMPQ, (void *)ip, (void *)addr);
 }
 
+static inline void *debug_memcpy(void *dst, const void *src, size_t n)
+{
+	int i;
+	ldebug("RELA: Copy %d bytes from %p to %p\n", n, src, dst);
+	if (get_log_level() >= LOG_NOTICE) {
+		for (i = 0; i < n; i += sizeof(unsigned long)) {
+			unsigned long ul = *(unsigned long *)(src + i);
+			ldebug("    : %Lx\n", ul);
+		}
+	}
+
+	return memcpy(dst, src, n);
+}
+
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		       const char *strtab, unsigned int symindex,
 		       unsigned int relsec)
@@ -42,7 +56,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	 */
 	long t_off = (long)info->hdr - (long)info->target_hdr;
 
-	void *(*write_func)(void *, const void *, size_t) = memcpy;
+	void *(*write_func)(void *, const void *, size_t) = debug_memcpy;
 
 	/* sh_addr now point to target process address space, so need to relocate
 	 * to current process. */
@@ -82,15 +96,18 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		switch (ELF64_R_TYPE(rel[i].r_info)) {
 
 		case R_X86_64_NONE:
+			ldebug("Handle R_X86_64_NONE\n");
 			break;
 
 		case R_X86_64_64:
+			ldebug("Handle R_X86_64_64\n");
 			if (*(uint64_t*)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 8);
 			break;
 
 		case R_X86_64_32:
+			ldebug("Handle R_X86_64_32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
@@ -99,6 +116,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		case R_X86_64_32S:
+			ldebug("Handle R_X86_64_32S\n");
 			if (*(int32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
@@ -125,6 +143,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		case R_X86_64_PC32:
 		case R_X86_64_PLT32:
+			ldebug("Handle R_X86_64_PC32/PLT32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			val -= (uint64_t)loc;
@@ -132,6 +151,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		case R_X86_64_PC64:
+			ldebug("Handle R_X86_64_PC64\n");
 			if (*(uint64_t *)loc != 0)
 				goto invalid_relocation;
 			val -= (uint64_t)loc;
