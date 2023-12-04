@@ -13,7 +13,9 @@ void print_hello(void)
 
 int main(int argc, char *argv[])
 {
-	printf("print_hello: %#016x\n", print_hello);
+#define PRINT_ADDR(a)	printf("%-32s: %#016x\n", #a, a);
+	PRINT_ADDR(print_hello);
+	PRINT_ADDR(puts);
 
 	while (1) {
 		print_hello();
