@@ -3,6 +3,7 @@ set -e
 
 pid=
 patch=
+debug=
 
 __usage__() {
 	echo "
@@ -11,15 +12,18 @@ test [-h|--help] [-u|--patch]
 -p, --pid  [PID]        specify pid
 -u, --patch [UPATCH]    specify upatch file
 
--h, --help               print this info
+-d, --debug             debug mode
+
+-h, --help              print this info
 "
 	exit ${1-0}
 }
 
 TEMP=$(getopt \
-	--options p:u:v:h \
+	--options p:u:dh \
 	--long pid: \
 	--long patch: \
+	--long debug \
 	--long help \
 	-n upatch-hello-test -- "$@")
 
@@ -38,6 +42,10 @@ while true; do
 		shift
 		patch=$1
 		shift
+		;;
+	-d|--debug)
+		shift
+		debug=$1
 		;;
 	-h|--help)
 		shift
@@ -58,7 +66,7 @@ done
 
 make
 
-upatch -p ${pid} --patch ${patch}
+upatch -p ${pid} --patch ${patch} ${debug:+--log-level=9}
 cat /proc/${pid}/maps
 
 dump_all_process_upatch() {

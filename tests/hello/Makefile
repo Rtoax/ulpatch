@@ -24,6 +24,7 @@ hello: hello.o
 %.up: %.o
 	@echo -e "Gen upatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	mv $(<) $(@)
+	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
 	readelf --relocs $(@)
 
 clean:
