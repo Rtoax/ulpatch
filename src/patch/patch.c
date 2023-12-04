@@ -209,9 +209,6 @@ static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
 	while (*(p++));
 	s->author = p;
 
-	ldebug("%s %s %s %s %s\n", s->magic, s->patch_type, s->src_func,
-		s->dst_func, s->author);
-
 	return 0;
 }
 
@@ -240,17 +237,10 @@ int setup_load_info(struct load_info *info)
 	info->info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
-	/* see UPATCH_INFO macro */
-	ldebug("UPATCH INFO: pad: %u %u %u %u\n",
-		info->info->pad[0], info->info->pad[1],
-		info->info->pad[2], info->info->pad[3]);
-
 	/* found ".upatch.strtab" */
 	info->index.upatch_strtab = find_sec(info, SEC_UPATCH_STRTAB);
 	const char *upatch_strtab = (void *)info->hdr
 		+ info->sechdrs[info->index.upatch_strtab].sh_offset;
-
-	memshowinlog(LOG_INFO, upatch_strtab, 64);
 
 	err = parse_upatch_strtab(&info->upatch_strtab, upatch_strtab);
 	if (err) {
@@ -280,8 +270,6 @@ int setup_load_info(struct load_info *info)
 
 			info->strtab = (char *)info->hdr
 				+ info->sechdrs[info->index.str].sh_offset;
-
-			ldebug("found symtab %d\n", info->index.sym);
 
 			break;
 		}
@@ -430,18 +418,18 @@ found:
 /* Change all symbols so that st_value encodes the pointer directly. */
 static int simplify_symbols(const struct load_info *info)
 {
+	unsigned long secbase;
+	unsigned int i;
+	int ret = 0;
+
 	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
 
 	/* need relocate sh_addr, because here is HOST task, not target task */
 	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
 
+
 	ldebug("sym = %lp + %lx - %lx, sh_offset %lx\n",
 		info->hdr, symsec->sh_addr, info->target_hdr, symsec->sh_offset);
-
-	unsigned long secbase;
-	unsigned int i;
-	int ret = 0;
-
 
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
@@ -482,7 +470,6 @@ static int simplify_symbols(const struct load_info *info)
 			break;
 
 		default:
-			ldebug("OK, the symbol in this patch. %s\n", name);
 			/* The address in the target process */
 			secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
 			sym[i].st_value += secbase;

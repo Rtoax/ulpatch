@@ -259,12 +259,7 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 	}
 
 	mem->ftype = _file_type_mem(mem);
-
-	ldebug("mmap %s: %d(trun %d), %p\n",
-		filepath, mem->size, truncate_size, mem->mem);
-
 	return mem;
-
 free_mem:
 	free(mem);
 	return NULL;
