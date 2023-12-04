@@ -51,10 +51,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	void *loc;
 	uint64_t val;
 
-	ldebug("Applying relocate section %u to %u\n",
-		relsec, sechdrs[relsec].sh_info);
-
-	memshowinlog(LOG_INFO, rel, sechdrs[relsec].sh_size);
+	ldebug("Applying relocate section %u to %u\n", relsec, sechdrs[relsec].sh_info);
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 
@@ -70,9 +67,12 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off
 			+ ELF64_R_SYM(rel[i].r_info));
 
+		const char *symname = strtab + sym->st_name;
+
 		val = sym->st_value + rel[i].r_addend;
 
-		ldebug("type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
+		ldebug("RELA: %s, type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
+			symname,
 			(int)ELF64_R_TYPE(rel[i].r_info),
 			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
 
