@@ -483,11 +483,11 @@ static int simplify_symbols(const struct load_info *info)
 
 		default:
 			ldebug("OK, the symbol in this patch. %s\n", name);
-
 			/* The address in the target process */
 			secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
-
 			sym[i].st_value += secbase;
+			ldebug("In patch sym %s: secbase:0x%lx, st_value:0x%lx\n",
+				name, secbase, sym[i].st_value);
 			break;
 		}
 	}
@@ -520,17 +520,18 @@ static int apply_relocations(const struct load_info *info)
 			continue;
 
 		if (unlikely(info->sechdrs[i].sh_type == SHT_REL)) {
-			// Not support 32bit SHT_REL yet
+			/* Not support 32bit SHT_REL yet */
 			err = -ENOEXEC;
 			break;
-		} else if (info->sechdrs[i].sh_type == SHT_RELA) {
-
-			err = apply_relocate_add(info, info->sechdrs, info->strtab,
+		} else if (info->sechdrs[i].sh_type == SHT_RELA)
+			err = apply_relocate_add(info, info->sechdrs,
+						info->strtab,
 						info->index.sym, i);
-		}
 
-		if (err < 0)
+		if (err < 0) {
+			lerror("apply relocations failed.\n");
 			break;
+		}
 	}
 
 	return err;

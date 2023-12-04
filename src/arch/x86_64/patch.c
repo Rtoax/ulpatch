@@ -21,7 +21,8 @@ const char *upatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,
 }
 
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-	const char *strtab, unsigned int symindex, unsigned int relsec)
+		       const char *strtab, unsigned int symindex,
+		       unsigned int relsec)
 {
 	unsigned int i;
 
@@ -69,11 +70,11 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off
 			+ ELF64_R_SYM(rel[i].r_info));
 
-		ldebug("type %d st_value %Lx r_addend %Lx loc %Lx\n",
-			(int)ELF64_R_TYPE(rel[i].r_info),
-			sym->st_value, rel[i].r_addend, (uint64_t)loc);
-
 		val = sym->st_value + rel[i].r_addend;
+
+		ldebug("type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
+			(int)ELF64_R_TYPE(rel[i].r_info),
+			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
 
 		/* HOWTO relocate
 		 * ref: https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/6n33n7fct/index.html

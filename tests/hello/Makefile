@@ -11,6 +11,7 @@ TARGETS := hello
 
 TARGETS_UP := patch-print.up
 TARGETS_UP += patch-asm-exit.up
+TARGETS_UP += patch-in-patch.up
 TARGETS_UP += patch-asm-print.up
 
 build: ${TARGETS_UP} ${TARGETS}
@@ -28,6 +29,7 @@ CFLAGS_hello := -g -ggdb
 	mv $(<) $(@)
 	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
 	readelf --relocs $(@)
+	readelf --syms $(@)
 
 $(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
