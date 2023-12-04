@@ -10,6 +10,7 @@ endif
 TARGETS := hello
 
 TARGETS_UP := patch-print.up
+TARGETS_UP := patch-empty.up
 TARGETS_UP += patch-asm-exit.up
 TARGETS_UP += patch-in-patch.up
 TARGETS_UP += patch-asm-print.up
