@@ -17,15 +17,21 @@ build: ${TARGETS_UP} ${TARGETS}
 
 hello: hello.o
 
+CFLAGS_hello := -g -ggdb
+
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(CC) $(CFLAGS) -o $(@) -c $(<)
+	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
 
 %.up: %.o
 	@echo -e "Gen upatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	mv $(<) $(@)
 	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
 	readelf --relocs $(@)
+
+$(TARGETS): %:
+	@echo -e "Target   \033[1;32m$(@)\033[m"
+	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
 
 clean:
 	rm -f $(TARGETS) *.o *.up
