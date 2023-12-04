@@ -9,7 +9,10 @@ endif
 
 TARGETS := hello
 
-build: patch.up ${TARGETS}
+TARGETS_UP := patch-print.up
+TARGETS_UP += patch-asm-exit.up
+
+build: ${TARGETS_UP} ${TARGETS}
 
 hello: hello.o
 
