@@ -99,18 +99,18 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		switch (ELF64_R_TYPE(rel[i].r_info)) {
 
 		case R_X86_64_NONE:
-			ldebug("Handle R_X86_64_NONE\n");
+			lwarning("Handle R_X86_64_NONE\n");
 			break;
 
 		case R_X86_64_64:
-			ldebug("Handle R_X86_64_64\n");
+			lwarning("Handle R_X86_64_64\n");
 			if (*(uint64_t*)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 8);
 			break;
 
 		case R_X86_64_32:
-			ldebug("Handle R_X86_64_32\n");
+			lwarning("Handle R_X86_64_32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
@@ -119,7 +119,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		case R_X86_64_32S:
-			ldebug("Handle R_X86_64_32S\n");
+			lwarning("Handle R_X86_64_32S\n");
 			if (*(int32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
@@ -146,7 +146,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		case R_X86_64_PC32:
 		case R_X86_64_PLT32:
-			ldebug("Handle R_X86_64_PC32/PLT32\n");
+			lwarning("Handle R_X86_64_PC32/PLT32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			/**
@@ -157,7 +157,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		case R_X86_64_PC64:
-			ldebug("Handle R_X86_64_PC64\n");
+			lwarning("Handle R_X86_64_PC64\n");
 			if (*(uint64_t *)loc != 0)
 				goto invalid_relocation;
 			/**
