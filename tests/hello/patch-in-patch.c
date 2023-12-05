@@ -4,7 +4,7 @@
 
 void func1(void)
 {
-	/* TODO */
+	printf("Hello patched.\n");
 }
 
 void upatch_print_hello(void)
