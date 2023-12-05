@@ -464,8 +464,10 @@ static int simplify_symbols(const struct load_info *info)
 
 			/* Not found symbol in any where */
 			ret = symbol_addr ? 0 : -ENOENT;
-
-			lwarning("Unknown symbol %s's addr %Lx (err %d)\n", name, symbol_addr, ret);
+			if (ret) {
+				lerror("Unknown symbol %s's addr %Lx (err %d)\n",
+					 name, symbol_addr, ret);
+			}
 			break;
 
 		default:
