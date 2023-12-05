@@ -6,9 +6,14 @@
 
 static unsigned long count = 0;
 
-void print_hello(void)
+void internal_print_hello(void)
 {
 	printf("Hello World. %d\n", count);
+}
+
+void print_hello(void)
+{
+	internal_print_hello();
 }
 
 int main(int argc, char *argv[])
