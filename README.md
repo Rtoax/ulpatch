@@ -3,7 +3,7 @@ UPatch
 
 # Introduction
 
-UPatch is open source ELF tool. Based on [elfutils](https://sourceware.org/git/elfutils.git).
+UPatch is open source user space live patch tool.
 
 
 # Support Architecture
@@ -14,15 +14,15 @@ UPatch is open source ELF tool. Based on [elfutils](https://sourceware.org/git/e
 
 # Theroy
 
+## Upatch
+
+![upatch](docs/images/upatch.svg)
+
+
 ## Ftrace
 
 Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compile option.
 `BUILD_UFTRACE` decides whether to compile `uftrace`.
-
-
-## Upatch
-
-![upatch](docs/images/upatch.svg)
 
 
 # Code Style
