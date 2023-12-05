@@ -149,6 +149,9 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			ldebug("Handle R_X86_64_PC32/PLT32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
+			/**
+			 * - t_off means that in target process
+			 */
 			val -= (uint64_t)loc - t_off;
 			write_func(loc, &val, 4);
 			break;
@@ -157,7 +160,10 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			ldebug("Handle R_X86_64_PC64\n");
 			if (*(uint64_t *)loc != 0)
 				goto invalid_relocation;
-			val -= (uint64_t)loc;
+			/**
+			 * - t_off means that in target process
+			 */
+			val -= (uint64_t)loc - t_off;
 			write_func(loc, &val, 8);
 			break;
 
