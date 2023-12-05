@@ -7,7 +7,7 @@ static long static_i = 1024;
 /**
  * TODO: .bss NOBITS not exist in relocatable ELF file.
  */
-static long static_i2;
+//static int static_i2;
 char *local_s = "Dear";
 static char *static_s = "you";
 
@@ -17,10 +17,9 @@ void upatch_print_hello(void)
 
 	local_i++;
 	static_i++;
-	static_i2 += 2;
+	static_i += 2;
 
-	printf("Hello World. Patched %d, %d, %d, %d\n",
-		local_i, static_i, static_i2, a);
+	printf("Hello World. Patched %d, %d, %d\n", local_i, static_i, a);
 	printf("%s %s\n", local_s, static_s);
 
 	for (i = 0; i < 3; i++)

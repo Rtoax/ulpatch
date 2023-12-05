@@ -324,6 +324,12 @@ static int rewrite_section_headers(struct load_info *info)
 			return -ENOEXEC;
 		}
 
+		if ((shdr->sh_type == SHT_NOBITS || !strcmp(name, ".bss"))
+		     && shdr->sh_size > 0) {
+			lerror("Not support uninitialized variable yet.\n");
+			return -EFAULT;
+		}
+
 		/**
 		 * Update sh_addr to point to target task address space.
 		 *
