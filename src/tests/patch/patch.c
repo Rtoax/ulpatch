@@ -222,6 +222,7 @@ TEST(Patch,	direct_patch_upatch,	0)
 	lerror("Only support x86_64 yet.\n");
 	ret = -1;
 #endif
+	free_task(task);
 	return ret;
 }
 
