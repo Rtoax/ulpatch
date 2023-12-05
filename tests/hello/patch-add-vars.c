@@ -10,7 +10,7 @@ static char *static_s = "you";
 
 void upatch_print_hello(void)
 {
-	int a = 10;
+	int i, a = 10;
 
 	local_i++;
 	static_i++;
@@ -19,5 +19,8 @@ void upatch_print_hello(void)
 	printf("Hello World. Patched %d, %d, %d, %d\n",
 		local_i, static_i, static_i2, a);
 	printf("%s %s\n", local_s, static_s);
+
+	for (i = 0; i < 3; i++)
+		printf("- %d -\n", i);
 }
 UPATCH_INFO(upatch, upatch_print_hello, print_hello, "Rong Tao");
