@@ -316,6 +316,8 @@ static int rewrite_section_headers(struct load_info *info)
 	for (i = 1; i < info->hdr->e_shnum; i++) {
 		GElf_Shdr *shdr = &info->sechdrs[i];
 
+		const char *name = info->secstrings + shdr->sh_name;
+
 		if (shdr->sh_type != SHT_NOBITS
 			&& info->len < shdr->sh_offset + shdr->sh_size) {
 			lerror("Patch len %lu truncated\n", info->len);
@@ -337,6 +339,8 @@ static int rewrite_section_headers(struct load_info *info)
 		 *  +---+
 		 */
 		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
+
+		ldebug("Rewrite section hdr %s sh_addr %Lx\n", name, shdr->sh_addr);
 	}
 
 	/* Track but don't keep info or other sections. */

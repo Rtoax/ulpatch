@@ -145,8 +145,9 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			FALLTHROUGH;
 
 		case R_X86_64_PC32:
+			lwarning("Handle R_X86_64_PC32\n");
 		case R_X86_64_PLT32:
-			lwarning("Handle R_X86_64_PC32/PLT32\n");
+			lwarning("Handle R_X86_64_PLT32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			/**

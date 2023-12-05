@@ -4,7 +4,7 @@
 
 extern void internal_print_hello(void);
 
-void upatch_internal_print_hello(void)
+static void upatch_internal_print_hello(void)
 {
 	printf("Hello World. Patched\n");
 	internal_print_hello();
