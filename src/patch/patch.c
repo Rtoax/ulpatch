@@ -377,9 +377,12 @@ resolve_symbol(const struct load_info *info, const char *name)
 		sym = find_symbol(task->exe_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			goto found;
+			if (addr)
+				goto found;
 		}
 	}
+
+	ldebug("Not found %d in self ELF.\n", name);
 
 	/* try find symbol address from @plt */
 	if (task->fto_flag & FTO_SELF_PLT) {
@@ -388,14 +391,19 @@ resolve_symbol(const struct load_info *info, const char *name)
 			goto found;
 	}
 
+	ldebug("Not found %d in @plt.\n", name);
+
 	/* try find symbol in libc.so */
 	if (!sym && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			goto found;
+			if (addr)
+				goto found;
 		}
 	}
+
+	ldebug("Not found %d in libc.\n", name);
 
 	/* try find symbol in other libraries mapped in target process address
 	 * space */
@@ -403,13 +411,13 @@ resolve_symbol(const struct load_info *info, const char *name)
 		sym = task_vma_find_symbol((struct task *)task, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			goto found;
+			if (addr)
+				goto found;
 		}
 	}
 
-	if (!sym) {
-		lerror("Not find symbol in libc and %s\n", task->exe);
-	}
+	if (!addr)
+		lerror("Not find symbol %s in anywhere\n", name);
 
 found:
 	return addr;
