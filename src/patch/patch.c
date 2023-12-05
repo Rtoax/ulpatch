@@ -442,6 +442,8 @@ static int simplify_symbols(const struct load_info *info)
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
 
+		ldebug("symbol: %s, st_name: %d\n", name, sym[i].st_name);
+
 		switch (sym[i].st_shndx) {
 		case SHN_COMMON:
 			/* Ignore common symbols */
@@ -563,7 +565,7 @@ static int solve_patch_symbols(struct load_info *info)
 	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		GElf_Sym *sym = &syms[i];
 		char *name = info->strtab + sym->st_name;
-		ldebug("patch: %s\n", name);
+		ldebug("patch: %s, %d\n", name, sym->st_name);
 
 		if (!strcmp(src_func, name))
 			sym_src_func = sym;

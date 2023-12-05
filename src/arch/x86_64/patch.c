@@ -88,8 +88,8 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		val = sym->st_value + rel[i].r_addend;
 
-		ldebug("RELA: %s, type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
-			symname,
+		ldebug("RELA: %s, st_name %d, type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
+			symname, sym->st_name,
 			(int)ELF64_R_TYPE(rel[i].r_info),
 			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
 
