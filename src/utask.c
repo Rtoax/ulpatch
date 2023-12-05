@@ -19,7 +19,7 @@
 
 
 struct config config = {
-	.log_level = -1,
+	.log_level = LOG_ERR,
 };
 
 enum {
