@@ -172,6 +172,13 @@ close_ret:
 	return ret;
 }
 
+static void delete_mmap_vma_file(struct task *task, struct load_info *info)
+{
+	task_attach(task->pid);
+	task_munmap(task, info->target_hdr, info->len);
+	task_detach(task->pid);
+}
+
 static unsigned int find_sec(const struct load_info *info, const char *name)
 {
 	unsigned int i;
@@ -652,8 +659,7 @@ static int load_patch(struct load_info *info)
 	if (err)
 		goto free_copy;
 
-	/* TODO: Blacklists */
-	/* TODO: Sign check */
+	/* May be there are some blacklists and sign check */
 
 	err = rewrite_section_headers(info);
 	if (err)
@@ -679,8 +685,6 @@ static int load_patch(struct load_info *info)
 	err = kick_target_process(info);
 	if (err < 0)
 		goto free_copy;
-
-	// TODO
 
 free_copy:
 	release_load_info(info);
@@ -718,7 +722,14 @@ int init_patch(struct task *task, const char *obj_file)
 		return err;
 	}
 
-	return load_patch(&info);
+	err = load_patch(&info);
+	if (err) {
+		delete_mmap_vma_file(task, &info);
+		release_load_info(&info);
+		return err;
+	}
+
+	return 0;
 }
 
 /* delete last patched patch, so, don't need any other arguments */
