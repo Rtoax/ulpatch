@@ -3,10 +3,10 @@ Upatch Install
 
 # Install Dependences
 
-## CentOS Fedora RHEL
+## rpm/dnf packages management
 
 ```bash
-$ sudo dnf install -y glibc-headers cmake gcc elfutils-libelf-devel systemtap-sdt-devel libunwind-devel
+$ sudo dnf install -y glibc-headers cmake gcc elfutils-libelf-devel libunwind-devel
 ```
 
 # Compile
