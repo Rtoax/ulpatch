@@ -15,6 +15,7 @@ TARGETS_UP += patch-asm-exit.up
 TARGETS_UP += patch-asm-puts.up
 TARGETS_UP += patch-asm-print.up
 TARGETS_UP += patch-add-vars.up
+TARGETS_UP += patch-failed-bss.up
 
 build: ${TARGETS_UP} ${TARGETS}
 

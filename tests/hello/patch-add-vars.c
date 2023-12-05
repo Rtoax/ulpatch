@@ -4,10 +4,6 @@
 
 int local_i = 123;
 static long static_i = 1024;
-/**
- * TODO: .bss NOBITS not exist in relocatable ELF file.
- */
-//static int static_i2;
 char *local_s = "Dear";
 static char *static_s = "you";
 

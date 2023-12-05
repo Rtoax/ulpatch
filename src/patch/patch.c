@@ -176,6 +176,7 @@ static void delete_mmap_vma_file(struct task *task, struct load_info *info)
 {
 	task_attach(task->pid);
 	task_munmap(task, info->target_hdr, info->len);
+	update_task_vmas(task);
 	task_detach(task->pid);
 }
 
