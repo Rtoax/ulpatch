@@ -20,7 +20,7 @@ build: ${TARGETS_UP} ${TARGETS}
 
 hello: hello.o
 
-CFLAGS_hello := -g -ggdb
+CFLAGS_hello := -g -ggdb -flto
 
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
