@@ -194,23 +194,32 @@ TEST(Patch,	direct_patch_upatch,	0)
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
+	unsigned long ip_pc = (unsigned long)try_to_wake_up;
+	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
+
 #if defined(__x86_64__)
 	union text_poke_insn insn;
 	const char *new = NULL;
-	unsigned long ip = (unsigned long)try_to_wake_up;
-	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
 
-	new = upatch_jmpq_replace(&insn, ip, addr);
+	new = upatch_jmpq_replace(&insn, ip_pc, addr);
 
-	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip);
-	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
+	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
 
-	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
+	ret = memcpy_to_task(task, ip_pc, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
+#else
+	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr, AARCH64_INSN_BRANCH_NOLINK);
+
+	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n", ip_pc, new);
+
+	try_to_wake_up(task, 1, 1);
+	/* application the patch */
+	ftrace_modify_code(task, ip_pc, 0, new, false);
+#endif
 
 	/* This will called patched function upatch_try_to_wake_up() */
 	ret = try_to_wake_up(task, 1, 1);
@@ -218,24 +227,7 @@ TEST(Patch,	direct_patch_upatch,	0)
 		ret = -1;
 	else
 		ret = 0;
-#else
-	unsigned long pc = (unsigned long)try_to_wake_up;
-	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
-	uint32_t new = aarch64_insn_gen_branch_imm(pc, addr, AARCH64_INSN_BRANCH_NOLINK);
 
-	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n", pc, new);
-
-	try_to_wake_up(task, 1, 1);
-
-	/* application the patch */
-	ftrace_modify_code(task, pc, 0, new, false);
-
-	ret = try_to_wake_up(task, 1, 1);
-	if (ret != UPATCH_TTWU_RET)
-		ret = -1;
-	else
-		ret = 0;
-#endif
 	free_task(task);
 	return ret;
 }
