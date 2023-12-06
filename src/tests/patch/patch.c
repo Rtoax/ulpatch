@@ -219,8 +219,22 @@ TEST(Patch,	direct_patch_upatch,	0)
 	else
 		ret = 0;
 #else
-	lerror("Only support x86_64 yet.\n");
-	ret = -1;
+	unsigned long pc = (unsigned long)try_to_wake_up;
+	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
+	uint32_t new = aarch64_insn_gen_branch_imm(pc, addr, AARCH64_INSN_BRANCH_NOLINK);
+
+	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n", pc, new);
+
+	try_to_wake_up(task, 1, 1);
+
+	/* application the patch */
+	ftrace_modify_code(task, pc, 0, new, false);
+
+	ret = try_to_wake_up(task, 1, 1);
+	if (ret != UPATCH_TTWU_RET)
+		ret = -1;
+	else
+		ret = 0;
 #endif
 	free_task(task);
 	return ret;
