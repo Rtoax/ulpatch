@@ -1,4 +1,4 @@
-Upatch Install
+ULPatch Install
 ===============
 
 # Install Dependences
@@ -12,7 +12,7 @@ $ sudo dnf install -y glibc-headers cmake gcc elfutils-libelf-devel libunwind-de
 # Compile
 
 ```bash
-$ cd upatch
+$ cd ulpatch
 $ mkdir build
 $ cd build
 $ cmake -DCMAKE_INSTALL_PREFIX=/usr ..

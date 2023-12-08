@@ -13,3 +13,5 @@ cmake_install.cmake
 *.d
 *.out
 *.so
+*.bkp
+*.dtmp
