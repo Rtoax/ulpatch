@@ -16,7 +16,7 @@ ULPatch is open source user space live patch tool.
 
 ## ULPatch
 
-![ulpatch](docs/images/ulpatch.svg)
+![ulpatch](docs/images/ulpatch.drawio.svg)
 
 
 ## Ftrace
