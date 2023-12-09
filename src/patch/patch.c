@@ -25,14 +25,14 @@
 /* free load_info */
 void release_load_info(struct load_info *info)
 {
-	if (info->patch_mmap) {
-		fmunmap(info->patch_mmap);
-		info->patch_mmap = NULL;
+	if (info->patch.mmap) {
+		fmunmap(info->patch.mmap);
+		info->patch.mmap = NULL;
 	}
 
-	if (info->patch_path) {
-		free(info->patch_path);
-		info->patch_path = NULL;
+	if (info->patch.path) {
+		free(info->patch.path);
+		info->patch.path = NULL;
 	}
 }
 
@@ -73,7 +73,7 @@ int alloc_patch_file(const char *obj_from, const char *obj_to,
 		return -EEXIST;
 	}
 
-	info->patch_path = strdup(obj_to);
+	info->patch.path = strdup(obj_to);
 
 	info->len = fsize(obj_from);
 	if (info->len < sizeof(*(info->hdr))) {
@@ -83,22 +83,22 @@ int alloc_patch_file(const char *obj_from, const char *obj_to,
 	}
 
 	/* allocate memory for object file */
-	info->patch_mmap = fmmap_shmem_create(info->patch_path, info->len);
-	if (!info->patch_mmap) {
-		lerror("%s: fmmap failed.\n", info->patch_path);
+	info->patch.mmap = fmmap_shmem_create(info->patch.path, info->len);
+	if (!info->patch.mmap) {
+		lerror("%s: fmmap failed.\n", info->patch.path);
 		err = -1;
 		goto out;
 	}
 
 	/* copy from file */
-	if (fmemcpy(info->patch_mmap->mem, info->len, obj_from) != info->len) {
+	if (fmemcpy(info->patch.mmap->mem, info->len, obj_from) != info->len) {
 		lerror("copy chunk failed.\n");
 		err = -EFAULT;
 		goto out;
 	}
 
 	/* This is the header of brand new object ELF file. */
-	info->hdr = info->patch_mmap->mem;
+	info->hdr = info->patch.mmap->mem;
 
 	if (!ehdr_magic_ok(info->hdr)) {
 		lerror("Invalid ELF format: %s\n", obj_from);
@@ -131,7 +131,7 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 	/* attach target task */
 	task_attach(task->pid);
 
-	map_fd = task_open(task, (char *)info->patch_path, O_RDWR, 0644);
+	map_fd = task_open(task, (char *)info->patch.path, O_RDWR, 0644);
 	if (map_fd <= 0) {
 		lerror("remote open failed.\n");
 		return -1;
