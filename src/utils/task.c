@@ -338,7 +338,9 @@ int vma_load_ulp(struct vma_struct *vma)
 	int ret;
 	GElf_Ehdr ehdr = {};
 	struct task *task = vma->task;
-
+	struct load_info info = {
+		.target_task = task,
+	};
 
 	ldebug("Load ulpatch vma %s.\n", vma->name_);
 
@@ -358,9 +360,7 @@ int vma_load_ulp(struct vma_struct *vma)
 
 	alloc_ulp(vma);
 
-	/**
-	 * TODO: load ulpatch Info
-	 */
+	vma_load_info(vma, &info);
 
 	return 0;
 }

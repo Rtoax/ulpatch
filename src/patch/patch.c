@@ -61,6 +61,17 @@ make:
 	return name;
 }
 
+static int __chk_load_info_len(struct load_info *info)
+{
+	if (info->hdr->e_shoff >= info->len
+		|| (info->hdr->e_shnum * sizeof(GElf_Shdr) >
+			info->len - info->hdr->e_shoff)) {
+		lerror("Bad section header.\n");
+		return -EFAULT;
+	}
+	return 0;
+}
+
 /* see linux:kernel/module.c */
 int alloc_patch_file(const char *obj_from, const char *obj_to,
 			struct load_info *info)
@@ -105,12 +116,8 @@ int alloc_patch_file(const char *obj_from, const char *obj_to,
 		err = -1;
 		goto free_out;
 	}
-	if (info->hdr->e_shoff >= info->len
-		|| (info->hdr->e_shnum * sizeof(GElf_Shdr) >
-			info->len - info->hdr->e_shoff)) {
-		lerror("Bad section header.\n");
+	if (__chk_load_info_len(info))
 		goto free_out;
-	}
 
 out:
 	return err;
@@ -118,6 +125,35 @@ out:
 free_out:
 	release_load_info(info);
 	return err;
+}
+
+/**
+ * Get load_info from ULPatch vma
+ */
+int vma_load_info(struct vma_struct *vma, struct load_info *info)
+{
+	int ret;
+	struct vma_ulp *ulp;
+
+	if (vma->type != VMA_ULPATCH || !vma->ulp) {
+		lerror("Forbid parse non-ulpatch VMA to load_info.\n");
+		return -ENOENT;
+	}
+
+	ulp = vma->ulp;
+	info->target_hdr = vma->start;
+	info->len = vma->end - vma->start;
+	info->hdr = ulp->elf_mem;
+
+	ret = __chk_load_info_len(info);
+	if (ret)
+		return ret;
+
+	/**
+	 * TODO: Parse info to ulp.
+	 */
+
+	return 0;
 }
 
 static int create_mmap_vma_file(struct task *task, struct load_info *info)

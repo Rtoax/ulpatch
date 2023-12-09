@@ -22,6 +22,7 @@
 #include <arch/aarch64/ftrace.h>
 #endif
 
+struct vma_struct;
 
 /* see linux:kernel/module-internal.h */
 struct load_info {
@@ -84,6 +85,7 @@ struct task;
 
 int alloc_patch_file(const char *obj_from, const char *obj_to,
 	struct load_info *info);
+int vma_load_info(struct vma_struct *vma, struct load_info *info);
 int setup_load_info(struct load_info *info);
 void release_load_info(struct load_info *info);
 
