@@ -109,7 +109,7 @@ TEST(Task,	attach_detach,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -228,7 +228,7 @@ TEST(Task,	mmap_malloc,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -291,7 +291,7 @@ TEST(Task,	fstat,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -403,7 +403,7 @@ static int task_mmap_file(int prot)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -459,7 +459,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL

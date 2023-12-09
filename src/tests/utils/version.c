@@ -9,15 +9,15 @@
 #include "../test_api.h"
 
 
-TEST(Utils,	upatch_version,	0)
+TEST(Utils,	ulpatch_version,	0)
 {
 	int ret = 0;
 
-	ret += upatch_version_major() != UPATCH_VERSION_MAJOR;
-	ret += upatch_version_minor() != UPATCH_VERSION_MINOR;
-	ret += upatch_version_patch() != UPATCH_VERSION_PATCH;
+	ret += ulpatch_version_major() != ULPATCH_VERSION_MAJOR;
+	ret += ulpatch_version_minor() != ULPATCH_VERSION_MINOR;
+	ret += ulpatch_version_patch() != ULPATCH_VERSION_PATCH;
 
-	printf("%s\n", upatch_version());
+	printf("%s\n", ulpatch_version());
 	return ret;
 }
 

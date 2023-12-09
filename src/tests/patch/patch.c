@@ -44,7 +44,7 @@ static void my_direct_func(void)
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-/* see macro UPATCH_TEST code branch */
+/* see macro ULPATCH_TEST code branch */
 __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 {
 	linfo("TTWU emulate.\n");
@@ -142,7 +142,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 #endif
 
 	// call again, custom_mcount() will be called.
-	// see macro UPATCH_TEST code branch
+	// see macro ULPATCH_TEST code branch
 	ret = try_to_wake_up(task, 1, 2);
 
 	free_task(task);
@@ -182,26 +182,26 @@ TEST(Patch,	ftrace_nop,	0)
 }
 #endif
 
-int upatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
+int ulpatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
 {
-#define UPATCH_TTWU_RET	0xdead1234
+#define ULPATCH_TTWU_RET	0xdead1234
 	linfo("TTWU emulate, patched.\n");
-	return UPATCH_TTWU_RET;
+	return ULPATCH_TTWU_RET;
 }
 
-TEST(Patch,	direct_patch_upatch,	0)
+TEST(Patch,	direct_patch_ulpatch,	0)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
-	unsigned long addr = (unsigned long)upatch_try_to_wake_up;
+	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
 
 #if defined(__x86_64__)
 	union text_poke_insn insn;
 	const char *new = NULL;
 
-	new = upatch_jmpq_replace(&insn, ip_pc, addr);
+	new = ulpatch_jmpq_replace(&insn, ip_pc, addr);
 
 	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
@@ -221,9 +221,9 @@ TEST(Patch,	direct_patch_upatch,	0)
 	ftrace_modify_code(task, ip_pc, 0, new, false);
 #endif
 
-	/* This will called patched function upatch_try_to_wake_up() */
+	/* This will called patched function ulpatch_try_to_wake_up() */
 	ret = try_to_wake_up(task, 1, 1);
-	if (ret != UPATCH_TTWU_RET)
+	if (ret != ULPATCH_TTWU_RET)
 		ret = -1;
 	else
 		ret = 0;

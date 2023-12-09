@@ -8,10 +8,10 @@
 	.global sym;				\
 	.type sym, %function;			\
 sym:						\
-	.global uftrace_ ## sym;		\
-	.hidden uftrace_ ## sym;		\
-	.type uftrace_ ## sym, %function;	\
-uftrace_ ## sym:
+	.global ulftrace_ ## sym;		\
+	.hidden ulftrace_ ## sym;		\
+	.type ulftrace_ ## sym, %function;	\
+ulftrace_ ## sym:
 
 #define ENTRY(sym)				\
 	.global sym;				\

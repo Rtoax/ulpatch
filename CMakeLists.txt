@@ -3,17 +3,17 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
-PROJECT(upatch)
+PROJECT(ulpatch)
 
 # version number components.
-set(upatch_VERSION_MAJOR 0)
-set(upatch_VERSION_MINOR 4)
-set(upatch_VERSION_PATCH 1)
+set(ulpatch_VERSION_MAJOR 0)
+set(ulpatch_VERSION_MINOR 4)
+set(ulpatch_VERSION_PATCH 1)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	OUTPUT_VARIABLE UPATCH_VERSION
+	OUTPUT_VARIABLE ULPATCH_VERSION
 	ERROR_VARIABLE GIT_DESCRIBE_ERROR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	RESULT_VARIABLE retcode
@@ -22,28 +22,28 @@ execute_process(
 # If the build is not done from a git repo, get the version information from
 # the version variables in main CMakeLists.txt
 if(NOT "${retcode}" STREQUAL "0")
-set(UPATCH_VERSION "v${upatch_VERSION_MAJOR}.${upatch_VERSION_MINOR}.${upatch_VERSION_PATCH}")
+set(ULPATCH_VERSION "v${ulpatch_VERSION_MAJOR}.${ulpatch_VERSION_MINOR}.${ulpatch_VERSION_PATCH}")
 endif()
 
-add_definitions("-DUPATCH_VERSION_MAJOR=${upatch_VERSION_MAJOR}")
-add_definitions("-DUPATCH_VERSION_MINOR=${upatch_VERSION_MINOR}")
-add_definitions("-DUPATCH_VERSION_PATCH=${upatch_VERSION_PATCH}")
-add_definitions("-DUPATCH_VERSION=\"${UPATCH_VERSION}\"")
+add_definitions("-DULPATCH_VERSION_MAJOR=${ulpatch_VERSION_MAJOR}")
+add_definitions("-DULPATCH_VERSION_MINOR=${ulpatch_VERSION_MINOR}")
+add_definitions("-DULPATCH_VERSION_PATCH=${ulpatch_VERSION_PATCH}")
+add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
-set(BUILD_UFTRACE ON CACHE BOOL "Build uftrace")
-set(BUILD_UTASK ON CACHE BOOL "Build utask")
+set(BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
+set(BUILD_ULTASK ON CACHE BOOL "Build ultask")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 set(CMAKE_INSTALL_PREFIX /usr)
 
-set(UPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/upatch/)
-set(UPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/upatch/)
+set(ULPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/ulpatch/)
+set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
 # see src/patch/objects/ftrace/CMakeLists.txt
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
-# see src/patch/objects/upatch-hello/CMakeLists.txt
-set(UPATCH_HELLO_OBJ upatch-hello.obj)
+# see src/patch/objects/ulpatch-hello/CMakeLists.txt
+set(ULPATCH_HELLO_OBJ ulpatch-hello.obj)
 
 # check processor architecture
 # only support x86_64 and aarch64 right now.
@@ -112,10 +112,10 @@ if(KERNEL_HEADERS_CONST_H)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" KERNEL_HEADERS_CONST_H)
 endif()
 
-# macro UPATCH_FTRACE_OBJ_PATH="/usr/share/upatch/ftrace-mcount.obj" for example
-set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_FTRACE_OBJ_PATH="${UPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
-# macro UPATCH_HELLO_OBJ_PATH="/usr/share/upatch/upatch-hello.obj" for example
-set(UTILS_FLAGS "${UTILS_FLAGS}" UPATCH_HELLO_OBJ_PATH="${UPATCH_SHARE_DIR}${UPATCH_HELLO_OBJ}")
+# macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example
+set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
+# macro ULPATCH_HELLO_OBJ_PATH="/usr/share/ulpatch/ulpatch-hello.obj" for example
+set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_HELLO_OBJ_PATH="${ULPATCH_SHARE_DIR}${ULPATCH_HELLO_OBJ}")
 
 
 set(TESTS_FLAGS)
@@ -124,32 +124,32 @@ add_subdirectory(src)
 
 
 # install targets
-if (BUILD_UFTRACE)
-install(TARGETS uftrace RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+if (BUILD_ULFTRACE)
+install(TARGETS ulftrace RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
-if (BUILD_UTASK)
-install(TARGETS utask RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+if (BUILD_ULTASK)
+install(TARGETS ultask RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
-install(TARGETS upatch RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS ulpatch RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(TARGETS upinfo RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 if (BUILD_TESTING)
-install(TARGETS upatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS ulpatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
 
 # install object file
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
-install(DIRECTORY DESTINATION ${UPATCH_SHARE_DIR})
-install(DIRECTORY DESTINATION ${UPATCH_INCLUDE_DIR})
+install(DIRECTORY DESTINATION ${ULPATCH_SHARE_DIR})
+install(DIRECTORY DESTINATION ${ULPATCH_INCLUDE_DIR})
 install(
 FILES
 	${PROJECT_SOURCE_DIR}/src/patch/meta.h
-DESTINATION ${UPATCH_INCLUDE_DIR}
+DESTINATION ${ULPATCH_INCLUDE_DIR}
 )
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
-	${PROJECT_SOURCE_DIR}/src/patch/objects/upatch-hello/${UPATCH_HELLO_OBJ}
-DESTINATION ${UPATCH_SHARE_DIR}
+	${PROJECT_SOURCE_DIR}/src/patch/objects/ulpatch-hello/${ULPATCH_HELLO_OBJ}
+DESTINATION ${ULPATCH_SHARE_DIR}
 )
 
 if (ENABLE_MAN)

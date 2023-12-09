@@ -34,22 +34,22 @@ static struct task *target_task = NULL;
 static const char *patch_object_file = NULL;
 
 /* This is ftrace object file path, during 'make install' install to
- * /usr/share/upatch/, this macro is a absolute path of LSB relocatable file.
+ * /usr/share/ulpatch/, this macro is a absolute path of LSB relocatable file.
  *
  * see top level of CMakeLists.txt
  */
-#if !defined(UPATCH_FTRACE_OBJ_PATH)
-# error "Need UPATCH_FTRACE_OBJ_PATH"
+#if !defined(ULPATCH_FTRACE_OBJ_PATH)
+# error "Need ULPATCH_FTRACE_OBJ_PATH"
 #endif
 
-static const char *prog_name = "uftrace";
+static const char *prog_name = "ulftrace";
 
 
 static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: uftrace [OPTION]... [FILE]...\n"
+	" Usage: ulftrace [OPTION]... [FILE]...\n"
 	"\n"
 	" User space ftrace\n"
 	"\n"
@@ -69,7 +69,7 @@ static void print_help(void)
 	"                      how to generate a ftrace relocatable object.\n"
 	"                      default: %s\n"
 	"\n",
-	UPATCH_FTRACE_OBJ_PATH);
+	ULPATCH_FTRACE_OBJ_PATH);
 	printf(
 	" Common argument:\n"
 	"\n"
@@ -89,8 +89,8 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n");
 	printf(
-	" uftrace %s\n",
-	upatch_version());
+	" ulftrace %s\n",
+	ulpatch_version());
 	exit(0);
 }
 
@@ -126,7 +126,7 @@ static int parse_config(int argc, char *argv[])
 			patch_object_file = optarg;
 			break;
 		case 'v':
-			printf("%s %s\n", prog_name, upatch_version());
+			printf("%s %s\n", prog_name, ulpatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -167,17 +167,17 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (!patch_object_file) {
-		if (!fexist(UPATCH_FTRACE_OBJ_PATH)) {
+		if (!fexist(ULPATCH_FTRACE_OBJ_PATH)) {
 			fprintf(stderr,
 				"Default ftrace relocatable object %s is not exist.\n"
-				"Make sure you install upatch correctly.\n",
-				UPATCH_FTRACE_OBJ_PATH
+				"Make sure you install ulpatch correctly.\n",
+				ULPATCH_FTRACE_OBJ_PATH
 			);
 			exit(1);
 		}
 		fprintf(stderr, "WARNING: use default %s.\n",
-			UPATCH_FTRACE_OBJ_PATH);
-		patch_object_file = UPATCH_FTRACE_OBJ_PATH;
+			ULPATCH_FTRACE_OBJ_PATH);
+		patch_object_file = ULPATCH_FTRACE_OBJ_PATH;
 	}
 
 	if (!fexist(patch_object_file)) {
@@ -202,11 +202,11 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	upatch_env_init();
+	ulpatch_env_init();
 
 	set_log_level(config.log_level);
 
-	target_task = open_task(target_pid, FTO_UFTRACE);
+	target_task = open_task(target_pid, FTO_ULFTRACE);
 	if (!target_task) {
 		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
 		return 1;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 		goto done;
 	}
 
-	init_patch(target_task, UPATCH_FTRACE_OBJ_PATH);
+	init_patch(target_task, ULPATCH_FTRACE_OBJ_PATH);
 
 	// MORE
 

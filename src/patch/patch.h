@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
-#ifndef __ELF_UPATCH_H
-#define __ELF_UPATCH_H 1
+#ifndef __ELF_ULPATCH_H
+#define __ELF_ULPATCH_H 1
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,16 +41,16 @@ struct load_info {
 	char *secstrings, *strtab;
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
-	struct upatch_info *info;
+	struct ulpatch_info *info;
 	enum patch_type type;
-	struct upatch_strtab upatch_strtab;
+	struct ulpatch_strtab ulpatch_strtab;
 
 	struct {
 		unsigned int
 			sym,
 			str,
 			vers,
-			upatch_strtab,
+			ulpatch_strtab,
 			info;
 	} index;
 };
@@ -90,4 +90,4 @@ int delete_patch(struct task *task);
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	const char *strtab,	unsigned int symindex, unsigned int relsec);
 
-#endif /* __ELF_UPATCH_H */
+#endif /* __ELF_ULPATCH_H */

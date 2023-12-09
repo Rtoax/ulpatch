@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
-#ifndef __UPATCH_UTILS_COMPILER_H
-#define __UPATCH_UTILS_COMPILER_H 1
+#ifndef __ULPATCH_UTILS_COMPILER_H
+#define __ULPATCH_UTILS_COMPILER_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,4 +92,4 @@ extern "C" {
 }
 #endif
 
-#endif /* __UPATCH_UTILS_COMPILER_H */
+#endif /* __ULPATCH_UTILS_COMPILER_H */

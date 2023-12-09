@@ -21,9 +21,9 @@ int i_am_a_patch(void)
 	return 1;
 }
 
-UPATCH_INFO(upatch, patch_me, i_am_a_patch, "Rong Tao <rtoax@foxmail.com>");
+ULPATCH_INFO(ulpatch, patch_me, i_am_a_patch, "Rong Tao <rtoax@foxmail.com>");
 
-TEST(Patch_meta,	macro__UPATCH_INFO,	0)
+TEST(Patch_meta,	macro__ULPATCH_INFO,	0)
 {
 	return 0;
 }

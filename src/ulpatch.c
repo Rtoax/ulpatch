@@ -40,7 +40,7 @@ enum {
 	ARG_LOG_ERR,
 };
 
-static const char *prog_name = "upatch";
+static const char *prog_name = "ulpatch";
 
 int check_patch_file(const char *file);
 
@@ -49,7 +49,7 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: upatch [OPTION]... [FILE]...\n"
+	" Usage: ulpatch [OPTION]... [FILE]...\n"
 	"\n"
 	" User space patch\n"
 	"\n"
@@ -85,8 +85,8 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n");
 	printf(
-	" upatch %s\n",
-	upatch_version()
+	" ulpatch %s\n",
+	ulpatch_version()
 	);
 	exit(0);
 }
@@ -126,7 +126,7 @@ static int parse_config(int argc, char *argv[])
 			command_type = CMD_INFO;
 			break;
 		case 'v':
-			printf("%s %s\n", prog_name, upatch_version());
+			printf("%s %s\n", prog_name, ulpatch_version());
 			exit(0);
 		case 'h':
 			print_help();
@@ -198,8 +198,8 @@ int check_patch_file(const char *file)
 		goto release;
 	}
 
-	if (strcmp(info.upatch_strtab.magic, SEC_UPATCH_MAGIC)) {
-		ldebug("%s is not upatch file.\n", file);
+	if (strcmp(info.ulpatch_strtab.magic, SEC_ULPATCH_MAGIC)) {
+		ldebug("%s is not ulpatch file.\n", file);
 		err = -ENODATA;
 	}
 
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
 
-	upatch_env_init();
+	ulpatch_env_init();
 
 	set_log_level(config.log_level);
 

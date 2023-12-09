@@ -36,7 +36,7 @@ void release_load_info(struct load_info *info)
 	}
 }
 
-/* Upatch is single thread, thus, this api is ok. */
+/* ULPatch is single thread, thus, this api is ok. */
 static char* make_pid_objname_unsafe(pid_t pid)
 {
 	static char name[BUFFER_SIZE];
@@ -51,7 +51,7 @@ make:
 		goto make;
 
 	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems like:
-	 * /tmp/upatch/5465/map_files/patch-AbIRYY */
+	 * /tmp/ulpatch/5465/map_files/patch-AbIRYY */
 	ret = snprintf(name, BUFFER_SIZE - 1,
 		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
 	if (ret <= 0)
@@ -194,14 +194,14 @@ static unsigned int find_sec(const struct load_info *info, const char *name)
 	return 0;
 }
 
-static int parse_upatch_strtab(struct upatch_strtab *s, const char *strtab)
+static int parse_ulpatch_strtab(struct ulpatch_strtab *s, const char *strtab)
 {
 	const char *p = strtab;
 
 	s->magic = p;
 
-	if (strcmp(s->magic, SEC_UPATCH_MAGIC)) {
-		lerror("No magic %s found.\n", SEC_UPATCH_MAGIC);
+	if (strcmp(s->magic, SEC_ULPATCH_MAGIC)) {
+		lerror("No magic %s found.\n", SEC_ULPATCH_MAGIC);
 		return -ENOENT;
 	}
 
@@ -235,34 +235,34 @@ int setup_load_info(struct load_info *info)
 	info->secstrings = (void *)info->hdr
 		+ info->sechdrs[info->hdr->e_shstrndx].sh_offset;
 
-	/* found ".upatch.info" */
-	info->index.info = find_sec(info, SEC_UPATCH_INFO);
+	/* found ".ulpatch.info" */
+	info->index.info = find_sec(info, SEC_ULPATCH_INFO);
 	if (info->index.info == 0) {
-		lerror("Not found %s section.\n", SEC_UPATCH_INFO);
+		lerror("Not found %s section.\n", SEC_ULPATCH_INFO);
 		return -EEXIST;
 	}
 
 	info->info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
-	/* found ".upatch.strtab" */
-	info->index.upatch_strtab = find_sec(info, SEC_UPATCH_STRTAB);
-	const char *upatch_strtab = (void *)info->hdr
-		+ info->sechdrs[info->index.upatch_strtab].sh_offset;
+	/* found ".ulpatch.strtab" */
+	info->index.ulpatch_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
+	const char *ulpatch_strtab = (void *)info->hdr
+		+ info->sechdrs[info->index.ulpatch_strtab].sh_offset;
 
-	err = parse_upatch_strtab(&info->upatch_strtab, upatch_strtab);
+	err = parse_ulpatch_strtab(&info->ulpatch_strtab, ulpatch_strtab);
 	if (err) {
-		lerror("Failed parse upatch_strtab.\n");
+		lerror("Failed parse ulpatch_strtab.\n");
 		return -ENOENT;
 	}
 
 	/* Get patch type */
-	if (!strcmp(info->upatch_strtab.patch_type, UPATCH_TYPE_PATCH_STR))
-		info->type = UPATCH_TYPE_PATCH;
-	else if (!strcmp(info->upatch_strtab.patch_type, UPATCH_TYPE_FTRACE_STR))
-		info->type = UPATCH_TYPE_FTRACE;
+	if (!strcmp(info->ulpatch_strtab.patch_type, ULPATCH_TYPE_PATCH_STR))
+		info->type = ULPATCH_TYPE_PATCH;
+	else if (!strcmp(info->ulpatch_strtab.patch_type, ULPATCH_TYPE_FTRACE_STR))
+		info->type = ULPATCH_TYPE_FTRACE;
 	else {
-		lerror("Unknown upatch type %s.\n", info->upatch_strtab.patch_type);
+		lerror("Unknown ulpatch type %s.\n", info->ulpatch_strtab.patch_type);
 		return -ENOENT;
 	}
 
@@ -568,8 +568,8 @@ static int solve_patch_symbols(struct load_info *info)
 	const char *dst_func, *src_func;
 	GElf_Sym *sym_src_func = NULL;
 
-	dst_func = info->upatch_strtab.dst_func;
-	src_func = info->upatch_strtab.src_func;
+	dst_func = info->ulpatch_strtab.dst_func;
+	src_func = info->ulpatch_strtab.src_func;
 
 	sym = task_vma_find_symbol(task, dst_func);
 	if (!sym) {
@@ -615,7 +615,7 @@ static int kick_target_process(const struct load_info *info)
 #if defined(__x86_64__)
 	union text_poke_insn insn;
 	const char __unused *new_insn = NULL;
-	new_insn = upatch_jmpq_replace(&insn, info->info->virtual_addr,
+	new_insn = ulpatch_jmpq_replace(&insn, info->info->virtual_addr,
 					info->info->patch_func_addr);
 	insn_sz = CALL_INSN_SIZE;
 #else

@@ -127,7 +127,7 @@ TEST_DYNSYM(mcount)
 TEST_DYNSYM(_mcount)
 #endif
 
-/* upatch_test */
+/* ulpatch_test */
 TEST_SYM_SELF(main)
 TEST_SYM_SELF(who_am_i)
 TEST_SYM_SELF(test_list)

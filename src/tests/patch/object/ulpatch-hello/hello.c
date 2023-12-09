@@ -13,7 +13,7 @@
 
 /**
  * This is target function to patch, the patch object see
- * src/patch/objects/upatch-hello/
+ * src/patch/objects/ulpatch-hello/
  */
 void hello_world(void)
 {
@@ -21,7 +21,7 @@ void hello_world(void)
 }
 
 
-TEST(Upatch,	object_hello,	0)
+TEST(ULPatch,	object_hello,	0)
 {
 	/* original */
 	hello_world();

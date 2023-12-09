@@ -15,7 +15,7 @@
 #include "compiler.h"
 
 
-void upatch_env_init(void)
+void ulpatch_env_init(void)
 {
 	if (!fexist("/tmp")) {
 		fprintf(stderr, "Need /tmp/\n");

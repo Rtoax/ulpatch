@@ -121,7 +121,7 @@ extern "C" {
 
 /* all output need file store here, mkdir(2) it before running.
  */
-#define ROOT_DIR	"/tmp/upatch"
+#define ROOT_DIR	"/tmp/ulpatch"
 
 
 /* Indirect stringification.  Doing two levels allows the parameter to be a
@@ -154,7 +154,7 @@ typedef enum {
 	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
 } file_type;
 
-/* upatch arguments configuration */
+/* ulpatch arguments configuration */
 struct config {
 	int log_level;
 };
@@ -175,20 +175,20 @@ struct str_node {
 extern struct config config;
 
 
-void upatch_env_init(void);
+void ulpatch_env_init(void);
 
-int upatch_version_major(void);
-int upatch_version_minor(void);
-int upatch_version_patch(void);
-const char *upatch_version(void);
-const char *upatch_arch(void);
+int ulpatch_version_major(void);
+int ulpatch_version_minor(void);
+int ulpatch_version_patch(void);
+const char *ulpatch_version(void);
+const char *ulpatch_arch(void);
 
 void daemonize(void);
 
 int memshow(FILE *fp, const void *data, int data_len);
 int memshowinlog(int level, const void *data, int data_len);
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
-int upatch_startswith(const char *str, const char *prefix);
+int ulpatch_startswith(const char *str, const char *prefix);
 
 /**
  * @src: string like a,b,c,d,e  MUST no whitespace

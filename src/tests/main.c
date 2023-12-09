@@ -104,8 +104,8 @@ static int print_interval_usec = PRINT_INTERVAL_USEC;
 static int print_nloop_default = PRINT_NLOOP;
 const char *print_content = "Hello";
 
-static char upatch_test_path_buf[MAX_PATH];
-const char *upatch_test_path = NULL;
+static char ulpatch_test_path_buf[MAX_PATH];
+const char *ulpatch_test_path = NULL;
 
 const char *listener_request = NULL;
 static bool listener_request_list = false;
@@ -117,7 +117,7 @@ static bool verbose = false;
 
 static void print_test_symbol(void);
 
-static const char *prog_name = "upatch_test";
+static const char *prog_name = "ulpatch_test";
 
 
 static enum who who_am_i(const char *s)
@@ -159,15 +159,15 @@ static void print_help(int ex)
 {
 	printf(
 	"\n"
-	"Usage: upatch_test [OPTION]... \n"
+	"Usage: ulpatch_test [OPTION]... \n"
 	"\n"
 	"  Exe: %s\n"
 	"\n"
-	"Test upatch\n"
+	"Test ulpatch\n"
 	"\n"
 	"Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n",
-	upatch_test_path
+	ulpatch_test_path
 	);
 
 	printf(
@@ -252,11 +252,11 @@ static void print_help(int ex)
 	" -h, --help          display this help and exit\n"
 	" -v, --version       output version information and exit\n"
 	"\n"
-	"upatch_test %s\n",
+	"ulpatch_test %s\n",
 	log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG,
-	upatch_version()
+	ulpatch_version()
 	);
 	exit(ex);
 }
@@ -351,7 +351,7 @@ static int parse_config(int argc, char *argv[])
 			verbose = true;
 			break;
 		case 'v':
-			printf("%s %s\n", prog_name, upatch_version());
+			printf("%s %s\n", prog_name, ulpatch_version());
 			exit(0);
 		case 'h':
 			print_help(0);
@@ -499,9 +499,9 @@ static void launch_tester(void)
 
 	test_log("=========================================\n");
 	test_log("===\n");
-	test_log("=== UPatch Testing\n");
+	test_log("=== ULPatch Testing\n");
 	test_log("===\n");
-	test_log("===  version: %s\n", upatch_version());
+	test_log("===  version: %s\n", ulpatch_version());
 	test_log("=== ---------------------------\n");
 	if (just_list_tests) {
 		fprintf(stderr,
@@ -794,12 +794,12 @@ static void sig_handler(int signum)
  */
 int main(int argc, char *argv[])
 {
-	upatch_env_init();
+	ulpatch_env_init();
 
 	signal(SIGINT, sig_handler);
 
-	upatch_test_path =
-		get_proc_pid_exe(getpid(), upatch_test_path_buf, MAX_PATH);
+	ulpatch_test_path =
+		get_proc_pid_exe(getpid(), ulpatch_test_path_buf, MAX_PATH);
 
 	parse_config(argc, argv);
 
@@ -832,7 +832,7 @@ int main(int argc, char *argv[])
 
 /* There are some selftests */
 
-TEST(upatch_test,	sleeper,	0)
+TEST(ulpatch_test,	sleeper,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -840,7 +840,7 @@ TEST(upatch_test,	sleeper,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"-r", "sleeper",
 			"-s", "100",
 			NULL
@@ -861,7 +861,7 @@ TEST(upatch_test,	sleeper,	0)
 	return ret;
 }
 
-TEST(upatch_test,	wait,	0)
+TEST(ulpatch_test,	wait,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -876,7 +876,7 @@ TEST(upatch_test,	wait,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
@@ -904,7 +904,7 @@ TEST(upatch_test,	wait,	0)
 	return ret;
 }
 
-TEST(upatch_test,	trigger,	0)
+TEST(ulpatch_test,	trigger,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -919,7 +919,7 @@ TEST(upatch_test,	trigger,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "trigger",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
@@ -947,7 +947,7 @@ TEST(upatch_test,	trigger,	0)
 	return ret;
 }
 
-TEST(upatch_test,	wait_wait_wait,	0)
+TEST(ulpatch_test,	wait_wait_wait,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -962,7 +962,7 @@ TEST(upatch_test,	wait_wait_wait,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "wait,sleeper,wait,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
@@ -992,7 +992,7 @@ TEST(upatch_test,	wait_wait_wait,	0)
 	return ret;
 }
 
-TEST(upatch_test,	trigger_trigger_trigger,	0)
+TEST(ulpatch_test,	trigger_trigger_trigger,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1007,7 +1007,7 @@ TEST(upatch_test,	trigger_trigger_trigger,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "trigger,sleeper,trigger,sleeper,trigger",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
@@ -1037,7 +1037,7 @@ TEST(upatch_test,	trigger_trigger_trigger,	0)
 	return ret;
 }
 
-TEST(upatch_test,	wait_trigger,	0)
+TEST(ulpatch_test,	wait_trigger,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1052,7 +1052,7 @@ TEST(upatch_test,	wait_trigger,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "wait,trigger,wait,trigger",
 			"--msgq", waitqueue.tmpfile,
 			NULL,
@@ -1102,7 +1102,7 @@ test_listener_symbol(char request, char *sym, unsigned long expect_addr)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "listener",
 			"--msgq", waitqueue.tmpfile,
 			"--listener-request", sym,
@@ -1140,7 +1140,7 @@ test_listener_symbol(char request, char *sym, unsigned long expect_addr)
 	return ret;
 }
 
-TEST(upatch_test,	listener,	0)
+TEST(ulpatch_test,	listener,	0)
 {
 	int err = 0, i;
 
@@ -1159,7 +1159,7 @@ TEST(upatch_test,	listener,	0)
 	return err;
 }
 
-TEST(upatch_test,	listener_epoll,	0)
+TEST(ulpatch_test,	listener_epoll,	0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1174,7 +1174,7 @@ TEST(upatch_test,	listener_epoll,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "listener",
 			"--listener-epoll",
 			NULL,

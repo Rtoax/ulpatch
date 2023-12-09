@@ -18,8 +18,8 @@ endif()
 
 aux_source_directory(. LIB_SOURCES)
 
-link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} upatch_elf)
+link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
 
-add_library(upatch_utils STATIC ${LIB_SOURCES})
+add_library(ulpatch_utils STATIC ${LIB_SOURCES})
 
-target_compile_definitions(upatch_utils PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_FLAGS})

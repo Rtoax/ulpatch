@@ -8,9 +8,9 @@ add_subdirectory(objects)
 find_library(ELF elf /usr/lib64)
 
 link_libraries(${ELF}
-	upatch_utils
-	upatch_utils_arch
-	upatch_elf
+	ulpatch_utils
+	ulpatch_utils_arch
+	ulpatch_elf
 )
 
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -D_GNU_SOURCE
@@ -18,7 +18,7 @@ add_definitions(-MD -Wall -Werror -g -ggdb -pg -D_GNU_SOURCE
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(upatch_patch STATIC ${LIB_SOURCES})
+add_library(ulpatch_patch STATIC ${LIB_SOURCES})
 
-target_compile_definitions(upatch_patch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_patch PRIVATE ${UTILS_FLAGS})
 

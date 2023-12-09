@@ -15,28 +15,28 @@ find_library(ELF elf /usr/lib64)
 find_library(RT rt /usr/lib64)
 
 link_libraries(${ELF} ${RT}
-	upatch_utils
-	upatch_utils_arch
-	upatch_elf
+	ulpatch_utils
+	ulpatch_utils_arch
+	ulpatch_elf
 )
 add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
 	-Wuninitialized -Wreturn-type -pg)
 
-# Target: utask
-if (BUILD_UTASK)
-add_executable(utask utask.c)
-target_compile_definitions(utask PRIVATE ${UTILS_FLAGS})
+# Target: ultask
+if (BUILD_ULTASK)
+add_executable(ultask ultask.c)
+target_compile_definitions(ultask PRIVATE ${UTILS_FLAGS})
 endif()
 
-# Target: uftrace
-if (BUILD_UFTRACE)
-add_executable(uftrace uftrace.c)
-target_compile_definitions(uftrace PRIVATE ${UTILS_FLAGS})
+# Target: ulftrace
+if (BUILD_ULFTRACE)
+add_executable(ulftrace ulftrace.c)
+target_compile_definitions(ulftrace PRIVATE ${UTILS_FLAGS})
 endif()
 
-# Target: upatch
-add_executable(upatch upatch.c)
-target_compile_definitions(upatch PRIVATE ${UTILS_FLAGS})
+# Target: ulpatch
+add_executable(ulpatch ulpatch.c)
+target_compile_definitions(ulpatch PRIVATE ${UTILS_FLAGS})
 
 # Target: upinfo
 add_executable(upinfo upinfo.c)

@@ -89,7 +89,7 @@ extern int nr_tests;
 
 extern struct list_head test_list[TEST_PRIO_NUM];
 
-extern const char *upatch_test_path;
+extern const char *ulpatch_test_path;
 
 
 #ifdef PRINTER_FN
@@ -159,7 +159,7 @@ struct clt_msg_hdr {
 };
 
 /**
- * Message between server and client, when upatch_test is ROLE_LISTENER
+ * Message between server and client, when ulpatch_test is ROLE_LISTENER
  */
 struct clt_msg {
 	struct clt_msg_hdr hdr;

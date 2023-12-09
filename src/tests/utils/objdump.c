@@ -14,13 +14,13 @@ static const char *test_files[] = {
 	"/usr/bin/cat",
 	"/usr/bin/grep",
 	"/usr/bin/vim",
-#define S_UPATCH_TEST_PATH	"0"
-	S_UPATCH_TEST_PATH, // for upatch_test_path
+#define S_ULPATCH_TEST_PATH	"0"
+	S_ULPATCH_TEST_PATH, // for ulpatch_test_path
 };
 
 #define MODIFY_TEST_FILES(i) \
-	if (!strcmp(test_files[i], S_UPATCH_TEST_PATH) == 0) { \
-		test_files[i] = upatch_test_path; \
+	if (!strcmp(test_files[i], S_ULPATCH_TEST_PATH) == 0) { \
+		test_files[i] = ulpatch_test_path; \
 	}
 
 

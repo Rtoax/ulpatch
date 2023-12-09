@@ -1,10 +1,10 @@
 
-DHR_META=/usr/include/upatch/meta.h
+DHR_META=/usr/include/ulpatch/meta.h
 HAVE_INSTALLED=$(shell if [[ -e ${DHR_META} ]]; then echo YES; fi)
 ifeq (${HAVE_INSTALLED},YES)
-$(info Already install upatch)
+$(info Already install ulpatch)
 else
-$(error Please install upatch first)
+$(error Please install ulpatch first)
 endif
 
 TARGETS := hello
@@ -28,7 +28,7 @@ CFLAGS_hello := -g -ggdb -flto
 	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
 
 %.up: %.o
-	@echo -e "Gen upatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	mv $(<) $(@)
 	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
 	readelf --relocs $(@)

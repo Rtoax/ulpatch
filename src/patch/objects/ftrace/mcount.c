@@ -11,17 +11,17 @@
 
 
 /**
- * The UPATCH_TEST macro just for test in elftoos_test target. it'll not
+ * The ULPATCH_TEST macro just for test in elftoos_test target. it'll not
  * compile into ftrace-object file.
  */
-#if defined(UPATCH_TEST)
+#if defined(ULPATCH_TEST)
 
 #include <utils/task.h>
 #include <utils/log.h>
 
 extern int try_to_wake_up(struct task *task, int mode, int wake_flags);
 
-#endif /* UPATCH_TEST */
+#endif /* ULPATCH_TEST */
 
 
 /* for example:
@@ -32,7 +32,7 @@ extern int try_to_wake_up(struct task *task, int mode, int wake_flags);
 int mcount_entry(unsigned long *parent_loc, unsigned long child,
 			struct mcount_regs *regs)
 {
-#if defined(UPATCH_TEST)
+#if defined(ULPATCH_TEST)
 
 	lwarning("parent: %p, child: %lx, args: %ld %ld %ld %ld %ld %ld.\n",
 		parent_loc,
@@ -54,7 +54,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 		lwarning("COMM: %s, PID %d\n", task->comm, task->pid);
 	}
 
-#endif /* UPATCH_TEST */
+#endif /* ULPATCH_TEST */
 
 	// TODO
 	return 0;
@@ -62,18 +62,18 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 
 unsigned long mcount_exit(long *retval)
 {
-#if defined(UPATCH_TEST)
+#if defined(ULPATCH_TEST)
 	printf("CALL mcount_exit.\n");
 
-#endif /* UPATCH_TEST */
+#endif /* ULPATCH_TEST */
 
 	// TODO
 	return 0;
 }
 
 #if defined(__x86_64__)
-UPATCH_INFO(uftrace, mcount, _ftrace_mcount, "Rong Tao");
+ULPATCH_INFO(ulftrace, mcount, _ftrace_mcount, "Rong Tao");
 #elif defined(__aarch64__)
-UPATCH_INFO(uftrace, _mcount, _ftrace_mcount, "Rong Tao");
+ULPATCH_INFO(ulftrace, _mcount, _ftrace_mcount, "Rong Tao");
 #endif
 

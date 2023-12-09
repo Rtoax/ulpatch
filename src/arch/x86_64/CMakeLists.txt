@@ -11,6 +11,6 @@ add_definitions(-MD -Wall -Werror -g -ggdb -pg -D_GNU_SOURCE
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(upatch_utils_arch STATIC ${LIB_SOURCES})
+add_library(ulpatch_utils_arch STATIC ${LIB_SOURCES})
 
-target_compile_definitions(upatch_utils_arch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_utils_arch PRIVATE ${UTILS_FLAGS})

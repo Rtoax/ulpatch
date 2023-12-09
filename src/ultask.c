@@ -45,7 +45,7 @@ static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
 
-static const char *prog_name = "utask";
+static const char *prog_name = "ultask";
 
 static bool verbose = false;
 
@@ -54,7 +54,7 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: utask [OPTION]... [FILE]...\n"
+	" Usage: ultask [OPTION]... [FILE]...\n"
 	"\n"
 	" User space task\n"
 	"\n"
@@ -101,8 +101,8 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n");
 	printf(
-	" utask %s\n",
-	upatch_version()
+	" ultask %s\n",
+	ulpatch_version()
 	);
 	exit(0);
 }
@@ -162,7 +162,7 @@ static int parse_config(int argc, char *argv[])
 			output_file = optarg;
 			break;
 		case 'v':
-			printf("%s %s\n", prog_name, upatch_version());
+			printf("%s %s\n", prog_name, ulpatch_version());
 			exit(0);
 		case 'V':
 			verbose = true;
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
 
-	upatch_env_init();
+	ulpatch_env_init();
 
 	set_log_level(config.log_level);
 

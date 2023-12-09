@@ -10,61 +10,61 @@
  * code.
  */
 
-#define SEC_UPATCH_MAGIC	".UPATCH"
-#define SEC_UPATCH_STRTAB	".upatch.strtab"
-#define SEC_UPATCH_INFO		".upatch.info"
+#define SEC_ULPATCH_MAGIC	".ULPATCH"
+#define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
+#define SEC_ULPATCH_INFO		".ulpatch.info"
 
 /* patch_type */
 enum patch_type {
-	UPATCH_TYPE_UNKNOWN,
-	UPATCH_TYPE_PATCH,
-	UPATCH_TYPE_FTRACE,
+	ULPATCH_TYPE_UNKNOWN,
+	ULPATCH_TYPE_PATCH,
+	ULPATCH_TYPE_FTRACE,
 };
-#define UPATCH_TYPE_FTRACE_STR	"uftrace"
-#define UPATCH_TYPE_PATCH_STR	"upatch"
+#define ULPATCH_TYPE_FTRACE_STR	"ulftrace"
+#define ULPATCH_TYPE_PATCH_STR	"ulpatch"
 
 /* Use to check support version or not. */
-#define UPATCH_FILE_VERSION	"1"
+#define ULPATCH_FILE_VERSION	"1"
 
 /**
  * Every patch has this information, it's metadata for each patch.
  *
- * @patch_type: the Patch type, see UPATCH_TYPE_PATCH, etc.
+ * @patch_type: the Patch type, see ULPATCH_TYPE_PATCH, etc.
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
  */
-#define UPATCH_INFO(patch_type, src_func, dst_func, author) \
+#define ULPATCH_INFO(patch_type, src_func, dst_func, author) \
 __asm__ (	\
-	"	.pushsection " SEC_UPATCH_STRTAB ", \"a\", @progbits\n"	\
-	"upatch_strtab: \n"	\
-	"	.string \"" SEC_UPATCH_MAGIC "\" \n"	\
+	"	.pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
+	"ulpatch_strtab: \n"	\
+	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"	\
 	"	.string \"" #patch_type "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
 	"	.string \"" #dst_func "\" \n"	\
 	"	.string \"" author "\" \n"	\
 	"	.popsection \n"	\
-	"	.pushsection " SEC_UPATCH_INFO ", \"aw\", @progbits\n"	\
+	"	.pushsection " SEC_ULPATCH_INFO ", \"aw\", @progbits\n"	\
 	"	.quad 0\n" /* target function address */	\
 	"	.quad 0\n" /* patch function address */	\
 	"	.quad 0\n" /* virtual address to modify in target process */	\
 	"	.quad 0\n" /* original value */	\
 	"	.long 0\n" /* flag */	\
-	"	.long " UPATCH_FILE_VERSION " \n"	\
+	"	.long " ULPATCH_FILE_VERSION " \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
 	"	.popsection \n"	\
 );
 
 /**
- * each element point each string in SEC_UPATCH_STRTAB
+ * each element point each string in SEC_ULPATCH_STRTAB
  *
- * @patch_type patch type, see UPATCH_TYPE_PATCH, etc.
+ * @patch_type patch type, see ULPATCH_TYPE_PATCH, etc.
  * @src_func source function
  * @dst_func destination function
  * @author Author of this patch
  */
-struct upatch_strtab {
-	/* Must be SEC_UPATCH_MAGIC */
+struct ulpatch_strtab {
+	/* Must be SEC_ULPATCH_MAGIC */
 	const char *magic;
 	const char *patch_type;
 	const char *src_func;
@@ -73,7 +73,7 @@ struct upatch_strtab {
 };
 
 /**
- * Point to SEC_UPATCH_INFO section
+ * Point to SEC_ULPATCH_INFO section
  *
  * Example:
  *
@@ -102,7 +102,7 @@ struct upatch_strtab {
  * virtual_addr     = 0x405fe1
  * orig_value       = 0x55 48 89 e5 41 ...
  */
-struct upatch_info {
+struct ulpatch_info {
 	unsigned long target_func_addr;
 	unsigned long patch_func_addr;
 
@@ -110,7 +110,7 @@ struct upatch_info {
 	unsigned long orig_value;
 
 	unsigned int flags;
-	unsigned int upatch_version;
+	unsigned int ulpatch_version;
 
 	char pad[4];
 };

@@ -30,7 +30,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -93,7 +93,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -184,7 +184,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,printer,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -252,7 +252,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
 			"--msgq", waitqueue.tmpfile,
 			NULL
@@ -267,10 +267,10 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 
 		struct task *task = open_task(pid, fto_flags);
 
-		ret = init_patch(task, UPATCH_FTRACE_OBJ_PATH);
+		ret = init_patch(task, ULPATCH_FTRACE_OBJ_PATH);
 		if (ret == -EEXIST) {
 			fprintf(stderr, "%s not exist. make install\n",
-				UPATCH_FTRACE_OBJ_PATH);
+				ULPATCH_FTRACE_OBJ_PATH);
 		}
 
 		if (cb)
@@ -326,7 +326,7 @@ static int find_task_symbol(struct task *task)
 
 TEST(Ftrace,	find_task_symbol_list,	0)
 {
-	return test_task_patch(FTO_UFTRACE, find_task_symbol);
+	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }
 
 TEST(Ftrace,	find_task_symbol_value,	0)
@@ -344,7 +344,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 		int ret;
 
 		char *_argv[] = {
-			(char*)upatch_test_path,
+			(char*)ulpatch_test_path,
 			"--role", "listener",
 			"--listener-epoll",
 			NULL,
@@ -363,7 +363,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 		 */
 		usleep(10000);
 
-		struct task *task = open_task(pid, FTO_UFTRACE);
+		struct task *task = open_task(pid, FTO_ULFTRACE);
 
 		dump_task_vmas(task, true);
 

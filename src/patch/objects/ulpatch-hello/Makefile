@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022 Rong Tao <rtoax@foxmail.com>
 #
-ifdef UPATCH_HELLO_OBJ
-TARGETS = $(UPATCH_HELLO_OBJ)
+ifdef ULPATCH_HELLO_OBJ
+TARGETS = $(ULPATCH_HELLO_OBJ)
 else
-TARGETS = upatch-hello.obj
+TARGETS = ulpatch-hello.obj
 endif
 
 DEBUG = yes

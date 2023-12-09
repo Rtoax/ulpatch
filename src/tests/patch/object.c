@@ -13,14 +13,14 @@
 
 
 /* see: root CMakeLists.txt */
-static const struct upatch_object {
+static const struct ulpatch_object {
 	enum patch_type type;
 	char *path;
-} upatch_objs[] = {
-	/* /usr/share/upatch/ftrace-mcount.obj */
-	{UPATCH_TYPE_FTRACE,	UPATCH_FTRACE_OBJ_PATH},
-	/* /usr/share/upatch/upatch-hello.obj */
-	{UPATCH_TYPE_PATCH,	UPATCH_HELLO_OBJ_PATH},
+} ulpatch_objs[] = {
+	/* /usr/share/ulpatch/ftrace-mcount.obj */
+	{ULPATCH_TYPE_FTRACE,	ULPATCH_FTRACE_OBJ_PATH},
+	/* /usr/share/ulpatch/ulpatch-hello.obj */
+	{ULPATCH_TYPE_PATCH,	ULPATCH_HELLO_OBJ_PATH},
 };
 
 
@@ -28,11 +28,11 @@ TEST(Object,	check_object,	0)
 {
 	int i, ret = 0;
 
-	for (i = 0; i < ARRAY_SIZE(upatch_objs); i++) {
+	for (i = 0; i < ARRAY_SIZE(ulpatch_objs); i++) {
 
 		struct load_info info = {};
-		enum patch_type expect_type = upatch_objs[i].type;
-		char *obj = upatch_objs[i].path;
+		enum patch_type expect_type = ulpatch_objs[i].type;
+		char *obj = ulpatch_objs[i].path;
 		char *tmpfile = "copy.obj";
 
 		if (!fexist(obj)) {
@@ -47,7 +47,7 @@ TEST(Object,	check_object,	0)
 
 		setup_load_info(&info);
 
-		/* see UPATCH_INFO() macro */
+		/* see ULPATCH_INFO() macro */
 		if (info.info->pad[0] != 1 || \
 			info.info->pad[1] != 2 || \
 			info.info->pad[2] != 3 || \

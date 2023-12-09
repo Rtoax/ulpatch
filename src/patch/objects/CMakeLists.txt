@@ -2,5 +2,5 @@
 # Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com>
 #
 add_subdirectory(ftrace)
-add_subdirectory(upatch-hello)
+add_subdirectory(ulpatch-hello)
 

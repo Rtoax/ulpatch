@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <upatch/meta.h>
+#include <ulpatch/meta.h>
 
 
-void upatch_print_hello(void)
+void ulpatch_print_hello(void)
 {
 #if defined(__x86_64__)
 	asm(
@@ -14,4 +14,4 @@ void upatch_print_hello(void)
 # warning Not supported CPU architecture yet.
 #endif
 }
-UPATCH_INFO(upatch, upatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulpatch, ulpatch_print_hello, print_hello, "Rong Tao");

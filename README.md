@@ -22,7 +22,7 @@ ULPatch is open source user space live patch tool.
 ## Ftrace
 
 Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compile option.
-`BUILD_UFTRACE` decides whether to compile `uftrace`.
+`BUILD_ULFTRACE` decides whether to compile `ulftrace`.
 
 
 # Code Style

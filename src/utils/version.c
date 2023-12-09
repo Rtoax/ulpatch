@@ -6,7 +6,7 @@
 #include "compiler.h"
 
 
-const char *upatch_arch(void)
+const char *ulpatch_arch(void)
 {
 #if defined(__x86_64__)
 	return "x86_64";
@@ -17,35 +17,35 @@ const char *upatch_arch(void)
 #endif
 }
 
-int upatch_version_major(void)
+int ulpatch_version_major(void)
 {
-#if !defined(UPATCH_VERSION_MAJOR)
-# error "Must define string UPATCH_VERSION_MAJOR"
+#if !defined(ULPATCH_VERSION_MAJOR)
+# error "Must define string ULPATCH_VERSION_MAJOR"
 #endif
-	return UPATCH_VERSION_MAJOR;
+	return ULPATCH_VERSION_MAJOR;
 }
 
-int upatch_version_minor(void)
+int ulpatch_version_minor(void)
 {
-#if !defined(UPATCH_VERSION_MINOR)
-# error "Must define string UPATCH_VERSION_MINOR"
+#if !defined(ULPATCH_VERSION_MINOR)
+# error "Must define string ULPATCH_VERSION_MINOR"
 #endif
-	return UPATCH_VERSION_MINOR;
+	return ULPATCH_VERSION_MINOR;
 }
 
-int upatch_version_patch(void)
+int ulpatch_version_patch(void)
 {
-#if !defined(UPATCH_VERSION_PATCH)
-# error "Must define string UPATCH_VERSION_PATCH"
+#if !defined(ULPATCH_VERSION_PATCH)
+# error "Must define string ULPATCH_VERSION_PATCH"
 #endif
-	return UPATCH_VERSION_PATCH;
+	return ULPATCH_VERSION_PATCH;
 }
 
-const char *upatch_version(void)
+const char *ulpatch_version(void)
 {
-#if !defined(UPATCH_VERSION)
-# error "Must define string UPATCH_VERSION"
+#if !defined(ULPATCH_VERSION)
+# error "Must define string ULPATCH_VERSION"
 #endif
-	return UPATCH_VERSION;
+	return ULPATCH_VERSION;
 }
 

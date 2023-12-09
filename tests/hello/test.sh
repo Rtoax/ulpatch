@@ -10,7 +10,7 @@ __usage__() {
 test [-h|--help] [-u|--patch]
 
 -p, --pid  [PID]        specify pid
--u, --patch [UPATCH]    specify upatch file
+-u, --patch [ULPATCH]    specify ulpatch file
 
 -d, --debug             debug mode
 
@@ -25,7 +25,7 @@ TEMP=$(getopt \
 	--long patch: \
 	--long debug \
 	--long help \
-	-n upatch-hello-test -- "$@")
+	-n ulpatch-hello-test -- "$@")
 
 test $? != 0 && __usage__ 1
 
@@ -61,21 +61,21 @@ done
 [[ -z ${pid} ]] && pid=$(pidof hello || true)
 [[ -z ${pid} ]] && echo "ERROR: Run ./hello first or specify -p" && exit 1
 
-[[ -z ${patch} ]] && echo "ERROR: Must specify upatch with -u" && exit 1
+[[ -z ${patch} ]] && echo "ERROR: Must specify ulpatch with -u" && exit 1
 [[ ! -e ${patch} ]] && echo "ERROR: ${patch} is not exist." && exit 1
 
 make
 
-upatch -p ${pid} --patch ${patch} ${debug:+--log-level=9}
+ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9}
 cat /proc/${pid}/maps
 
-dump_all_process_upatch() {
+dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
 
 	for ((i = 0; i < ${#patches_addr_range[@]}; i++))
 	do
 		rm -f patch-$i.up
-		utask -p ${pid} --dump-vma ${patches_addr_range[$i]} -o patch-$i.up
+		ultask -p ${pid} --dump-vma ${patches_addr_range[$i]} -o patch-$i.up
 	done
 }
-dump_all_process_upatch
+dump_all_process_ulpatch
