@@ -27,7 +27,7 @@ enum {
 	ARG_LOG_ERR,
 };
 
-static const char *prog_name = "upinfo";
+static const char *prog_name = "ulpinfo";
 
 static char *patch_file = NULL;
 
@@ -35,7 +35,7 @@ static void print_help(void)
 {
 	printf(
 	"\n"
-	" Usage: upinfo [OPTION]... [FILE]...\n"
+	" Usage: ulpinfo [OPTION]... [FILE]...\n"
 	"\n"
 	" User space patch\n"
 	"\n"
@@ -64,7 +64,7 @@ static void print_help(void)
 	"  -v, --version       output version information and exit\n"
 	"\n");
 	printf(
-	" upinfo %s\n",
+	" ulpinfo %s\n",
 	ulpatch_version()
 	);
 	exit(0);

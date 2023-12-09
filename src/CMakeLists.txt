@@ -38,9 +38,9 @@ endif()
 add_executable(ulpatch ulpatch.c)
 target_compile_definitions(ulpatch PRIVATE ${UTILS_FLAGS})
 
-# Target: upinfo
-add_executable(upinfo upinfo.c)
-target_compile_definitions(upinfo PRIVATE ${UTILS_FLAGS})
+# Target: ulpinfo
+add_executable(ulpinfo ulpinfo.c)
+target_compile_definitions(ulpinfo PRIVATE ${UTILS_FLAGS})
 
 if(BUILD_TESTING)
 add_subdirectory(tests)
