@@ -24,7 +24,6 @@ struct config config = {
 enum command {
 	CMD_NONE,
 	CMD_PATCH,
-	CMD_INFO,
 } command_type = CMD_NONE;
 
 
@@ -34,7 +33,6 @@ static char *patch_file = NULL;
 
 enum {
 	ARG_PATCH = 139,
-	ARG_INFO,
 	ARG_LOG_LEVEL,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
@@ -63,8 +61,6 @@ static void print_help(void)
 	"\n"
 	"  --patch  [patch]    patch an object file into target task, and patch\n"
 	"                      the patch.\n"
-	"\n"
-	"  --info              show patch info of process\n"
 	"\n");
 	printf(
 	" Common argument:\n"
@@ -98,7 +94,6 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
 		{ "patch",          required_argument, 0, ARG_PATCH },
-		{ "info",           no_argument,       0, ARG_INFO },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
@@ -121,9 +116,6 @@ static int parse_config(int argc, char *argv[])
 		case ARG_PATCH:
 			command_type = CMD_PATCH;
 			patch_file = strdup(optarg);
-			break;
-		case ARG_INFO:
-			command_type = CMD_INFO;
 			break;
 		case 'v':
 			printf("%s %s\n", prog_name, ulpatch_version());
@@ -217,12 +209,6 @@ static int command_patch(void)
 	return 0;
 }
 
-static int command_info(void)
-{
-	lerror("TODO: --info\n");
-	return 0;
-}
-
 int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
@@ -241,9 +227,6 @@ int main(int argc, char *argv[])
 	switch (command_type) {
 	case CMD_PATCH:
 		command_patch();
-		break;
-	case CMD_INFO:
-		command_info();
 		break;
 	case CMD_NONE:
 	default:

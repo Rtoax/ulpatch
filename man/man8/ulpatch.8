@@ -3,7 +3,7 @@
 ulpatch \- Userspace livepatch.
 .SH SYNOPSIS
 .B ulpatch
-[\fI\,OPTION\/\fR]... [\fI\,FUNCTION\/\fR]...
+[\fI\,OPTION\/\fR]...
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
@@ -12,8 +12,12 @@ ulpatch Patching a running process
 This program is also a basic command of ulpatch
 
 .SH ARGUMENTS
-
-TODO
+.TP
+\fB\-p\fR, \fB\-\-pid\fR [PID]
+Specify a target process's PID.
+.TP
+\fB\-\-patch\fR [ULPATCH.ELF]
+Specify a ulpatch.elf file to patch to target process.
 
 .SH OS
 Linux
@@ -22,4 +26,4 @@ Unstable - in development.
 .SH AUTHOR
 Written by Rong Tao
 .SH SEE ALSO
-uftrace(8), utask(8)
+ulftrace(8), ultask(8)

@@ -1,0 +1,29 @@
+.TH ulpinfo 8  "2023-12-09" "USER COMMANDS"
+.SH NAME
+ulpinfo \- Userspace livepatch information.
+.SH SYNOPSIS
+.B ulpinfo
+[\fI\,OPTION\/\fR]...
+.SH DESCRIPTION
+.\" Add any additional description here
+.PP
+ulpinfo Check patched running process status and livepatch information.
+
+This program is also a basic command of ulpinfo
+
+.SH ARGUMENTS
+.TP
+\fB\-p\fR, \fB\-\-pid\fR [PID]
+Specify a target process's PID.
+.TP
+\fB\-i\fR, \fB\-\-patch\fR [ULPATCH.ELF]
+Show ulpatch.elf file information.
+
+.SH OS
+Linux
+.SH STABILITY
+Unstable - in development.
+.SH AUTHOR
+Written by Rong Tao
+.SH SEE ALSO
+ulftrace(8), ultask(8), ulpatch(8)
