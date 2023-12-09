@@ -91,8 +91,7 @@ int parse_load_info(const char *obj_from, const char *obj_to,
 	}
 
 	/* copy from file */
-	if (copy_chunked_from_file(info->patch_mmap->mem, info->len,
-			obj_from) != info->len) {
+	if (fmemcpy(info->patch_mmap->mem, info->len, obj_from) != info->len) {
 		lerror("copy chunk failed.\n");
 		err = -EFAULT;
 		goto out;

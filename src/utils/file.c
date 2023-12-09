@@ -211,7 +211,7 @@ char* fmktempname(char *buf, int buf_len, char *seed)
 }
 
 /* Load a @file to @mem, make sure @file exist in file system */
-int copy_chunked_from_file(void *mem, int mem_len, const char *file)
+int fmemcpy(void *mem, int mem_len, const char *file)
 {
 	FILE *fp;
 	int size = MIN(mem_len, fsize(file));
