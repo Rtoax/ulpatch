@@ -100,11 +100,11 @@ int show_patch_info(void)
 
 	setup_load_info(&info);
 
-	printf("%-16s : %s\n", "Magic", info.ulpatch_strtab.magic);
+	printf("%-16s : %s\n", "Magic", info.ulp_strtab.magic);
 	printf("%-16s : %d\n", "Type", info.type);
-	printf("%-16s : %s\n", "SrcFunc", info.ulpatch_strtab.src_func);
-	printf("%-16s : %s\n", "DstFunc", info.ulpatch_strtab.dst_func);
-	printf("%-16s : %s\n", "Author", info.ulpatch_strtab.author);
+	printf("%-16s : %s\n", "SrcFunc", info.ulp_strtab.src_func);
+	printf("%-16s : %s\n", "DstFunc", info.ulp_strtab.dst_func);
+	printf("%-16s : %s\n", "Author", info.ulp_strtab.author);
 
 	printf("TargetAddr : %#016lx\n", info.ulp_info->target_func_addr);
 	printf("PatchAddr  : %#016lx\n", info.ulp_info->patch_func_addr);

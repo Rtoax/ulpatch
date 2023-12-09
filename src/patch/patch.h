@@ -46,14 +46,14 @@ struct load_info {
 
 	struct ulpatch_info *ulp_info;
 	enum patch_type type;
-	struct ulpatch_strtab ulpatch_strtab;
+	struct ulpatch_strtab ulp_strtab;
 
 	struct {
 		unsigned int
 			sym,
 			str,
 			vers,
-			ulpatch_strtab,
+			ulp_strtab,
 			info;
 	} index;
 };

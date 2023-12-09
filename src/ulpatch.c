@@ -148,7 +148,7 @@ int check_patch_file(const char *file)
 		goto release;
 	}
 
-	if (strcmp(info.ulpatch_strtab.magic, SEC_ULPATCH_MAGIC)) {
+	if (strcmp(info.ulp_strtab.magic, SEC_ULPATCH_MAGIC)) {
 		ldebug("%s is not ulpatch file.\n", file);
 		err = -ENODATA;
 	}

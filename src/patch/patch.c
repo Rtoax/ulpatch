@@ -245,23 +245,23 @@ int setup_load_info(struct load_info *info)
 		+ info->sechdrs[info->index.info].sh_offset;
 
 	/* found ".ulpatch.strtab" */
-	info->index.ulpatch_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
-	const char *ulpatch_strtab = (void *)info->hdr
-		+ info->sechdrs[info->index.ulpatch_strtab].sh_offset;
+	info->index.ulp_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
+	const char *ulp_strtab = (void *)info->hdr
+		+ info->sechdrs[info->index.ulp_strtab].sh_offset;
 
-	err = parse_ulpatch_strtab(&info->ulpatch_strtab, ulpatch_strtab);
+	err = parse_ulpatch_strtab(&info->ulp_strtab, ulp_strtab);
 	if (err) {
 		lerror("Failed parse ulpatch_strtab.\n");
 		return -ENOENT;
 	}
 
 	/* Get patch type */
-	if (!strcmp(info->ulpatch_strtab.patch_type, ULPATCH_TYPE_PATCH_STR))
+	if (!strcmp(info->ulp_strtab.patch_type, ULPATCH_TYPE_PATCH_STR))
 		info->type = ULPATCH_TYPE_PATCH;
-	else if (!strcmp(info->ulpatch_strtab.patch_type, ULPATCH_TYPE_FTRACE_STR))
+	else if (!strcmp(info->ulp_strtab.patch_type, ULPATCH_TYPE_FTRACE_STR))
 		info->type = ULPATCH_TYPE_FTRACE;
 	else {
-		lerror("Unknown ulpatch type %s.\n", info->ulpatch_strtab.patch_type);
+		lerror("Unknown ulpatch type %s.\n", info->ulp_strtab.patch_type);
 		return -ENOENT;
 	}
 
@@ -567,8 +567,8 @@ static int solve_patch_symbols(struct load_info *info)
 	const char *dst_func, *src_func;
 	GElf_Sym *sym_src_func = NULL;
 
-	dst_func = info->ulpatch_strtab.dst_func;
-	src_func = info->ulpatch_strtab.src_func;
+	dst_func = info->ulp_strtab.dst_func;
+	src_func = info->ulp_strtab.src_func;
 
 	sym = task_vma_find_symbol(task, dst_func);
 	if (!sym) {
