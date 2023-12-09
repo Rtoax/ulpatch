@@ -17,15 +17,11 @@
 #include <utils/task.h>
 #include <utils/compiler.h>
 
+#include "common.c"
 
-struct config config = {
-	.log_level = LOG_ERR,
-};
 
 enum {
-	ARG_LOG_LEVEL = 200,
-	ARG_LOG_DEBUG,
-	ARG_LOG_ERR,
+	ARG_MIN = ARG_COMMON_MAX,
 	ARG_VMAS, // print all vmas
 	ARG_DUMP_VMA, // dump one vma
 	ARG_FILE_MAP_TO_VMA,
@@ -46,8 +42,6 @@ static const char *output_file = NULL;
 static struct task *target_task = NULL;
 
 static const char *prog_name = "ultask";
-
-static bool verbose = false;
 
 
 static void print_help(void)
@@ -81,29 +75,7 @@ static void print_help(void)
 	"  -o, --output        specify output filename.\n"
 	"\n"
 	"\n");
-	printf(
-	" Other argument:\n"
-	"\n"
-	"  --log-level         set log level, default(%d)\n"
-	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
-	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
-	"  --log-debug         set log level to DEBUG(%d)\n"
-	"  --log-error         set log level to ERR(%d)\n"
-	"\n",
-	config.log_level,
-	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
-	LOG_DEBUG,
-	LOG_DEBUG,
-	LOG_ERR);
-	printf(
-	"  -V, --verbose       show detail\n"
-	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
-	"\n");
-	printf(
-	" ultask %s\n",
-	ulpatch_version()
-	);
+	print_usage_common(prog_name);
 	exit(0);
 }
 
@@ -117,22 +89,18 @@ static int parse_config(int argc, char *argv[])
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
-		{ "version",        no_argument,       0, 'v' },
-		{ "verbose",        no_argument,       0, 'V' },
-		{ "help",           no_argument,       0, 'h' },
-		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
-		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
-		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
+		COMMON_OPTIONS
 		{ NULL }
 	};
 
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:o:hvV", options, &option_index);
-		if (c < 0) {
+		c = getopt_long(argc, argv, "p:o:"COMMON_GETOPT_OPTSTRING,
+				options, &option_index);
+		if (c < 0)
 			break;
-		}
+
 		switch (c) {
 		case 'p':
 			target_pid = atoi(optarg);
@@ -161,24 +129,7 @@ static int parse_config(int argc, char *argv[])
 		case 'o':
 			output_file = optarg;
 			break;
-		case 'v':
-			printf("%s %s\n", prog_name, ulpatch_version());
-			exit(0);
-		case 'V':
-			verbose = true;
-			break;
-		case 'h':
-			print_help();
-			break;
-		case ARG_LOG_LEVEL:
-			config.log_level = atoi(optarg);
-			break;
-		case ARG_LOG_DEBUG:
-			config.log_level = LOG_DEBUG;
-			break;
-		case ARG_LOG_ERR:
-			config.log_level = LOG_ERR;
-			break;
+		COMMON_GETOPT_CASES(prog_name)
 		default:
 			print_help();
 			break;
@@ -351,7 +302,7 @@ int main(int argc, char *argv[])
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)
-		dump_task_vmas(target_task, verbose);
+		dump_task_vmas(target_task, config.verbose);
 
 	/* dump an VMA */
 	if (flag_dump_vma) {

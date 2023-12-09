@@ -16,10 +16,8 @@
 #include <utils/compiler.h>
 #include <utils/task.h>
 
+#include "common.c"
 
-struct config config = {
-	.log_level = LOG_ERR,
-};
 
 enum command {
 	CMD_NONE,
@@ -32,10 +30,8 @@ static struct task *target_task = NULL;
 static char *patch_file = NULL;
 
 enum {
-	ARG_PATCH = 139,
-	ARG_LOG_LEVEL,
-	ARG_LOG_DEBUG,
-	ARG_LOG_ERR,
+	ARG_MIN = ARG_COMMON_MAX,
+	ARG_PATCH,
 };
 
 static const char *prog_name = "ulpatch";
@@ -62,28 +58,7 @@ static void print_help(void)
 	"  --patch  [patch]    patch an object file into target task, and patch\n"
 	"                      the patch.\n"
 	"\n");
-	printf(
-	" Common argument:\n"
-	"\n"
-	"  --log-level         set log level, default(%d)\n"
-	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
-	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
-	"  --log-debug         set log level to DEBUG(%d)\n"
-	"  --log-error         set log level to ERR(%d)\n"
-	"\n",
-	config.log_level,
-	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
-	LOG_DEBUG,
-	LOG_DEBUG,
-	LOG_ERR);
-	printf(
-	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
-	"\n");
-	printf(
-	" ulpatch %s\n",
-	ulpatch_version()
-	);
+	print_usage_common(prog_name);
 	exit(0);
 }
 
@@ -94,21 +69,18 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
 		{ "patch",          required_argument, 0, ARG_PATCH },
-		{ "version",        no_argument,       0, 'v' },
-		{ "help",           no_argument,       0, 'h' },
-		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
-		{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },
-		{ "log-error",      no_argument,       0, ARG_LOG_ERR },
+		COMMON_OPTIONS
 		{ NULL }
 	};
 
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "p:vh", options, &option_index);
-		if (c < 0) {
+		c = getopt_long(argc, argv, "p:"COMMON_GETOPT_OPTSTRING,
+				options, &option_index);
+		if (c < 0)
 			break;
-		}
+
 		switch (c) {
 		case 'p':
 			target_pid = atoi(optarg);
@@ -117,21 +89,7 @@ static int parse_config(int argc, char *argv[])
 			command_type = CMD_PATCH;
 			patch_file = strdup(optarg);
 			break;
-		case 'v':
-			printf("%s %s\n", prog_name, ulpatch_version());
-			exit(0);
-		case 'h':
-			print_help();
-			break;
-		case ARG_LOG_LEVEL:
-			config.log_level = atoi(optarg);
-			break;
-		case ARG_LOG_DEBUG:
-			config.log_level = LOG_DEBUG;
-			break;
-		case ARG_LOG_ERR:
-			config.log_level = LOG_ERR;
-			break;
+		COMMON_GETOPT_CASES(prog_name)
 		default:
 			print_help();
 			break;

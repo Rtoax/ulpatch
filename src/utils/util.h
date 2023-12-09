@@ -157,6 +157,7 @@ typedef enum {
 /* ulpatch arguments configuration */
 struct config {
 	int log_level;
+	int verbose;
 };
 
 struct nr_idx_bool {
