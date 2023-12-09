@@ -306,6 +306,7 @@ int alloc_ulp(struct vma_struct *vma)
 
 	vma->ulp = ulp;
 	ulp->elf_mem = mem;
+	ulp->vma = vma;
 
 	/* Copy VMA from target task memory space */
 	ret = memcpy_from_task(task, ulp->elf_mem, vma->start, elf_mem_len);

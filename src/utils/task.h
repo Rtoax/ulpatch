@@ -59,6 +59,8 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	NULL
 };
 
+struct vma_struct;
+
 struct vma_elf {
 	GElf_Ehdr ehdr;
 	GElf_Phdr *phdrs;
@@ -71,6 +73,9 @@ struct vma_ulp {
 
 	/* This is ELF */
 	void *elf_mem;
+
+	/* Belongs to */
+	struct vma_struct *vma;
 
 	/* struct task.ulp_list */
 	struct list_head node;

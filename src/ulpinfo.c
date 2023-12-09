@@ -18,7 +18,7 @@
 
 
 struct config config = {
-	.log_level = -1,
+	.log_level = LOG_ERR,
 };
 
 enum {
@@ -30,6 +30,7 @@ enum {
 static const char *prog_name = "ulpinfo";
 
 static char *patch_file = NULL;
+static pid_t pid = 0;
 
 static void print_help(void)
 {
@@ -44,6 +45,8 @@ static void print_help(void)
 	" Option argument:\n"
 	"\n"
 	"  -i, --patch         specify an patch file to check\n"
+	"\n"
+	"  -p, --pid           list all patches in specified PID process\n"
 	"\n");
 	printf(
 	" Common argument:\n"
@@ -74,6 +77,7 @@ static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
 		{ "patch",          required_argument, 0, 'i' },
+		{ "pid",            required_argument, 0, 'p' },
 		{ "version",        no_argument,       0, 'v' },
 		{ "help",           no_argument,       0, 'h' },
 		{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },
@@ -85,13 +89,16 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "i:vh", options, &option_index);
+		c = getopt_long(argc, argv, "i:p:vh", options, &option_index);
 		if (c < 0) {
 			break;
 		}
 		switch (c) {
 		case 'i':
 			patch_file = optarg;
+			break;
+		case 'p':
+			pid = atoi(optarg);
 			break;
 		case 'v':
 			printf("%s %s\n", prog_name, ulpatch_version());
@@ -160,6 +167,27 @@ int show_patch_info(void)
 	return 0;
 }
 
+int show_task_patch_info(pid_t pid)
+{
+	struct task *task;
+	struct vma_ulp *ulp, *tmpulp;
+
+	task = open_task(pid, FTO_ALL);
+	if (!task) {
+		lerror("Open pid=%d task failed.\n", pid);
+		return -ENOENT;
+	}
+
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
+		struct vma_struct *vma = ulp->vma;
+		print_vma(stdout, vma, 0);
+		lerror("TODO: Print ulpatch info.\n");
+	}
+
+	free_task(task);
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
@@ -168,6 +196,9 @@ int main(int argc, char *argv[])
 
 	if (patch_file)
 		show_patch_info();
+
+	if (pid)
+		show_task_patch_info(pid);
 
 	return 0;
 }
