@@ -241,7 +241,7 @@ int setup_load_info(struct load_info *info)
 		return -EEXIST;
 	}
 
-	info->info = (void *)info->hdr
+	info->ulp_info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
 
 	/* found ".ulpatch.strtab" */
@@ -593,13 +593,13 @@ static int solve_patch_symbols(struct load_info *info)
 		return -ENOENT;
 	}
 
-	info->info->target_func_addr = sym->sym.st_value;
-	info->info->patch_func_addr = sym_src_func->st_value;
+	info->ulp_info->target_func_addr = sym->sym.st_value;
+	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */
-	info->info->virtual_addr = info->info->target_func_addr;
+	info->ulp_info->virtual_addr = info->ulp_info->target_func_addr;
 
-	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->info->target_func_addr);
-	ldebug("Found %s symbol address %#016lx.\n", src_func, info->info->patch_func_addr);
+	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->ulp_info->target_func_addr);
+	ldebug("Found %s symbol address %#016lx.\n", src_func, info->ulp_info->patch_func_addr);
 	return 0;
 }
 
@@ -614,16 +614,16 @@ static int kick_target_process(const struct load_info *info)
 #if defined(__x86_64__)
 	union text_poke_insn insn;
 	const char __unused *new_insn = NULL;
-	new_insn = ulpatch_jmpq_replace(&insn, info->info->virtual_addr,
-					info->info->patch_func_addr);
+	new_insn = ulpatch_jmpq_replace(&insn, info->ulp_info->virtual_addr,
+					info->ulp_info->patch_func_addr);
 	insn_sz = CALL_INSN_SIZE;
 #else
 	lerror("not support expect x86_64 yet.\n");
 	exit(1);
 #endif
 
-	n = memcpy_from_task(task, &info->info->orig_value,
-				info->info->virtual_addr, insn_sz);
+	n = memcpy_from_task(task, &info->ulp_info->orig_value,
+				info->ulp_info->virtual_addr, insn_sz);
 	if (n < insn_sz) {
 		lerror("Backup original instructions failed.\n");
 		/* TODO */
@@ -639,7 +639,7 @@ static int kick_target_process(const struct load_info *info)
 	task_attach(task->pid);
 
 #if defined(__x86_64__)
-	n = memcpy_to_task(task, info->info->virtual_addr, (void *)new_insn, insn_sz);
+	n = memcpy_to_task(task, info->ulp_info->virtual_addr, (void *)new_insn, insn_sz);
 	if (n < insn_sz) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;

@@ -48,10 +48,10 @@ TEST(Object,	check_object,	0)
 		setup_load_info(&info);
 
 		/* see ULPATCH_INFO() macro */
-		if (info.info->pad[0] != 1 || \
-			info.info->pad[1] != 2 || \
-			info.info->pad[2] != 3 || \
-			info.info->pad[3] != 4) {
+		if (info.ulp_info->pad[0] != 1 || \
+			info.ulp_info->pad[1] != 2 || \
+			info.ulp_info->pad[2] != 3 || \
+			info.ulp_info->pad[3] != 4) {
 			fprintf(stderr, "Get wrong pad 0-3.\n");
 			return 0;
 		}

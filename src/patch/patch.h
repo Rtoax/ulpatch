@@ -44,7 +44,7 @@ struct load_info {
 	char *secstrings, *strtab;
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
-	struct ulpatch_info *info;
+	struct ulpatch_info *ulp_info;
 	enum patch_type type;
 	struct ulpatch_strtab ulpatch_strtab;
 

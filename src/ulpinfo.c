@@ -106,15 +106,15 @@ int show_patch_info(void)
 	printf("%-16s : %s\n", "DstFunc", info.ulpatch_strtab.dst_func);
 	printf("%-16s : %s\n", "Author", info.ulpatch_strtab.author);
 
-	printf("TargetAddr : %#016lx\n", info.info->target_func_addr);
-	printf("PatchAddr  : %#016lx\n", info.info->patch_func_addr);
-	printf("VirtAddr   : %#016lx\n", info.info->virtual_addr);
-	printf("OrigVal    : %#016lx\n", info.info->orig_value);
-	printf("Flags      : %#08x\n",  info.info->flags);
-	printf("Version    : %#08x\n",  info.info->ulpatch_version);
+	printf("TargetAddr : %#016lx\n", info.ulp_info->target_func_addr);
+	printf("PatchAddr  : %#016lx\n", info.ulp_info->patch_func_addr);
+	printf("VirtAddr   : %#016lx\n", info.ulp_info->virtual_addr);
+	printf("OrigVal    : %#016lx\n", info.ulp_info->orig_value);
+	printf("Flags      : %#08x\n",  info.ulp_info->flags);
+	printf("Version    : %#08x\n",  info.ulp_info->ulpatch_version);
 	printf("Pad[4]     : [%d,%d,%d,%d]\n",
-		info.info->pad[0], info.info->pad[1],
-		info.info->pad[2], info.info->pad[3]);
+		info.ulp_info->pad[0], info.ulp_info->pad[1],
+		info.ulp_info->pad[2], info.ulp_info->pad[3]);
 
 	release_load_info(&info);
 
