@@ -35,6 +35,7 @@ enum vma_type {
 	VMA_VSYSCALL, /* [vsyscall] */
 	VMA_LIB_DONT_KNOWN, /* Unknown Library */
 	VMA_ANON,   /* No name */
+	VMA_ULPATCH,/* ULPatch */
 	VMA_TYPE_NUM,
 };
 
@@ -52,6 +53,7 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	"vsyscall",
 	"lib?",
 	"anon",
+	"ulpatch",
 	NULL
 };
 
@@ -205,7 +207,7 @@ int read_task_vmas(struct task *task);
 int update_task_vmas(struct task *task);
 int free_task_vmas(struct task *task);
 
-enum vma_type get_vma_type(const char *exe, const char *name);
+enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
 
 int dump_task(const struct task *t);
 

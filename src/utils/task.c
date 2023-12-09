@@ -14,6 +14,7 @@
 #include <elf.h>
 
 #include <elf/elf_api.h>
+#include <patch/patch.h>
 
 #include "log.h"
 #include "task.h"
@@ -198,9 +199,12 @@ static int __prot2flags(unsigned int prot)
 
 int free_task_vmas(struct task *task);
 
-enum vma_type get_vma_type(const char *exe, const char *name)
+enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 {
 	enum vma_type type = VMA_NONE;
+	char s_pid[64];
+
+	snprintf(s_pid, sizeof(s_pid), "%d", pid);
 
 	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
@@ -225,6 +229,13 @@ enum vma_type get_vma_type(const char *exe, const char *name)
 		type = VMA_LIB_DONT_KNOWN;
 	} else if (strlen(name) == 0) {
 		type = VMA_ANON;
+	/**
+	 * Example:
+	 * /tmp/ulpatch/17099/map_files/patch-ZUkaOS
+	 *              ^^^^^           ^^^^^^
+	 */
+	} else if (strstr(name, PATCH_VMA_TEMP_PREFIX) && strstr(name, s_pid)) {
+		type = VMA_ULPATCH;
 	} else {
 		type = VMA_NONE;
 	}
@@ -805,7 +816,7 @@ int read_task_vmas(struct task *task)
 		vma->min = min;
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
-		vma->type = get_vma_type(task->exe, name_);
+		vma->type = get_vma_type(task->pid, task->exe, name_);
 
 		/* Find libc.so */
 		if (!task->libc_vma && vma->type == VMA_LIBC &&
