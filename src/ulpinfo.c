@@ -114,6 +114,14 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
+	return 0;
+}
+
+int show_patch_info(void)
+{
+	int err;
+	struct load_info info;
+
 	if (!patch_file) {
 		fprintf(stderr, "Must specify --patch\n");
 		exit(1);
@@ -122,18 +130,6 @@ static int parse_config(int argc, char *argv[])
 		fprintf(stderr, "%s is not exist\n", patch_file);
 		exit(1);
 	}
-
-	return 0;
-}
-
-int main(int argc, char *argv[])
-{
-	int err;
-	struct load_info info;
-
-	parse_config(argc, argv);
-
-	set_log_level(config.log_level);
 
 	err = parse_load_info(patch_file, "temp.up", &info);
 	if (err) {
@@ -160,6 +156,19 @@ int main(int argc, char *argv[])
 		info.info->pad[2], info.info->pad[3]);
 
 	release_load_info(&info);
+
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	parse_config(argc, argv);
+
+	set_log_level(config.log_level);
+
+	if (patch_file)
+		show_patch_info();
+
 	return 0;
 }
 
