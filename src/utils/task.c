@@ -14,7 +14,6 @@
 #include <elf.h>
 
 #include <elf/elf_api.h>
-#include <patch/patch.h>
 
 #include "log.h"
 #include "task.h"
@@ -65,6 +64,8 @@ struct vma_struct *alloc_vma(struct task *task)
 	list_init(&vma->node_list);
 
 	vma->leader = NULL;
+	vma->ulp = NULL;
+
 	list_init(&vma->siblings);
 
 	return vma;
@@ -118,6 +119,7 @@ int free_vma(struct vma_struct *vma)
 	if (!vma)
 		return -1;
 
+	free_ulp(vma);
 	free(vma);
 	return 0;
 }
@@ -283,6 +285,85 @@ static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 }
 
+int alloc_ulp(struct vma_struct *vma)
+{
+	int ret;
+	void *mem;
+	struct vma_ulp *ulp;
+	size_t elf_mem_len = vma->end - vma->start;
+	struct task *task = vma->task;
+
+	ulp = malloc(sizeof(struct vma_ulp));
+	if (!ulp) {
+		lerror("malloc failed.\n");
+		return -ENOMEM;
+	}
+	mem = malloc(elf_mem_len);
+	if (!mem) {
+		lerror("malloc failed.\n");
+		return -ENOMEM;
+	}
+
+	vma->ulp = ulp;
+	ulp->elf_mem = mem;
+
+	/* Copy VMA from target task memory space */
+	ret = memcpy_from_task(task, ulp->elf_mem, vma->start, elf_mem_len);
+	if (ret < elf_mem_len) {
+		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+		free_ulp(vma);
+		return -EAGAIN;
+	}
+
+	list_add(&ulp->node, &task->ulp_list);
+	return 0;
+}
+
+void free_ulp(struct vma_struct *vma)
+{
+	struct vma_ulp *ulp = vma->ulp;
+
+	if (!ulp)
+		return;
+
+	list_del(&ulp->node);
+	free(ulp->elf_mem);
+	free(ulp);
+	vma->ulp = NULL;
+}
+
+int vma_load_ulp(struct vma_struct *vma)
+{
+	int ret;
+	GElf_Ehdr ehdr = {};
+	struct task *task = vma->task;
+
+
+	ldebug("Load ulpatch vma %s.\n", vma->name_);
+
+	ret = memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr));
+	if (ret < sizeof(ehdr)) {
+		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+		return -EAGAIN;
+	}
+
+	if (!ehdr_magic_ok(&ehdr)) {
+		lerror("VMA %s(%Lx) is considered as ULPATCH, but it isn't ELF.",
+			vma->name_, vma->start);
+		return -ENOENT;
+	}
+
+	vma->is_elf = true;
+
+	alloc_ulp(vma);
+
+	/**
+	 * TODO: load ulpatch Info
+	 */
+
+	return 0;
+}
+
 /* Only FTO_VMA_ELF flag will load VMA ELF */
 int vma_peek_phdr(struct vma_struct *vma)
 {
@@ -301,6 +382,8 @@ int vma_peek_phdr(struct vma_struct *vma)
 	case VMA_VSYSCALL:
 		lwarning("not support %s\n", VMA_TYPE_NAME(vma->type));
 		return 0;
+	case VMA_ULPATCH:
+		return vma_load_ulp(vma);
 	default:
 		break;
 	}
@@ -475,7 +558,7 @@ share_lib:
 
 void vma_free_elf(struct vma_struct *vma)
 {
-	if (!vma->is_elf)
+	if (!vma->is_elf || vma->type == VMA_ULPATCH)
 		return;
 
 	free(vma->elf->phdrs);
@@ -972,6 +1055,7 @@ int free_task_vmas(struct task *task)
 	}
 
 	list_init(&task->vma_list);
+	list_init(&task->ulp_list);
 	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
@@ -1053,6 +1137,7 @@ struct task *open_task(pid_t pid, int flag)
 	memset(task, 0x0, sizeof(struct task));
 
 	list_init(&task->vma_list);
+	list_init(&task->ulp_list);
 	rb_init(&task->vmas_rb);
 
 	task->fto_flag = flag;

@@ -17,6 +17,8 @@
 #error "Must install binutils-devel"
 #endif
 
+#include <patch/patch.h>
+
 #include <utils/util.h>
 #include <utils/rbtree.h>
 #include <utils/list.h>
@@ -63,6 +65,17 @@ struct vma_elf {
 	unsigned long load_offset;
 };
 
+struct vma_ulp {
+	struct ulpatch_strtab strtab;
+	struct ulpatch_info info;
+
+	/* This is ELF */
+	void *elf_mem;
+
+	/* struct task.ulp_list */
+	struct list_head node;
+};
+
 struct vma_struct {
 	unsigned long start, end, offset;
 	unsigned int maj, min, inode;
@@ -82,6 +95,8 @@ struct vma_struct {
 
 	/* Only elf has it */
 	struct vma_elf *elf;
+	/* Only VMA_ULPATCH has it */
+	struct vma_ulp *ulp;
 
 	struct task *task;
 
@@ -183,6 +198,9 @@ struct task {
 	struct rb_root vma_symbols;
 
 	struct objdump_elf_file *objdump;
+
+	/* struct vma_ulp.node */
+	struct list_head ulp_list;
 };
 
 
@@ -217,6 +235,9 @@ int dump_task_addr_to_file(const char *ofile, struct task *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task *task,
 		unsigned long addr);
+
+int alloc_ulp(struct vma_struct *vma);
+void free_ulp(struct vma_struct *vma);
 
 struct task *open_task(pid_t pid, int flag);
 int free_task(struct task *task);
