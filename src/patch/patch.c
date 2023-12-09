@@ -62,8 +62,8 @@ make:
 }
 
 /* see linux:kernel/module.c */
-int parse_load_info(const char *obj_from, const char *obj_to,
-	struct load_info *info)
+int alloc_patch_file(const char *obj_from, const char *obj_to,
+			struct load_info *info)
 {
 	int err = 0;
 
@@ -706,7 +706,7 @@ int init_patch(struct task *task, const char *obj_file)
 
 	const char *obj_to = make_pid_objname_unsafe(task->pid);
 
-	err = parse_load_info(obj_file, obj_to, &info);
+	err = alloc_patch_file(obj_file, obj_to, &info);
 	if (err) {
 		lerror("Parse %s failed.\n", obj_file);
 		return err;

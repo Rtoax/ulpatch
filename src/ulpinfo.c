@@ -92,7 +92,7 @@ int show_patch_info(void)
 		exit(1);
 	}
 
-	err = parse_load_info(patch_file, "temp.up", &info);
+	err = alloc_patch_file(patch_file, "temp.up", &info);
 	if (err) {
 		lerror("Parse %s failed.\n", patch_file);
 		return err;

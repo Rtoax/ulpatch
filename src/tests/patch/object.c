@@ -39,7 +39,7 @@ TEST(Object,	check_object,	0)
 			ret = -EEXIST;
 			fprintf(stderr, "\n%s is not exist, maybe: make install\n", obj);
 		}
-		ret = parse_load_info(obj, tmpfile, &info);
+		ret = alloc_patch_file(obj, tmpfile, &info);
 		if (ret) {
 			fprintf(stderr, "Parse %s failed.\n", obj);
 			return ret;
