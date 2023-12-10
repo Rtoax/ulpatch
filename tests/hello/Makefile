@@ -29,7 +29,7 @@ CFLAGS_hello := -g -ggdb -flto
 
 %.up: %.o
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	mv $(<) $(@)
+	ld -r -o $(@) --build-id=sha1 $(<)
 	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
 	readelf --relocs $(@)
 	readelf --syms $(@)
