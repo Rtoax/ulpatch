@@ -101,8 +101,8 @@ int show_patch_info(void)
 	setup_load_info(&info);
 
 	printf("%-16s : %d\n", "Type", info.type);
-	print_ulp_strtab(stdout, &info.ulp_strtab);
-	print_ulp_info(stdout, info.ulp_info);
+	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
+	print_ulp_info(stdout, "\t", info.ulp_info);
 
 	release_load_info(&info);
 
@@ -123,8 +123,8 @@ int show_task_patch_info(pid_t pid)
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vma_struct *vma = ulp->vma;
 		print_vma(stdout, vma, 0);
-		print_ulp_strtab(stdout, &ulp->strtab);
-		print_ulp_info(stdout, &ulp->info);
+		print_ulp_strtab(stdout, "\t", &ulp->strtab);
+		print_ulp_info(stdout, "\t", &ulp->info);
 	}
 
 	free_task(task);

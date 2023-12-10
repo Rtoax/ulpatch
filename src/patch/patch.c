@@ -23,23 +23,25 @@
 #endif
 
 
-void print_ulp_strtab(FILE *fp, struct ulpatch_strtab *strtab)
+void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab)
 {
-	fprintf(fp, "Magic      : %s\n", strtab->magic);
-	fprintf(fp, "SrcFunc    : %s\n", strtab->src_func);
-	fprintf(fp, "DstFunc    : %s\n", strtab->dst_func);
-	fprintf(fp, "Author     : %s\n", strtab->author);
+	const char *prefix = pfx ?: "";
+	fprintf(fp, "%sMagic      : %s\n", prefix, strtab->magic);
+	fprintf(fp, "%sSrcFunc    : %s\n", prefix, strtab->src_func);
+	fprintf(fp, "%sDstFunc    : %s\n", prefix, strtab->dst_func);
+	fprintf(fp, "%sAuthor     : %s\n", prefix, strtab->author);
 }
 
-void print_ulp_info(FILE *fp, struct ulpatch_info *inf)
+void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 {
-	fprintf(fp, "TargetAddr : %#016lx\n", inf->target_func_addr);
-	fprintf(fp, "PatchAddr  : %#016lx\n", inf->patch_func_addr);
-	fprintf(fp, "VirtAddr   : %#016lx\n", inf->virtual_addr);
-	fprintf(fp, "OrigVal    : %#016lx\n", inf->orig_value);
-	fprintf(fp, "Flags      : %#08x\n",  inf->flags);
-	fprintf(fp, "Version    : %#08x\n",  inf->ulpatch_version);
-	fprintf(fp, "Pad[4]     : [%d,%d,%d,%d]\n",
+	const char *prefix = pfx ?: "";
+	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
+	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
+	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
+	fprintf(fp, "%sOrigVal    : %#016lx\n", prefix, inf->orig_value);
+	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
+	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->ulpatch_version);
+	fprintf(fp, "%sPad[4]     : [%d,%d,%d,%d]\n", prefix,
 		inf->pad[0], inf->pad[1],
 		inf->pad[2], inf->pad[3]);
 }
