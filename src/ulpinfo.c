@@ -100,9 +100,10 @@ int show_patch_info(void)
 
 	setup_load_info(&info);
 
-	printf("%-16s : %d\n", "Type", info.type);
+	fprintf(stdout, "\tType       : %d\n", info.type);
 	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
 	print_ulp_info(stdout, "\t", info.ulp_info);
+	fprintf(stdout, "\tBuildID    : %s\n", info.str_build_id);
 
 	release_load_info(&info);
 
@@ -121,11 +122,12 @@ int show_task_patch_info(pid_t pid)
 		return -ENOENT;
 	}
 
-	printf("\033[1;7m%-8s %-16s %-16s\033[m\n",
-		"NUM", "VMA_ADDR", "TARGET_FUNC");
+	printf("\033[1;7m%-8s %-16s %-16s %-41s\033[m\n",
+		"NUM", "VMA_ADDR", "TARGET_FUNC", "Build ID");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vma_struct *vma = ulp->vma;
-		printf("%-8d %-16lx %-16s\n", i, vma->start, ulp->strtab.dst_func);
+		printf("%-8d %-16lx %-16s %-41s\n",
+			i, vma->start, ulp->strtab.dst_func, ulp->str_build_id);
 		if (config.verbose) {
 			print_vma(stdout, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);

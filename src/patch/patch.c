@@ -193,6 +193,7 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 	}
 	ulp->strtab = info->ulp_strtab;
 	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
+	ulp->str_build_id = strdup(info->str_build_id);
 
 	return 0;
 }

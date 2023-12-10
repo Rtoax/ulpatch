@@ -307,6 +307,7 @@ int alloc_ulp(struct vma_struct *vma)
 	vma->ulp = ulp;
 	ulp->elf_mem = mem;
 	ulp->vma = vma;
+	ulp->str_build_id = NULL;
 
 	/* Copy VMA from target task memory space */
 	ret = memcpy_from_task(task, ulp->elf_mem, vma->start, elf_mem_len);
@@ -328,6 +329,8 @@ void free_ulp(struct vma_struct *vma)
 		return;
 
 	list_del(&ulp->node);
+	if (ulp->str_build_id)
+		free(ulp->str_build_id);
 	free(ulp->elf_mem);
 	free(ulp);
 	vma->ulp = NULL;

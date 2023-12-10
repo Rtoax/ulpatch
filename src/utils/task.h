@@ -77,6 +77,8 @@ struct vma_ulp {
 	/* Belongs to */
 	struct vma_struct *vma;
 
+	char *str_build_id;
+
 	/* struct task.ulp_list */
 	struct list_head node;
 };
