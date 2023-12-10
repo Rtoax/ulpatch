@@ -134,6 +134,7 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 {
 	int ret;
 	struct vma_ulp *ulp;
+	unsigned int i;
 
 	if (vma->type != VMA_ULPATCH || !vma->ulp) {
 		lerror("Forbid parse non-ulpatch VMA to load_info.\n");
@@ -149,9 +150,20 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 	if (ret)
 		return ret;
 
-	/**
-	 * TODO: Parse info to ulp.
-	 */
+	setup_load_info(info);
+
+	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
+	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
+
+	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
+		const char *name = info->strtab + sym[i].st_name;
+		ldebug("Sym: %s\n", name);
+		/**
+		 * TODO: Maybe do something
+		 */
+	}
+	ulp->strtab = info->ulp_strtab;
+	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
 
 	return 0;
 }

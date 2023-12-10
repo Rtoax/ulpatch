@@ -1,3 +1,4 @@
+- Add ulpatches that already patched symbols to task symbols.
 - Support uninitialized variable yet, see '.bss' 'SHT_NOBITS'
 - ULPatch VMA better isn't file map
 - Anon vma for each patch and use prctl(2)(CONFIG_ANON_VMA_NAME) set vma's name.
