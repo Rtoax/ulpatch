@@ -122,6 +122,11 @@ int show_task_patch_info(pid_t pid)
 		return -ENOENT;
 	}
 
+	if (list_empty(&task->ulp_list)) {
+		fprintf(stdout, "No ULPatch founded in process %d\n", pid);
+		goto free;
+	}
+
 	printf("\033[1;7m%-8s %-16s %-16s %-41s\033[m\n",
 		"NUM", "VMA_ADDR", "TARGET_FUNC", "Build ID");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
@@ -136,6 +141,7 @@ int show_task_patch_info(pid_t pid)
 		i++;
 	}
 
+free:
 	free_task(task);
 	return 0;
 }

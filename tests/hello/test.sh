@@ -74,8 +74,8 @@ dump_all_process_ulpatch() {
 
 	for ((i = 0; i < ${#patches_addr_range[@]}; i++))
 	do
-		rm -f patch-$i.up
-		ultask -p ${pid} --dump-vma ${patches_addr_range[$i]} -o patch-$i.up
+		rm -f patch-$i.ulp
+		ultask -p ${pid} --dump-vma ${patches_addr_range[$i]} -o patch-$i.ulp
 	done
 }
 dump_all_process_ulpatch
