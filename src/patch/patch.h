@@ -83,6 +83,9 @@ unsigned long mcount_exit(long *retval);
 
 struct task;
 
+void print_ulp_strtab(FILE *fp, struct ulpatch_strtab *strtab);
+void print_ulp_info(FILE *fp, struct ulpatch_info *inf);
+
 int alloc_patch_file(const char *obj_from, const char *obj_to,
 	struct load_info *info);
 int vma_load_info(struct vma_struct *vma, struct load_info *info);

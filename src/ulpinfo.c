@@ -78,27 +78,6 @@ static int parse_config(int argc, char *argv[])
 	return 0;
 }
 
-static void print_ulp_strtab(struct ulpatch_strtab *strtab)
-{
-	printf("%-16s : %s\n", "Magic", strtab->magic);
-	printf("%-16s : %s\n", "SrcFunc", strtab->src_func);
-	printf("%-16s : %s\n", "DstFunc", strtab->dst_func);
-	printf("%-16s : %s\n", "Author", strtab->author);
-}
-
-static void print_ulp_info(struct ulpatch_info *inf)
-{
-	printf("TargetAddr : %#016lx\n", inf->target_func_addr);
-	printf("PatchAddr  : %#016lx\n", inf->patch_func_addr);
-	printf("VirtAddr   : %#016lx\n", inf->virtual_addr);
-	printf("OrigVal    : %#016lx\n", inf->orig_value);
-	printf("Flags      : %#08x\n",  inf->flags);
-	printf("Version    : %#08x\n",  inf->ulpatch_version);
-	printf("Pad[4]     : [%d,%d,%d,%d]\n",
-		inf->pad[0], inf->pad[1],
-		inf->pad[2], inf->pad[3]);
-}
-
 int show_patch_info(void)
 {
 	int err;
@@ -122,8 +101,8 @@ int show_patch_info(void)
 	setup_load_info(&info);
 
 	printf("%-16s : %d\n", "Type", info.type);
-	print_ulp_strtab(&info.ulp_strtab);
-	print_ulp_info(info.ulp_info);
+	print_ulp_strtab(stdout, &info.ulp_strtab);
+	print_ulp_info(stdout, info.ulp_info);
 
 	release_load_info(&info);
 
@@ -144,8 +123,8 @@ int show_task_patch_info(pid_t pid)
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vma_struct *vma = ulp->vma;
 		print_vma(stdout, vma, 0);
-		print_ulp_strtab(&ulp->strtab);
-		print_ulp_info(&ulp->info);
+		print_ulp_strtab(stdout, &ulp->strtab);
+		print_ulp_info(stdout, &ulp->info);
 	}
 
 	free_task(task);
