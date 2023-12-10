@@ -1,5 +1,5 @@
 hello
 *.o
 *.d
-*.up
+*.ulp
 core.*

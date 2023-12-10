@@ -9,15 +9,15 @@ endif
 
 TARGETS := hello
 
-TARGETS_UP := patch-print.up
-TARGETS_UP += patch-empty.up
-TARGETS_UP += patch-asm-exit.up
-TARGETS_UP += patch-asm-puts.up
-TARGETS_UP += patch-asm-print.up
-TARGETS_UP += patch-add-vars.up
-TARGETS_UP += patch-failed-bss.up
+TARGETS_ULP := patch-print.ulp
+TARGETS_ULP += patch-empty.ulp
+TARGETS_ULP += patch-asm-exit.ulp
+TARGETS_ULP += patch-asm-puts.ulp
+TARGETS_ULP += patch-asm-print.ulp
+TARGETS_ULP += patch-add-vars.ulp
+TARGETS_ULP += patch-failed-bss.ulp
 
-build: ${TARGETS_UP} ${TARGETS}
+build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
 
@@ -27,7 +27,7 @@ CFLAGS_hello := -g -ggdb -flto
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
 
-%.up: %.o
+%.ulp: %.o
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	ld -r -o $(@) --build-id=sha1 $(<)
 	@echo -e "\033[1;33m-----------$(@)-----------\033[m"
@@ -39,4 +39,4 @@ $(TARGETS): %:
 	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
 
 clean:
-	rm -f $(TARGETS) *.o *.up core.*
+	rm -f $(TARGETS) *.o *.ulp core.*
