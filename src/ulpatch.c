@@ -160,11 +160,7 @@ release:
 
 static int command_patch(void)
 {
-	init_patch(target_task, patch_file);
-
-	lerror("TODO: --patch\n");
-
-	return 0;
+	return init_patch(target_task, patch_file);
 }
 
 int main(int argc, char *argv[])

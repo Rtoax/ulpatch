@@ -228,8 +228,8 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
 struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task *task, size_t size);
-int read_task_vmas(struct task *task);
-int update_task_vmas(struct task *task);
+int read_task_vmas(struct task *task, bool update_ulp);
+int update_task_vmas_ulp(struct task *task);
 int free_task_vmas(struct task *task);
 
 enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
@@ -258,7 +258,7 @@ int memcpy_from_task(struct task *task,
 		void *dst, unsigned long remote_src, ssize_t size);
 
 /* syscalls based on task_syscall() */
-/* if mmap file, need to update_task_vmas() manual */
+/* if mmap file, need to update_task_vmas_ulp() manual */
 unsigned long task_mmap(struct task *task,
 	unsigned long addr, size_t length, int prot, int flags,
 	int fd, off_t offset);

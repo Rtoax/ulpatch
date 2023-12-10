@@ -378,7 +378,7 @@ static int test_mmap_file(struct task *task, int prot)
 				MAP_PRIVATE, map_fd, 0);
 	ldebug("New mmap. %lx\n", map_v);
 
-	update_task_vmas(task);
+	update_task_vmas_ulp(task);
 	dump_task_vmas(task, true);
 
 	ldebug("unmmap. %lx\n", map_v);

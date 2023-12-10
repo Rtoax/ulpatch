@@ -208,7 +208,7 @@ static int mmap_a_file(void)
 
 	task_detach(task->pid);
 
-	update_task_vmas(task);
+	update_task_vmas_ulp(task);
 
 close_ret:
 	task_close(task, map_fd);

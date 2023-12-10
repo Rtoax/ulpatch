@@ -317,6 +317,7 @@ int alloc_ulp(struct vma_struct *vma)
 		return -EAGAIN;
 	}
 
+	ldebug("Add %s to ulpatch list.\n", vma->name_);
 	list_add(&ulp->node, &task->ulp_list);
 	return 0;
 }
@@ -327,6 +328,8 @@ void free_ulp(struct vma_struct *vma)
 
 	if (!ulp)
 		return;
+
+	ldebug("Remove %s from ulpatch list.\n", vma->name_);
 
 	list_del(&ulp->node);
 	if (ulp->str_build_id)
@@ -360,11 +363,8 @@ int vma_load_ulp(struct vma_struct *vma)
 	}
 
 	vma->is_elf = true;
-
 	alloc_ulp(vma);
-
 	vma_load_info(vma, &info);
-
 	return 0;
 }
 
@@ -854,7 +854,11 @@ out_free:
 	return 0;
 }
 
-int read_task_vmas(struct task *task)
+/**
+ * @update_ulp: if patch to target process, we need to insert the new vma to
+ *              list.
+ */
+int read_task_vmas(struct task *task, bool update_ulp)
 {
 	struct vma_struct *vma, *prev = NULL;
 	int mapsfd;
@@ -874,6 +878,7 @@ int read_task_vmas(struct task *task)
 		char perms[5], name_[256];
 		int r;
 		char line[1024];
+		struct vma_struct __unused *old;
 
 		start = end = offset = maj = min = inode = 0;
 
@@ -891,6 +896,17 @@ int read_task_vmas(struct task *task)
 			lerror("sscanf failed.\n");
 			return -1;
 		}
+#if 1
+		if (update_ulp) {
+			old = find_vma(task, start + 1);
+			/* Skip if alread exist. */
+			if (old && old->start == start && old->end == end) {
+				lwarning("vma %s alread exist.\n", name_);
+				continue;
+			} else
+				lwarning("insert vma %s.\n", name_);
+		}
+#endif
 
 		vma = alloc_vma(task);
 
@@ -917,6 +933,7 @@ int read_task_vmas(struct task *task)
 			task->stack = vma;
 
 		vma->leader = vma;
+
 		insert_vma(task, vma, prev);
 		prev = vma;
 	} while (1);
@@ -926,10 +943,9 @@ int read_task_vmas(struct task *task)
 	return 0;
 }
 
-int update_task_vmas(struct task *task)
+int update_task_vmas_ulp(struct task *task)
 {
-	free_task_vmas(task);
-	return read_task_vmas(task);
+	return read_task_vmas(task, true);
 }
 
 void print_vma(FILE *fp, struct vma_struct *vma, bool detail)
@@ -1150,7 +1166,7 @@ struct task *open_task(pid_t pid, int flag)
 	__get_exe(task);
 	task->proc_mem_fd = memfd;
 
-	read_task_vmas(task);
+	read_task_vmas(task, false);
 
 	rb_init(&task->vma_symbols);
 

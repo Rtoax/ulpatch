@@ -195,6 +195,8 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
 	ulp->str_build_id = strdup(info->str_build_id);
 
+	ldebug("%s build id %s\n", vma->name_, ulp->str_build_id);
+
 	return 0;
 }
 
@@ -240,7 +242,7 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 	/* save the target mmap address */
 	info->target_hdr = map_v;
 
-	update_task_vmas(task);
+	update_task_vmas_ulp(task);
 	ldebug("Done to create patch vma, addr 0x%lx\n", map_v);
 
 close_ret:
@@ -253,7 +255,7 @@ static void delete_mmap_vma_file(struct task *task, struct load_info *info)
 {
 	task_attach(task->pid);
 	task_munmap(task, info->target_hdr, info->len);
-	update_task_vmas(task);
+	update_task_vmas_ulp(task);
 	task_detach(task->pid);
 }
 
@@ -310,6 +312,8 @@ int setup_load_info(struct load_info *info)
 	const char *secname;
 	GElf_Shdr *shdr;
 	GElf_Nhdr *nhdr;
+	void *bid;
+	size_t strlen_bid;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
@@ -354,13 +358,10 @@ int setup_load_info(struct load_info *info)
 	switch (nhdr->n_type) {
 	/* .note.gnu.build-id */
 	case NT_GNU_BUILD_ID:
-		ldebug("Read Build ID from %s\n", secname);
-		void *bid = (void *)nhdr + sizeof(*nhdr) + nhdr->n_namesz;
-		size_t strlen_bid = nhdr->n_descsz * 2 + 1;
+		bid = (void *)nhdr + sizeof(*nhdr) + nhdr->n_namesz;
+		strlen_bid = nhdr->n_descsz * 2 + 1;
 		info->str_build_id = malloc(strlen_bid);
-		const char *s_bid = strbuildid(bid, nhdr->n_descsz,
-			info->str_build_id, strlen_bid);
-		ldebug("Read Build ID %s\n", s_bid);
+		strbuildid(bid, nhdr->n_descsz, info->str_build_id, strlen_bid);
 		break;
 	/* .note.gnu.property */
 	case NT_GNU_PROPERTY_TYPE_0:
@@ -770,10 +771,26 @@ static int kick_target_process(const struct load_info *info)
 static int load_patch(struct load_info *info)
 {
 	long err = 0;
+	struct vma_ulp *ulp, *tmpulp;
+	struct task *task = info->target_task;
 
 	err = setup_load_info(info);
 	if (err)
 		goto free_copy;
+
+	/**
+	 * Check the Build ID exist or not.
+	 */
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
+		ldebug("ULPatch \n");
+		if (!strcmp(ulp->str_build_id, info->str_build_id)) {
+			lerror("Build ID %s already exist\n" \
+				"Check ULPatch in target process first.\n",
+				ulp->str_build_id);
+			err = -EALREADY;
+			goto free_copy;
+		}
+	}
 
 	/* May be there are some blacklists and sign check */
 
