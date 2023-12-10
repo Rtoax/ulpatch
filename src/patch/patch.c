@@ -58,6 +58,11 @@ void release_load_info(struct load_info *info)
 		free(info->patch.path);
 		info->patch.path = NULL;
 	}
+
+	if (info->str_build_id) {
+		free(info->str_build_id);
+		info->str_build_id = NULL;
+	}
 }
 
 /* ULPatch is single thread, thus, this api is ok. */
@@ -300,6 +305,10 @@ int setup_load_info(struct load_info *info)
 {
 	unsigned int i;
 	int err = 0;
+	int secbuildid;
+	const char *secname;
+	GElf_Shdr *shdr;
+	GElf_Nhdr *nhdr;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
@@ -318,8 +327,46 @@ int setup_load_info(struct load_info *info)
 
 	/* found ".ulpatch.strtab" */
 	info->index.ulp_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
+	if (info->index.ulp_strtab == 0) {
+		lerror("Not found %s section.\n", SEC_ULPATCH_STRTAB);
+		return -EEXIST;
+	}
 	const char *ulp_strtab = (void *)info->hdr
 		+ info->sechdrs[info->index.ulp_strtab].sh_offset;
+
+	/**
+	 * Get Build ID of patch ELF,  Mark a PATCH file with BuildID to avoid
+	 * duplicate patches.
+	 */
+	secbuildid = find_sec(info, ".note.gnu.build-id");
+	if (secbuildid == 0 || info->sechdrs[secbuildid].sh_type != SHT_NOTE) {
+		lerror("Not found Build ID or .note.gnu.build-id section.\n"
+			"Add gcc argument '-Wl,--build-id=sha1'\n"
+			"or Add linker(ld) argument '--build-id=sha1'\n");
+		return -EEXIST;
+	}
+	info->index.build_id = secbuildid;
+	shdr = &info->sechdrs[secbuildid];
+	nhdr = (void *)info->hdr + shdr->sh_offset;
+	secname = info->secstrings + shdr->sh_name;
+
+	switch (nhdr->n_type) {
+	/* .note.gnu.build-id */
+	case NT_GNU_BUILD_ID:
+		ldebug("Read Build ID from %s\n", secname);
+		void *bid = (void *)nhdr + sizeof(*nhdr) + nhdr->n_namesz;
+		size_t strlen_bid = nhdr->n_descsz * 2 + 1;
+		info->str_build_id = malloc(strlen_bid);
+		const char *s_bid = strbuildid(bid, nhdr->n_descsz,
+			info->str_build_id, strlen_bid);
+		ldebug("Read Build ID %s\n", s_bid);
+		break;
+	/* .note.gnu.property */
+	case NT_GNU_PROPERTY_TYPE_0:
+	default:
+		lerror("No need Note section %s.", secname);
+		break;
+	}
 
 	err = parse_ulpatch_strtab(&info->ulp_strtab, ulp_strtab);
 	if (err) {
@@ -341,15 +388,11 @@ int setup_load_info(struct load_info *info)
 
 	/* Find internal symbols and strings. */
 	for (i = 1; i < info->hdr->e_shnum; i++) {
-
 		if (info->sechdrs[i].sh_type == SHT_SYMTAB) {
 			info->index.sym = i;
-
 			info->index.str = info->sechdrs[i].sh_link;
-
 			info->strtab = (char *)info->hdr
 				+ info->sechdrs[info->index.str].sh_offset;
-
 			break;
 		}
 	}

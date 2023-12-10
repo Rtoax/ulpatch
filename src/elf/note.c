@@ -230,6 +230,31 @@ fail:
 	}
 }
 
+const char *strbuildid(uint8_t *bid, size_t descsz, char *buf, size_t buf_len)
+{
+	char *p_buf = buf;
+	int i;
+
+	if (buf_len < (descsz * 2 + 1)) {
+		lerror("No enough space to copy Build ID.\n");
+		return NULL;
+	}
+	for (i = 0; i < descsz; ++i) {
+		snprintf(p_buf, 3, "%02x", bid[i]);
+		p_buf += 2;
+	}
+	p_buf[0] = '\0';
+	return buf;
+}
+
+int print_elf_build_id(FILE *fp, uint8_t *build_id, size_t descsz)
+{
+	char buf[128];
+	const char *bid = strbuildid(build_id, descsz, buf, 128);
+	fprintf(fp, "%s\n", bid);
+	return 0;
+}
+
 static void __unused
 elf_object_note(struct elf_file *elf, uint32_t namesz, const char *name,
 	uint32_t type, uint32_t descsz, const char *desc)

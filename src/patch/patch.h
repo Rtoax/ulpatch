@@ -48,6 +48,8 @@ struct load_info {
 	struct ulpatch_info *ulp_info;
 	enum patch_type type;
 	struct ulpatch_strtab ulp_strtab;
+	/* Store Build ID if exist. malloc, need free */
+	char *str_build_id;
 
 	struct {
 		unsigned int
@@ -55,7 +57,8 @@ struct load_info {
 			str,
 			vers,
 			ulp_strtab,
-			info;
+			info,
+			build_id;
 	} index;
 };
 
