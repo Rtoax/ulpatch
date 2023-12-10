@@ -15,3 +15,8 @@ cmake_install.cmake
 *.so
 *.bkp
 *.dtmp
+
+# Patches
+*.patch
+*.ulp
+*.up
