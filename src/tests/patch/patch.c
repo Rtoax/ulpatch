@@ -80,7 +80,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 	 */
 	libc_s = find_symbol(task->libc_elf, mcount_str);
 	if (!libc_s) {
-		lerror("Not found mcount symbol\n", task->libc_elf->filepath);
+		lerror("Not found mcount in %s\n", task->libc_elf->filepath);
 		return -1;
 	}
 

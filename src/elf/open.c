@@ -43,12 +43,12 @@ static __unused int handle_sections(struct elf_file *elf)
 		case SHT_PROGBITS:
 			/* .plt */
 			if (strcmp(elf->shdrnames[iter.i], ".plt") == 0) {
-				ldebug("%s PLT: %d\n", elf->filepath, iter.i);
+				ldebug("%s PLT: %ld\n", elf->filepath, iter.i);
 				elf->plt_data = elf_getdata(scn, NULL);
 				elf->plt_shdr_idx = iter.i;
 			/* .got */
 			} else if (strcmp(elf->shdrnames[iter.i], ".got") == 0) {
-				ldebug("%s GOT: %d\n", elf->filepath, iter.i);
+				ldebug("%s GOT: %ld\n", elf->filepath, iter.i);
 				elf->got_data = elf_getdata(scn, NULL);
 				elf->got_shdr_idx = iter.i;
 			}

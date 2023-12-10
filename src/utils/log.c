@@ -66,8 +66,9 @@ FILE *get_log_fp(void)
 	return log_fp;
 }
 
-int _____log(int level, const char *file, const char *func,
-		unsigned long int line, char *fmt, ...)
+int __attribute__((format(printf, 5, 6)))
+_____log(int level, const char *file, const char *func, unsigned long int line,
+	 char *fmt, ...)
 {
 	int n = 0;
 	FILE *fp = get_log_fp();

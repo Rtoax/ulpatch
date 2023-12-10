@@ -24,8 +24,8 @@ static long target_off = 0L;
 static inline void *debug_memcpy(void *dst, const void *src, size_t n)
 {
 	int i;
-	ldebug("RELA: Copy %d bytes from %p to %p\n", n, src, dst);
-	ldebug("RELA: Copy %x to %Lx\n", *(int *)src, dst - target_off);
+	ldebug("RELA: Copy %ld bytes from %p to %p\n", n, src, dst);
+	ldebug("RELA: Copy %x to %p\n", *(int *)src, dst - target_off);
 	if (get_log_level() >= LOG_NOTICE) {
 		for (i = 0; i < n; i += sizeof(unsigned int)) {
 			unsigned int ui = *(unsigned int *)(src + i);
@@ -88,7 +88,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		val = sym->st_value + rel[i].r_addend;
 
-		ldebug("RELA: %s, st_name %d, type %d, st_value %Lx, r_addend %Lx, loc %Lx, val %Lx\n",
+		ldebug("RELA: %s, st_name %d, type %d, st_value %lx, r_addend %lx, loc %lx, val %lx\n",
 			symname, sym->st_name,
 			(int)ELF64_R_TYPE(rel[i].r_info),
 			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
@@ -175,7 +175,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		default:
-			lerror("Unknown rela relocation: %llu\n",
+			lerror("Unknown rela relocation: %lu\n",
 					ELF64_R_TYPE(rel[i].r_info));
 			return -ENOEXEC;
 		}
@@ -186,13 +186,13 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 invalid_relocation:
 	lerror(
 		"x86: Skipping invalid relocation target, "
-		"existing value is nonzero for type %d, loc %p, val %Lx\n",
+		"existing value is nonzero for type %d, loc %p, val %lx\n",
 		(int)ELF64_R_TYPE(rel[i].r_info), loc, val);
 
 	return -ENOEXEC;
 
 overflow:
-	lerror("overflow in relocation type %d val %Lx\n",
+	lerror("overflow in relocation type %d val %lx\n",
 		(int)ELF64_R_TYPE(rel[i].r_info), val);
 	lerror("likely not compiled with -mcmodel=kernel.\n");
 	return -ENOEXEC;

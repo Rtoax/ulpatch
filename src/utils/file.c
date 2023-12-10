@@ -29,12 +29,12 @@ int fsize(const char *filepath)
 
 	fd = open(filepath, O_RDONLY);
 	if (fd <= 0) {
-		lerror("open %s failed.\n", filepath, strerror(errno));
+		lerror("open %s failed %s.\n", filepath, strerror(errno));
 		return -1;
 	}
 	ret = fstat(fd, &statbuf);
 	if (ret != 0) {
-		lerror("fstat %s failed.\n", filepath, strerror(errno));
+		lerror("fstat %s failed %s.\n", filepath, strerror(errno));
 		return -1;
 	}
 	return statbuf.st_size;

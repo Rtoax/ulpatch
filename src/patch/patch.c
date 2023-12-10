@@ -470,7 +470,7 @@ static int rewrite_section_headers(struct load_info *info)
 		 */
 		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
 
-		ldebug("Rewrite section hdr %s sh_addr %Lx\n", name, shdr->sh_addr);
+		ldebug("Rewrite section hdr %s sh_addr %lx\n", name, shdr->sh_addr);
 	}
 
 	/* Track but don't keep info or other sections. */
@@ -516,7 +516,7 @@ resolve_symbol(const struct load_info *info, const char *name)
 		}
 	}
 
-	ldebug("Not found %d in self ELF.\n", name);
+	ldebug("Not found %s in self ELF.\n", name);
 
 	/* try find symbol address from @plt */
 	if (task->fto_flag & FTO_SELF_PLT) {
@@ -525,7 +525,7 @@ resolve_symbol(const struct load_info *info, const char *name)
 			goto found;
 	}
 
-	ldebug("Not found %d in @plt.\n", name);
+	ldebug("Not found %s in @plt.\n", name);
 
 	/* try find symbol in libc.so */
 	if (!sym && task->fto_flag & FTO_LIBC) {
@@ -537,7 +537,7 @@ resolve_symbol(const struct load_info *info, const char *name)
 		}
 	}
 
-	ldebug("Not found %d in libc.\n", name);
+	ldebug("Not found %s in libc.\n", name);
 
 	/* try find symbol in other libraries mapped in target process address
 	 * space */
@@ -570,7 +570,7 @@ static int simplify_symbols(const struct load_info *info)
 	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
 
 
-	ldebug("sym = %lp + %lx - %lx, sh_offset %lx\n",
+	ldebug("sym = %p + %lx - %lx, sh_offset %lx\n",
 		info->hdr, symsec->sh_addr, info->target_hdr, symsec->sh_offset);
 
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
@@ -609,7 +609,7 @@ static int simplify_symbols(const struct load_info *info)
 			/* Not found symbol in any where */
 			ret = symbol_addr ? 0 : -ENOENT;
 			if (ret) {
-				lerror("Unknown symbol %s's addr %Lx (err %d)\n",
+				lerror("Unknown symbol %s's addr %lx (err %d)\n",
 					 name, symbol_addr, ret);
 			}
 			break;

@@ -19,9 +19,9 @@ extern "C" {
 #define lalert(fmt...) _____log(LOG_ALERT, __FILE__, __func__, __LINE__, fmt)
 #define lemerg(fmt...) _____log(LOG_EMERG, __FILE__, __func__, __LINE__, fmt)
 
-int
-_____log(int level, const char *file, const char *func,
-	unsigned long int line, char *fmt, ...);
+int __attribute__((format(printf, 5, 6)))
+_____log(int level, const char *file, const char *func, unsigned long int line,
+	 char *fmt, ...);
 
 void set_log_fp(FILE *fp);
 FILE *get_log_fp(void);

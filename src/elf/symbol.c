@@ -119,7 +119,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 		&& sym->st_shndx == elf->shdrstrndx) {
 
 		lwarning("WARNING:"
-		" symbol table [%zd] contains section symbol %zd"
+		" symbol table [%zd] contains section symbol %d"
 		" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
 	}
 

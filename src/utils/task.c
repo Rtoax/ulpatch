@@ -357,7 +357,7 @@ int vma_load_ulp(struct vma_struct *vma)
 	}
 
 	if (!ehdr_magic_ok(&ehdr)) {
-		lerror("VMA %s(%Lx) is considered as ULPATCH, but it isn't ELF.",
+		lerror("VMA %s(%lx) is considered as ULPATCH, but it isn't ELF.",
 			vma->name_, vma->start);
 		return -ENOENT;
 	}
@@ -1703,7 +1703,7 @@ unsigned long task_malloc(struct task *task, size_t length)
 				PROT_READ | PROT_WRITE,
 				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (remote_addr == (unsigned long)MAP_FAILED) {
-		lerror("Remote malloc failed, %d\n", remote_addr);
+		lerror("Remote malloc failed, %ld\n", remote_addr);
 		return 0UL;
 	}
 	return remote_addr;

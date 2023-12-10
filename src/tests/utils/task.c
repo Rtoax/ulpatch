@@ -251,7 +251,7 @@ TEST(Task,	mmap_malloc,	0)
 
 		ret = task_attach(pid);
 		addr = task_malloc(task, 64);
-		ldebug("task %lx, addr = %lx\n", task, addr);
+		ldebug("task %p, addr = %lx\n", task, addr);
 
 		dump_task_vmas(task, true);
 
@@ -326,12 +326,12 @@ TEST(Task,	fstat,	0)
 		ret = task_fstat(task, remote_fd, &statbuf);
 
 		if (stat.st_size != statbuf.st_size) {
-			lerror("st_size not equal: remote(%d) vs local(%d)\n",
+			lerror("st_size not equal: remote(%ld) vs local(%ld)\n",
 				statbuf.st_size, stat.st_size);
 			ret = -1;
 		}
 
-		ldebug("stat.st_size = %d\n", statbuf.st_size);
+		ldebug("stat.st_size = %ld\n", statbuf.st_size);
 
 		task_close(task, remote_fd);
 		task_detach(pid);
@@ -482,7 +482,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 
 		ret = task_attach(pid);
 		addr = task_malloc(task, 64);
-		ldebug("task %lx, addr = %lx\n", task, addr);
+		ldebug("task %p, addr = %lx\n", task, addr);
 
 		dump_task_vmas(task, true);
 
