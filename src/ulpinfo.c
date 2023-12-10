@@ -111,6 +111,7 @@ int show_patch_info(void)
 
 int show_task_patch_info(pid_t pid)
 {
+	int i = 1;
 	struct task *task;
 	struct vma_ulp *ulp, *tmpulp;
 
@@ -120,11 +121,17 @@ int show_task_patch_info(pid_t pid)
 		return -ENOENT;
 	}
 
+	printf("\033[1;7m%-8s %-16s %-16s\033[m\n",
+		"NUM", "VMA_ADDR", "TARGET_FUNC");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vma_struct *vma = ulp->vma;
-		print_vma(stdout, vma, 0);
-		print_ulp_strtab(stdout, "\t", &ulp->strtab);
-		print_ulp_info(stdout, "\t", &ulp->info);
+		printf("%-8d %-16lx %-16s\n", i, vma->start, ulp->strtab.dst_func);
+		if (config.verbose) {
+			print_vma(stdout, vma, 0);
+			print_ulp_strtab(stdout, "\t", &ulp->strtab);
+			print_ulp_info(stdout, "\t", &ulp->info);
+		}
+		i++;
 	}
 
 	free_task(task);
