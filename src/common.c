@@ -68,5 +68,8 @@ void print_usage_common(const char *progname)
 		break;	\
 	case ARG_LOG_PREFIX_OFF:	\
 		set_log_prefix(false);	\
-		break;
+		break;	\
+	case '?':	\
+		fprintf(stderr, "Unknown option or option missing argument.\n");	\
+		exit(1);
 
