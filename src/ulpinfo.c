@@ -127,12 +127,13 @@ int show_task_patch_info(pid_t pid)
 		goto free;
 	}
 
-	printf("\033[1;7m%-8s %-16s %-16s %-41s\033[m\n",
-		"NUM", "VMA_ADDR", "TARGET_FUNC", "Build ID");
+	printf("\033[1;7m%-8s %-20s %-16s %-16s %-41s\033[m\n",
+		"NUM", "DATE", "VMA_ADDR", "TARGET_FUNC", "Build ID");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vma_struct *vma = ulp->vma;
-		printf("%-8d %-16lx %-16s %-41s\n",
-			i, vma->start, ulp->strtab.dst_func, ulp->str_build_id);
+		printf("%-8d %-20s %-16lx %-16s %-41s\n",
+			i, ulp_info_strftime(&ulp->info),
+			vma->start, ulp->strtab.dst_func, ulp->str_build_id);
 		if (config.verbose) {
 			print_vma(stdout, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);

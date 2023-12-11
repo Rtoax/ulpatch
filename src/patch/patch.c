@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <time.h>
 
 #include <elf/elf_api.h>
 #include <utils/log.h>
@@ -32,13 +33,22 @@ void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab)
 	fprintf(fp, "%sAuthor     : %s\n", prefix, strtab->author);
 }
 
+const char *ulp_info_strftime(struct ulpatch_info *inf)
+{
+	static char t_buf[40];
+	strftime(t_buf, sizeof(t_buf), "%Y/%m/%d %T", localtime((time_t *)&inf->time));
+	return t_buf;
+}
+
 void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 {
 	const char *prefix = pfx ?: "";
+
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
 	fprintf(fp, "%sOrigVal    : %#016lx\n", prefix, inf->orig_value);
+	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time, ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
 	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->ulpatch_version);
 	fprintf(fp, "%sPad[4]     : [%d,%d,%d,%d]\n", prefix,
@@ -714,6 +724,8 @@ static int solve_patch_symbols(struct load_info *info)
 	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */
 	info->ulp_info->virtual_addr = info->ulp_info->target_func_addr;
+
+	info->ulp_info->time = secs();
 
 	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->ulp_info->target_func_addr);
 	ldebug("Found %s symbol address %#016lx.\n", src_func, info->ulp_info->patch_func_addr);

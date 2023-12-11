@@ -49,6 +49,7 @@ __asm__ (	\
 	"	.quad 0\n" /* patch function address */	\
 	"	.quad 0\n" /* virtual address to modify in target process */	\
 	"	.quad 0\n" /* original value */	\
+	"	.quad 0\n" /* patched time(2) */	\
 	"	.long 0\n" /* flag */	\
 	"	.long " ULPATCH_FILE_VERSION " \n"	\
 	"	.byte 1, 2, 3, 4 \n"	\
@@ -108,6 +109,9 @@ struct ulpatch_info {
 
 	unsigned long virtual_addr;
 	unsigned long orig_value;
+
+	/* Record the patch time */
+	unsigned long time;
 
 	unsigned int flags;
 	unsigned int ulpatch_version;

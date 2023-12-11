@@ -88,6 +88,7 @@ struct task;
 
 void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab);
 void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf);
+const char *ulp_info_strftime(struct ulpatch_info *inf);
 
 int alloc_patch_file(const char *obj_from, const char *obj_to,
 	struct load_info *info);
