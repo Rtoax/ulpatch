@@ -8,6 +8,7 @@ enum {
 	ARG_LOG_LEVEL = 139,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
+	ARG_LOG_PREFIX_OFF,
 	ARG_COMMON_MAX,
 };
 
@@ -21,6 +22,7 @@ void print_usage_common(const char *progname)
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"
 	"  --log-error         set log level to ERR(%d)\n"
+	"  --log-prefix-off    turn log prefix off. default is open\n"
 	"\n",
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
@@ -41,6 +43,7 @@ void print_usage_common(const char *progname)
 	{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },	\
 	{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },	\
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
+	{ "log-prefix-off", no_argument,       0,  ARG_LOG_PREFIX_OFF }, \
 	{ "verbose",        no_argument,       0, 'V' },
 #define COMMON_GETOPT_OPTSTRING "Vvh"
 
@@ -62,5 +65,8 @@ void print_usage_common(const char *progname)
 		break;	\
 	case ARG_LOG_ERR:	\
 		config.log_level = LOG_ERR;	\
+		break;	\
+	case ARG_LOG_PREFIX_OFF:	\
+		set_log_prefix(false);	\
 		break;
 
