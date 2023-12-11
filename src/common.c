@@ -17,7 +17,7 @@ void print_usage_common(const char *progname)
 	printf(
 	" Common argument:\n"
 	"\n"
-	"  --log-level         set log level, default(%d)\n"
+	"  --log-level [NUM]   set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"

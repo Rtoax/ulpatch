@@ -18,6 +18,8 @@
 #include <elf/elf_api.h>
 
 #include "test_api.h"
+#include "../common.c"
+
 
 #ifdef HAVE_CUNIT
 #else
@@ -65,8 +67,6 @@ static bool just_list_tests = false;
 /* For -f, --filter-tests */
 static char *filter_format = NULL;
 
-static int log_level = LOG_ERR;
-
 /* exit if Error */
 static bool error_exit = false;
 
@@ -112,9 +112,6 @@ static bool listener_request_list = false;
 static int listener_nloop = 1;
 static bool listener_epoll = false;
 
-/* For -V, --verbose */
-static bool verbose = false;
-
 static void print_test_symbol(void);
 
 static const char *prog_name = "ulpatch_test";
@@ -155,7 +152,7 @@ static enum who who_am_i(const char *s)
 	return ROLE_NONE;
 }
 
-static void print_help(int ex)
+static void print_help(void)
 {
 	printf(
 	"\n"
@@ -230,43 +227,21 @@ static void print_help(int ex)
 	"                     -r %s, the main thread will msgsnd(2) to msgq.\n"
 	"                     -r %s, the main thread will msgrcv(2) a request on msgq.\n"
 	"                            and send response.\n"
+	"\n"
+	"     --error-exit    Exit if error.\n"
 	"\n",
 	role_string[ROLE_SLEEPER],
 	role_string[ROLE_WAITING],
 	role_string[ROLE_TRIGGER],
 	role_string[ROLE_LISTENER]
 	);
-	printf(
-	"Others:\n"
-	"\n"
-	" -L, --log-level     set log level, default(%d)\n"
-	"                     EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
-	"                     NOTICE(%d),INFO(%d),DEBUG(%d)\n"
-	"\n"
-	" --log-prefix-off    turn log prefix off. default is open\n"
-	"\n"
-	"     --error-exit    Exit if error.\n"
-	"\n"
-	" -V, --verbose       output all test logs, if -V arg was set, you may\n"
-	"                     need to set -L, --log-level.\n"
-	" -h, --help          display this help and exit\n"
-	" -v, --version       output version information and exit\n"
-	"\n"
-	"ulpatch_test %s\n",
-	log_level,
-	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
-	LOG_DEBUG,
-	ulpatch_version()
-	);
-	exit(ex);
 }
 
 enum {
-	ARG_PRINT_NLOOP = 199,
+	ARG_EXTRA_MIN = ARG_COMMON_MAX,
+	ARG_PRINT_NLOOP,
 	ARG_PRINT_INTERVAL_USEC,
 	ARG_ERROR_EXIT,
-
-	ARG_LOG_PREFIX_OFF,
 
 	ARG_LISTENER_REQUEST,
 	ARG_LISTENER_REQUEST_LIST,
@@ -288,19 +263,15 @@ static int parse_config(int argc, char *argv[])
 	{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
 	{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
 	{ "listener-epoll",     no_argument,        0,  ARG_LISTENER_EPOLL },
-	{ "log-level",          required_argument,  0,  'L' },
-	{ "log-prefix-off",     no_argument,        0,  ARG_LOG_PREFIX_OFF },
 	{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
-	{ "verbose",            no_argument,        0,  'V' },
-	{ "version",            no_argument,        0,  'v' },
-	{ "help",               no_argument,        0,  'h' },
+	COMMON_OPTIONS
 	{ NULL }
 	};
 
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:r:s:m:L:Vvh", options, &option_index);
+		c = getopt_long(argc, argv, "lf:r:s:m:"COMMON_GETOPT_OPTSTRING, options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -341,29 +312,15 @@ static int parse_config(int argc, char *argv[])
 		case ARG_ERROR_EXIT:
 			error_exit = true;
 			break;
-		case 'L':
-			log_level = atoi(optarg);
-			break;
-		case ARG_LOG_PREFIX_OFF:
-			set_log_prefix(false);
-			break;
-		case 'V':
-			verbose = true;
-			break;
-		case 'v':
-			printf("%s %s\n", prog_name, ulpatch_version());
-			exit(0);
-		case 'h':
-			print_help(0);
-			break;
+		COMMON_GETOPT_CASES(prog_name)
 		default:
-			print_help(1);
+			print_help();
+			exit(1);
 			break;
 		}
 	}
 
-	/* Set log level */
-	set_log_level(log_level);
+	set_log_level(config.log_level);
 
 	if (role == ROLE_NONE) {
 		fprintf(stderr, "wrong -r, --role argument.\n");
@@ -451,7 +408,7 @@ static int operate_test(struct test *test)
 
 	test_log("=== %4d/%-4d %s.%s %c",
 		test->idx, nr_tests,
-		test->category, test->name, verbose?'\n':'\0');
+		test->category, test->name, config.verbose?'\n':'\0');
 
 	gettimeofday(&test->start, NULL);
 
@@ -513,7 +470,7 @@ static void launch_tester(void)
 		);
 	}
 
-	if (!verbose && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
+	if (!config.verbose && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
 		dup2(fd, STDIN_FILENO);
 		dup2(fd, STDOUT_FILENO);
 		if (fd > STDERR_FILENO)
@@ -656,7 +613,8 @@ static void launch_mix_role(enum who r)
 		fprintf(stderr, "Not support %s in mix role.\n", role_string[r]);
 		exit(1);
 	default:
-		print_help(1);
+		print_help();
+		exit(1);
 		break;
 	}
 }
@@ -820,7 +778,8 @@ int main(int argc, char *argv[])
 		launch_mix();
 		break;
 	default:
-		print_help(1);
+		print_help();
+		exit(1);
 		break;
 	}
 
