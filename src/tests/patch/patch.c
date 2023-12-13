@@ -211,7 +211,7 @@ TEST(Patch,	direct_patch_ulpatch,	0)
 	if (ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
-#else
+#elif defined(__aarch64__)
 	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr, AARCH64_INSN_BRANCH_NOLINK);
 
 	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n", ip_pc, new);

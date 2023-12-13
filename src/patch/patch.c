@@ -499,6 +499,18 @@ static int rewrite_section_headers(struct load_info *info)
 #define SHF_RO_AFTER_INIT	0x00200000
 #endif
 
+unsigned long arch_jmp_table_jmp(void)
+{
+#if defined(__x86_64__)
+#define JMP_TABLE_JUMP_X86_64   0x90900000000225ff /* jmp [rip+2]; nop; nop */
+	return JMP_TABLE_JUMP_X86_64;
+#elif defined(__aarch64__)
+#define JMP_TABLE_JUMP_AARCH64  0xd61f022058000051 /*  ldr x17 #8; br x17 */
+	return JMP_TABLE_JUMP_AARCH64;
+#else
+# error "Unsupport architecture"
+#endif
+}
 
 /**
  * Try find symbol in current patch, otherwise, search in libc and target task

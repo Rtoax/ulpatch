@@ -75,6 +75,8 @@ struct load_info {
 #define PATCH_VMA_TEMP_PREFIX	"patch-"
 
 
+struct task;
+
 bool is_ftrace_entry(char *func);
 
 extern void _ftrace_mcount(void);
@@ -84,14 +86,12 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 			struct mcount_regs *regs);
 unsigned long mcount_exit(long *retval);
 
-struct task;
-
 void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab);
 void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf);
 const char *ulp_info_strftime(struct ulpatch_info *inf);
 
 int alloc_patch_file(const char *obj_from, const char *obj_to,
-	struct load_info *info);
+			struct load_info *info);
 int vma_load_info(struct vma_struct *vma, struct load_info *info);
 int setup_load_info(struct load_info *info);
 void release_load_info(struct load_info *info);
@@ -100,6 +100,9 @@ int init_patch(struct task *task, const char *obj_file);
 int delete_patch(struct task *task);
 
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-	const char *strtab,	unsigned int symindex, unsigned int relsec);
+			const char *strtab, unsigned int symindex,
+			unsigned int relsec);
+
+unsigned long arch_jmp_table_jmp(void);
 
 #endif /* __ELF_ULPATCH_H */
