@@ -234,6 +234,10 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 		goto close_ret;
 	}
 
+	/**
+	 * TODO: This patch can't map to the area that address bigger than
+	 * 0xFFFFFFFFUL, maybe i should use jmp_table, see arch_jmp_table_jmp()
+	 */
 	addr = find_vma_span_area(task, map_len);
 	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
 		lerror("Not found 4 bytes length span area in memory space.\n");
