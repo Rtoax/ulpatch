@@ -499,6 +499,22 @@ static int rewrite_section_headers(struct load_info *info)
 #define SHF_RO_AFTER_INIT	0x00200000
 #endif
 
+/**
+ * $ objdump -d /usr/bin/ls | grep 'printf@plt>:' -A 5
+ * ----------------------------------------------------------------------------
+ * On x86_64:
+ * 00000000000049c0 <snprintf@plt>:
+ *     49c0:	f3 0f 1e fa          	endbr64
+ *     49c4:	ff 25 7e f3 01 00    	jmp    *0x1f37e(%rip)        # 23d48 <snprintf@GLIBC_2.2.5>
+ *     49ca:	66 0f 1f 44 00 00    	nopw   0x0(%rax,%rax,1)
+ * ----------------------------------------------------------------------------
+ * On aarch64:
+ * 0000000000003750 <snprintf@plt>:
+ *     3750:	90000170 	adrp	x16, 2f000 <block_size_args+0x10>
+ *     3754:	f9468a11 	ldr	x17, [x16, #3344]
+ *     3758:	91344210 	add	x16, x16, #0xd10
+ *     375c:	d61f0220 	br	x17
+ */
 unsigned long arch_jmp_table_jmp(void)
 {
 #if defined(__x86_64__)
