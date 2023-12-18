@@ -10,6 +10,7 @@
 #include <utils/util.h>
 #include <utils/compiler.h>
 
+#define __ULP_DEV
 #include <patch/meta.h>
 
 

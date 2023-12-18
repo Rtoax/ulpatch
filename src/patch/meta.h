@@ -2,6 +2,10 @@
 /* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
 #pragma once
 
+#ifndef __ULP_DEV
+# error "Must define __ULPATCH_DEV, and make sure what do you do."
+#endif
+
 /* This header use to Identifier Patch metadata info in target process. If that,
  * the task user address space will mmap serial of pages into target address
  * space.

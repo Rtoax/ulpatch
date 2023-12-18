@@ -7,6 +7,8 @@ else
 $(error Please install ulpatch first)
 endif
 
+CFLAGS :=
+
 TARGETS := hello
 
 TARGETS_ULP := patch-print.ulp
@@ -16,6 +18,8 @@ TARGETS_ULP += patch-asm-puts.ulp
 TARGETS_ULP += patch-asm-print.ulp
 TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
+
+CFLAGS += -D__ULP_DEV
 
 build: ${TARGETS_ULP} ${TARGETS}
 

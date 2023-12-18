@@ -40,6 +40,29 @@ Show help information.
 \fB\-v\fR, \fB\-\-version\fR
 Show version information.
 
+.SH MACROS
+.TP
+__ULP_DEV
+If you develope an ulpatch file, you need to define __ULP_DEV and include <ulpatch/meta.h> header in your ulpatch source code.
+
+.SH ULP DEMO
+More to see the documentations in ulpatch source code tree.
+.SS Program source
+\&
+.\" SRC BEGIN (tee.c)
+.EX
+#ifndef __ULP_DEV
+#define __ULP_DEV 1
+#endif
+#include <ulpatch/meta.h>
+void ulpatch_print_hello_exit(void)
+{
+	printf("Patched.\n");
+}
+ULPATCH_INFO(ulpatch, ulpatch_print_hello_exit, print_hello, "Rong Tao");
+.EE
+.\" SRC END
+
 .SH OS
 Linux
 .SH STABILITY
@@ -47,4 +70,4 @@ Unstable - in development.
 .SH AUTHOR
 Written by Rong Tao
 .SH SEE ALSO
-ulftrace(8), ultask(8)
+ulpinfo(8), ulftrace(8), ultask(8)
