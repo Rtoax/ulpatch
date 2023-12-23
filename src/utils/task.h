@@ -121,6 +121,12 @@ struct vma_struct {
 	unsigned long voffset;
 };
 
+struct thread {
+	pid_t tid;
+	/* struct task.threads_list */
+	struct list_head node;
+};
+
 /* When task opening, what do you want to do?
  *
  * FTO means Flag of Task when Open.
@@ -210,6 +216,9 @@ struct task {
 
 	/* struct vma_ulp.node */
 	struct list_head ulp_list;
+
+	/* struct thread.node */
+	struct list_head threads_list;
 };
 
 

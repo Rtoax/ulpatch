@@ -1077,6 +1077,7 @@ int free_task_vmas(struct task *task)
 
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
+	list_init(&task->threads_list);
 	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
@@ -1159,6 +1160,7 @@ struct task *open_task(pid_t pid, int flag)
 
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
+	list_init(&task->threads_list);
 	rb_init(&task->vmas_rb);
 
 	task->fto_flag = flag;
@@ -1241,6 +1243,7 @@ struct task *open_task(pid_t pid, int flag)
 		DIR *dir;
 		struct dirent *entry;
 		pid_t child;
+		struct thread *thread;
 		char proc_task_dir[] = {"/proc/1234567890abc/task"};
 		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
 		dir = opendir(proc_task_dir);
@@ -1253,13 +1256,20 @@ struct task *open_task(pid_t pid, int flag)
 				continue;
 			ldebug("Thread %s\n", entry->d_name);
 			child = atoi(entry->d_name);
-			if (child == task->pid) {
-				ldebug("Thread %s (pid)\n", entry->d_name);
-			}
 			/**
-			 * TODO: record all children
+			 * Maybe we should skip the thread tid == pid, however,
+			 * if that, we must add an extra list of extra opendir
+			 * while loop, thus, we add the pid == tid thread to
+			 * task.threads_list.
 			 */
+			if (child == task->pid)
+				ldebug("Thread %s (pid)\n", entry->d_name);
+			thread = malloc(sizeof(struct thread));
+			thread->tid = child;
+			list_init(&thread->node);
+			list_add(&thread->node, &task->threads_list);
 		}
+		closedir(dir);
 	}
 
 	return task;
@@ -1328,6 +1338,13 @@ int free_task(struct task *task)
 
 	if (task->fto_flag & FTO_PROC)
 		free_task_proc(task);
+
+	if (task->fto_flag & FTO_THREADS) {
+		struct thread *thread, *tmpthread;
+		list_for_each_entry_safe(thread, tmpthread, &task->threads_list, node) {
+			free(thread);
+		}
+	}
 
 	/* Destroy symbols rb tree */
 	rb_destroy(&task->vma_symbols, rb_free_symbol);
