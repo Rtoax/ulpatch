@@ -25,7 +25,7 @@ build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
 
-CFLAGS_hello := -g -ggdb -flto
+CFLAGS_hello := -g -ggdb -flto -pthread
 
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
