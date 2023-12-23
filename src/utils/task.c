@@ -983,6 +983,11 @@ void print_vma(FILE *fp, struct vma_struct *vma, bool detail)
 	}
 }
 
+void print_thread(FILE *fp, struct task *task, struct thread *thread)
+{
+	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
+}
+
 int dump_task(const struct task *task)
 {
 	printf(
@@ -1064,6 +1069,19 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 	vma_size = vma->end - vma->start;
 
 	return dump_task_addr_to_file(ofile, task, vma->start, vma_size);
+}
+
+void dump_task_threads(struct task *task, bool detail)
+{
+	struct thread *thread;
+
+	if (!(task->fto_flag & FTO_THREADS)) {
+		lerror("Not set FTO_THREADS(%ld) flag\n", FTO_THREADS);
+		return;
+	}
+
+	list_for_each_entry(thread, &task->threads_list, node)
+		print_thread(stdout, task, thread);
 }
 
 int free_task_vmas(struct task *task)

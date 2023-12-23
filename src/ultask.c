@@ -26,6 +26,7 @@ enum {
 	ARG_DUMP_VMA, // dump one vma
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
+	ARG_THREADS,
 	ARG_LIST_SYMBOLS,
 };
 
@@ -37,6 +38,7 @@ static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
 static unsigned long vma_addr = 0;
 static bool flag_list_symbols = false;
+static bool flag_print_threads = false;
 static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
@@ -84,6 +86,7 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
 		{ "vmas",           no_argument,       0, ARG_VMAS },
+		{ "threads",        no_argument,       0, ARG_THREADS },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
@@ -126,6 +129,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_LIST_SYMBOLS:
 			flag_list_symbols = true;
 			break;
+		case ARG_THREADS:
+			flag_print_threads = true;
+			break;
 		case 'o':
 			output_file = optarg;
 			break;
@@ -141,7 +147,8 @@ static int parse_config(int argc, char *argv[])
 		!flag_dump_vma &&
 		!map_file &&
 		!flag_unmap_vma &&
-		!flag_list_symbols) {
+		!flag_list_symbols &&
+		!flag_print_threads) {
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 		exit(1);
 	}
@@ -313,6 +320,9 @@ int main(int argc, char *argv[])
 	if (flag_list_symbols) {
 		list_all_symbol();
 	}
+
+	if (flag_print_threads)
+		dump_task_threads(target_task, config.verbose);
 
 	free_task(target_task);
 

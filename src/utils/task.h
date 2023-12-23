@@ -253,6 +253,8 @@ int dump_task_addr_to_file(const char *ofile, struct task *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task *task,
 		unsigned long addr);
+void dump_task_threads(struct task *task, bool detail);
+void print_thread(FILE *fp, struct task *task, struct thread *thread);
 
 int alloc_ulp(struct vma_struct *vma);
 void free_ulp(struct vma_struct *vma);
