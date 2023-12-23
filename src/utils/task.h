@@ -146,11 +146,12 @@ struct vma_struct {
 #define FTO_VMA_ELF	BIT(4)
 #define FTO_VMA_ELF_SYMBOLS	(BIT(5) | FTO_VMA_ELF | FTO_SELF)
 #define FTO_SELF_PLT	BIT(6)
+#define FTO_THREADS	BIT(7)
 
 #define FTO_ALL 0xffffffff
 
 #define FTO_ULFTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS \
-					| FTO_SELF_PLT)
+					| FTO_SELF_PLT | FTO_THREADS)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
 /* under ROOT_DIR/PID/ */

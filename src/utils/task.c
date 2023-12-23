@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <elf.h>
+#include <dirent.h>
 
 #include <elf/elf_api.h>
 
@@ -1232,6 +1233,32 @@ struct task *open_task(pid_t pid, int flag)
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
+		}
+	}
+
+	/* /proc/PID/task/xxx */
+	if (flag & FTO_THREADS) {
+		DIR *dir;
+		struct dirent *entry;
+		pid_t child;
+		char proc_task_dir[] = {"/proc/1234567890abc/task"};
+		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
+		dir = opendir(proc_task_dir);
+		if (!dir) {
+			lerror("opendir %s failed.\n", proc_task_dir);
+			goto free_task;
+		}
+		while ((entry = readdir(dir)) != NULL) {
+			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
+				continue;
+			ldebug("Thread %s\n", entry->d_name);
+			child = atoi(entry->d_name);
+			if (child == task->pid) {
+				ldebug("Thread %s (pid)\n", entry->d_name);
+			}
+			/**
+			 * TODO: record all children
+			 */
 		}
 	}
 
