@@ -1279,6 +1279,11 @@ struct task *open_task(pid_t pid, int flag)
 			 * if that, we must add an extra list of extra opendir
 			 * while loop, thus, we add the pid == tid thread to
 			 * task.threads_list.
+			 *
+			 * TODO: Should we need update threads_list by timingly
+			 * read /proc/PID/task/, make sure new thread created
+			 * during the ULPatch patching or unpatching? Maybe this
+			 * is a longterm work, but not now.
 			 */
 			if (child == task->pid)
 				ldebug("Thread %s (pid)\n", entry->d_name);
