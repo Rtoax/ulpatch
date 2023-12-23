@@ -5,7 +5,7 @@
 #include <ulpatch/meta.h>
 
 
-void ulpatch_print_hello_exit(void)
+void ulpatch_print_hello_exit(unsigned long ul)
 {
 #if defined(__x86_64__)
 	/* write("Hello") */

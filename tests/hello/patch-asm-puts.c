@@ -5,7 +5,7 @@
 #include <ulpatch/meta.h>
 
 
-void ulpatch_print_hello(void)
+void ulpatch_print_hello(unsigned long ul)
 {
 #if defined(__x86_64__)
 	asm(

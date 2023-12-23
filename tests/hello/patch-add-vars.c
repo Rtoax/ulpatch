@@ -10,7 +10,7 @@ static long static_i = 1024;
 char *local_s = "Dear";
 static char *static_s = "you";
 
-void ulpatch_print_hello(void)
+void ulpatch_print_hello(unsigned long ul)
 {
 	int i, a = 10;
 
@@ -18,7 +18,7 @@ void ulpatch_print_hello(void)
 	static_i++;
 	static_i += 2;
 
-	printf("Hello World. Patched %d, %d, %d\n", local_i, static_i, a);
+	printf("Hello World. Patched %ld %d, %d, %d\n", ul, local_i, static_i, a);
 	printf("%s %s\n", local_s, static_s);
 
 	for (i = 0; i < 3; i++)

@@ -9,7 +9,7 @@
  */
 static int static_i;
 
-void ulpatch_print_hello(void)
+void ulpatch_print_hello(unsigned long ul)
 {
 	static_i += 2;
 }
