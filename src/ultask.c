@@ -129,9 +129,10 @@ static int parse_config(int argc, char *argv[])
 		case 'o':
 			output_file = optarg;
 			break;
-		COMMON_GETOPT_CASES(prog_name)
+		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
+			exit(1);
 			break;
 		}
 	}

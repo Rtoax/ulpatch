@@ -47,12 +47,13 @@ void print_usage_common(const char *progname)
 	{ "verbose",        no_argument,       0, 'V' },
 #define COMMON_GETOPT_OPTSTRING "Vvh"
 
-#define COMMON_GETOPT_CASES(progname)	\
+#define COMMON_GETOPT_CASES(progname, usage)	\
 	case 'v':	\
 		printf("%s %s\n", progname, ulpatch_version());	\
 		exit(0);	\
 	case 'h':	\
-		print_help();	\
+		usage();	\
+		exit(0);	\
 		break;	\
 	case 'V':	\
 		config.verbose = true;	\

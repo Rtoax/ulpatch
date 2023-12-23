@@ -312,7 +312,7 @@ static int parse_config(int argc, char *argv[])
 		case ARG_ERROR_EXIT:
 			error_exit = true;
 			break;
-		COMMON_GETOPT_CASES(prog_name)
+		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
 			exit(1);
