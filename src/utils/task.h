@@ -137,6 +137,7 @@ struct vma_struct {
  *                all symbols, need to load SELF
  * @FTO_SELF_PLT load elf file's @plt symbol address value by objdump.
  *                 ftrace/patch will need those @plt address value.
+ * @FTO_THREADS open /proc/PID/task/ and record it.
  */
 #define FTO_NONE	0x0
 #define FTO_SELF	BIT(0)
