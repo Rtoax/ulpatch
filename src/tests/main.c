@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <utils/log.h>
 #include <utils/list.h>
@@ -70,6 +71,9 @@ static char *filter_format = NULL;
 /* exit if Error */
 static bool error_exit = false;
 
+/* set number of thread of ROLE_MULTI_THREADS */
+static int nr_threads = 3;
+
 /* For -r, --role */
 static enum who {
 	ROLE_NONE,
@@ -78,6 +82,7 @@ static enum who {
 	ROLE_WAITING, // wait for a while
 	ROLE_TRIGGER, // trigger
 	ROLE_PRINTER, // printer
+	ROLE_MULTI_THREADS, // multi-threads
 	ROLE_LISTENER, // listener
 	ROLE_MIX, // mix: sleeper, waiting, trigger
 	ROLE_MAX,
@@ -90,6 +95,7 @@ static const char *role_string[ROLE_MAX] = {
 	[ROLE_WAITING] = "wait",
 	[ROLE_TRIGGER] = "trigger",
 	[ROLE_PRINTER] = "printer",
+	[ROLE_MULTI_THREADS] = "multi-threads",
 	[ROLE_LISTENER] = "listener",
 	[ROLE_MIX] = "mix",
 };
@@ -182,6 +188,8 @@ static void print_help(void)
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
 	"                     '%s' i will msgsnd(2) a msg, specify by -m.\n"
 	"                     '%s' i will loop print some message.\n"
+	"                     '%s' i will startup a multi-thread printer process.\n"
+	"                           number or threads set by --nr-threads, default: %d\n"
 	"                     '%s' i will wait on msgrcv(2) with request, specify by -m.\n"
 	"                     MIX:\n"
 	"                       -r sleeper,sleeper, will launch sleeper twice\n"
@@ -192,14 +200,17 @@ static void print_help(void)
 	role_string[ROLE_WAITING],
 	role_string[ROLE_TRIGGER],
 	role_string[ROLE_PRINTER],
+	role_string[ROLE_MULTI_THREADS],
+	nr_threads,
 	role_string[ROLE_LISTENER]
 	);
 	printf(
-	"   %s arguments:\n"
+	"   %s and %s arguments:\n"
 	"     --print-nloop    loop of print, default %d\n"
 	"     --print-usec     interval of print, default %d usec\n"
 	"\n",
 	role_string[ROLE_PRINTER],
+	role_string[ROLE_MULTI_THREADS],
 	print_nloop_default,
 	print_interval_usec
 	);
@@ -242,6 +253,7 @@ enum {
 	ARG_PRINT_NLOOP,
 	ARG_PRINT_INTERVAL_USEC,
 	ARG_ERROR_EXIT,
+	ARG_NR_THREADS,
 
 	ARG_LISTENER_REQUEST,
 	ARG_LISTENER_REQUEST_LIST,
@@ -258,6 +270,7 @@ static int parse_config(int argc, char *argv[])
 	{ "usecond",            required_argument,  0,  's' },
 	{ "msgq",               required_argument,  0,  'm' },
 	{ "print-nloop",        required_argument,  0,  ARG_PRINT_NLOOP },
+	{ "nr-threads",         required_argument,  0,  ARG_NR_THREADS },
 	{ "print-usec",         required_argument,  0,  ARG_PRINT_INTERVAL_USEC },
 	{ "listener-request",   required_argument,  0,  ARG_LISTENER_REQUEST },
 	{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
@@ -293,6 +306,9 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_PRINT_NLOOP:
 			print_nloop_default = atoi(optarg);
+			break;
+		case ARG_NR_THREADS:
+			nr_threads = atoi(optarg);
 			break;
 		case ARG_PRINT_INTERVAL_USEC:
 			print_interval_usec = atoi(optarg);
@@ -532,6 +548,36 @@ print_stat:
 
 }
 
+static void launch_printer(void);
+
+static void *thread1(void *arg)
+{
+	launch_printer();
+	return NULL;
+}
+
+static void launch_multi_thread(void)
+{
+	int i;
+	pthread_t *threads;
+
+	if (nr_threads <= 0) {
+		fprintf(stderr, "OMG! number of thread is %d <= 0.\n", nr_threads);
+		return;
+	}
+
+	threads = malloc(sizeof(pthread_t) * nr_threads);
+
+	for (i = 0; i < nr_threads; i++)
+		pthread_create(&threads[i], NULL, thread1, NULL);
+
+	for (i = 0; i < nr_threads; i++)
+		pthread_join(threads[i], NULL);
+
+	free(threads);
+	return;
+}
+
 static void launch_sleeper(void)
 {
 	usleep(sleep_usec);
@@ -766,6 +812,9 @@ int main(int argc, char *argv[])
 	switch (role) {
 	case ROLE_TESTER:
 		launch_tester();
+		break;
+	case ROLE_MULTI_THREADS:
+		launch_multi_thread();
 		break;
 	case ROLE_SLEEPER:
 	case ROLE_WAITING:
