@@ -31,7 +31,7 @@ SET(CMAKE_REQUIRED_LIBRARIES elf)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <bfd.h>
-int main() {
+int main(void) {
 	return 0;
 }" BINUTILS_BFD_H)
 SET(CMAKE_REQUIRED_LIBRARIES)
