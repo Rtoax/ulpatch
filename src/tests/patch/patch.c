@@ -129,7 +129,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
-	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n",
+	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n",
 		pc, new, aarch64_func_bl_offset(try_to_wake_up));
 
 	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
@@ -214,7 +214,7 @@ TEST(Patch,	direct_patch_ulpatch,	0)
 #elif defined(__aarch64__)
 	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr, AARCH64_INSN_BRANCH_NOLINK);
 
-	linfo("pc:%#0lx new addr:%#0lx, mcount_offset %d\n", ip_pc, new);
+	linfo("pc:%#0lx new addr:%#0x\n", ip_pc, new);
 
 	try_to_wake_up(task, 1, 1);
 	/* application the patch */

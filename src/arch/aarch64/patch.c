@@ -210,7 +210,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off
 			+ ELF64_R_SYM(rel[i].r_info));
 
-		ldebug("type %d st_value %Lx r_addend %Lx loc %Lx\n",
+		ldebug("type %d st_value %lx r_addend %lx loc %lx\n",
 			(int)ELF64_R_TYPE(rel[i].r_info),
 			sym->st_value, rel[i].r_addend, (uint64_t)loc);
 
@@ -384,7 +384,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		// TODO:
 
 		default:
-			lerror("unsupported RELA relocation: %llu\n",
+			lerror("unsupported RELA relocation: %lu\n",
 				ELF64_R_TYPE(rel[i].r_info));
 			return -ENOEXEC;
 		}
@@ -396,7 +396,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	return 0;
 
 overflow:
-	lerror("overflow in relocation type %d val %Lx\n",
+	lerror("overflow in relocation type %d val %lx\n",
 		(int)ELF64_R_TYPE(rel[i].r_info), val);
 	return -ENOEXEC;
 }
