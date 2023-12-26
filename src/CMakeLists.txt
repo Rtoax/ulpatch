@@ -19,8 +19,7 @@ link_libraries(${ELF} ${RT}
 	ulpatch_utils_arch
 	ulpatch_elf
 )
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
-	-Wuninitialized -Wreturn-type -pg)
+add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type -pg)
 
 # Target: ultask
 if (BUILD_ULTASK)

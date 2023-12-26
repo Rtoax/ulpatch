@@ -14,8 +14,7 @@ link_libraries(${ELF}
 	ulpatch_utils_arch
 )
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
-	-Wuninitialized -Wreturn-type)
+add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 aux_source_directory(. DIR_SRCS)
 aux_source_directory(elf DIR_ELF_SRCS)

@@ -4,8 +4,7 @@
 include_directories(.)
 include_directories(..)
 
-add_definitions(-MD -Wall -Werror -g -ggdb -pg -O2 -D_GNU_SOURCE
-	-Wuninitialized -Wreturn-type)
+add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 message(STATUS "=== UTILS Architecture: ${ARCHITECTURE}")
 if(LIBUNWIND_LIBRARIES)

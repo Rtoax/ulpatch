@@ -12,8 +12,7 @@ link_libraries(${ELF}
 	ulpatch_elf
 )
 
-add_definitions(-MD -Wall -Werror -O0 -D_GNU_SOURCE
-	-Wuninitialized -Wreturn-type)
+add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 aux_source_directory(. LIB_SOURCES)
 
