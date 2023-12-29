@@ -75,6 +75,10 @@ struct load_info {
 
 #define PATCH_VMA_TEMP_PREFIX	"patch-"
 
+struct jmp_table_entry {
+	unsigned long jmp;
+	unsigned long addr;
+};
 
 struct task;
 

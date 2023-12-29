@@ -52,7 +52,8 @@ __asm__ (	\
 	"	.quad 0\n" /* target function address */	\
 	"	.quad 0\n" /* patch function address */	\
 	"	.quad 0\n" /* virtual address to modify in target process */	\
-	"	.quad 0\n" /* original value */	\
+	"	.quad 0\n" /* original value1 */	\
+	"	.quad 0\n" /* original value2 */	\
 	"	.quad 0\n" /* patched time(2) */	\
 	"	.long 0\n" /* flag */	\
 	"	.long " ULPATCH_FILE_VERSION " \n"	\
@@ -112,7 +113,10 @@ struct ulpatch_info {
 	unsigned long patch_func_addr;
 
 	unsigned long virtual_addr;
-	unsigned long orig_value;
+	/**
+	 * We need area to store origin data in target process.
+	 */
+	unsigned long orig_value[2];
 
 	/* Record the patch time */
 	unsigned long time;

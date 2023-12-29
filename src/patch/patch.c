@@ -47,7 +47,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
-	fprintf(fp, "%sOrigVal    : %#016lx\n", prefix, inf->orig_value);
+	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix, inf->orig_value[0], inf->orig_value[1]);
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time, ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
 	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->ulpatch_version);
@@ -245,10 +245,8 @@ static int create_mmap_vma_file(struct task *task, struct load_info *info)
 	 */
 	addr = find_vma_span_area(task, map_len);
 	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
-		lerror("Not found 4 bytes length address span area in memory space.\n"\
+		lwarning("Not found 4 bytes length address span area in memory space.\n"\
 			"please: cat /proc/%d/maps\n", task->pid);
-		ret = -EFAULT;
-		goto close_ret;
 	}
 
 	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
@@ -779,21 +777,31 @@ static int kick_target_process(const struct load_info *info)
 	size_t insn_sz = 0;
 
 #if defined(__x86_64__)
-	union text_poke_insn insn;
 	const char __unused *new_insn = NULL;
-	new_insn = ulpatch_jmpq_replace(&insn, info->ulp_info->virtual_addr,
-					info->ulp_info->patch_func_addr);
-	insn_sz = CALL_INSN_SIZE;
+	struct jmp_table_entry jmp_entry;
+	jmp_entry.jmp = arch_jmp_table_jmp();
+	jmp_entry.addr = info->ulp_info->patch_func_addr;
+	new_insn = (void *)&jmp_entry;
+	insn_sz = sizeof(struct jmp_table_entry);
 #else
 	lerror("not support expect x86_64 yet.\n");
 	exit(1);
 #endif
 
-	n = memcpy_from_task(task, &info->ulp_info->orig_value,
+	/**
+	 * The struct ulpatch_info.orig_value MUST store the original code.
+	 */
+	if (sizeof(info->ulp_info->orig_value) < insn_sz) {
+		lerror("No enough space in ulpatch_info::orig_value field.\n");
+		goto done;
+	}
+
+	n = memcpy_from_task(task, info->ulp_info->orig_value,
 				info->ulp_info->virtual_addr, insn_sz);
 	if (n < insn_sz) {
 		lerror("Backup original instructions failed.\n");
 		/* TODO */
+		goto done;
 	}
 
 	/* copy patch to target address space */
@@ -801,6 +809,7 @@ static int kick_target_process(const struct load_info *info)
 	if (n < info->len) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
+		goto done;
 	}
 
 	task_attach(task->pid);
@@ -815,6 +824,7 @@ static int kick_target_process(const struct load_info *info)
 
 	task_detach(task->pid);
 
+done:
 	return err;
 }
 
