@@ -18,7 +18,8 @@ find_path(ELFUTILS_INCLUDE_DIRS
 
 include(FindPackageHandleStandardArgs)
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(elfutils-devel "Please install the elfutils-devel development package"
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(elfutils-devel
+	"Please install the elfutils-devel(if rpm), libelf-dev(if deb) development package"
   ELFUTILS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
