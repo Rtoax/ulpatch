@@ -1,6 +1,6 @@
 
 DHR_META=/usr/include/ulpatch/meta.h
-HAVE_INSTALLED=$(shell if [[ -e ${DHR_META} ]]; then echo YES; fi)
+HAVE_INSTALLED=$(shell if [ -e ${DHR_META} ]; then echo YES; fi)
 ifeq (${HAVE_INSTALLED},YES)
 $(info Already install ulpatch)
 else
