@@ -656,7 +656,8 @@ int task_vma_link_symbol(struct task *task, struct symbol *s)
 	if (unlikely(node))
 		lwarning("%s: symbol %s already exist\n", task->comm, s->name);
 	else
-		ldebug("%s: add symbol %s success.\n", task->comm, s->name);
+		ldebug("%s: add symbol %s addr %lx success.\n", task->comm,
+			s->name, s->sym.st_value);
 	return node ? -1 : 0;
 }
 
