@@ -3,10 +3,16 @@ ULPatch Install
 
 # Install Dependences
 
-## rpm/dnf packages management
+## Fedora/RHEL/ALmaLinux
 
 ```bash
-$ sudo dnf install -y glibc-headers cmake gcc elfutils-libelf-devel libunwind-devel
+$ sudo dnf install -y glibc-devel cmake gcc binutils-devel elfutils-libelf-devel libunwind-devel
+```
+
+## Debian/Ubuntu
+
+```bash
+$ sudo apt install -y libc6 cmake gcc binutils-dev libunwind-dev
 ```
 
 # Compile
@@ -15,7 +21,7 @@ $ sudo dnf install -y glibc-headers cmake gcc elfutils-libelf-devel libunwind-de
 $ cd ulpatch
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTING=OFF -DBUILD_ULFTRACE=OFF -DBUILD_ULTASK=OFF ..
 $ make -j$(nproc)
 ```
 
@@ -26,4 +32,10 @@ You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD
 
 ```bash
 $ sudo make install
+```
+
+# Uninstall
+
+```bash
+$ sudo make uninstall
 ```
