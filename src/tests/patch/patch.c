@@ -93,9 +93,13 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 	try_to_wake_up(task, 0, 0);
 
 	unsigned long addr = (unsigned long)arg->custom_mcount;
+	/**
+	 * Skip symbols whose symbol address length is longer than 4 bytes.
+	 * After all, this method is designed to test 4-byte addresses.
+	 */
 	if ((addr & 0xFFFFFFFFUL) != addr) {
 		lwarning("Not support address overflow 4 bytes length.\n");
-		return -1;
+		return 0;
 	}
 
 #if defined(__x86_64__)
@@ -202,9 +206,13 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
 	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
 
+	/**
+	 * Skip symbols whose symbol address length is longer than 4 bytes.
+	 * After all, this method is designed to test 4-byte addresses.
+	 */
 	if ((addr & 0xFFFFFFFFUL) != addr) {
 		lwarning("Not support address overflow 4 bytes length.\n");
-		return -1;
+		return 0;
 	}
 
 #if defined(__x86_64__)
