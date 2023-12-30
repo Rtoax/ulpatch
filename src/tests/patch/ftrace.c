@@ -464,6 +464,10 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 				} else
 					ret = -1;
 			}
+			if (ret) {
+				lerror("Sym %s wrong addr %lx(plt), %lx(mem)\n",
+					test_symbols[i].sym, plt_addr, addr);
+			}
 		}
 
 		listener_helper_close(fd, &rslt);
