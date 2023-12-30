@@ -36,15 +36,16 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 			NULL
 		};
 		ret = execvp(argv[0], argv);
-		if (ret == -1) {
+		if (ret == -1)
 			exit(1);
-		}
 	} else if (pid > 0) {
 
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
 		struct task *task = open_task(pid, FTO_SELF);
+		unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
+		int pagesize = getpagesize();
 
 		sym = find_symbol(task->exe_elf, __stringify(STATIC_FUNC_FN));
 		if (!sym) {
@@ -53,16 +54,28 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 			goto out;
 		}
 
-		linfo("%s: st_value %lx, %p\n",
-			__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
+		linfo("%s: st_value %lx, %lx\n",
+			__stringify(STATIC_FUNC_FN), sym->sym.st_value, memaddr);
 
 		/* st_value MUST equal to ELF address */
-		if (sym->sym.st_value == (unsigned long)STATIC_FUNC_FN) {
+		if (sym->sym.st_value == memaddr) {
 			ret = 0;
 		} else {
-			lerror(" %s's st_value %lx != %p\n",
-				__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
-			ret = -1;
+			linfo(" %s's st_value %lx != %lx\n",
+				__stringify(STATIC_FUNC_FN), sym->sym.st_value,
+				memaddr);
+			/**
+			 * Because the load address and the address of the
+			 * symbol in the ELF file are not absolutely equal,
+			 * there is an offset relationship.
+			 *
+			 * This offset must be page aligned.
+			 */
+			unsigned long off = memaddr - sym->sym.st_value;
+			if (off % pagesize)
+				ret = -1;
+			else
+				ret = 0;
 		}
 
 out:
@@ -73,12 +86,10 @@ out:
 			ret = -EINVAL;
 		}
 		free_task(task);
-	} else {
+	} else
 		lerror("fork(2) error.\n");
-	}
 
 	task_wait_destroy(&waitqueue);
-
 	return ret;
 }
 
