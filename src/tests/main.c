@@ -686,6 +686,7 @@ static void init_test_symbols(void)
 #define TEST_DYNSYM(s) \
 	if (!strcmp(#s, test_symbols[i].sym)) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
+		ldebug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
 	}
 #define TEST_SYM_NON_STATIC(s, a)	TEST_DYNSYM(s)
 #define TEST_SYM_SELF(s) TEST_DYNSYM(s)
@@ -1105,12 +1106,14 @@ test_listener_symbol(char request, char *sym, unsigned long expect_addr)
 	pid = fork();
 	if (pid == 0) {
 		int ret;
-
+		char lv[16];
+		sprintf(lv, "%d", get_log_level());
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "listener",
 			"--msgq", waitqueue.tmpfile,
 			"--listener-request", sym,
+			"--log-level", lv,
 			NULL,
 		};
 		ret = execvp(_argv[0], _argv);
@@ -1127,12 +1130,11 @@ test_listener_symbol(char request, char *sym, unsigned long expect_addr)
 
 		unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
 
-		ldebug("%s: addr 0x%lx (0x%lx)\n",
-			sym, addr, expect_addr);
-
 		/* The address must be equal */
-		if (addr != expect_addr)
+		if (addr != expect_addr) {
+			lerror("%s: addr 0x%lx != 0x%lx\n", sym, addr, expect_addr);
 			ret = -1;
+		}
 
 		waitpid(pid, &status, __WALL);
 		if (status != 0) {
