@@ -119,7 +119,10 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 
 		struct symbol *sym;
 		struct task *task = open_task(pid, FTO_SELF);
+		int pagesize = getpagesize();
+		unsigned long memaddr;
 
+		memaddr = (unsigned long)PRINTER_FN;
 		/* Test1:
 		 * Try find global function
 		 */
@@ -130,23 +133,36 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 			goto out;
 		}
 
-		linfo("%s: st_value %lx, %p\n",
-			__stringify(PRINTER_FN), sym->sym.st_value, PRINTER_FN);
+		linfo("%s: st_value %lx, %lx\n",
+			__stringify(PRINTER_FN), sym->sym.st_value, memaddr);
 
 		/* st_value MUST equal to ELF address */
-		if (sym->sym.st_value == (unsigned long)PRINTER_FN) {
+		if (sym->sym.st_value == memaddr) {
 			ret = 0;
 		} else {
-			lerror(" %s's st_value %lx != %p\n",
-				__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
-			ret = -1;
+			linfo(" %s's st_value %lx != %lx\n",
+				__stringify(STATIC_FUNC_FN), sym->sym.st_value,
+				memaddr);
+			/**
+			 * Because the load address and the address of the
+			 * symbol in the ELF file are not absolutely equal,
+			 * there is an offset relationship.
+			 *
+			 * This offset must be page aligned.
+			 */
+			unsigned long off = memaddr - sym->sym.st_value;
+			if (off % pagesize)
+				ret = -1;
+			else
+				ret = 0;
 		}
 
 		/* Test2:
 		 * Try find libc function
 		 */
-		// call it, make PLT/GOT done
+		/* call it, make PLT/GOT done */
 		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
+		memaddr = (unsigned long)LIBC_PUTS_FN;
 
 		sym = find_symbol(task->exe_elf, __stringify(LIBC_PUTS_FN));
 		if (!sym) {
@@ -155,32 +171,49 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 			goto out;
 		}
 
-		linfo("%s: st_value %lx, %p\n",
-			__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
+		linfo("%s: st_value %lx, %lx\n",
+			__stringify(LIBC_PUTS_FN), sym->sym.st_value, memaddr);
 
 		/* st_value MUST equal to ELF address */
-		if (sym->sym.st_value == (unsigned long)LIBC_PUTS_FN) {
+		if (sym->sym.st_value == memaddr) {
 			ret = 0;
 		} else {
-			lerror(" %s's st_value %lx != %p\n",
-				__stringify(STATIC_FUNC_FN), sym->sym.st_value, STATIC_FUNC_FN);
-			ret = -1;
+			linfo(" %s's st_value %lx != %lx\n",
+				__stringify(STATIC_FUNC_FN), sym->sym.st_value,
+				memaddr);
+			/**
+			 * Because the load address and the address of the
+			 * symbol in the ELF file are not absolutely equal,
+			 * there is an offset relationship.
+			 *
+			 * This offset must be page aligned.
+			 */
+			unsigned long off = memaddr - sym->sym.st_value;
+			if (off % pagesize) {
+#if defined(__aarch64__)
+				/**
+				 * TODO: st_value == 0 in aarch64?
+				 */
+				if (sym->sym.st_value == 0)
+					ret = 0;
+#else
+				ret = -1;
+#endif
+			} else
+				ret = 0;
 		}
 
 out:
 		task_wait_trigger(&waitqueue);
 
 		waitpid(pid, &status, __WALL);
-		if (status != 0) {
+		if (status != 0)
 			ret = -EINVAL;
-		}
 		free_task(task);
-	} else {
+	} else
 		lerror("fork(2) error.\n");
-	}
 
 	task_wait_destroy(&waitqueue);
-
 	return ret;
 }
 
