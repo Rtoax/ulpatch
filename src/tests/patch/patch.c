@@ -92,11 +92,16 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 
 	try_to_wake_up(task, 0, 0);
 
+	unsigned long addr = (unsigned long)arg->custom_mcount;
+	if ((addr & 0xFFFFFFFFUL) != addr) {
+		lwarning("Not support address overflow 4 bytes length.\n");
+		return -1;
+	}
+
 #if defined(__x86_64__)
 
 	unsigned long ip = (unsigned long)try_to_wake_up +
 		x86_64_func_callq_offset(try_to_wake_up);
-	unsigned long addr = (unsigned long)arg->custom_mcount;
 
 	union text_poke_insn insn;
 	const char *new = NULL;
@@ -189,13 +194,18 @@ int ulpatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
 	return ULPATCH_TTWU_RET;
 }
 
-TEST(Patch,	direct_patch_ulpatch,	0)
+TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
 	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
+
+	if ((addr & 0xFFFFFFFFUL) != addr) {
+		lwarning("Not support address overflow 4 bytes length.\n");
+		return -1;
+	}
 
 #if defined(__x86_64__)
 	union text_poke_insn insn;
