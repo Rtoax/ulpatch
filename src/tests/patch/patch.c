@@ -123,7 +123,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
-	if (ret != MCOUNT_INSN_SIZE) {
+	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 
@@ -226,7 +226,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 	try_to_wake_up(task, 1, 1);
 
 	ret = memcpy_to_task(task, ip_pc, (void*)new, MCOUNT_INSN_SIZE);
-	if (ret != MCOUNT_INSN_SIZE) {
+	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 #elif defined(__aarch64__)
@@ -269,7 +269,7 @@ TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
 	try_to_wake_up(task, 1, 1);
 
 	ret = memcpy_to_task(task, ip_pc, (void*)new, sizeof(jmp_entry));
-	if (ret <= sizeof(jmp_entry)) {
+	if (ret == -1 || ret <= sizeof(jmp_entry)) {
 		lerror("failed to memcpy.\n");
 	}
 	/* This will called patched function ulpatch_try_to_wake_up() */

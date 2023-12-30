@@ -183,13 +183,11 @@ TEST(Task,	copy_from_task,	0)
 
 	struct task *task = open_task(getpid(), FTO_NONE);
 
-	n = memcpy_from_task(task, buf, (unsigned long)data, strlen(data) + 1);
 	ldebug("memcpy_from_task: %s\n", buf);
-
-	// memcpy failed
-	if (n != strlen(data) + 1 || strcmp(data, buf)) {
+	n = memcpy_from_task(task, buf, (unsigned long)data, strlen(data) + 1);
+	/* memcpy failed */
+	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 		ret = -1;
-	}
 
 	free_task(task);
 
@@ -257,24 +255,20 @@ TEST(Task,	mmap_malloc,	0)
 		dump_task_vmas(task, true);
 
 		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
-		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
 		ldebug("memcpy_from_task: %s\n", buf);
-
-		// memcpy failed
-		if (n != strlen(data) + 1 || strcmp(data, buf)) {
+		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
+		/* memcpy failed */
+		if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 			ret = -1;
-		}
 
 		ret = task_detach(pid);
 		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
-		if (status != 0) {
+		if (status != 0)
 			ret = -EINVAL;
-		}
 		free_task(task);
-	} else {
+	} else
 		lerror("fork(2) error.\n");
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -497,25 +491,21 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 		//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
 		ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
 
-		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
 		ldebug("memcpy_from_task: %s\n", buf);
-
-		// memcpy failed
-		if (n != strlen(data) + 1 || strcmp(data, buf)) {
+		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
+		/* memcpy failed */
+		if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 			ret = -1;
-		}
 
 		ret = task_detach(pid);
 
 		task_wait_trigger(&waitqueue);
 		waitpid(pid, &status, __WALL);
-		if (status != 0) {
+		if (status != 0)
 			ret = -EINVAL;
-		}
 		free_task(task);
-	} else {
+	} else
 		lerror("fork(2) error.\n");
-	}
 
 	task_wait_destroy(&waitqueue);
 

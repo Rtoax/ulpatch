@@ -312,7 +312,7 @@ int alloc_ulp(struct vma_struct *vma)
 
 	/* Copy VMA from target task memory space */
 	ret = memcpy_from_task(task, ulp->elf_mem, vma->start, elf_mem_len);
-	if (ret < elf_mem_len) {
+	if (ret == -1 || ret < elf_mem_len) {
 		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
 		free_ulp(vma);
 		return -EAGAIN;
@@ -352,7 +352,7 @@ int vma_load_ulp(struct vma_struct *vma)
 	ldebug("Load ulpatch vma %s.\n", vma->name_);
 
 	ret = memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr));
-	if (ret < sizeof(ehdr)) {
+	if (ret == -1 || ret < sizeof(ehdr)) {
 		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
 		return -EAGAIN;
 	}
@@ -745,7 +745,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	err = memcpy_from_task(task, dynamics,
 			       vma->elf->load_offset + phdr->p_vaddr,
 			       phdr->p_memsz);
-	if (err < phdr->p_memsz) {
+	if (err == -1 || err < phdr->p_memsz) {
 		lerror("Task read mem failed, %lx.\n", vma->start + phdr->p_vaddr);
 		goto out_free;
 	}
@@ -811,7 +811,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 		symtab_addr += vma->elf->load_offset;
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
-	if (err < strtab_sz + symtab_sz) {
+	if (err == -1 || err < strtab_sz + symtab_sz) {
 		lerror("load symtab failed.\n");
 		goto out_free_buffer;
 	}
@@ -1483,8 +1483,8 @@ static __unused int pid_read(int pid, void *dst, const void *src, size_t len)
 	return len;
 }
 
-int memcpy_from_task(struct task *task,
-		void *dst, unsigned long task_src, ssize_t size)
+int memcpy_from_task(struct task *task, void *dst, unsigned long task_src,
+		     ssize_t size)
 {
 	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
@@ -1492,13 +1492,13 @@ int memcpy_from_task(struct task *task,
 		lerror("pread(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, dst, size, task_src, ret, strerror(errno));
 		do_backtrace();
-		return -errno;
 	}
+	/* pread(2) will return -1 if failed, keep it that way. */
 	return ret;
 }
 
-int memcpy_to_task(struct task *task,
-		unsigned long task_dst, void *src, ssize_t size)
+int memcpy_to_task(struct task *task, unsigned long task_dst, void *src,
+		   ssize_t size)
 {
 	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
@@ -1506,8 +1506,8 @@ int memcpy_to_task(struct task *task,
 		lerror("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
 		do_backtrace();
-		return -errno;
 	}
+	/* pwrite(2) will return -1 if failed, keep it that way. */
 	return ret;
 }
 
@@ -1842,7 +1842,7 @@ int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
 		lerror("fstat failed, ret %d, %ld\n", ret_fstat, result);
 
 	ret = memcpy_from_task(task, statbuf, remote_statbuf, sizeof(struct stat));
-	if (ret != sizeof(struct stat))
+	if (ret == -1 || ret != sizeof(struct stat))
 		lerror("failed copy struct stat.\n");
 
 	task_free(task, remote_statbuf, sizeof(struct stat));

@@ -271,6 +271,7 @@ close_ret:
 
 static void delete_mmap_vma_file(struct task *task, struct load_info *info)
 {
+	lwarning("munmap ulpatch.\n");
 	task_attach(task->pid);
 	task_munmap(task, info->target_hdr, info->len);
 	update_task_vmas_ulp(task);
@@ -770,23 +771,18 @@ static int solve_patch_symbols(struct load_info *info)
 
 static int kick_target_process(const struct load_info *info)
 {
-	ssize_t n;
+	int n;
 	int err = 0;
 	struct task *task = info->target_task;
 	unsigned long target_hdr = info->target_hdr;
 	size_t insn_sz = 0;
 
-#if defined(__x86_64__)
 	const char __unused *new_insn = NULL;
 	struct jmp_table_entry jmp_entry;
 	jmp_entry.jmp = arch_jmp_table_jmp();
 	jmp_entry.addr = info->ulp_info->patch_func_addr;
 	new_insn = (void *)&jmp_entry;
 	insn_sz = sizeof(struct jmp_table_entry);
-#else
-	lerror("not support expect x86_64 yet.\n");
-	exit(1);
-#endif
 
 	/**
 	 * The struct ulpatch_info.orig_value MUST store the original code.
@@ -796,17 +792,20 @@ static int kick_target_process(const struct load_info *info)
 		goto done;
 	}
 
+	ldebug("Backup original instructions from %lx.\n", info->ulp_info->virtual_addr);
 	n = memcpy_from_task(task, info->ulp_info->orig_value,
 				info->ulp_info->virtual_addr, insn_sz);
-	if (n < insn_sz) {
+	ldebug("memcpy return %d, expect %ld\n", n, insn_sz);
+	if (n == -1 || n < insn_sz) {
 		lerror("Backup original instructions failed.\n");
-		/* TODO */
+		err = -ENOEXEC;
 		goto done;
 	}
 
+	ldebug("Copy ulpatch to target process.\n");
 	/* copy patch to target address space */
 	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
-	if (n < info->len) {
+	if (n == -1 || n < info->len) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
 		goto done;
@@ -814,17 +813,17 @@ static int kick_target_process(const struct load_info *info)
 
 	task_attach(task->pid);
 
-#if defined(__x86_64__)
 	n = memcpy_to_task(task, info->ulp_info->virtual_addr, (void *)new_insn, insn_sz);
-	if (n < insn_sz) {
+	if (n == -1 || n < insn_sz) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;
 	}
-#endif
 
 	task_detach(task->pid);
 
 done:
+	if (err)
+		lerror("Kick target process failed.\n");
 	return err;
 }
 
