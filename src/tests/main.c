@@ -1076,11 +1076,8 @@ TEST(ulpatch_test,	wait_trigger,	0)
 		/* do something */
 		ldebug("PARENT: do some thing.\n");
 		task_wait_trigger(&waitqueue);
-		usleep(1000);
 		task_wait_wait(&waitqueue);
-		usleep(1000);
 		task_wait_trigger(&waitqueue);
-		usleep(1000);
 		task_wait_wait(&waitqueue);
 		ldebug("PARENT: done.\n");
 		waitpid(pid, &status, __WALL);

@@ -109,6 +109,11 @@ recv:
 			goto recv;
 		}
 	}
+	/**
+	 * Just wait some time, make sure the message not combian to each other
+	 * int msgqueue.
+	 */
+	usleep(10000);
 
 	return 0;
 }
@@ -130,6 +135,8 @@ int task_wait_trigger(struct task_wait *task_wait)
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
 			ret, msqid, strerror(errno));
 	}
+	/* SAME as usleep() in task_wait_wait() */
+	usleep(10000);
 
 	return 0;
 }
