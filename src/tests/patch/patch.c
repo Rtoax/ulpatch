@@ -232,3 +232,37 @@ TEST(Patch,	direct_patch_ulpatch,	0)
 	return ret;
 }
 
+#if defined(__x86_64__)
+TEST(Patch,	direct_patch_ulpatch_jmp_table_x86_64, 0)
+{
+	int ret = 0;
+	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
+
+	unsigned long ip_pc = (unsigned long)try_to_wake_up;
+	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
+
+	const char *new = NULL;
+	struct jmp_table_entry jmp_entry;
+	jmp_entry.jmp = arch_jmp_table_jmp();
+	jmp_entry.addr = addr;
+	new = (void *)&jmp_entry;
+
+	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
+
+	try_to_wake_up(task, 1, 1);
+
+	ret = memcpy_to_task(task, ip_pc, (void*)new, sizeof(jmp_entry));
+	if (ret <= sizeof(jmp_entry)) {
+		lerror("failed to memcpy.\n");
+	}
+	/* This will called patched function ulpatch_try_to_wake_up() */
+	ret = try_to_wake_up(task, 1, 1);
+	if (ret != ULPATCH_TTWU_RET)
+		ret = -1;
+	else
+		ret = 0;
+
+	free_task(task);
+	return ret;
+}
+#endif
