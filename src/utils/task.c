@@ -453,15 +453,19 @@ int vma_peek_phdr(struct vma_struct *vma)
 
 	vma->is_elf = true;
 
-	/* If type of the ELF is not ET_DYN, this is definitely not a shared
+	/**
+	 * If type of the ELF is not ET_DYN, this is definitely not a shared
 	 * library.
+	 *
+	 * Actually, if the ELF executable file need share libraries(not compile
+	 * with '-static'), it's ET_DYN, not ET_EXEC.
 	 */
 	if (vma->elf->ehdr.e_type != ET_DYN) {
 		is_share_lib = false;
 		goto share_lib;
 	}
 
-	/*
+	/**
 	 * Now there are possibilities:
 	 *   - either this is really a shared library
 	 *   - or this is a position-independent executable
