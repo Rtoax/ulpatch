@@ -6,9 +6,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 PROJECT(ulpatch)
 
 # version number components.
-set(ulpatch_VERSION_MAJOR 0)
-set(ulpatch_VERSION_MINOR 5)
-set(ulpatch_VERSION_PATCH 0)
+set(ULPATCH_VERSION_MAJOR 0)
+set(ULPATCH_VERSION_MINOR 5)
+set(ULPATCH_VERSION_PATCH 0)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags
@@ -22,12 +22,12 @@ execute_process(
 # If the build is not done from a git repo, get the version information from
 # the version variables in main CMakeLists.txt
 if(NOT "${retcode}" STREQUAL "0")
-set(ULPATCH_VERSION "v${ulpatch_VERSION_MAJOR}.${ulpatch_VERSION_MINOR}.${ulpatch_VERSION_PATCH}")
+set(ULPATCH_VERSION "v${ULPATCH_VERSION_MAJOR}.${ULPATCH_VERSION_MINOR}.${ULPATCH_VERSION_PATCH}")
 endif()
 
-add_definitions("-DULPATCH_VERSION_MAJOR=${ulpatch_VERSION_MAJOR}")
-add_definitions("-DULPATCH_VERSION_MINOR=${ulpatch_VERSION_MINOR}")
-add_definitions("-DULPATCH_VERSION_PATCH=${ulpatch_VERSION_PATCH}")
+add_definitions("-DULPATCH_VERSION_MAJOR=${ULPATCH_VERSION_MAJOR}")
+add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
+add_definitions("-DULPATCH_VERSION_PATCH=${ULPATCH_VERSION_PATCH}")
 add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
@@ -63,11 +63,11 @@ include(find_elfutils)
 include(find_binutils)
 include(find_kernel_headers)
 
-#message(STATUS "=== CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
-#message(STATUS "=== CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
-#message(STATUS "=== CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
-#message(STATUS "=== CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-#message(STATUS "=== Architecture: ${ARCHITECTURE}")
+message(STATUS "=== CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+message(STATUS "=== CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "=== CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+message(STATUS "=== CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "=== Architecture: ${ARCHITECTURE}")
 
 if(ELFUTILS_INCLUDE_DIRS)
 message(STATUS "=== FOUND elfutils-devel")
