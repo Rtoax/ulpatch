@@ -242,8 +242,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 	return ret;
 }
 
-#if defined(__x86_64__)
-TEST(Patch,	direct_patch_ulpatch_jmp_table_x86_64, 0)
+TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
@@ -275,4 +274,3 @@ TEST(Patch,	direct_patch_ulpatch_jmp_table_x86_64, 0)
 	free_task(task);
 	return ret;
 }
-#endif
