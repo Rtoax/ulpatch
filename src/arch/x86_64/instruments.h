@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // SPDX-License-Identifier: GPL-2.0
-/* Copyright (C) 2022-2023 Rong Tao <rtoax@foxmail.com> */
+/* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #pragma once
 
 #include <stdint.h>
