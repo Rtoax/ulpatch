@@ -26,7 +26,7 @@ static const char *level_prefix[] = {
 };
 
 static int log_level = LOG_DEBUG;
-static bool prefix_on = true;
+static bool prefix_on = false;
 static FILE *log_fp = NULL;
 
 
