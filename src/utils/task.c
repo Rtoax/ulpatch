@@ -397,6 +397,12 @@ int vma_peek_phdr(struct vma_struct *vma)
 	if (vma->elf != NULL || vma->is_elf)
 		return 0;
 
+	/**
+	 * TODO: Add some check, skip some VMA peek, because some vma pread()
+	 * will failed, and it's not necessary to check is ELF or not.
+	 */
+
+	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->start);
 	/* Is not ELF? */
 	if (memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr)) < sizeof(ehdr)) {
 		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
