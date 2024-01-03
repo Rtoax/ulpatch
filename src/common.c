@@ -28,31 +28,31 @@ void print_usage_common(const char *progname)
 	LOG_DEBUG,
 	LOG_ERR);
 	printf(
-	"  -V, --verbose       set verbose\n"
+	"  -v, --verbose       set verbose\n"
 	"  -h, --help          display this help and exit\n"
-	"  -v, --version       output version information and exit\n"
+	"  -V, --version       output version information and exit\n"
 	"\n");
 	printf(" %s %s\n", progname, ulpatch_version());
 }
 
 #define COMMON_OPTIONS	\
-	{ "version",        no_argument,       0, 'v' },	\
+	{ "version",        no_argument,       0, 'V' },	\
 	{ "help",           no_argument,       0, 'h' },	\
 	{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },	\
 	{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },	\
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
-	{ "verbose",        no_argument,       0, 'V' },
+	{ "verbose",        no_argument,       0, 'v' },
 #define COMMON_GETOPT_OPTSTRING "Vvh"
 
 #define COMMON_GETOPT_CASES(progname, usage)	\
-	case 'v':	\
+	case 'V':	\
 		printf("%s %s\n", progname, ulpatch_version());	\
 		exit(0);	\
 	case 'h':	\
 		usage();	\
 		exit(0);	\
 		break;	\
-	case 'V':	\
+	case 'v':	\
 		config.verbose = true;	\
 		set_log_prefix(true);	\
 		break;	\
