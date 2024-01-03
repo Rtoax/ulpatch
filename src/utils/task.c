@@ -490,6 +490,10 @@ share_lib:
 
 	vma->is_share_lib = is_share_lib;
 
+	/**
+	 * VMA is ELF, for each program header to find the lowest Virtual
+	 * address in p_vaddr.
+	 */
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->elf->phdrs[i];
 		unsigned long off;
@@ -510,7 +514,10 @@ share_lib:
 				if (vma->prot == PROT_NONE)
 					continue;
 
-				/* TODO: How to get the real offset of load */
+				/**
+				 * TODO: How to get the real offset of load
+				 * maybe i can use /proc/PID/auxv to get it.
+				 */
 				if (sibling->offset == off)
 					sibling->voffset = phdr->p_vaddr;
 			}
