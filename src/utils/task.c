@@ -444,6 +444,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 		return -ENOMEM;
 	}
 
+	ldebug("peek phdr from target addr %lx, len %d\n", phaddr, phsz);
 	if (memcpy_from_task(task, vma->elf->phdrs, phaddr, phsz) < phsz) {
 		free(vma->elf->phdrs);
 		free(vma->elf);
