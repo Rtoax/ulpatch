@@ -66,6 +66,7 @@ static void print_help(void)
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
+	"  --threads           dump threads\n"
 	"\n"
 	"  --map-file          mmap a exist file into target process address space\n"
 	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
@@ -300,26 +301,22 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (map_file) {
+	if (map_file)
 		mmap_a_file();
-	}
 
-	if (flag_unmap_vma) {
+	if (flag_unmap_vma)
 		munmap_an_vma();
-	}
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)
 		dump_task_vmas(target_task, config.verbose);
 
 	/* dump an VMA */
-	if (flag_dump_vma) {
+	if (flag_dump_vma)
 		dump_task_vma_to_file(output_file, target_task, vma_addr);
-	}
 
-	if (flag_list_symbols) {
+	if (flag_list_symbols)
 		list_all_symbol();
-	}
 
 	if (flag_print_threads)
 		dump_task_threads(target_task, config.verbose);
