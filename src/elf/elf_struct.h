@@ -107,6 +107,3 @@ struct elf_iter {
 	Elf_Data *data;
 };
 
-
-extern struct list_head client_list;
-
