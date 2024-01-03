@@ -10,10 +10,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef MAX_PATH
 #define MAX_PATH 256
 #endif
@@ -264,8 +260,5 @@ int destroy_callback_chain(struct callback_chain *chain);
 unsigned long secs(void);
 unsigned long usecs(void);
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _UTIL_H */
 

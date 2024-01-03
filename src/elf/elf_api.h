@@ -13,10 +13,6 @@
 #include <utils/util.h>
 #include <utils/compiler.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 struct file_info {
 	file_type type;
@@ -125,8 +121,4 @@ int handle_relocs(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
 
 /* ELF Auxv api */
 int auxv_type_info(GElf_Xword a_type, const char **name, const char **format);
-
-#ifdef __cplusplus
-}
-#endif
 

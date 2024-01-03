@@ -9,10 +9,6 @@
 #include <utils/list.h>
 #include <utils/util.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct elf_file {
 	int fd;
 	Elf *elf;
@@ -113,8 +109,4 @@ struct elf_iter {
 
 
 extern struct list_head client_list;
-
-#ifdef __cplusplus
-}
-#endif
 

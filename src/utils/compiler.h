@@ -3,10 +3,6 @@
 #ifndef __ULPATCH_UTILS_COMPILER_H
 #define __ULPATCH_UTILS_COMPILER_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define compiler_barrier()	asm volatile("" :::"memory")
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -86,10 +82,6 @@ extern "C" {
 # else
 #  define FALLTHROUGH ((void) 0)
 # endif
-#endif
-
-#ifdef __cplusplus
-}
 #endif
 
 #endif /* __ULPATCH_UTILS_COMPILER_H */

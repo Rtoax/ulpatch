@@ -33,10 +33,6 @@
 
 #include <utils/util.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define WRITE_ONCE(a, b) (a) = (b)
 
 struct rb_node {
@@ -355,8 +351,5 @@ void rb_destroy(struct rb_root *root, void(*free_node_cb)(struct rb_node *))
         }
 }
 
-#ifdef __cplusplus
-}
-#endif
 #endif	/* _LINUX_RBTREE_H */
 
