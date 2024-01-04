@@ -1,6 +1,5 @@
 - support Qemu
 - support multi-thread and make each thread safety.
-- how to fix the ulpatch mapped address bigger than 32bit (ref:bpf_tail_call())
 - Add ulpatches that already patched symbols to task symbols.
 - Support uninitialized variable yet, see '.bss' 'SHT_NOBITS'
 - ULPatch VMA better isn't file map
