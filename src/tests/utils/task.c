@@ -145,9 +145,11 @@ TEST(Task,	for_each_vma,	0)
 {
 	struct task *task = open_task(getpid(), FTO_NONE);
 	struct vma_struct *vma;
+	bool first_line = true;
 
 	task_for_each_vma(vma, task) {
-		print_vma(stdout, vma, true);
+		print_vma(stdout, first_line, vma, true);
+		first_line = false;
 	}
 
 	return free_task(task);
@@ -158,6 +160,7 @@ TEST(Task,	find_vma,	0)
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_NONE);
 	struct vma_struct *vma;
+	bool first_line = true;
 
 	task_for_each_vma(vma, task) {
 		struct vma_struct *find = NULL;
@@ -166,7 +169,8 @@ TEST(Task,	find_vma,	0)
 			ret = -1;
 			goto failed;
 		}
-		print_vma(stdout, find, true);
+		print_vma(stdout, first_line, find, true);
+		first_line = false;
 	}
 
 failed:

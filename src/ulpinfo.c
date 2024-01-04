@@ -142,7 +142,7 @@ int show_task_patch_info(pid_t pid)
 			printf(" %-41s", ulp->str_build_id);
 		printf("\n");
 		if (config.verbose) {
-			print_vma(stdout, vma, 0);
+			print_vma(stdout, false, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);
 			print_ulp_info(stdout, "\t", &ulp->info);
 		}
