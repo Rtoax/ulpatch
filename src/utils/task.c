@@ -508,7 +508,7 @@ share_lib:
 	 */
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->elf->phdrs[i];
-		unsigned long off;
+		unsigned long pgoff;
 		struct vma_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
@@ -517,7 +517,7 @@ share_lib:
 					? lowest_vaddr : phdr->p_vaddr;
 
 			/* Virtual address offset */
-			off = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
+			pgoff = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
 
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
@@ -530,7 +530,7 @@ share_lib:
 				 * TODO: How to get the real offset of load
 				 * maybe i can use /proc/PID/auxv to get it.
 				 */
-				if (sibling->offset == off)
+				if (sibling->pgoff == pgoff)
 					sibling->voffset = phdr->p_vaddr;
 			}
 
@@ -643,7 +643,7 @@ unsigned long task_vma_symbol_value(struct symbol *sym)
 			if (vma->prot == PROT_NONE)
 				continue;
 
-			if (off < vma->offset)
+			if (off < vma->pgoff)
 				break;
 		}
 
@@ -898,14 +898,14 @@ int read_task_vmas(struct task *task, bool update_ulp)
 	mapsfp = fdopen(mapsfd, "r");
 	fseek(mapsfp, 0, SEEK_SET);
 	do {
-		unsigned long start, end, offset;
+		unsigned long start, end, pgoff;
 		unsigned int maj, min, inode;
 		char perms[5], name_[256];
 		int r;
 		char line[1024];
 		struct vma_struct __unused *old;
 
-		start = end = offset = maj = min = inode = 0;
+		start = end = pgoff = maj = min = inode = 0;
 
 		memset(perms, 0, sizeof(perms));
 		memset(name_, 0, sizeof(name_));
@@ -915,7 +915,7 @@ int read_task_vmas(struct task *task, bool update_ulp)
 			break;
 
 		r = sscanf(line, "%lx-%lx %s %lx %x:%x %d %255s",
-				&start, &end, perms, &offset,
+				&start, &end, perms, &pgoff,
 				&maj, &min, &inode, name_);
 		if (r <= 0) {
 			lerror("sscanf failed.\n");
@@ -939,7 +939,7 @@ int read_task_vmas(struct task *task, bool update_ulp)
 		vma->end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
-		vma->offset = offset;
+		vma->pgoff = pgoff;
 		vma->maj = maj;
 		vma->min = min;
 		vma->inode = inode;
@@ -987,7 +987,7 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 		fprintf(fp, "%10s: %16s %16s %6s %4s\n",
 			"TYPE", "Start", "End", "Perm", "Role");
 		fprintf(fp, "%11s %16s %16s %s\n",
-			"", "Offset", "Voffset", "Name");
+			"", "pgoff", "Voffset", "Name");
 	}
 
 	fprintf(fp, "%10s: %016lx-%016lx %6s %s%s%s%s\n",
@@ -1001,7 +1001,7 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 		vma->leader == vma ? "L" : "-");
 	fprintf(fp, "%11s %016lx %016lx %s\n",
 		"",
-		vma->offset,
+		vma->pgoff,
 		vma->voffset,
 		vma->name_);
 
