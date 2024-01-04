@@ -9,10 +9,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/types.h>
-
-#ifndef MAX_PATH
-#define MAX_PATH 256
-#endif
+#include <limits.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 4096

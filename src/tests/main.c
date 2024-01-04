@@ -110,7 +110,7 @@ static int print_interval_usec = PRINT_INTERVAL_USEC;
 static int print_nloop_default = PRINT_NLOOP;
 const char *print_content = "Hello";
 
-static char ulpatch_test_path_buf[MAX_PATH];
+static char ulpatch_test_path_buf[PATH_MAX];
 const char *ulpatch_test_path = NULL;
 
 const char *listener_request = NULL;
@@ -804,7 +804,7 @@ int main(int argc, char *argv[])
 	signal(SIGINT, sig_handler);
 
 	ulpatch_test_path =
-		get_proc_pid_exe(getpid(), ulpatch_test_path_buf, MAX_PATH);
+		get_proc_pid_exe(getpid(), ulpatch_test_path_buf, PATH_MAX);
 
 	parse_config(argc, argv);
 

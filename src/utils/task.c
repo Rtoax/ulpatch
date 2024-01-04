@@ -1187,6 +1187,41 @@ static int __get_exe(struct task *task)
 	return 0;
 }
 
+int load_task_auxv(pid_t pid, struct task_auxv *pauxv)
+{
+	int fd, n, ret = 0;
+	char buf[PATH_MAX];
+	GElf_auxv_t auxv;
+
+	memset(pauxv, 0x00, sizeof(struct task_auxv));
+	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
+	fd = open(buf, O_RDONLY);
+	if (fd == -1) {
+		lerror("Open %s failed, %s\n", buf, strerror(errno));
+		ret = -errno;
+		goto close_exit;
+	}
+
+	while (true) {
+		n = read(fd, &auxv, sizeof(auxv));
+		if (n < sizeof(auxv))
+			break;
+		if (auxv.a_type == AT_PHDR)
+			pauxv->auxv_phdr = auxv.a_un.a_val;
+	}
+
+	if (pauxv->auxv_phdr == 0) {
+		lerror("Not found AT_PHDR in %s\n", buf);
+		errno = ENOENT;
+		ret = -errno;
+		goto close_exit;
+	}
+
+close_exit:
+	close(fd);
+	return ret;
+}
+
 struct task *open_task(pid_t pid, int flag)
 {
 	struct task *task = NULL;
@@ -1199,6 +1234,9 @@ struct task *open_task(pid_t pid, int flag)
 	task = malloc(sizeof(struct task));
 	assert(task && "malloc failed");
 	memset(task, 0x0, sizeof(struct task));
+
+	if (load_task_auxv(pid, &task->auxv))
+		goto free_task;
 
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);

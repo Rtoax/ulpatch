@@ -26,7 +26,7 @@ enum sym_type {
 };
 
 struct objdump_elf_file {
-	char name[MAX_PATH];
+	char name[PATH_MAX];
 
 	bfd *bfd;
 
@@ -376,7 +376,7 @@ static struct objdump_elf_file* file_load(const char *filename)
 	file = malloc(sizeof(struct objdump_elf_file));
 	memset(file, 0, sizeof(struct objdump_elf_file));
 
-	strncpy(file->name, filename, MAX_PATH - 1);
+	strncpy(file->name, filename, PATH_MAX - 1);
 
 	for (i = 0; i < S_T_PLT; i++)
 		rb_init(&file->rb_tree_syms[i]);

@@ -15,7 +15,7 @@ struct elf_file {
 	char *rawfile;
 	size_t rawsize;
 	size_t size;
-	char filepath[MAX_PATH];
+	char filepath[PATH_MAX];
 	char *build_id;
 
 	/* ELF file header */

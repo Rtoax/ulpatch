@@ -170,6 +170,14 @@ struct elf_file;
 
 #define TASK_COMM_LEN	128
 
+/**
+ * Store values of the auxiliary vector, read from /proc/PID/auxv
+ */
+struct task_auxv {
+	/* AT_PHDR */
+	unsigned long auxv_phdr;
+};
+
 /* This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
@@ -183,6 +191,8 @@ struct task {
 
 	/* realpath of /proc/PID/exe */
 	char *exe;
+
+	struct task_auxv auxv;
 
 	/* If FTO_SELF set, load SELF ELF file when open. */
 	struct elf_file *exe_elf;
@@ -258,6 +268,8 @@ void print_thread(FILE *fp, struct task *task, struct thread *thread);
 
 int alloc_ulp(struct vma_struct *vma);
 void free_ulp(struct vma_struct *vma);
+
+int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
 
 struct task *open_task(pid_t pid, int flag);
 int free_task(struct task *task);
