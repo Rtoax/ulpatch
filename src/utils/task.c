@@ -900,13 +900,14 @@ int read_task_vmas(struct task *task, bool update_ulp)
 	fseek(mapsfp, 0, SEEK_SET);
 	do {
 		unsigned long start, end, pgoff;
-		unsigned int maj, min, inode;
+		unsigned int major, minor;
+		unsigned long inode;
 		char perms[5], name_[256];
 		int r;
 		char line[1024];
 		struct vma_struct __unused *old;
 
-		start = end = pgoff = maj = min = inode = 0;
+		start = end = pgoff = major = minor = inode = 0;
 
 		memset(perms, 0, sizeof(perms));
 		memset(name_, 0, sizeof(name_));
@@ -915,9 +916,9 @@ int read_task_vmas(struct task *task, bool update_ulp)
 		if (!fgets(line, sizeof(line), mapsfp))
 			break;
 
-		r = sscanf(line, "%lx-%lx %s %lx %x:%x %d %255s",
+		r = sscanf(line, "%lx-%lx %s %lx %x:%x %ld %255s",
 				&start, &end, perms, &pgoff,
-				&maj, &min, &inode, name_);
+				&major, &minor, &inode, name_);
 		if (r <= 0) {
 			lerror("sscanf failed.\n");
 			return -1;
@@ -941,8 +942,8 @@ int read_task_vmas(struct task *task, bool update_ulp)
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
 		vma->pgoff = pgoff;
-		vma->maj = maj;
-		vma->min = min;
+		vma->major = major;
+		vma->minor = minor;
 		vma->inode = inode;
 		strncpy(vma->name_, name_, sizeof(vma->name_));
 		vma->type = get_vma_type(task->pid, task->exe, name_);

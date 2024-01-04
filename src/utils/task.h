@@ -87,8 +87,10 @@ struct vma_struct {
 	unsigned long vm_start;
 	unsigned long vm_end;
 	unsigned long pgoff;
-	unsigned int maj, min, inode;
-	char perms[5], name_[256];
+	unsigned int major, minor;
+	unsigned long inode;
+	char perms[5];
+	char name_[256];
 #define PROT_FMT "%c%c%c"
 #define PROT_ARGS(p) \
 	(p & PROT_READ) ? 'r' : '-', \
