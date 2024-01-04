@@ -1231,6 +1231,19 @@ close_exit:
 	return ret;
 }
 
+int print_task_auxv(FILE *fp, struct task *task)
+{
+	const struct task_auxv *pauxv = &task->auxv;
+
+	if (!fp)
+		fp = stdout;
+
+	fprintf(fp, "%-8s %-16s\n", "TYPE", "VALUE");
+	fprintf(fp, "%-8s %-#16lx\n", "AT_PHDR", pauxv->auxv_phdr);
+
+	return 0;
+}
+
 struct task *open_task(pid_t pid, int flag)
 {
 	struct task *task = NULL;

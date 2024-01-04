@@ -27,6 +27,7 @@ enum {
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
+	ARG_AUXV,
 	ARG_LIST_SYMBOLS,
 };
 
@@ -39,6 +40,7 @@ static const char *map_file = NULL;
 static unsigned long vma_addr = 0;
 static bool flag_list_symbols = false;
 static bool flag_print_threads = false;
+static bool flag_print_auxv = false;
 static const char *output_file = NULL;
 
 static struct task *target_task = NULL;
@@ -67,6 +69,7 @@ static void print_help(void)
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"  --threads           dump threads\n"
+	"  --auxv              print auxv of task\n"
 	"\n"
 	"  --map-file          mmap a exist file into target process address space\n"
 	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
@@ -88,6 +91,7 @@ static int parse_config(int argc, char *argv[])
 		{ "pid",            required_argument, 0, 'p' },
 		{ "vmas",           no_argument,       0, ARG_VMAS },
 		{ "threads",        no_argument,       0, ARG_THREADS },
+		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
@@ -133,6 +137,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_THREADS:
 			flag_print_threads = true;
 			break;
+		case ARG_AUXV:
+			flag_print_auxv = true;
+			break;
 		case 'o':
 			output_file = optarg;
 			break;
@@ -149,6 +156,7 @@ static int parse_config(int argc, char *argv[])
 		!map_file &&
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
+		!flag_print_auxv &&
 		!flag_print_threads) {
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 		exit(1);
@@ -306,6 +314,9 @@ int main(int argc, char *argv[])
 
 	if (flag_unmap_vma)
 		munmap_an_vma();
+
+	if (flag_print_auxv)
+		print_task_auxv(stdout, target_task);
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)

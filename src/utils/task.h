@@ -270,6 +270,7 @@ int alloc_ulp(struct vma_struct *vma);
 void free_ulp(struct vma_struct *vma);
 
 int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
+int print_task_auxv(FILE *fp, struct task *task);
 
 struct task *open_task(pid_t pid, int flag);
 int free_task(struct task *task);
