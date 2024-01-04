@@ -398,9 +398,14 @@ int vma_peek_phdr(struct vma_struct *vma)
 		return 0;
 
 	/**
-	 * TODO: Add some check, skip some VMA peek, because some vma pread()
+	 * Add more check here, skip some VMA peek, because some vma pread()
 	 * will failed, and it's not necessary to check is ELF or not.
 	 */
+	if (!strncmp(vma->name_, "/etc", 4)
+	 || !strncmp(vma->name_, "/sys", 4)) {
+		ldebug("Skip peek vma %s\n", vma->name_);
+		return 0;
+	}
 
 	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->start);
 	/* Is not ELF? */
