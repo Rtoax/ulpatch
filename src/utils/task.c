@@ -77,11 +77,11 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
 	struct vma_struct *new = (struct vma_struct *)key;
 
-	if (new->end <= vma->start)
+	if (new->vm_end <= vma->vm_start)
 		return -1;
-	else if (vma->start < new->end && vma->end > new->start)
+	else if (vma->vm_start < new->vm_end && vma->vm_end > new->vm_start)
 		return 0;
-	else if (vma->end <= new->start)
+	else if (vma->vm_end <= new->vm_start)
 		return 1;
 
 	assert(0 && "Try insert illegal vma.");
@@ -129,9 +129,9 @@ static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 {
 	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
 
-	if (vma->start > vaddr)
+	if (vma->vm_start > vaddr)
 		return -1;
-	else if (vma->start <= vaddr && vma->end > vaddr)
+	else if (vma->vm_start <= vaddr && vma->vm_end > vaddr)
 		return 0;
 	else
 		return 1;
@@ -165,11 +165,12 @@ unsigned long find_vma_span_area(struct task *task, size_t size)
 		if (!next_node)
 			return 0;
 
-		ldebug("vma: %lx-%lx %s\n", ivma->start, ivma->end, ivma->name_);
+		ldebug("vma: %lx-%lx %s\n", ivma->vm_start, ivma->vm_end,
+			ivma->name_);
 
 		next_vma = rb_entry(next_node, struct vma_struct, node_rb);
-		if (next_vma->start - ivma->end >= size)
-			return ivma->end;
+		if (next_vma->vm_start - ivma->vm_end >= size)
+			return ivma->vm_end;
 	}
 	lerror("No space fatal in target process, pid %d\n", task->pid);
 	return 0;
@@ -282,7 +283,7 @@ static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
 	start = PAGE_DOWN(start);
 	end = PAGE_UP(end);
 
-	return (start == vma->start) && (end == vma->end) &&
+	return (start == vma->vm_start) && (end == vma->vm_end) &&
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 }
 
@@ -291,7 +292,7 @@ int alloc_ulp(struct vma_struct *vma)
 	int ret;
 	void *mem;
 	struct vma_ulp *ulp;
-	size_t elf_mem_len = vma->end - vma->start;
+	size_t elf_mem_len = vma->vm_end - vma->vm_start;
 	struct task *task = vma->task;
 
 	ulp = malloc(sizeof(struct vma_ulp));
@@ -311,9 +312,9 @@ int alloc_ulp(struct vma_struct *vma)
 	ulp->str_build_id = NULL;
 
 	/* Copy VMA from target task memory space */
-	ret = memcpy_from_task(task, ulp->elf_mem, vma->start, elf_mem_len);
+	ret = memcpy_from_task(task, ulp->elf_mem, vma->vm_start, elf_mem_len);
 	if (ret == -1 || ret < elf_mem_len) {
-		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		free_ulp(vma);
 		return -EAGAIN;
 	}
@@ -351,15 +352,15 @@ int vma_load_ulp(struct vma_struct *vma)
 
 	ldebug("Load ulpatch vma %s.\n", vma->name_);
 
-	ret = memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr));
+	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret == -1 || ret < sizeof(ehdr)) {
-		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
 
 	if (!ehdr_magic_ok(&ehdr)) {
 		lerror("VMA %s(%lx) is considered as ULPATCH, but it isn't ELF.",
-			vma->name_, vma->start);
+			vma->name_, vma->vm_start);
 		return -ENOENT;
 	}
 
@@ -407,10 +408,10 @@ int vma_peek_phdr(struct vma_struct *vma)
 		return 0;
 	}
 
-	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->start);
+	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
 	/* Is not ELF? */
-	if (memcpy_from_task(task, &ehdr, vma->start, sizeof(ehdr)) < sizeof(ehdr)) {
-		lerror("Failed read from %lx:%s\n", vma->start, vma->name_);
+	if (memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr)) < sizeof(ehdr)) {
+		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
 
@@ -418,7 +419,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	if (!ehdr_magic_ok(&ehdr))
 		return 0;
 
-	ldebug("%lx %s is ELF\n", vma->start, vma->name_);
+	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
 	/* VMA is ELF, handle it */
 	vma->elf = malloc(sizeof(struct vma_elf));
@@ -430,7 +431,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	/* Copy ehdr from load var */
 	memcpy(&vma->elf->ehdr, &ehdr, sizeof(ehdr));
 
-	phaddr = vma->start + vma->elf->ehdr.e_phoff;
+	phaddr = vma->vm_start + vma->elf->ehdr.e_phoff;
 	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
 
 	/* if no program headers, just return. we don't need it, such as:
@@ -550,7 +551,7 @@ share_lib:
 		return -1;
 	}
 
-	vma->elf->load_offset = vma->start - lowest_vaddr;
+	vma->elf->load_offset = vma->vm_start - lowest_vaddr;
 
 	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->elf->phdrs[i];
@@ -579,7 +580,7 @@ share_lib:
 	}
 
 	linfo("%s vma start %lx, load_offset %lx\n",
-		vma->name_, vma->start, vma->elf->load_offset);
+		vma->name_, vma->vm_start, vma->elf->load_offset);
 
 	return 0;
 }
@@ -647,7 +648,7 @@ unsigned long task_vma_symbol_value(struct symbol *sym)
 				break;
 		}
 
-		addr = vma->start + (off - vma->voffset);
+		addr = vma->vm_start + (off - vma->voffset);
 
 		ldebug("SYMBOL %s addr %lx\n", sym->name, addr);
 
@@ -770,7 +771,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 			       vma->elf->load_offset + phdr->p_vaddr,
 			       phdr->p_memsz);
 	if (err == -1 || err < phdr->p_memsz) {
-		lerror("Task read mem failed, %lx.\n", vma->start + phdr->p_vaddr);
+		lerror("Task read mem failed, %lx.\n", vma->vm_start + phdr->p_vaddr);
 		goto out_free;
 	}
 
@@ -808,18 +809,18 @@ int vma_load_all_symbols(struct vma_struct *vma)
 			"No strtab, p_memsz %ld, p_vaddr %lx. "
 			"strtab(%lx) symtab(%lx) %s %lx\n",
 			phdr->p_memsz, phdr->p_vaddr,
-			strtab_addr, symtab_addr, vma->name_, vma->start);
+			strtab_addr, symtab_addr, vma->name_, vma->vm_start);
 	}
 
 	buffer = malloc(symtab_sz + strtab_sz);
 	assert(buffer && "Malloc fatal.");
 	memset(buffer, 0x0, symtab_sz + strtab_sz);
 
-	ldebug("%s: symtab_addr %lx, load_offset: %lx, vma_start %lx\n",
+	ldebug("%s: symtab_addr %lx, load_offset: %lx, vma start %lx\n",
 		vma->name_,
 		symtab_addr,
 		vma->elf->load_offset,
-		vma->start);
+		vma->vm_start);
 
 	/* [vdso] need add load_offset or vma start address.
 	 *
@@ -925,7 +926,7 @@ int read_task_vmas(struct task *task, bool update_ulp)
 		if (update_ulp) {
 			old = find_vma(task, start + 1);
 			/* Skip if alread exist. */
-			if (old && old->start == start && old->end == end) {
+			if (old && old->vm_start == start && old->vm_end == end) {
 				lwarning("vma %s alread exist.\n", name_);
 				continue;
 			} else
@@ -935,8 +936,8 @@ int read_task_vmas(struct task *task, bool update_ulp)
 
 		vma = alloc_vma(task);
 
-		vma->start = start;
-		vma->end = end;
+		vma->vm_start = start;
+		vma->vm_end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
 		vma->pgoff = pgoff;
@@ -992,8 +993,8 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 
 	fprintf(fp, "%10s: %016lx-%016lx %6s %s%s%s%s\n",
 		VMA_TYPE_NAME(vma->type),
-		vma->start,
-		vma->end,
+		vma->vm_start,
+		vma->vm_end,
 		vma->perms,
 		vma->is_elf ? "E" : "-",
 		vma->is_share_lib ? "S" : "-",
@@ -1099,9 +1100,9 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 		return -1;
 	}
 
-	vma_size = vma->end - vma->start;
+	vma_size = vma->vm_end - vma->vm_start;
 
-	return dump_task_addr_to_file(ofile, task, vma->start, vma_size);
+	return dump_task_addr_to_file(ofile, task, vma->vm_start, vma_size);
 }
 
 void dump_task_threads(struct task *task, bool detail)
@@ -1714,7 +1715,7 @@ int task_syscall(struct task *task, int nr,
 	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5, arg6);
 
 	unsigned char orig_code[sizeof(__syscall)];
-	unsigned long libc_base = task->libc_vma->start;
+	unsigned long libc_base = task->libc_vma->vm_start;
 
 #if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);

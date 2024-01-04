@@ -181,8 +181,8 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 	}
 
 	ulp = vma->ulp;
-	info->target_hdr = vma->start;
-	info->len = vma->end - vma->start;
+	info->target_hdr = vma->vm_start;
+	info->len = vma->vm_end - vma->vm_start;
 	info->hdr = ulp->elf_mem;
 
 	ret = __chk_load_info_len(info);

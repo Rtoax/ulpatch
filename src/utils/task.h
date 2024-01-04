@@ -84,7 +84,9 @@ struct vma_ulp {
 };
 
 struct vma_struct {
-	unsigned long start, end, pgoff;
+	unsigned long vm_start;
+	unsigned long vm_end;
+	unsigned long pgoff;
 	unsigned int maj, min, inode;
 	char perms[5], name_[256];
 #define PROT_FMT "%c%c%c"

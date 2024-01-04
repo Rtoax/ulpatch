@@ -164,7 +164,7 @@ TEST(Task,	find_vma,	0)
 
 	task_for_each_vma(vma, task) {
 		struct vma_struct *find = NULL;
-		find = find_vma(task, vma->start);
+		find = find_vma(task, vma->vm_start);
 		if (!find) {
 			ret = -1;
 			goto failed;
@@ -524,7 +524,7 @@ TEST(Task,	dump_task_vma_to_file,	0)
 
 	task_for_each_vma(vma, task) {
 		/* Make sure the address is within the VMA range */
-		addr = vma->start;
+		addr = vma->vm_start;
 
 		/* Only VDSO code is tested here, there is no need to test them
 		 * all, right! Note that this test will overwrite vdso.so files

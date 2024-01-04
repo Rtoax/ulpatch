@@ -248,9 +248,9 @@ static int munmap_an_vma(void)
 	if (fexist(vma->name_)) {
 		size = fsize(vma->name_);
 	} else {
-		size = vma->end - vma->start;
+		size = vma->vm_end - vma->vm_start;
 	}
-	addr = vma->start;
+	addr = vma->vm_start;
 
 	task_attach(task->pid);
 	task_munmap(task, addr, size);

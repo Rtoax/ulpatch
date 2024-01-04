@@ -137,7 +137,7 @@ int show_task_patch_info(pid_t pid)
 		struct vma_struct *vma = ulp->vma;
 		printf("%-8d %-20s %-16lx %-16s",
 			i, ulp_info_strftime(&ulp->info),
-			vma->start, ulp->strtab.dst_func);
+			vma->vm_start, ulp->strtab.dst_func);
 		if (config.verbose)
 			printf(" %-41s", ulp->str_build_id);
 		printf("\n");
