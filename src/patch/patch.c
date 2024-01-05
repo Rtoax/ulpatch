@@ -544,10 +544,9 @@ unsigned long arch_jmp_table_jmp(void)
  * @return: 0-failed
  */
 static const unsigned long
-resolve_symbol(const struct load_info *info, const char *name)
+resolve_symbol(const struct task *task, const char *name)
 {
 	const struct symbol *sym = NULL;
-	const struct task *task = info->target_task;
 	unsigned long addr = 0;
 
 	if (!task)
@@ -642,7 +641,8 @@ static int simplify_symbols(const struct load_info *info)
 
 		case SHN_UNDEF:
 			ldebug("Resolve UNDEF sym %s\n", name);
-			const unsigned long symbol_addr = resolve_symbol(info, name);
+			const unsigned long symbol_addr =
+				resolve_symbol(info->target_task, name);
 			/* Ok if resolved.  */
 			if (symbol_addr) {
 				sym[i].st_value = symbol_addr;
