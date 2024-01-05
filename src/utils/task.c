@@ -89,7 +89,7 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 }
 
 int insert_vma(struct task *task, struct vma_struct *vma,
-	struct vma_struct *prev)
+	       struct vma_struct *prev)
 {
 	if (prev && strcmp(prev->name_, vma->name_) == 0) {
 		struct vma_struct *leader = prev->leader;
@@ -275,7 +275,7 @@ static bool elf_vma_is_interp_exception(struct vma_struct *vma)
 }
 
 static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
-				unsigned long load_offset)
+			  unsigned long load_offset)
 {
 	unsigned long start = load_offset + phdr->p_vaddr;
 	unsigned long end = start + phdr->p_filesz;
@@ -1027,15 +1027,8 @@ void print_thread(FILE *fp, struct task *task, struct thread *thread)
 
 int dump_task(const struct task *task)
 {
-	printf(
-		"COMM: %s\n"
-		"PID:  %d\n"
-		"EXE:  %s\n",
-		task->comm,
-		task->pid,
-		task->exe
-	);
-
+	printf("COMM: %s\nPID:  %d\nEXE:  %s\n",
+		task->comm, task->pid, task->exe);
 	return 0;
 }
 
@@ -1053,7 +1046,7 @@ void dump_task_vmas(struct task *task, bool detail)
 }
 
 int dump_task_addr_to_file(const char *ofile, struct task *task,
-		unsigned long addr, unsigned long size)
+			   unsigned long addr, unsigned long size)
 {
 	void *mem = NULL;
 
@@ -1097,7 +1090,7 @@ int dump_task_addr_to_file(const char *ofile, struct task *task,
 }
 
 int dump_task_vma_to_file(const char *ofile, struct task *task,
-		unsigned long addr)
+			  unsigned long addr)
 {
 	size_t vma_size = 0;
 	struct vma_struct *vma = find_vma(task, addr);
@@ -1808,9 +1801,8 @@ poke_back:
 	return ret;
 }
 
-unsigned long task_mmap(struct task *task,
-	unsigned long addr, size_t length, int prot, int flags,
-	int fd, off_t offset)
+unsigned long task_mmap(struct task *task, unsigned long addr, size_t length,
+			int prot, int flags, int fd, off_t offset)
 {
 	int ret;
 	unsigned long result;
@@ -1942,7 +1934,7 @@ int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
 }
 
 int task_prctl(struct task *task, int option, unsigned long arg2,
-	unsigned long arg3, unsigned long arg4, unsigned long arg5)
+	       unsigned long arg3, unsigned long arg4, unsigned long arg5)
 {
 	int ret;
 	unsigned long result;
