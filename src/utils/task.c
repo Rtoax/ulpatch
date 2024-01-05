@@ -594,7 +594,11 @@ void vma_free_elf(struct vma_struct *vma)
 	free(vma->elf);
 }
 
-unsigned long task_vma_symbol_value(struct symbol *sym)
+/**
+ * This function use to calculate the real symbol value, because load_addr's
+ * effect.
+ */
+unsigned long task_vma_symbol_value(const struct symbol *sym)
 {
 	unsigned long addr = 0;
 	struct vma_struct *vma_leader = sym->vma;
@@ -704,7 +708,8 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 		/* skip undefined symbols */
 		if (is_undef_symbol(&sym->sym)) {
 			ldebug("%s undef symbol: %s %lx\n",
-				basename(vma->name_), sym->name, sym->sym.st_value);
+				basename(vma->name_), sym->name,
+				sym->sym.st_value);
 			continue;
 		}
 

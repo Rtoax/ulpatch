@@ -757,7 +757,7 @@ static int solve_patch_symbols(struct load_info *info)
 		return -ENOENT;
 	}
 
-	info->ulp_info->target_func_addr = sym->sym.st_value;
+	info->ulp_info->target_func_addr = task_vma_symbol_value(sym);
 	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */
 	info->ulp_info->virtual_addr = info->ulp_info->target_func_addr;

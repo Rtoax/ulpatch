@@ -273,25 +273,21 @@ static void list_all_symbol(void)
 			max_name_len = len;
 	}
 
-	printf(
-	"%-*s %-16s %-16s %-8s %-8s %-8s %-32s\n",
-	max_name_len, "VMA",
-	"ADDR", "ST_VALUE", "ST_SIZE", "BIND", "TYPE", "SYMBOL"
-	);
+	printf("%-*s %-16s %-16s %-8s %-8s %-8s %-32s\n",
+		max_name_len, "VMA",
+		"ADDR", "ST_VALUE", "ST_SIZE", "BIND", "TYPE", "SYMBOL");
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp,
 		&target_task->vma_symbols, node) {
 
-		printf(
-			"%-*s %#016lx %#016lx %-8ld %-8s %-8s %s\n",
+		printf("%-*s %#016lx %#016lx %-8ld %-8s %-8s %s\n",
 			max_name_len, basename(sym->vma->name_),
 			task_vma_symbol_value(sym),
 			sym->sym.st_value,
 			sym->sym.st_size,
 			st_bind_string(&sym->sym),
 			st_type_string(&sym->sym),
-			sym->name
-		);
+			sym->name);
 	}
 }
 
