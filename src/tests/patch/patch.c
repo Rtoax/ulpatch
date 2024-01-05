@@ -99,7 +99,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 	 */
 	if ((addr & 0xFFFFFFFFUL) != addr) {
 		lwarning("Not support address overflow 4 bytes length.\n");
-		return 0;
+		/* Skip, return expected value */
+		return TTWU_FTRACE_RETURN;
 	}
 
 #if defined(__x86_64__)
