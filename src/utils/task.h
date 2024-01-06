@@ -182,6 +182,8 @@ struct task_auxv {
 	unsigned long auxv_phdr;
 	/* AT_BASE */
 	unsigned long auxv_interp;
+	/* AT_ENTRY */
+	unsigned long auxv_entry;
 };
 
 /* This struct use to discript a running process in system, like you can see in
