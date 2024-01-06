@@ -180,6 +180,8 @@ struct elf_file;
 struct task_auxv {
 	/* AT_PHDR */
 	unsigned long auxv_phdr;
+	/* AT_BASE */
+	unsigned long auxv_interp;
 };
 
 /* This struct use to discript a running process in system, like you can see in
