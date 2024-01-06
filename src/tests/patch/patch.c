@@ -53,7 +53,7 @@ __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 	return ret;
 }
 
-static int direct_patch_ftrace_test(struct patch_test_arg *arg)
+static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 {
 	int ret = 0;
 	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
@@ -100,7 +100,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg)
 	if ((addr & 0xFFFFFFFFUL) != addr) {
 		lwarning("Not support address overflow 4 bytes length.\n");
 		/* Skip, return expected value */
-		return TTWU_FTRACE_RETURN;
+		return expect_ret;
 	}
 
 #if defined(__x86_64__)
@@ -167,7 +167,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 		.replace = REPLACE_MCOUNT,
 	};
 
-	return direct_patch_ftrace_test(&arg);
+	return direct_patch_ftrace_test(&arg, TTWU_FTRACE_RETURN);
 }
 
 TEST(Patch,	ftrace_object,	0)
@@ -177,7 +177,7 @@ TEST(Patch,	ftrace_object,	0)
 		.replace = REPLACE_MCOUNT,
 	};
 
-	return direct_patch_ftrace_test(&arg);
+	return direct_patch_ftrace_test(&arg, 0);
 }
 
 #if defined(__x86_64__)
@@ -188,7 +188,7 @@ TEST(Patch,	ftrace_nop,	0)
 		.replace = REPLACE_NOP,
 	};
 
-	return direct_patch_ftrace_test(&arg);
+	return direct_patch_ftrace_test(&arg, 0);
 }
 #endif
 
