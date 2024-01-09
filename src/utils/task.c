@@ -1290,13 +1290,13 @@ struct task *open_task(pid_t pid, int flag)
 	assert(task && "malloc failed");
 	memset(task, 0x0, sizeof(struct task));
 
-	if (load_task_auxv(pid, &task->auxv))
-		goto free_task;
-
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
 	rb_init(&task->vmas_rb);
+
+	if (load_task_auxv(pid, &task->auxv))
+		goto free_task;
 
 	task->fto_flag = flag;
 	task->pid = pid;

@@ -25,7 +25,11 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTING=OFF -DBUILD_ULFTRACE=OFF -DB
 $ make -j$(nproc)
 ```
 
-You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD_TYPE=Debug`(`Release`,`Debug`,`RelWithDebInfo`,`MinSizeRel`).
+You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD_TYPE=Debug`(`Release`,`Debug`,`RelWithDebInfo`,`MinSizeRel`), such as:
+
+```
+$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+```
 
 
 # Install
