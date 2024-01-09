@@ -10,6 +10,8 @@ The `PT_LOAD` in ELF file:
 ```
 $ readelf -l /home/rongtao/Git/ulpatch/tests/hello/hello
 Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
   LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
                  0x0000000000000640 0x0000000000000640  R      0x1000
   LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
@@ -89,6 +91,8 @@ The `PT_LOAD` in ELF file:
 ```
 $ readelf -l /home/rongtao/Git/ulpatch/tests/hello/hello
 Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
   LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
                  0x0000000000000cec 0x0000000000000cec  R E    0x10000
   LOAD           0x000000000000fdc0 0x000000000001fdc0 0x000000000001fdc0
