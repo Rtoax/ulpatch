@@ -8,6 +8,7 @@ $(error Please install ulpatch first)
 endif
 
 CFLAGS :=
+CFLAGS += -O0 -ggdb -g
 
 TARGETS := hello
 

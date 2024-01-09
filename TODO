@@ -1,3 +1,4 @@
+- Some symbols will be optimized out.
 - support Qemu
 - support multi-thread and make each thread safety.
 - Add ulpatches that already patched symbols to task symbols.
