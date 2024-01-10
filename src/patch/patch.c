@@ -215,7 +215,7 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info)
 	return 0;
 }
 
-static int create_mmap_vma_file(struct task *task, struct load_info *info)
+static int create_mmap_vma_file(struct task_struct *task, struct load_info *info)
 {
 	int ret = 0;
 	ssize_t map_len = info->len;
@@ -274,7 +274,7 @@ close_ret:
 	return ret;
 }
 
-static void delete_mmap_vma_file(struct task *task, struct load_info *info)
+static void delete_mmap_vma_file(struct task_struct *task, struct load_info *info)
 {
 	lwarning("munmap ulpatch.\n");
 	task_attach(task->pid);
@@ -549,7 +549,7 @@ unsigned long arch_jmp_table_jmp(void)
  * @return: 0-failed
  */
 static const unsigned long
-resolve_symbol(const struct task *task, const char *name)
+resolve_symbol(const struct task_struct *task, const char *name)
 {
 	const struct symbol *sym = NULL;
 	unsigned long addr = 0;
@@ -593,7 +593,7 @@ resolve_symbol(const struct task *task, const char *name)
 	/* try find symbol in other libraries mapped in target process address
 	 * space */
 	if (!sym && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
-		sym = task_vma_find_symbol((struct task *)task, name);
+		sym = task_vma_find_symbol((struct task_struct *)task, name);
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr)
@@ -731,7 +731,7 @@ static int post_relocation(const struct load_info *info)
 static int solve_patch_symbols(struct load_info *info)
 {
 	int i;
-	struct task *task = info->target_task;
+	struct task_struct *task = info->target_task;
 	struct symbol *sym;
 	const char *dst_func, *src_func;
 	GElf_Sym *sym_src_func = NULL;
@@ -779,7 +779,7 @@ static int kick_target_process(const struct load_info *info)
 {
 	int n;
 	int err = 0;
-	struct task *task = info->target_task;
+	struct task_struct *task = info->target_task;
 	unsigned long target_hdr = info->target_hdr;
 	size_t insn_sz = 0;
 
@@ -837,7 +837,7 @@ static int load_patch(struct load_info *info)
 {
 	long err = 0;
 	struct vma_ulp *ulp, *tmpulp;
-	struct task *task = info->target_task;
+	struct task_struct *task = info->target_task;
 
 	err = setup_load_info(info);
 	if (err)
@@ -890,7 +890,7 @@ free_copy:
 }
 
 /* looks like init_module() in kernel */
-int init_patch(struct task *task, const char *obj_file)
+int init_patch(struct task_struct *task, const char *obj_file)
 {
 	int err;
 	struct load_info info = {
@@ -931,7 +931,7 @@ int init_patch(struct task *task, const char *obj_file)
 }
 
 /* delete last patched patch, so, don't need any other arguments */
-int delete_patch(struct task *task)
+int delete_patch(struct task_struct *task)
 {
 	// TODO:
 

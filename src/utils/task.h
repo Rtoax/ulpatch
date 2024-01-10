@@ -79,7 +79,7 @@ struct vma_ulp {
 
 	char *str_build_id;
 
-	/* struct task.ulp_list */
+	/* struct task_struct.ulp_list */
 	struct list_head node;
 };
 
@@ -109,11 +109,11 @@ struct vma_struct {
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;
 
-	struct task *task;
+	struct task_struct *task;
 
-	/* struct task.vma_list */
+	/* struct task_struct.vma_list */
 	struct list_head node_list;
-	/* struct task.vmas_rb */
+	/* struct task_struct.vmas_rb */
 	struct rb_node node_rb;
 
 	/* All same name vma in one list, and the first vma is leader.
@@ -127,7 +127,7 @@ struct vma_struct {
 
 struct thread {
 	pid_t tid;
-	/* struct task.threads_list */
+	/* struct task_struct.threads_list */
 	struct list_head node;
 };
 
@@ -177,7 +177,7 @@ struct elf_file;
 /**
  * Store values of the auxiliary vector, read from /proc/PID/auxv
  */
-struct task_auxv {
+struct task_struct_auxv {
 	/* AT_PHDR */
 	unsigned long auxv_phdr;
 	/* AT_BASE */
@@ -189,7 +189,7 @@ struct task_auxv {
 /* This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
-struct task {
+struct task_struct {
 	/* /proc/[PID]/comm */
 	char comm[TASK_COMM_LEN];
 
@@ -200,7 +200,7 @@ struct task {
 	/* realpath of /proc/PID/exe */
 	char *exe;
 
-	struct task_auxv auxv;
+	struct task_struct_auxv auxv;
 
 	/* If FTO_SELF set, load SELF ELF file when open. */
 	struct elf_file *exe_elf;
@@ -246,7 +246,7 @@ int open_pid_mem(pid_t pid);
 bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
 
-struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
+struct vma_struct *next_vma(struct task_struct *task, struct vma_struct *prev);
 
 /* Get task's first vma in rbtree */
 #define first_vma(task) next_vma(task, NULL)
@@ -254,67 +254,67 @@ struct vma_struct *next_vma(struct task *task, struct vma_struct *prev);
 #define task_for_each_vma(vma, task) \
 		for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
-struct vma_struct *find_vma(struct task *task, unsigned long vaddr);
+struct vma_struct *find_vma(struct task_struct *task, unsigned long vaddr);
 /* Find a span area between two vma */
-unsigned long find_vma_span_area(struct task *task, size_t size);
-int read_task_vmas(struct task *task, bool update_ulp);
-int update_task_vmas_ulp(struct task *task);
-int free_task_vmas(struct task *task);
+unsigned long find_vma_span_area(struct task_struct *task, size_t size);
+int read_task_vmas(struct task_struct *task, bool update_ulp);
+int update_task_vmas_ulp(struct task_struct *task);
+int free_task_vmas(struct task_struct *task);
 
 enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
 
-int dump_task(const struct task *t);
+int dump_task(const struct task_struct *t);
 
 void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail);
-void dump_task_vmas(struct task *task, bool detail);
-int dump_task_addr_to_file(const char *ofile, struct task *task,
+void dump_task_vmas(struct task_struct *task, bool detail);
+int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
-int dump_task_vma_to_file(const char *ofile, struct task *task,
+int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
-void dump_task_threads(struct task *task, bool detail);
-void print_thread(FILE *fp, struct task *task, struct thread *thread);
+void dump_task_threads(struct task_struct *task, bool detail);
+void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 
 int alloc_ulp(struct vma_struct *vma);
 void free_ulp(struct vma_struct *vma);
 
-int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
-int print_task_auxv(FILE *fp, struct task *task);
+int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv);
+int print_task_auxv(FILE *fp, struct task_struct *task);
 
-struct task *open_task(pid_t pid, int flag);
-int free_task(struct task *task);
+struct task_struct *open_task(pid_t pid, int flag);
+int free_task(struct task_struct *task);
 
 int task_attach(pid_t pid);
 int task_detach(pid_t pid);
 
-int memcpy_to_task(struct task *task,
+int memcpy_to_task(struct task_struct *task,
 		unsigned long remote_dst, void *src, ssize_t size);
-int memcpy_from_task(struct task *task,
+int memcpy_from_task(struct task_struct *task,
 		void *dst, unsigned long remote_src, ssize_t size);
 
 /* syscalls based on task_syscall() */
 /* if mmap file, need to update_task_vmas_ulp() manual */
-unsigned long task_mmap(struct task *task,
+unsigned long task_mmap(struct task_struct *task,
 	unsigned long addr, size_t length, int prot, int flags,
 	int fd, off_t offset);
-int task_munmap(struct task *task, unsigned long addr, size_t size);
-int task_msync(struct task *task, unsigned long addr, size_t length, int flags);
-int task_msync_sync(struct task *task, unsigned long addr, size_t length);
-int task_msync_async(struct task *task, unsigned long addr, size_t length);
-unsigned long task_malloc(struct task *task, size_t length);
-int task_free(struct task *task, unsigned long addr, size_t length);
-int task_open(struct task *task, char *pathname, int flags, mode_t mode);
-int task_close(struct task *task, int remote_fd);
-int task_ftruncate(struct task *task, int remote_fd, off_t length);
-int task_fstat(struct task *task, int remote_fd, struct stat *statbuf);
-int task_prctl(struct task *task, int option, unsigned long arg2,
+int task_munmap(struct task_struct *task, unsigned long addr, size_t size);
+int task_msync(struct task_struct *task, unsigned long addr, size_t length, int flags);
+int task_msync_sync(struct task_struct *task, unsigned long addr, size_t length);
+int task_msync_async(struct task_struct *task, unsigned long addr, size_t length);
+unsigned long task_malloc(struct task_struct *task, size_t length);
+int task_free(struct task_struct *task, unsigned long addr, size_t length);
+int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode);
+int task_close(struct task_struct *task, int remote_fd);
+int task_ftruncate(struct task_struct *task, int remote_fd, off_t length);
+int task_fstat(struct task_struct *task, int remote_fd, struct stat *statbuf);
+int task_prctl(struct task_struct *task, int option, unsigned long arg2,
 	unsigned long arg3, unsigned long arg4, unsigned long arg5);
 
 /* Execute a syscall(2) in target task */
-int task_syscall(struct task *task, int nr,
+int task_syscall(struct task_struct *task, int nr,
 		unsigned long arg1, unsigned long arg2, unsigned long arg3,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res);
 
-struct symbol *task_vma_find_symbol(struct task *task, const char *name);
+struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name);
 unsigned long task_vma_symbol_value(const struct symbol *sym);
 

@@ -43,7 +43,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task *task = open_task(pid, FTO_SELF);
+		struct task_struct *task = open_task(pid, FTO_SELF);
 		unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
 		int pagesize = getpagesize();
 
@@ -118,7 +118,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task *task = open_task(pid, FTO_SELF);
+		struct task_struct *task = open_task(pid, FTO_SELF);
 		int pagesize = getpagesize();
 		unsigned long memaddr;
 
@@ -242,7 +242,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task *task = open_task(pid, FTO_LIBC);
+		struct task_struct *task = open_task(pid, FTO_LIBC);
 
 #ifndef LIBC_PUTS_FN
 # error "No macro LIBC_PUTS_FN"
@@ -285,7 +285,7 @@ out:
 	return ret;
 }
 
-static int test_task_patch(int fto_flags, int (*cb)(struct task *))
+static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 {
 	int ret = -1;
 	int status = 0;
@@ -309,7 +309,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task *))
 
 		task_wait_wait(&waitqueue);
 
-		struct task *task = open_task(pid, fto_flags);
+		struct task_struct *task = open_task(pid, fto_flags);
 
 		ret = init_patch(task, ULPATCH_FTRACE_OBJ_PATH);
 		if (ret == -EEXIST) {
@@ -346,7 +346,7 @@ TEST(Ftrace,	init_patch,	TEST_SKIP_RET)
 }
 
 
-static int find_task_symbol(struct task *task)
+static int find_task_symbol(struct task_struct *task)
 {
 	int i;
 	int err = 0;
@@ -407,7 +407,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 		 */
 		usleep(10000);
 
-		struct task *task = open_task(pid, FTO_ULFTRACE);
+		struct task_struct *task = open_task(pid, FTO_ULFTRACE);
 
 		dump_task_vmas(task, true);
 

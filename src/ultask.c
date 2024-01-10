@@ -43,7 +43,7 @@ static bool flag_print_threads = false;
 static bool flag_print_auxv = false;
 static const char *output_file = NULL;
 
-static struct task *target_task = NULL;
+static struct task_struct *target_task = NULL;
 
 static const char *prog_name = "ultask";
 
@@ -198,7 +198,7 @@ static int mmap_a_file(void)
 	int __unused map_fd;
 	const char *filename = map_file;
 
-	struct task *task = target_task;
+	struct task_struct *task = target_task;
 
 	task_attach(task->pid);
 
@@ -236,7 +236,7 @@ close_ret:
 static int munmap_an_vma(void)
 {
 	size_t size = 0;
-	struct task *task = target_task;
+	struct task_struct *task = target_task;
 	unsigned long addr = 0;
 
 	struct vma_struct *vma = find_vma(task, vma_addr);

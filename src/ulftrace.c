@@ -20,7 +20,7 @@
 
 static pid_t target_pid = -1;
 static const char *target_func = NULL;
-static struct task *target_task = NULL;
+static struct task_struct *target_task = NULL;
 
 static const char *patch_object_file = NULL;
 

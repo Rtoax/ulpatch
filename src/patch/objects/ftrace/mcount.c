@@ -19,7 +19,7 @@
 #include <utils/task.h>
 #include <utils/log.h>
 
-extern int try_to_wake_up(struct task *task, int mode, int wake_flags);
+extern int try_to_wake_up(struct task_struct *task, int mode, int wake_flags);
 
 #endif /* ULPATCH_TEST */
 
@@ -50,7 +50,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 	 */
 	if (child - (unsigned long)try_to_wake_up > 0x0 &&
 		child - (unsigned long)try_to_wake_up < 0x26) {
-		struct task *task = (void *)ARG1(regs);
+		struct task_struct *task = (void *)ARG1(regs);
 		lwarning("COMM: %s, PID %d\n", task->comm, task->pid);
 	}
 

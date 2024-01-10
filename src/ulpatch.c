@@ -26,7 +26,7 @@ enum command {
 
 
 static pid_t target_pid = -1;
-static struct task *target_task = NULL;
+static struct task_struct *target_task = NULL;
 static char *patch_file = NULL;
 
 enum {

@@ -114,7 +114,7 @@ int show_patch_info(void)
 int show_task_patch_info(pid_t pid)
 {
 	int i = 1;
-	struct task *task;
+	struct task_struct *task;
 	struct vma_ulp *ulp, *tmpulp;
 
 	task = open_task(pid, FTO_ALL);

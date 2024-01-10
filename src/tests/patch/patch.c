@@ -45,7 +45,7 @@ static void my_direct_func(void)
 }
 
 /* see macro ULPATCH_TEST code branch */
-__opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
+__opt_O0 int try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 {
 	linfo("TTWU emulate.\n");
 	int ret = ret_TTWU;
@@ -56,7 +56,7 @@ __opt_O0 int try_to_wake_up(struct task *task, int mode, int wake_flags)
 static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
+	struct task_struct *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
 	struct symbol *rel_s = NULL;
 	struct symbol *libc_s = NULL;
@@ -192,7 +192,7 @@ TEST(Patch,	ftrace_nop,	0)
 }
 #endif
 
-int ulpatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
+int ulpatch_try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 {
 #define ULPATCH_TTWU_RET	0xdead1234
 	linfo("TTWU emulate, patched.\n");
@@ -202,7 +202,7 @@ int ulpatch_try_to_wake_up(struct task *task, int mode, int wake_flags)
 TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
+	struct task_struct *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
 	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
@@ -254,7 +254,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
 {
 	int ret = 0;
-	struct task *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
+	struct task_struct *task = open_task(getpid(), FTO_SELF | FTO_LIBC);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
 	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;

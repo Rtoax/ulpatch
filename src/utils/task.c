@@ -53,7 +53,7 @@ int open_pid_mem(pid_t pid)
 	return memfd;
 }
 
-struct vma_struct *alloc_vma(struct task *task)
+struct vma_struct *alloc_vma(struct task_struct *task)
 {
 	struct vma_struct *vma = malloc(sizeof(struct vma_struct));
 	assert(vma && "alloc vma failed.");
@@ -88,7 +88,7 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	return 0;
 }
 
-int insert_vma(struct task *task, struct vma_struct *vma,
+int insert_vma(struct task_struct *task, struct vma_struct *vma,
 	       struct vma_struct *prev)
 {
 	if (prev && strcmp(prev->name_, vma->name_) == 0) {
@@ -105,7 +105,7 @@ int insert_vma(struct task *task, struct vma_struct *vma,
 	return 0;
 }
 
-int unlink_vma(struct task *task, struct vma_struct *vma)
+int unlink_vma(struct task_struct *task, struct vma_struct *vma)
 {
 	list_del(&vma->node_list);
 	rb_erase(&vma->node_rb, &task->vmas_rb);
@@ -137,7 +137,7 @@ static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 		return 1;
 }
 
-struct vma_struct *find_vma(struct task *task, unsigned long vaddr)
+struct vma_struct *find_vma(struct task_struct *task, unsigned long vaddr)
 {
 	struct rb_node *rnode = rb_search_node(&task->vmas_rb, __find_vma_cmp,
 						vaddr);
@@ -146,14 +146,14 @@ struct vma_struct *find_vma(struct task *task, unsigned long vaddr)
 	return NULL;
 }
 
-struct vma_struct *next_vma(struct task *task, struct vma_struct *prev)
+struct vma_struct *next_vma(struct task_struct *task, struct vma_struct *prev)
 {
 	struct rb_node *next;
 	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vmas_rb);
 	return  next ? rb_entry(next, struct vma_struct, node_rb) : NULL;
 }
 
-unsigned long find_vma_span_area(struct task *task, size_t size)
+unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 {
 	struct vma_struct *ivma;
 	struct rb_node * rnode;
@@ -201,7 +201,7 @@ static int __prot2flags(unsigned int prot)
 	return flags;
 }
 
-int free_task_vmas(struct task *task);
+int free_task_vmas(struct task_struct *task);
 
 enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 {
@@ -293,7 +293,7 @@ int alloc_ulp(struct vma_struct *vma)
 	void *mem;
 	struct vma_ulp *ulp;
 	size_t elf_mem_len = vma->vm_end - vma->vm_start;
-	struct task *task = vma->task;
+	struct task_struct *task = vma->task;
 
 	ulp = malloc(sizeof(struct vma_ulp));
 	if (!ulp) {
@@ -345,7 +345,7 @@ int vma_load_ulp(struct vma_struct *vma)
 {
 	int ret;
 	GElf_Ehdr ehdr = {};
-	struct task *task = vma->task;
+	struct task_struct *task = vma->task;
 	struct load_info info = {
 		.target_task = task,
 	};
@@ -374,7 +374,7 @@ int vma_load_ulp(struct vma_struct *vma)
 int vma_peek_phdr(struct vma_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
-	struct task *task = vma->task;
+	struct task_struct *task = vma->task;
 	unsigned long phaddr;
 	unsigned int phsz = 0;
 	int i;
@@ -661,8 +661,8 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 	 * auxv_phdr. Thus, we must fix the offset of VMA_SELF's symbol.
 	 */
 	} else if (vma_leader->type == VMA_SELF) {
-		struct task *task = sym->vma->task;
-		struct task_auxv *auxv = &task->auxv;
+		struct task_struct *task = sym->vma->task;
+		struct task_struct_auxv *auxv = &task->auxv;
 		unsigned long phoff = vma_leader->elf->ehdr.e_phoff;
 		addr = sym->sym.st_value + auxv->auxv_phdr - phoff;
 #endif
@@ -672,7 +672,7 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 	return addr;
 }
 
-struct symbol *task_vma_find_symbol(struct task *task, const char *name)
+struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
 {
 	struct rb_node *node;
 	struct symbol tmp = {
@@ -685,7 +685,7 @@ struct symbol *task_vma_find_symbol(struct task *task, const char *name)
 }
 
 /* Insert OK, return 0, else return -1 */
-int task_vma_link_symbol(struct task *task, struct symbol *s)
+int task_vma_link_symbol(struct task_struct *task, struct symbol *s)
 {
 	struct rb_node *node;
 
@@ -707,7 +707,7 @@ int task_vma_link_symbol(struct task *task, struct symbol *s)
 static int load_self_vma_symbols(struct vma_struct *vma)
 {
 	int err = 0;
-	struct task *task = vma->task;
+	struct task_struct *task = vma->task;
 
 	struct symbol *sym, *tmp;
 
@@ -747,7 +747,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	if (!vma->is_elf || !vma->elf)
 		return 0;
 
-	struct task *task = vma->task;
+	struct task_struct *task = vma->task;
 
 	int err = 0;
 	size_t i;
@@ -899,7 +899,7 @@ out_free:
  * @update_ulp: if patch to target process, we need to insert the new vma to
  *              list.
  */
-int read_task_vmas(struct task *task, bool update_ulp)
+int read_task_vmas(struct task_struct *task, bool update_ulp)
 {
 	struct vma_struct *vma, *prev = NULL;
 	int mapsfd;
@@ -985,7 +985,7 @@ int read_task_vmas(struct task *task, bool update_ulp)
 	return 0;
 }
 
-int update_task_vmas_ulp(struct task *task)
+int update_task_vmas_ulp(struct task_struct *task)
 {
 	return read_task_vmas(task, true);
 }
@@ -1030,19 +1030,19 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 	}
 }
 
-void print_thread(FILE *fp, struct task *task, struct thread *thread)
+void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
 {
 	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
 }
 
-int dump_task(const struct task *task)
+int dump_task(const struct task_struct *task)
 {
 	printf("COMM: %s\nPID:  %d\nEXE:  %s\n",
 		task->comm, task->pid, task->exe);
 	return 0;
 }
 
-void dump_task_vmas(struct task *task, bool detail)
+void dump_task_vmas(struct task_struct *task, bool detail)
 {
 	int first_line = 1;
 	struct vma_struct *vma;
@@ -1055,7 +1055,7 @@ void dump_task_vmas(struct task *task, bool detail)
 	printf("\n(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n");
 }
 
-int dump_task_addr_to_file(const char *ofile, struct task *task,
+int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 			   unsigned long addr, unsigned long size)
 {
 	void *mem = NULL;
@@ -1099,7 +1099,7 @@ int dump_task_addr_to_file(const char *ofile, struct task *task,
 	return 0;
 }
 
-int dump_task_vma_to_file(const char *ofile, struct task *task,
+int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 			  unsigned long addr)
 {
 	size_t vma_size = 0;
@@ -1114,7 +1114,7 @@ int dump_task_vma_to_file(const char *ofile, struct task *task,
 	return dump_task_addr_to_file(ofile, task, vma->vm_start, vma_size);
 }
 
-void dump_task_threads(struct task *task, bool detail)
+void dump_task_threads(struct task_struct *task, bool detail)
 {
 	struct thread *thread;
 
@@ -1127,7 +1127,7 @@ void dump_task_threads(struct task *task, bool detail)
 		print_thread(stdout, task, thread);
 }
 
-int free_task_vmas(struct task *task)
+int free_task_vmas(struct task_struct *task)
 {
 	struct vma_struct *vma, *tmpvma;
 
@@ -1168,7 +1168,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
-static int __get_comm(struct task *task)
+static int __get_comm(struct task_struct *task)
 {
 	char path[128];
 	ssize_t ret;
@@ -1189,7 +1189,7 @@ static int __get_comm(struct task *task)
 	return 0;
 }
 
-static int __get_exe(struct task *task)
+static int __get_exe(struct task_struct *task)
 {
 	char path[128], realpath[128];
 	ssize_t ret;
@@ -1206,13 +1206,13 @@ static int __get_exe(struct task *task)
 	return 0;
 }
 
-int load_task_auxv(pid_t pid, struct task_auxv *pauxv)
+int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 {
 	int fd, n, ret = 0;
 	char buf[PATH_MAX];
 	GElf_auxv_t auxv;
 
-	memset(pauxv, 0x00, sizeof(struct task_auxv));
+	memset(pauxv, 0x00, sizeof(struct task_struct_auxv));
 	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
 	fd = open(buf, O_RDONLY);
 	if (fd == -1) {
@@ -1262,9 +1262,9 @@ close_exit:
 	return ret;
 }
 
-int print_task_auxv(FILE *fp, struct task *task)
+int print_task_auxv(FILE *fp, struct task_struct *task)
 {
-	const struct task_auxv *pauxv = &task->auxv;
+	const struct task_struct_auxv *pauxv = &task->auxv;
 
 	if (!fp)
 		fp = stdout;
@@ -1277,18 +1277,18 @@ int print_task_auxv(FILE *fp, struct task *task)
 	return 0;
 }
 
-struct task *open_task(pid_t pid, int flag)
+struct task_struct *open_task(pid_t pid, int flag)
 {
-	struct task *task = NULL;
+	struct task_struct *task = NULL;
 	int memfd;
 
 	memfd = open_pid_mem(pid);
 	if (memfd <= 0)
 		return NULL;
 
-	task = malloc(sizeof(struct task));
+	task = malloc(sizeof(struct task_struct));
 	assert(task && "malloc failed");
-	memset(task, 0x0, sizeof(struct task));
+	memset(task, 0x0, sizeof(struct task_struct));
 
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
@@ -1425,7 +1425,7 @@ static void rb_free_symbol(struct rb_node *node)
 	free_symbol(s);
 }
 
-static void __unused clean_task_proc(struct task *task)
+static void __unused clean_task_proc(struct task_struct *task)
 {
 	char buffer[BUFFER_SIZE];
 
@@ -1457,10 +1457,10 @@ static void __unused clean_task_proc(struct task *task)
 /**
  * TODO: Couldn't remove the proc if this process patched
  */
-static void free_task_proc(struct task *task)
+static void free_task_proc(struct task_struct *task)
 {}
 
-int free_task(struct task *task)
+int free_task(struct task_struct *task)
 {
 	close(task->proc_mem_fd);
 
@@ -1600,7 +1600,7 @@ static __unused int pid_read(int pid, void *dst, const void *src, size_t len)
 	return len;
 }
 
-int memcpy_from_task(struct task *task, void *dst, unsigned long task_src,
+int memcpy_from_task(struct task_struct *task, void *dst, unsigned long task_src,
 		     ssize_t size)
 {
 	int ret = -1;
@@ -1614,7 +1614,7 @@ int memcpy_from_task(struct task *task, void *dst, unsigned long task_src,
 	return ret;
 }
 
-int memcpy_to_task(struct task *task, unsigned long task_dst, void *src,
+int memcpy_to_task(struct task_struct *task, unsigned long task_dst, void *src,
 		   ssize_t size)
 {
 	int ret = -1;
@@ -1689,7 +1689,7 @@ copy_regs(struct user_regs_struct *dst, struct user_regs_struct *src)
 #pragma GCC diagnostic pop
 #endif
 
-int wait_for_stop(struct task *task)
+int wait_for_stop(struct task_struct *task)
 {
 	int ret, status = 0;
 	pid_t pid = task->pid;
@@ -1726,7 +1726,7 @@ int wait_for_stop(struct task *task)
 	return 0;
 }
 
-int task_syscall(struct task *task, int nr,
+int task_syscall(struct task_struct *task, int nr,
 		unsigned long arg1, unsigned long arg2, unsigned long arg3,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res)
@@ -1834,7 +1834,7 @@ poke_back:
 	return ret;
 }
 
-unsigned long task_mmap(struct task *task, unsigned long addr, size_t length,
+unsigned long task_mmap(struct task_struct *task, unsigned long addr, size_t length,
 			int prot, int flags, int fd, off_t offset)
 {
 	int ret;
@@ -1847,7 +1847,7 @@ unsigned long task_mmap(struct task *task, unsigned long addr, size_t length,
 	return result;
 }
 
-int task_munmap(struct task *task, unsigned long addr, size_t size)
+int task_munmap(struct task_struct *task, unsigned long addr, size_t size)
 {
 	int ret;
 	unsigned long result;
@@ -1858,7 +1858,7 @@ int task_munmap(struct task *task, unsigned long addr, size_t size)
 	return result;
 }
 
-int task_msync(struct task *task, unsigned long addr, size_t length, int flags)
+int task_msync(struct task_struct *task, unsigned long addr, size_t length, int flags)
 {
 	int ret;
 	unsigned long result;
@@ -1869,16 +1869,16 @@ int task_msync(struct task *task, unsigned long addr, size_t length, int flags)
 	return result;
 }
 
-int task_msync_sync(struct task *task, unsigned long addr, size_t length)
+int task_msync_sync(struct task_struct *task, unsigned long addr, size_t length)
 {
 	return task_msync(task, addr, length, MS_SYNC);
 }
-int task_msync_async(struct task *task, unsigned long addr, size_t length)
+int task_msync_async(struct task_struct *task, unsigned long addr, size_t length)
 {
 	return task_msync(task, addr, length, MS_ASYNC);
 }
 
-unsigned long task_malloc(struct task *task, size_t length)
+unsigned long task_malloc(struct task_struct *task, size_t length)
 {
 	unsigned long remote_addr;
 	remote_addr = task_mmap(task,
@@ -1892,12 +1892,12 @@ unsigned long task_malloc(struct task *task, size_t length)
 	return remote_addr;
 }
 
-int task_free(struct task *task, unsigned long addr, size_t length)
+int task_free(struct task_struct *task, unsigned long addr, size_t length)
 {
 	return task_munmap(task, addr, length);
 }
 
-int task_open(struct task *task, char *pathname, int flags, mode_t mode)
+int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode)
 {
 	int __unused ret;
 	unsigned long result;
@@ -1923,7 +1923,7 @@ int task_open(struct task *task, char *pathname, int flags, mode_t mode)
 	return result;
 }
 
-int task_close(struct task *task, int remote_fd)
+int task_close(struct task_struct *task, int remote_fd)
 {
 	int ret;
 	unsigned long result;
@@ -1931,7 +1931,7 @@ int task_close(struct task *task, int remote_fd)
 	return result | ret;
 }
 
-int task_ftruncate(struct task *task, int remote_fd, off_t length)
+int task_ftruncate(struct task_struct *task, int remote_fd, off_t length)
 {
 	int ret;
 	unsigned long result;
@@ -1942,7 +1942,7 @@ int task_ftruncate(struct task *task, int remote_fd, off_t length)
 	return result;
 }
 
-int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
+int task_fstat(struct task_struct *task, int remote_fd, struct stat *statbuf)
 {
 	int ret, ret_fstat;
 	unsigned long remote_statbuf;
@@ -1966,7 +1966,7 @@ int task_fstat(struct task *task, int remote_fd, struct stat *statbuf)
 	return ret_fstat;
 }
 
-int task_prctl(struct task *task, int option, unsigned long arg2,
+int task_prctl(struct task_struct *task, int option, unsigned long arg2,
 	       unsigned long arg3, unsigned long arg4, unsigned long arg5)
 {
 	int ret;

@@ -14,7 +14,7 @@
  * In ARMv8-A, A64 instructions have a fixed length of 32 bits and are always
  * little-endian.
  */
-int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp)
+int aarch64_insn_read(struct task_struct *task, unsigned long addr, uint32_t *insnp)
 {
 	int ret;
 	uint32_t val;
@@ -26,7 +26,7 @@ int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp)
 	return ret?0:-1;
 }
 
-int aarch64_insn_write(struct task *task, unsigned long addr, uint32_t insn)
+int aarch64_insn_write(struct task_struct *task, unsigned long addr, uint32_t insn)
 {
 	uint32_t *tp = (uint32_t *)addr;
 	int ret;

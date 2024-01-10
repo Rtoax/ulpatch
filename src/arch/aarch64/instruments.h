@@ -174,10 +174,10 @@ __AARCH64_INSN_FUNCS(pssbb,	0xFFFFFFFF, 0xD503349F)
 #undef	__AARCH64_INSN_FUNCS
 
 
-struct task;
+struct task_struct;
 
-int aarch64_insn_read(struct task *task, unsigned long addr, uint32_t *insnp);
-int aarch64_insn_write(struct task *task, unsigned long addr, uint32_t insn);
+int aarch64_insn_read(struct task_struct *task, unsigned long addr, uint32_t *insnp);
+int aarch64_insn_write(struct task_struct *task, unsigned long addr, uint32_t insn);
 
 uint64_t aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type,
 			uint32_t insn);

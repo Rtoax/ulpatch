@@ -35,7 +35,7 @@ struct load_info {
 
 	/* the VMA start address in target task/process address space */
 	unsigned long target_hdr;
-	struct task *target_task;
+	struct task_struct *target_task;
 
 	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
 	struct {
@@ -81,7 +81,7 @@ struct jmp_table_entry {
 	unsigned long addr;
 };
 
-struct task;
+struct task_struct;
 
 bool is_ftrace_entry(char *func);
 
@@ -102,8 +102,8 @@ int vma_load_info(struct vma_struct *vma, struct load_info *info);
 int setup_load_info(struct load_info *info);
 void release_load_info(struct load_info *info);
 
-int init_patch(struct task *task, const char *obj_file);
-int delete_patch(struct task *task);
+int init_patch(struct task_struct *task, const char *obj_file);
+int delete_patch(struct task_struct *task);
 
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			const char *strtab, unsigned int symindex,
