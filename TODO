@@ -5,3 +5,4 @@
 - Support uninitialized variable yet, see '.bss' 'SHT_NOBITS'
 - ULPatch VMA better isn't file map
 - Anon vma for each patch and use prctl(2)(CONFIG_ANON_VMA_NAME) set vma's name.
+- How to patch to strip ELF process.

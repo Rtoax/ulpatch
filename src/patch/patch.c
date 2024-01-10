@@ -73,6 +73,10 @@ void release_load_info(struct load_info *info)
 		free(info->str_build_id);
 		info->str_build_id = NULL;
 	}
+	if (info->ulp_name) {
+		free(info->ulp_name);
+		info->ulp_name = NULL;
+	}
 }
 
 /* ULPatch is single thread, thus, this api is ok. */
@@ -123,6 +127,7 @@ int alloc_patch_file(const char *obj_from, const char *obj_to,
 		return -EEXIST;
 	}
 
+	info->ulp_name = strdup(obj_from);
 	info->patch.path = strdup(obj_to);
 
 	info->len = fsize(obj_from);
@@ -736,7 +741,8 @@ static int solve_patch_symbols(struct load_info *info)
 
 	sym = task_vma_find_symbol(task, dst_func);
 	if (!sym) {
-		lerror("Couldn't found %s in target process.\n", dst_func);
+		lerror("Couldn't found %s in target process, maybe %s is stripped.\n",
+		       dst_func, task->exe);
 		return -ENOENT;
 	}
 
@@ -753,7 +759,7 @@ static int solve_patch_symbols(struct load_info *info)
 	}
 
 	if (!sym_src_func) {
-		lerror("Couldn't found %s in target process.\n", src_func);
+		lerror("Couldn't found %s in %s.\n", src_func, info->ulp_name);
 		return -ENOENT;
 	}
 

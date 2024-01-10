@@ -28,6 +28,7 @@ struct vma_struct;
 /* see linux:kernel/module-internal.h */
 struct load_info {
 	const char *name;
+	char *ulp_name;
 
 	GElf_Ehdr *hdr;
 	unsigned long len;
