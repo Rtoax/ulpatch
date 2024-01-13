@@ -48,6 +48,9 @@ bool ehdr_magic_ok(const GElf_Ehdr *ehdr);
 
 /* ELF Phdr api */
 int handle_phdrs(struct elf_file *elf);
+int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
+const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
+const char *phdr_type_str_unsafe(GElf_Phdr *pphdr);
 
 #define elf_for_each_phdr(elf, iter)                                        \
 	for ((iter)->i = 0, (iter)->nr = (elf)->phdrnum;                        \

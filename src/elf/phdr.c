@@ -11,6 +11,48 @@
 #include <utils/log.h>
 
 
+const char *phdr_type_str_unsafe(GElf_Phdr *pphdr)
+{
+	switch (pphdr->p_type) {
+	case PT_LOAD:	return "LOAD";
+	/* TODO: more */
+	}
+	return "Unknown, see /usr/include/elf.h";
+}
+
+const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr)
+{
+	static char prot[4];
+	memset(prot, 0x00, sizeof(prot));
+	prot[0] = pphdr->p_flags & PF_R ? 'R' : ' ';
+	prot[1] = pphdr->p_flags & PF_W ? 'W' : ' ';
+	prot[2] = pphdr->p_flags & PF_X ? 'X' : ' ';
+	return prot;
+}
+
+int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first)
+{
+	if (first) {
+		fprintf(fp, "  %-8s %-16s %-16s %-16s\n",
+			"Type", "Offset", "VirtAddr", "PhysAddr");
+		fprintf(fp, "  %-8s %-16s %-16s %-8s %-8s\n",
+			"", "FileSize", "MemSize", "Flags", "Align");
+	}
+	fprintf(fp, "  %-8s %016lx %016lx %016lx\n",
+		phdr_type_str_unsafe(pphdr),
+		pphdr->p_offset,
+		pphdr->p_vaddr,
+		pphdr->p_paddr);
+	fprintf(fp, "  %-8s %016lx %016lx %-8s %08lx\n",
+		"",
+		pphdr->p_filesz,
+		pphdr->p_memsz,
+		phdr_flags_str_unsafe(pphdr),
+		pphdr->p_align);
+
+	return 0;
+}
+
 int handle_phdrs(struct elf_file *elf)
 {
 	struct elf_iter iter;

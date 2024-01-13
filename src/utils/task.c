@@ -992,13 +992,14 @@ int update_task_vmas_ulp(struct task_struct *task)
 
 void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 {
+	int i;
+
 	if (!vma) {
 		lerror("Invalide pointer.\n");
 		return;
 	}
 
-	if (!fp)
-		fp = stdout;
+	fp = fp ?: stdout;
 
 	if (first_line) {
 		fprintf(fp, "%10s: %16s %16s %6s %4s\n",
@@ -1026,6 +1027,14 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 		if (vma->vma_elf) {
 			fprintf(fp, "%10s  load_offset = 0x%lx\n", "",
 				vma->vma_elf->load_offset);
+			bool first = true;
+			for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
+				GElf_Phdr *pphdr = &vma->vma_elf->phdrs[i];
+				if (pphdr->p_type != PT_LOAD)
+					continue;
+				print_phdr(fp, pphdr, first);
+				first = false;
+			}
 		}
 		/* Add more information here */
 	}
