@@ -395,7 +395,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	}
 
 	/* is ELF or already peek */
-	if (vma->elf != NULL || vma->is_elf)
+	if (vma->vma_elf != NULL || vma->is_elf)
 		return 0;
 
 	/**
@@ -422,17 +422,17 @@ int vma_peek_phdr(struct vma_struct *vma)
 	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
 	/* VMA is ELF, handle it */
-	vma->elf = malloc(sizeof(struct vma_elf));
-	if (!vma->elf)
+	vma->vma_elf = malloc(sizeof(struct vma_elf));
+	if (!vma->vma_elf)
 		return -ENOMEM;
 
-	memset(vma->elf, 0x0, sizeof(struct vma_elf));
+	memset(vma->vma_elf, 0x0, sizeof(struct vma_elf));
 
 	/* Copy ehdr from load var */
-	memcpy(&vma->elf->ehdr, &ehdr, sizeof(ehdr));
+	memcpy(&vma->vma_elf->ehdr, &ehdr, sizeof(ehdr));
 
-	phaddr = vma->vm_start + vma->elf->ehdr.e_phoff;
-	phsz = vma->elf->ehdr.e_phnum * sizeof(GElf_Phdr);
+	phaddr = vma->vm_start + vma->vma_elf->ehdr.e_phoff;
+	phsz = vma->vma_elf->ehdr.e_phnum * sizeof(GElf_Phdr);
 
 	/* if no program headers, just return. we don't need it, such as:
 	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr
@@ -445,21 +445,21 @@ int vma_peek_phdr(struct vma_struct *vma)
 	 */
 	if (phsz == 0) {
 		lwarning("%s: no phdr, e_phoff %lx, skip it.\n",
-			vma->name_, vma->elf->ehdr.e_phoff);
-		free(vma->elf);
+			vma->name_, vma->vma_elf->ehdr.e_phoff);
+		free(vma->vma_elf);
 		return 0;
 	}
 
-	vma->elf->phdrs = malloc(phsz);
-	if (!vma->elf->phdrs) {
-		free(vma->elf);
+	vma->vma_elf->phdrs = malloc(phsz);
+	if (!vma->vma_elf->phdrs) {
+		free(vma->vma_elf);
 		return -ENOMEM;
 	}
 
 	ldebug("peek phdr from target addr %lx, len %d\n", phaddr, phsz);
-	if (memcpy_from_task(task, vma->elf->phdrs, phaddr, phsz) < phsz) {
-		free(vma->elf->phdrs);
-		free(vma->elf);
+	if (memcpy_from_task(task, vma->vma_elf->phdrs, phaddr, phsz) < phsz) {
+		free(vma->vma_elf->phdrs);
+		free(vma->vma_elf);
 		lerror("Failed to read %s program header.\n", vma->name_);
 		return -EAGAIN;
 	}
@@ -473,7 +473,7 @@ int vma_peek_phdr(struct vma_struct *vma)
 	 * Actually, if the ELF executable file need share libraries(not compile
 	 * with '-static'), it's ET_DYN, not ET_EXEC.
 	 */
-	if (vma->elf->ehdr.e_type != ET_DYN) {
+	if (vma->vma_elf->ehdr.e_type != ET_DYN) {
 		is_share_lib = false;
 		goto share_lib;
 	}
@@ -487,9 +487,9 @@ int vma_peek_phdr(struct vma_struct *vma)
 	 * executable or usually don't in shared libraries
 	 * (notable exception - libc)
 	 */
-	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
+	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		/* Ok, looks like this is an executable */
-		if (vma->elf->phdrs[i].p_type == PT_INTERP &&
+		if (vma->vma_elf->phdrs[i].p_type == PT_INTERP &&
 			!elf_vma_is_interp_exception(vma)) {
 			is_share_lib = false;
 			goto share_lib;
@@ -507,8 +507,8 @@ share_lib:
 	 * VMA is ELF, for each program header to find the lowest Virtual
 	 * address in p_vaddr.
 	 */
-	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
-		GElf_Phdr *phdr = &vma->elf->phdrs[i];
+	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
+		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
 		unsigned long pgoff;
 		struct vma_struct *sibling, *tmpvma;
 
@@ -543,18 +543,18 @@ share_lib:
 
 	if (lowest_vaddr == ULONG_MAX) {
 		lerror("%s: unable to find lowest load address.\n", vma->name_);
-		free(vma->elf->phdrs);
-		free(vma->elf);
-		vma->elf = NULL;
+		free(vma->vma_elf->phdrs);
+		free(vma->vma_elf);
+		vma->vma_elf = NULL;
 		vma->is_elf = false;
 		vma->is_share_lib = false;
 		return -1;
 	}
 
-	vma->elf->load_offset = vma->vm_start - lowest_vaddr;
+	vma->vma_elf->load_offset = vma->vm_start - lowest_vaddr;
 
-	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
-		GElf_Phdr *phdr = &vma->elf->phdrs[i];
+	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
+		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
 		struct vma_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
@@ -562,7 +562,7 @@ share_lib:
 		case PT_LOAD:
 		case PT_GNU_RELRO:
 			/* leader */
-			if (match_vma_phdr(vma, phdr, vma->elf->load_offset)) {
+			if (match_vma_phdr(vma, phdr, vma->vma_elf->load_offset)) {
 				vma->is_matched_phdr = true;
 			}
 
@@ -570,7 +570,7 @@ share_lib:
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
 
-				if (match_vma_phdr(sibling, phdr, vma->elf->load_offset)) {
+				if (match_vma_phdr(sibling, phdr, vma->vma_elf->load_offset)) {
 					sibling->is_matched_phdr = true;
 				}
 			}
@@ -580,7 +580,7 @@ share_lib:
 	}
 
 	linfo("%s vma start %lx, load_offset %lx\n",
-		vma->name_, vma->vm_start, vma->elf->load_offset);
+		vma->name_, vma->vm_start, vma->vma_elf->load_offset);
 
 	return 0;
 }
@@ -590,8 +590,8 @@ void vma_free_elf(struct vma_struct *vma)
 	if (!vma->is_elf || vma->type == VMA_ULPATCH)
 		return;
 
-	free(vma->elf->phdrs);
-	free(vma->elf);
+	free(vma->vma_elf->phdrs);
+	free(vma->vma_elf);
 }
 
 /**
@@ -663,7 +663,7 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 	} else if (vma_leader->type == VMA_SELF) {
 		struct task_struct *task = sym->vma->task;
 		struct task_struct_auxv *auxv = &task->auxv;
-		unsigned long phoff = vma_leader->elf->ehdr.e_phoff;
+		unsigned long phoff = vma_leader->vma_elf->ehdr.e_phoff;
 		addr = sym->sym.st_value + auxv->auxv_phdr - phoff;
 #endif
 	} else
@@ -744,7 +744,7 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 
 int vma_load_all_symbols(struct vma_struct *vma)
 {
-	if (!vma->is_elf || !vma->elf)
+	if (!vma->is_elf || !vma->vma_elf)
 		return 0;
 
 	struct task_struct *task = vma->task;
@@ -767,14 +767,14 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	if (vma->type == VMA_SELF)
 		return load_self_vma_symbols(vma);
 
-	for (i = 0; i < vma->elf->ehdr.e_phnum; i++) {
-		if (vma->elf->phdrs[i].p_type == PT_DYNAMIC) {
-			phdr = &vma->elf->phdrs[i];
+	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
+		if (vma->vma_elf->phdrs[i].p_type == PT_DYNAMIC) {
+			phdr = &vma->vma_elf->phdrs[i];
 			break;
 		}
 	}
 
-	if (i == vma->elf->ehdr.e_phnum) {
+	if (i == vma->vma_elf->ehdr.e_phnum) {
 		lerror("No PT_DYNAMIC in %s\n", vma->name_);
 		return -1;
 	}
@@ -783,7 +783,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	assert(dynamics && "Malloc fatal.");
 
 	err = memcpy_from_task(task, dynamics,
-			       vma->elf->load_offset + phdr->p_vaddr,
+			       vma->vma_elf->load_offset + phdr->p_vaddr,
 			       phdr->p_memsz);
 	if (err == -1 || err < phdr->p_memsz) {
 		lerror("Task read mem failed, %lx.\n", vma->vm_start + phdr->p_vaddr);
@@ -834,7 +834,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	ldebug("%s: symtab_addr %lx, load_offset: %lx, vma start %lx\n",
 		vma->name_,
 		symtab_addr,
-		vma->elf->load_offset,
+		vma->vma_elf->load_offset,
 		vma->vm_start);
 
 	/* [vdso] need add load_offset or vma start address.
@@ -848,7 +848,7 @@ int vma_load_all_symbols(struct vma_struct *vma)
 	 *       0000000000000138  0000000000000018   A       4     1     8
 	 */
 	if (vma->type == VMA_VDSO)
-		symtab_addr += vma->elf->load_offset;
+		symtab_addr += vma->vma_elf->load_offset;
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err == -1 || err < strtab_sz + symtab_sz) {
@@ -1023,9 +1023,10 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 		vma->name_);
 
 	if (detail) {
-		if (vma->elf)
+		if (vma->vma_elf) {
 			fprintf(fp, "%10s  load_offset = 0x%lx\n", "",
-				vma->elf->load_offset);
+				vma->vma_elf->load_offset);
+		}
 		/* Add more information here */
 	}
 }

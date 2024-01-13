@@ -105,7 +105,7 @@ struct vma_struct {
 	bool is_matched_phdr;
 
 	/* Only elf has it */
-	struct vma_elf *elf;
+	struct vma_elf *vma_elf;
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;
 
