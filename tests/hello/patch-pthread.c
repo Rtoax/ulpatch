@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <pthread.h>
 #ifndef __ULP_DEV
 #define __ULP_DEV
