@@ -14,6 +14,13 @@ void ulpatch_print_hello_exit(unsigned long ul)
 		"xor    $0xff,%rdi\n"
 		"syscall\n"
 	);
+#elif defined(__aarch64__)
+	/* exit(0xff) */
+	asm(
+		"mov    x0, #0xff\n"
+		"mov    w8, #0x5d\n"
+		"svc    #0x0\n"
+	);
 #else
 # warning Not supported CPU architecture yet.
 #endif
