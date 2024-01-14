@@ -531,8 +531,11 @@ share_lib:
 				 * TODO: How to get the real offset of load
 				 * maybe i can use /proc/PID/auxv to get it.
 				 */
-				if (sibling->pgoff == pgoff)
+				if (sibling->pgoff == pgoff) {
+					ldebug("Get %s voffset %lx\n",
+						vma->name_, phdr->p_vaddr);
 					sibling->voffset = phdr->p_vaddr;
+				}
 			}
 
 			FALLTHROUGH;
