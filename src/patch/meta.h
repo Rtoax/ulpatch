@@ -16,7 +16,7 @@
 
 #define SEC_ULPATCH_MAGIC	".ULPATCH"
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
-#define SEC_ULPATCH_INFO		".ulpatch.info"
+#define SEC_ULPATCH_INFO	".ulpatch.info"
 
 /* Use to check support version or not. */
 #define ULPATCH_FILE_VERSION	"1"
