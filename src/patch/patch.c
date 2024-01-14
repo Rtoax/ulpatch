@@ -309,9 +309,6 @@ static int parse_ulpatch_strtab(struct ulpatch_strtab *s, const char *strtab)
 	}
 
 	while (*(p++));
-	s->patch_type = p;
-
-	while (*(p++));
 	s->src_func = p;
 
 	while (*(p++));
@@ -397,16 +394,6 @@ int setup_load_info(struct load_info *info)
 	err = parse_ulpatch_strtab(&info->ulp_strtab, ulp_strtab);
 	if (err) {
 		lerror("Failed parse ulpatch_strtab.\n");
-		return -ENOENT;
-	}
-
-	/* Get patch type */
-	if (!strcmp(info->ulp_strtab.patch_type, ULPATCH_TYPE_PATCH_STR))
-		info->type = ULPATCH_TYPE_PATCH;
-	else if (!strcmp(info->ulp_strtab.patch_type, ULPATCH_TYPE_FTRACE_STR))
-		info->type = ULPATCH_TYPE_FTRACE;
-	else {
-		lerror("Unknown ulpatch type %s.\n", info->ulp_strtab.patch_type);
 		return -ENOENT;
 	}
 

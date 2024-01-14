@@ -10,5 +10,5 @@ void new_hello_world(void)
 	printf("Hello World from ulpatch.\n");
 }
 
-ULPATCH_INFO(ulpatch, new_hello_world, hello_world, "Rong Tao");
+ULPATCH_INFO(new_hello_world, hello_world, "Rong Tao");
 

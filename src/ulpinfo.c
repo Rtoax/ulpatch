@@ -101,7 +101,6 @@ int show_patch_info(void)
 
 	setup_load_info(&info);
 
-	fprintf(stdout, "\tType       : %d\n", info.type);
 	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
 	print_ulp_info(stdout, "\t", info.ulp_info);
 	fprintf(stdout, "\tBuildID    : %s\n", info.str_build_id);

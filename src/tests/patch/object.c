@@ -14,13 +14,12 @@
 
 /* see: root CMakeLists.txt */
 static const struct ulpatch_object {
-	enum patch_type type;
 	char *path;
 } ulpatch_objs[] = {
 	/* /usr/share/ulpatch/ftrace-mcount.obj */
-	{ULPATCH_TYPE_FTRACE,	ULPATCH_FTRACE_OBJ_PATH},
+	{ULPATCH_FTRACE_OBJ_PATH},
 	/* /usr/share/ulpatch/ulpatch-hello.obj */
-	{ULPATCH_TYPE_PATCH,	ULPATCH_HELLO_OBJ_PATH},
+	{ULPATCH_HELLO_OBJ_PATH},
 };
 
 
@@ -31,7 +30,6 @@ TEST(Object,	check_object,	0)
 	for (i = 0; i < ARRAY_SIZE(ulpatch_objs); i++) {
 
 		struct load_info info = {};
-		enum patch_type expect_type = ulpatch_objs[i].type;
 		char *obj = ulpatch_objs[i].path;
 		char *tmpfile = "copy.obj";
 
@@ -54,12 +52,6 @@ TEST(Object,	check_object,	0)
 			info.ulp_info->pad[3] != 4) {
 			fprintf(stderr, "Get wrong pad 0-3.\n");
 			return 0;
-		}
-
-		if (info.type != expect_type) {
-			fprintf(stderr, "Unknow patch type %d(expect %d).\n",
-				info.type, expect_type);
-			return -1;
 		}
 	}
 

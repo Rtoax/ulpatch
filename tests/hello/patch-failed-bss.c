@@ -13,4 +13,4 @@ void ulpatch_print_hello(unsigned long ul)
 {
 	static_i += 2;
 }
-ULPATCH_INFO(ulpatch, ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");

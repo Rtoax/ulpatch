@@ -72,8 +72,8 @@ unsigned long mcount_exit(long *retval)
 }
 
 #if defined(__x86_64__)
-ULPATCH_INFO(ulftrace, mcount, _ftrace_mcount, "Rong Tao");
+ULPATCH_INFO(mcount, _ftrace_mcount, "Rong Tao");
 #elif defined(__aarch64__)
-ULPATCH_INFO(ulftrace, _mcount, _ftrace_mcount, "Rong Tao");
+ULPATCH_INFO(_mcount, _ftrace_mcount, "Rong Tao");
 #endif
 

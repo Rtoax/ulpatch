@@ -18,32 +18,21 @@
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
 #define SEC_ULPATCH_INFO		".ulpatch.info"
 
-/* patch_type */
-enum patch_type {
-	ULPATCH_TYPE_UNKNOWN,
-	ULPATCH_TYPE_PATCH,
-	ULPATCH_TYPE_FTRACE,
-};
-#define ULPATCH_TYPE_FTRACE_STR	"ulftrace"
-#define ULPATCH_TYPE_PATCH_STR	"ulpatch"
-
 /* Use to check support version or not. */
 #define ULPATCH_FILE_VERSION	"1"
 
 /**
  * Every patch has this information, it's metadata for each patch.
  *
- * @patch_type: the Patch type, see ULPATCH_TYPE_PATCH, etc.
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
  */
-#define ULPATCH_INFO(patch_type, src_func, dst_func, author) \
+#define ULPATCH_INFO(src_func, dst_func, author) \
 __asm__ (	\
 	"	.pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
 	"ulpatch_strtab: \n"	\
 	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"	\
-	"	.string \"" #patch_type "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
 	"	.string \"" #dst_func "\" \n"	\
 	"	.string \"" author "\" \n"	\
@@ -64,7 +53,6 @@ __asm__ (	\
 /**
  * each element point each string in SEC_ULPATCH_STRTAB
  *
- * @patch_type patch type, see ULPATCH_TYPE_PATCH, etc.
  * @src_func source function
  * @dst_func destination function
  * @author Author of this patch
@@ -72,7 +60,6 @@ __asm__ (	\
 struct ulpatch_strtab {
 	/* Must be SEC_ULPATCH_MAGIC */
 	const char *magic;
-	const char *patch_type;
 	const char *src_func;
 	const char *dst_func;
 	const char *author;

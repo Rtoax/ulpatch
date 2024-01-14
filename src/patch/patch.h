@@ -48,7 +48,6 @@ struct load_info {
 	unsigned long symoffs, stroffs, init_typeoffs, core_typeoffs;
 
 	struct ulpatch_info *ulp_info;
-	enum patch_type type;
 	struct ulpatch_strtab ulp_strtab;
 	/* Store Build ID if exist. malloc, need free */
 	char *str_build_id;

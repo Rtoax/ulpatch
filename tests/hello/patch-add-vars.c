@@ -24,4 +24,4 @@ void ulpatch_print_hello(unsigned long ul)
 	for (i = 0; i < 3; i++)
 		printf("- %d -\n", i);
 }
-ULPATCH_INFO(ulpatch, ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");
