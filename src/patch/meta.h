@@ -31,7 +31,6 @@
 #define ULPATCH_INFO(src_func, dst_func, author) \
 __asm__ (	\
 	"	.pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
-	"ulpatch_strtab: \n"	\
 	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"	\
 	"	.string \"" #src_func "\" \n"	\
 	"	.string \"" #dst_func "\" \n"	\
