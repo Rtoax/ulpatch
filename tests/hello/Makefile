@@ -1,3 +1,5 @@
+CC = gcc
+LD = ld
 
 DHR_META=/usr/include/ulpatch/meta.h
 HAVE_INSTALLED=$(shell if [ -e ${DHR_META} ]; then echo YES; fi)
@@ -9,6 +11,7 @@ endif
 
 CFLAGS :=
 CFLAGS += -O0 -ggdb -g
+CFLAGS += -pthread
 
 TARGETS := hello
 
@@ -36,9 +39,7 @@ CFLAGS_hello := -g -ggdb -flto -pthread
 %.ulp: %.o
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	cp $(<) $(@).no-build-id
-	ld -relocatable -o $(@) --build-id=sha1 $(<)
-	#readelf --relocs $(@)
-	#readelf --syms $(@)
+	$(LD) -relocatable -o $(@) --build-id=sha1 $(<)
 
 $(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
