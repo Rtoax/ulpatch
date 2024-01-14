@@ -15,7 +15,7 @@
 
 
 const char *ulpatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,
-			unsigned long addr)
+				 unsigned long addr)
 {
 	return text_gen_insn(insn, INST_JMPQ, (void *)ip, (void *)addr);
 }
@@ -183,11 +183,9 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	return 0;
 
 invalid_relocation:
-	lerror(
-		"x86: Skipping invalid relocation target, "
+	lerror("x86: Skipping invalid relocation target, "
 		"existing value is nonzero for type %d, loc %p, val %lx\n",
 		(int)ELF64_R_TYPE(rel[i].r_info), loc, val);
-
 	return -ENOEXEC;
 
 overflow:

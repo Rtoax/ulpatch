@@ -19,8 +19,9 @@ enum aarch64_reloc_op {
 	RELOC_OP_PAGE,
 };
 
+
 static uint64_t do_reloc(enum aarch64_reloc_op reloc_op, uint32_t *place,
-				uint64_t val)
+			 uint64_t val)
 {
 	switch (reloc_op) {
 	case RELOC_OP_ABS:
@@ -37,8 +38,8 @@ static uint64_t do_reloc(enum aarch64_reloc_op reloc_op, uint32_t *place,
 	return 0;
 }
 
-
-static int reloc_data(enum aarch64_reloc_op op, void *place, uint64_t val, int len)
+static int reloc_data(enum aarch64_reloc_op op, void *place, uint64_t val,
+		      int len)
 {
 	int64_t sval = do_reloc(op, place, val);
 
@@ -104,7 +105,8 @@ enum aarch64_insn_movw_imm_type {
 };
 
 static int reloc_insn_movw(enum aarch64_reloc_op op, uint32_t *place,
-	uint64_t val, int lsb, enum aarch64_insn_movw_imm_type imm_type)
+			   uint64_t val, int lsb,
+			   enum aarch64_insn_movw_imm_type imm_type)
 {
 	uint64_t imm;
 	int64_t sval;
@@ -144,9 +146,9 @@ static int reloc_insn_movw(enum aarch64_reloc_op op, uint32_t *place,
 	return 0;
 }
 
-
-static __unused int reloc_insn_imm(enum aarch64_reloc_op op, uint32_t *place,
-	uint64_t val, int lsb, int len, enum aarch64_insn_imm_type imm_type)
+static int reloc_insn_imm(enum aarch64_reloc_op op, uint32_t *place,
+			  uint64_t val, int lsb, int len,
+			  enum aarch64_insn_imm_type imm_type)
 {
 	uint64_t imm, imm_mask;
 	int64_t sval;
@@ -191,11 +193,12 @@ static int reloc_insn_adrp(Elf64_Shdr *sechdrs,
 }
 
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-	const char *strtab, unsigned int symindex, unsigned int relsec)
+		       const char *strtab, unsigned int symindex,
+		       unsigned int relsec)
 {
 	unsigned int i;
-	int __unused ovf;
-	bool __unused overflow_check;
+	int ovf;
+	bool overflow_check;
 	Elf64_Sym *sym;
 	void *loc;
 	uint64_t val;
@@ -205,7 +208,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 	/* sh_addr now point to target process address space, so need to
 	 * relocate to current process. */
-	Elf64_Rela __unused *rel = (void *)sechdrs[relsec].sh_addr + t_off;
+	Elf64_Rela *rel = (void *)sechdrs[relsec].sh_addr + t_off;
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 		/* This is where to make the change, so, here need to relocate
@@ -391,13 +394,10 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		case R_AARCH64_CALL26:
 			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 26,
 					     AARCH64_INSN_IMM_26);
-
 			if (ovf == -ERANGE) {
 				lerror("Out of rang.\n");
 			}
 			break;
-
-		// TODO:
 
 		default:
 			lerror("unsupported RELA relocation: %lu\n",
