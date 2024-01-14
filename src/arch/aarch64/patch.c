@@ -216,8 +216,8 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		/* This is the symbol it is referring to.  Note that all
 		 * undefined symbols have been resolved. */
-		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off
-			+ ELF64_R_SYM(rel[i].r_info));
+		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off)
+			+ ELF64_R_SYM(rel[i].r_info);
 
 		ldebug("type %d st_value %lx r_addend %lx loc %lx\n",
 			(int)ELF64_R_TYPE(rel[i].r_info),
