@@ -19,6 +19,7 @@ TARGETS_ULP += patch-asm-puts.ulp
 TARGETS_ULP += patch-asm-print.ulp
 TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
+TARGETS_ULP += patch-pthread.ulp
 
 CFLAGS += -D__ULP_DEV
 
