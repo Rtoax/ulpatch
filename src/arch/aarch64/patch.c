@@ -180,6 +180,16 @@ static __unused int reloc_insn_imm(enum aarch64_reloc_op op, uint32_t *place,
 	return 0;
 }
 
+/**
+ * See same name function in kernel source code.
+ */
+static int reloc_insn_adrp(Elf64_Shdr *sechdrs,
+			   uint32_t *place, uint64_t val)
+{
+	return reloc_insn_imm(RELOC_OP_PAGE, place, val, 12, 21,
+			      AARCH64_INSN_IMM_ADR);
+}
+
 int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	const char *strtab, unsigned int symindex, unsigned int relsec)
 {
@@ -333,6 +343,15 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 					     AARCH64_INSN_IMM_ADR);
 			break;
 
+		case R_AARCH64_ADR_PREL_PG_HI21_NC:
+			overflow_check = false;
+		case R_AARCH64_ADR_PREL_PG_HI21:
+			/* ADRP ins */
+			ovf = reloc_insn_adrp(sechdrs, loc, val);
+			if (ovf && ovf != -ERANGE)
+				return ovf;
+			break;
+
 		case R_AARCH64_ADD_ABS_LO12_NC:
 		case R_AARCH64_LDST8_ABS_LO12_NC:
 			overflow_check = false;
@@ -377,11 +396,6 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 				lerror("Out of rang.\n");
 			}
 			break;
-
-		case R_AARCH64_ADR_PREL_PG_HI21_NC:
-			overflow_check = false;
-		case R_AARCH64_ADR_PREL_PG_HI21:
-			/* ADRP ins */
 
 		// TODO:
 
