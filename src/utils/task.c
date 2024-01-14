@@ -657,21 +657,12 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 
 		addr = vma->vm_start + (off - vma->voffset);
 
-		ldebug("SYMBOL %s addr %lx\n", sym->name, addr);
-#if defined(__aarch64__)
-	/**
-	 * Kernel will load binary into memory, and set the program header to
-	 * auxv_phdr. Thus, we must fix the offset of VMA_SELF's symbol.
-	 */
 	} else if (vma_leader->type == VMA_SELF) {
-		struct task_struct *task = sym->vma->task;
-		struct task_struct_auxv *auxv = &task->auxv;
-		unsigned long phoff = vma_leader->vma_elf->ehdr.e_phoff;
-		addr = sym->sym.st_value + auxv->auxv_phdr - phoff;
-#endif
+		addr = sym->sym.st_value + vma_leader->vma_elf->load_offset;
 	} else
 		addr = sym->sym.st_value;
 
+	ldebug("Get symbol %s addr %lx\n", sym->name, addr);
 	return addr;
 }
 
