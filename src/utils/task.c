@@ -1024,6 +1024,8 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 		vma->name_);
 
 	if (detail) {
+		if (fp == stdout || fp == stderr)
+			fprintf(fp, "\033[2m");
 		if (vma->vma_elf) {
 			fprintf(fp, "%10s  load_offset = 0x%lx\n", "",
 				vma->vma_elf->load_offset);
@@ -1037,6 +1039,8 @@ void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
 			}
 		}
 		/* Add more information here */
+		if (fp == stdout || fp == stderr)
+			fprintf(fp, "\033[0m");
 	}
 }
 
