@@ -84,6 +84,17 @@ AT_BASE  0x7ff11afbb000
 AT_ENTRY 0x401090
 ```
 
+There are two different situation. The first is the `p_vaddr != 0`, then the min address of `PT_LOAD` equal to `p_vaddr`.
+
+For example `print_hello`:
+
+```
+maps:	0x0000000000400000
+ELF:	0x00000000004011cb
+GDB:	0x00000000004011cb
+```
+
+
 ## Example 2: on aarch64
 
 The `PT_LOAD` in ELF file:
