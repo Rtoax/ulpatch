@@ -474,7 +474,9 @@ static int rewrite_section_headers(struct load_info *info)
 
 		if ((shdr->sh_type == SHT_NOBITS || !strcmp(name, ".bss"))
 		     && shdr->sh_size > 0) {
-			lerror("Not support uninitialized variable yet.\n");
+			lerror("Not support uninitialized variable yet.\n"
+			       "Or you can just initial global variables "
+			       "with non-zero value.\n");
 			return -EFAULT;
 		}
 

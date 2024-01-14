@@ -9,8 +9,8 @@
 
 extern void internal_print_hello(unsigned long ul);
 
-int created = false;
-pthread_t thread = { 0 };
+int not_created = true;
+pthread_t thread = { 1 };
 
 void *routine(void *arg)
 {
@@ -22,9 +22,9 @@ void *routine(void *arg)
 
 void ulpatch_print_hello_print(unsigned long ul)
 {
-	if (!created) {
+	if (not_created) {
 		printf("Hello World. Patched\n");
-		created = true;
+		not_created = false;
 		pthread_create(&thread, NULL, routine, NULL);
 	}
 	internal_print_hello(ul);
