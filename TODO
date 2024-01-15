@@ -1,4 +1,5 @@
 - Some symbols will be optimized out.
+- Maybe we could use dlopen/dlsym to map ulpatch file.
 - support Qemu
 - support multi-thread and make each thread safety.
 - Add ulpatches that already patched symbols to task symbols.
