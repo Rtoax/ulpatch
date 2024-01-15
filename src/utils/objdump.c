@@ -22,7 +22,7 @@
 
 enum sym_type {
 	S_T_PLT, /* @plt */
-	S_T_MUM,
+	S_T_NUM,
 };
 
 struct objdump_elf_file {
@@ -45,7 +45,7 @@ struct objdump_elf_file {
 	/* head is file_list */
 	struct list_head node;
 
-	struct rb_root rb_tree_syms[S_T_MUM];
+	struct rb_root rb_tree_syms[S_T_NUM];
 };
 
 struct objdump_symbol {
@@ -71,7 +71,6 @@ static struct objdump_elf_file* file_already_load(const char *filename)
 			break;
 		}
 	}
-
 	return ret;
 }
 
@@ -238,8 +237,7 @@ static const char* asymbol_pure_name(asymbol *sym, char *buf, int blen)
 	return buf;
 }
 
-static inline bool
-_startswith(const char *str, const char *prefix)
+static inline bool _startswith(const char *str, const char *prefix)
 {
 	return strncmp(str, prefix, strlen(prefix)) == 0;
 }
@@ -412,7 +410,8 @@ int objdump_elf_close(struct objdump_elf_file *file)
 }
 
 
-static void rb_free_sym(struct rb_node *node) {
+static void __rb_free_sym(struct rb_node *node)
+{
 	struct objdump_symbol *s = rb_entry(node, struct objdump_symbol, node);
 	free_sym(s);
 }
@@ -427,8 +426,8 @@ int objdump_destroy(void)
 		list_del(&f->node);
 
 		/* Destroy all type symbols rb tree */
-		for (i = 0; i < S_T_MUM; i++)
-			rb_destroy(&f->rb_tree_syms[i], rb_free_sym);
+		for (i = 0; i < S_T_NUM; i++)
+			rb_destroy(&f->rb_tree_syms[i], __rb_free_sym);
 
 		free(f);
 	}
