@@ -36,7 +36,7 @@ TEST(Task,	open_free,	0)
 TEST(Task,	open_free_fto_flags,	0)
 {
 	int ret = 0;
-	char buffer[BUFFER_SIZE];
+	char buffer[PATH_MAX];
 
 	struct task_struct *task = open_task(getpid(), FTO_ALL);
 
@@ -45,20 +45,20 @@ TEST(Task,	open_free_fto_flags,	0)
 	}
 
 	/* ROOT_DIR/PID */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
 	/* ROOT_DIR/PID/TASK_PROC_COMM */
-	snprintf(buffer, BUFFER_SIZE - 1,
+	snprintf(buffer, PATH_MAX - 1,
 		ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
 	/* ROOT_DIR/PID/patches */
-	snprintf(buffer, BUFFER_SIZE - 1,
+	snprintf(buffer, PATH_MAX - 1,
 		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;

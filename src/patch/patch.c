@@ -80,28 +80,29 @@ void release_load_info(struct load_info *info)
 }
 
 /* ULPatch is single thread, thus, this api is ok. */
-static char* make_pid_objname_unsafe(pid_t pid)
+static char *make_pid_objname(pid_t pid, char *buf, size_t buf_len)
 {
-	static char name[BUFFER_SIZE];
-	char buffer1[BUFFER_SIZE];
+	char buffer1[PATH_MAX];
 	const char *s;
 	int ret;
 
 make:
 	/* make patch-XXXXXX temp file name */
-	s = fmktempname(buffer1, BUFFER_SIZE, PATCH_VMA_TEMP_PREFIX "XXXXXX");
+	s = fmktempname(buffer1, PATH_MAX, PATCH_VMA_TEMP_PREFIX "XXXXXX");
 	if (!s)
 		goto make;
 
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems like:
-	 * /tmp/ulpatch/5465/map_files/patch-AbIRYY */
-	ret = snprintf(name, BUFFER_SIZE - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
+	/**
+	 * Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems like:
+	 * /tmp/ulpatch/5465/map_files/patch-AbIRYY
+	 */
+	ret = snprintf(buf, buf_len - 1,
+			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
 	if (ret <= 0)
 		/* try again */
 		goto make;
 
-	return name;
+	return buf;
 }
 
 static int __chk_load_info_len(struct load_info *info)
@@ -117,7 +118,7 @@ static int __chk_load_info_len(struct load_info *info)
 
 /* see linux:kernel/module.c */
 int alloc_patch_file(const char *obj_from, const char *obj_to,
-			struct load_info *info)
+		     struct load_info *info)
 {
 	int err = 0;
 
@@ -859,6 +860,9 @@ free_copy:
 int init_patch(struct task_struct *task, const char *obj_file)
 {
 	int err;
+	char buffer[PATH_MAX];
+	char *obj_to;
+
 	struct load_info info = {
 		.target_task = task,
 	};
@@ -868,7 +872,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 		return -1;
 	}
 
-	const char *obj_to = make_pid_objname_unsafe(task->pid);
+	obj_to = make_pid_objname(task->pid, buffer, sizeof(buffer));
 
 	err = alloc_patch_file(obj_file, obj_to, &info);
 	if (err) {

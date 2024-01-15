@@ -1357,10 +1357,10 @@ struct task_struct *open_task(pid_t pid, int flag)
 	/* Create a directory under ROOT_DIR */
 	if (flag & FTO_PROC) {
 		FILE *fp;
-		char buffer[BUFFER_SIZE];
+		char buffer[PATH_MAX];
 
 		/* ROOT_DIR/PID */
-		snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+		snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
@@ -1373,7 +1373,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		fclose(fp);
 
 		/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-		snprintf(buffer, BUFFER_SIZE - 1,
+		snprintf(buffer, PATH_MAX - 1,
 			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
@@ -1435,17 +1435,17 @@ static void rb_free_symbol(struct rb_node *node)
 
 static void __unused clean_task_proc(struct task_struct *task)
 {
-	char buffer[BUFFER_SIZE];
+	char buffer[PATH_MAX];
 
 	/* ROOT_DIR/PID/TASK_PROC_COMM */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/" TASK_PROC_COMM,
+	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d/" TASK_PROC_COMM,
 		 task->pid);
 	if (unlink(buffer) != 0)
 		lerror("unlink(%s) for %d:%s failed, %s.\n",
 			buffer, task->pid, task->exe, strerror(errno));
 
 	/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
+	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
 		 task->pid);
 	/**
 	 * If process patched, we should not remove the proc directory,
@@ -1456,7 +1456,7 @@ static void __unused clean_task_proc(struct task_struct *task)
 			task->exe, strerror(errno));
 
 	/* ROOT_DIR/PID */
-	snprintf(buffer, BUFFER_SIZE - 1, ROOT_DIR "/%d", task->pid);
+	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
 	if (rmdir(buffer) != 0)
 		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
 			task->exe, strerror(errno));

@@ -102,12 +102,12 @@ TEST(File,	ftype_ELF,	0)
 TEST(File,	fmktempfile,	0)
 {
 	int err = 0;
-	char buffer[BUFFER_SIZE];
+	char buffer[PATH_MAX];
 
 	char *name;
 
 	/* Create /tmp/xxx file */
-	name = fmktempfile(buffer, BUFFER_SIZE, NULL);
+	name = fmktempfile(buffer, PATH_MAX, NULL);
 	if (!name)
 		err = -1;
 	linfo("fmktempfile: %s\n", name);
@@ -118,7 +118,7 @@ TEST(File,	fmktempfile,	0)
 	unlink(name);
 
 	/* Create /tmp/patch-xxx file */
-	name = fmktempfile(buffer, BUFFER_SIZE, "patch-XXXXXX");
+	name = fmktempfile(buffer, PATH_MAX, "patch-XXXXXX");
 	if (!name)
 		err = -1;
 	linfo("fmktempfile: %s\n", name);
@@ -133,16 +133,16 @@ TEST(File,	fmktempfile,	0)
 TEST(File,	fmktempname,	0)
 {
 	int err = 0;
-	char buffer[BUFFER_SIZE];
+	char buffer[PATH_MAX];
 
 	char *name;
 
-	name = fmktempname(buffer, BUFFER_SIZE, NULL);
+	name = fmktempname(buffer, PATH_MAX, NULL);
 	if (!name)
 		err = -1;
 	linfo("fmktempname: %s\n", name);
 
-	name = fmktempname(buffer, BUFFER_SIZE, "patch-XXXXXX");
+	name = fmktempname(buffer, PATH_MAX, "patch-XXXXXX");
 	if (!name)
 		err = -1;
 	linfo("fmktempname: %s\n", name);
