@@ -75,8 +75,8 @@ static struct objdump_elf_file* file_already_load(const char *filename)
 	return ret;
 }
 
-// the @key is (unsigned long)objdump_elf_file
-static __unused inline int cmp_sym(struct rb_node *n1, unsigned long key)
+/* the @key is (unsigned long)objdump_elf_file */
+static inline int cmp_sym(struct rb_node *n1, unsigned long key)
 {
 	struct objdump_symbol *s1 = rb_entry(n1, struct objdump_symbol, node);
 	struct objdump_symbol *s2 = (struct objdump_symbol*)key;
@@ -84,8 +84,8 @@ static __unused inline int cmp_sym(struct rb_node *n1, unsigned long key)
 	return strcmp(s1->name, s2->name);
 }
 
-static __unused struct objdump_symbol *
-alloc_sym(const char *name, unsigned long addr, enum sym_type type)
+static struct objdump_symbol *alloc_sym(const char *name, unsigned long addr,
+					enum sym_type type)
 {
 	struct objdump_symbol *s = malloc(sizeof(struct objdump_symbol));
 
@@ -98,45 +98,41 @@ alloc_sym(const char *name, unsigned long addr, enum sym_type type)
 	return s;
 }
 
-static __unused void free_sym(struct objdump_symbol *s)
+static void free_sym(struct objdump_symbol *s)
 {
 	free(s->name);
 	free(s);
 }
 
-static __unused struct objdump_symbol *
-find_sym(struct rb_root *root, const char *name)
+static struct objdump_symbol *find_sym(struct rb_root *root, const char *name)
 {
 	struct objdump_symbol tmp = {
 		.name = (char *)name,
 	};
-	struct rb_node *node = rb_search_node(root,
-						cmp_sym, (unsigned long)&tmp);
+	struct rb_node *node = rb_search_node(root, cmp_sym,
+					(unsigned long)&tmp);
 
 	return node?rb_entry(node, struct objdump_symbol, node):NULL;
 }
 
 /* Insert OK, return 0, else return -1 */
-static __unused int link_sym(struct rb_root *root, struct objdump_symbol *s)
+static int link_sym(struct rb_root *root, struct objdump_symbol *s)
 {
 	struct rb_node *node = rb_insert_node(root, &s->node,
 						cmp_sym, (unsigned long)s);
 	return node?-1:0;
 }
 
-static __unused struct objdump_symbol*
-next_sym(struct rb_root *root, struct objdump_symbol *prev)
+static struct objdump_symbol *next_sym(struct rb_root *root,
+				       struct objdump_symbol *prev)
 {
 	struct rb_node *next;
-
 	next = prev ? rb_next(&prev->node) : rb_first(root);
-
 	return next ? rb_entry(next, struct objdump_symbol, node) : NULL;
 }
 
-struct objdump_symbol*
-objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
-		struct objdump_symbol *prev)
+struct objdump_symbol *objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
+						   struct objdump_symbol *prev)
 {
 	return next_sym(&file->rb_tree_syms[S_T_PLT], prev);
 }
