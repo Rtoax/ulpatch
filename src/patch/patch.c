@@ -422,25 +422,6 @@ int setup_load_info(struct load_info *info)
 	return 0;
 }
 
-/* Additional bytes needed by arch in front of individual sections */
-unsigned int __weak arch_mod_section_prepend(unsigned int section)
-{
-	/* default implementation just returns zero */
-	return 0;
-}
-
-/* Update size with this section: return offset. */
-static long __unused get_offset(unsigned int *size, GElf_Shdr *sechdr,
-		unsigned int section)
-{
-	long ret;
-
-	*size += arch_mod_section_prepend(section);
-	ret = ALIGN(*size, sechdr->sh_addralign ?: 1);
-	*size = ret + sechdr->sh_size;
-	return ret;
-}
-
 static int rewrite_section_headers(struct load_info *info)
 {
 	unsigned int i;
@@ -469,17 +450,6 @@ static int rewrite_section_headers(struct load_info *info)
 
 		/**
 		 * Update sh_addr to point to target task address space.
-		 *
-		 *  +---+
-		 *  |   | <--- hdr(current task), target_hdr(target task)
-		 *  |   |
-		 *  |   |
-		 *  |   |   shdr->sh_offset
-		 *  |   |
-		 *  |   |
-		 *  |   | <--- shdr->sh_addr
-		 *  |   |
-		 *  +---+
 		 */
 		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
 
@@ -537,16 +507,20 @@ unsigned long arch_jmp_table_jmp(void)
  *
  * @return: 0-failed
  */
-static const unsigned long
-resolve_symbol(const struct task_struct *task, const char *name)
+static const unsigned long resolve_symbol(const struct task_struct *task,
+					  const char *name)
 {
 	const struct symbol *sym = NULL;
 	unsigned long addr = 0;
 
-	if (!task)
+	if (!task || !name) {
+		errno = -EINVAL;
 		return 0;
+	}
 
-	/* try find symbol in SELF */
+	/**
+	 * Try find symbol in SELF
+	 */
 	if (task->fto_flag & FTO_SELF) {
 		sym = find_symbol(task->exe_elf, name);
 		if (sym) {
@@ -555,19 +529,21 @@ resolve_symbol(const struct task_struct *task, const char *name)
 				goto found;
 		}
 	}
-
 	ldebug("Not found %s in self ELF.\n", name);
 
-	/* try find symbol address from @plt */
+	/**
+	 * Try find symbol address from @plt
+	 */
 	if (task->fto_flag & FTO_SELF_PLT) {
 		addr = objdump_elf_plt_symbol_address(task->objdump, name);
 		if (addr)
 			goto found;
 	}
-
 	ldebug("Not found %s in @plt.\n", name);
 
-	/* try find symbol in libc.so */
+	/**
+	 * Try find symbol in libc.so
+	 */
 	if (!sym && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
 		if (sym) {
@@ -576,11 +552,12 @@ resolve_symbol(const struct task_struct *task, const char *name)
 				goto found;
 		}
 	}
-
 	ldebug("Not found %s in libc.\n", name);
 
-	/* try find symbol in other libraries mapped in target process address
-	 * space */
+	/**
+	 * Try find symbol in other libraries mapped in target process address
+	 * space.
+	 */
 	if (!sym && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
 		sym = task_vma_find_symbol((struct task_struct *)task, name);
 		if (sym) {
@@ -772,7 +749,7 @@ static int kick_target_process(const struct load_info *info)
 	unsigned long target_hdr = info->target_hdr;
 	size_t insn_sz = 0;
 
-	const char __unused *new_insn = NULL;
+	const char *new_insn = NULL;
 	struct jmp_table_entry jmp_entry;
 	jmp_entry.jmp = arch_jmp_table_jmp();
 	jmp_entry.addr = info->ulp_info->patch_func_addr;
