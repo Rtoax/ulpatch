@@ -10,6 +10,7 @@ ULPatch is open source user space live patch tool.
 
 - [ ] `x86_64`: ready to go
 - [ ] `aarch64`: ready to go
+- [ ] `loongarch64`: ready to go
 
 
 # Theroy
