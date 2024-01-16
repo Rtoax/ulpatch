@@ -1,10 +1,17 @@
+
+# Now
+
 - Some symbols will be optimized out.
-- Maybe we could use dlopen/dlsym to map ulpatch file.
 - support Qemu
 - support multi-thread and make each thread safety.
 - Add ulpatches that already patched symbols to task symbols.
 - Support uninitialized variable yet, see '.bss' 'SHT_NOBITS'
 - ULPatch VMA better isn't file map
+
+
+# Further
+
+- Maybe we could use dlopen/dlsym to map ulpatch file.
 - Anon vma for each patch and use prctl(2)(CONFIG_ANON_VMA_NAME) set vma's name.
 - How to patch to strip ELF process.
 - loongarch64 support.
