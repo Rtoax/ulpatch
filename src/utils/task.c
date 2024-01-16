@@ -1299,8 +1299,10 @@ struct task_struct *open_task(pid_t pid, int flag)
 {
 	struct task_struct *task = NULL;
 	int memfd;
+	int o_flags;
 
-	memfd = open_pid_mem_rw(pid);
+	o_flags = flag & FTO_RDWR ? O_RDWR : O_RDONLY;
+	memfd = __open_pid_mem(pid, o_flags);
 	if (memfd <= 0)
 		return NULL;
 

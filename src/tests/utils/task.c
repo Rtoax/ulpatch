@@ -205,7 +205,7 @@ TEST(Task,	copy_to_task,	0)
 	int ret = 0;
 	int n;
 
-	struct task_struct *task = open_task(getpid(), FTO_NONE);
+	struct task_struct *task = open_task(getpid(), FTO_RDWR);
 
 	n = memcpy_to_task(task, (unsigned long)buf, data, strlen(data) + 1);
 	ldebug("memcpy_to_task: %s\n", buf);
@@ -248,7 +248,7 @@ TEST(Task,	mmap_malloc,	0)
 
 		task_wait_wait(&waitqueue);
 
-		struct task_struct *task = open_task(pid, FTO_NONE);
+		struct task_struct *task = open_task(pid, FTO_RDWR);
 
 		// dump_task_vmas(task, true);
 
@@ -306,7 +306,7 @@ TEST(Task,	fstat,	0)
 		int remote_fd, local_fd;
 		struct stat stat = {};
 		struct stat statbuf = {};
-		struct task_struct *task = open_task(pid, FTO_NONE);
+		struct task_struct *task = open_task(pid, FTO_RDWR);
 		char *filename = "/usr/bin/ls";
 
 		ret = task_attach(pid);
@@ -415,7 +415,7 @@ static int task_mmap_file(int prot)
 
 		task_wait_wait(&waitqueue);
 
-		struct task_struct *task = open_task(pid, FTO_NONE);
+		struct task_struct *task = open_task(pid, FTO_RDWR);
 
 		dump_task_vmas(task, true);
 
@@ -475,7 +475,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 
 		task_wait_wait(&waitqueue);
 
-		struct task_struct *task = open_task(pid, FTO_NONE);
+		struct task_struct *task = open_task(pid, FTO_RDWR);
 
 		// dump_task_vmas(task, true);
 

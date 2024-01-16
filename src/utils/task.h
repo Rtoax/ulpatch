@@ -148,6 +148,7 @@ struct thread {
  * @FTO_SELF_PLT load elf file's @plt symbol address value by objdump.
  *                 ftrace/patch will need those @plt address value.
  * @FTO_THREADS open /proc/PID/task/ and record it.
+ * @FTO_RDWR Open task with read and write permission, otherwise readonly.
  */
 #define FTO_NONE	0x0
 #define FTO_SELF	BIT(0)
@@ -158,11 +159,12 @@ struct thread {
 #define FTO_VMA_ELF_SYMBOLS	(BIT(5) | FTO_VMA_ELF | FTO_SELF)
 #define FTO_SELF_PLT	BIT(6)
 #define FTO_THREADS	BIT(7)
+#define FTO_RDWR	BIT(8)
 
 #define FTO_ALL 0xffffffff
 
 #define FTO_ULFTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS \
-					| FTO_SELF_PLT | FTO_THREADS)
+				| FTO_SELF_PLT | FTO_THREADS | FTO_RDWR)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
 /* under ROOT_DIR/PID/ */
