@@ -42,15 +42,25 @@ int open_pid_maps(pid_t pid)
 	return ret;
 }
 
-int open_pid_mem(pid_t pid)
+static int __open_pid_mem(pid_t pid, int flags)
 {
 	char mem[] = "/proc/1234567890/mem";
 	snprintf(mem, sizeof(mem), "/proc/%d/mem", pid);
-	int memfd = open(mem, O_RDWR);
+	int memfd = open(mem, flags);
 	if (memfd <= 0) {
 		lerror("open %s failed. %s\n", mem, strerror(errno));
 	}
 	return memfd;
+}
+
+int open_pid_mem_ro(pid_t pid)
+{
+	return __open_pid_mem(pid, O_RDONLY);
+}
+
+int open_pid_mem_rw(pid_t pid)
+{
+	return __open_pid_mem(pid, O_RDWR);
 }
 
 struct vma_struct *alloc_vma(struct task_struct *task)
@@ -1290,7 +1300,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	struct task_struct *task = NULL;
 	int memfd;
 
-	memfd = open_pid_mem(pid);
+	memfd = open_pid_mem_rw(pid);
 	if (memfd <= 0)
 		return NULL;
 

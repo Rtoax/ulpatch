@@ -241,7 +241,8 @@ struct task_struct {
 
 
 int open_pid_maps(pid_t pid);
-int open_pid_mem(pid_t pid);
+int open_pid_mem_ro(pid_t pid);
+int open_pid_mem_rw(pid_t pid);
 
 bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);

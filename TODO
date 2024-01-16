@@ -1,6 +1,7 @@
 
 # Now
 
+- ultask open /proc/PID/mem read only, add FTO_RDONLY maybe.
 - Some symbols will be optimized out.
 - support Qemu
 - support multi-thread and make each thread safety.
