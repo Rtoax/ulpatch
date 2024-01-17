@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 
 	set_log_level(config.log_level);
 
-	target_task = open_task(target_pid, FTO_ALL);
+	target_task = open_task(target_pid, FTO_ALL & ~FTO_RDWR);
 	if (!target_task) {
 		fprintf(stderr, "open pid %d failed. %s\n", target_pid, strerror(errno));
 		return 1;

@@ -116,7 +116,7 @@ int show_task_patch_info(pid_t pid)
 	struct task_struct *task;
 	struct vma_ulp *ulp, *tmpulp;
 
-	task = open_task(pid, FTO_ALL);
+	task = open_task(pid, FTO_ALL & ~FTO_RDWR);
 	if (!task) {
 		lerror("Open pid=%d task failed.\n", pid);
 		return -ENOENT;
