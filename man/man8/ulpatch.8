@@ -52,6 +52,7 @@ More to see the documentations in ulpatch source code tree.
 #define __ULP_DEV 1
 #endif
 #include <ulpatch/meta.h>
+
 void ulpatch_print_hello_exit(void)
 {
 	printf("Patched.\n");
@@ -59,7 +60,9 @@ void ulpatch_print_hello_exit(void)
 ULPATCH_INFO(ulpatch_print_hello_exit, print_hello, "Rong Tao");
 .EE
 .\" SRC END
-
+.SH LINKS
+.SS aarch64 relocations
+https://docslib.org/doc/4448214/elf-for-the-arm-64-bit-architecture-aarch64
 .SH OS
 Linux
 .SH STABILITY
