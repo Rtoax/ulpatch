@@ -163,8 +163,12 @@ struct thread {
 
 #define FTO_ALL 0xffffffff
 
-#define FTO_ULFTRACE	(FTO_PROC | FTO_PATCH | FTO_VMA_ELF_SYMBOLS \
-				| FTO_SELF_PLT | FTO_THREADS | FTO_RDWR)
+#define FTO_ULFTRACE	(FTO_PROC | \
+			FTO_PATCH | \
+			FTO_VMA_ELF_SYMBOLS | \
+			FTO_SELF_PLT | \
+			FTO_THREADS | \
+			FTO_RDWR)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
 /* under ROOT_DIR/PID/ */
