@@ -206,19 +206,25 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	/* See x86_64 for t_off's meaning */
 	long t_off = (long)info->hdr - (long)info->target_hdr;
 
-	/* sh_addr now point to target process address space, so need to
-	 * relocate to current process. */
+	/**
+	 * sh_addr now point to target process address space, so need to
+	 * relocate to current process.
+	 */
 	Elf64_Rela *rel = (void *)sechdrs[relsec].sh_addr + t_off;
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change, so, here need to relocate
+		/**
+		 * This is where to make the change, so, here need to relocate
 		 * to current process address space (use info->target_hdr and
-		 * info->hdr) */
+		 * info->hdr)
+		 */
 		loc = (void *)(sechdrs[sechdrs[relsec].sh_info].sh_addr + t_off
 			+ rel[i].r_offset);
 
-		/* This is the symbol it is referring to.  Note that all
-		 * undefined symbols have been resolved. */
+		/**
+		 * This is the symbol it is referring to.  Note that all
+		 * undefined symbols have been resolved.
+		 */
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off)
 			+ ELF64_R_SYM(rel[i].r_info);
 
@@ -228,9 +234,6 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		val = sym->st_value + rel[i].r_addend;
 
-		/* HOWTO relocate
-		 * ref: https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/6n33n7fct/index.html
-		 */
 		switch (ELF64_R_TYPE(rel[i].r_info)) {
 		/* Null relocations. */
 #if R_AARCH64_NONE != R_ARM_NONE
