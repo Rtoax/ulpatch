@@ -42,6 +42,8 @@ static bool flag_list_symbols = false;
 static bool flag_print_threads = false;
 static bool flag_print_auxv = false;
 static const char *output_file = NULL;
+/* Default: read only */
+static bool flag_rdonly = true;
 
 static struct task_struct *target_task = NULL;
 
@@ -126,9 +128,11 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_FILE_MAP_TO_VMA:
 			map_file = optarg;
+			flag_rdonly = false;
 			break;
 		case ARG_FILE_UNMAP_FROM_VMA:
 			flag_unmap_vma = true;
+			flag_rdonly = false;
 			vma_addr = strtoull(optarg, NULL, 16);
 			break;
 		case ARG_LIST_SYMBOLS:
@@ -293,13 +297,18 @@ static void list_all_symbol(void)
 
 int main(int argc, char *argv[])
 {
+	int flags = FTO_ALL;
+
 	parse_config(argc, argv);
 
 	ulpatch_env_init();
 
 	set_log_level(config.log_level);
 
-	target_task = open_task(target_pid, FTO_ALL & ~FTO_RDWR);
+	if (flag_rdonly)
+		flags &= ~FTO_RDWR;
+
+	target_task = open_task(target_pid, flags);
 	if (!target_task) {
 		fprintf(stderr, "open pid %d failed. %s\n", target_pid, strerror(errno));
 		return 1;
