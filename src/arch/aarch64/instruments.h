@@ -7,11 +7,9 @@
 
 #include <utils/compiler.h>
 
-
 /* A64 instructions are always 32 bits. */
 #define	AARCH64_INSN_SIZE		4
 #define BL_INSN_SIZE AARCH64_INSN_SIZE
-
 
 #define INST_SYSCALL    0x01, 0x00, 0x00, 0xd4  /*0xd4000001 svc #0  = syscall*/
 #define INST_INT3       0xa0, 0x00, 0x20, 0xd4  /*0xd42000a0 brk #5  = int3*/
@@ -173,18 +171,17 @@ __AARCH64_INSN_FUNCS(pssbb,	0xFFFFFFFF, 0xD503349F)
 
 #undef	__AARCH64_INSN_FUNCS
 
-
 struct task_struct;
 
 int aarch64_insn_read(struct task_struct *task, unsigned long addr, uint32_t *insnp);
 int aarch64_insn_write(struct task_struct *task, unsigned long addr, uint32_t insn);
 
 uint64_t aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type,
-			uint32_t insn);
+				       uint32_t insn);
 uint32_t aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
-			uint32_t insn, uint64_t imm);
+				       uint32_t insn, uint64_t imm);
 uint32_t aarch64_insn_gen_branch_imm(unsigned pc, unsigned long addr,
-				enum aarch64_insn_branch_type type);
+				     enum aarch64_insn_branch_type type);
 
 uint32_t aarch64_func_bl_offset(void *func);
 

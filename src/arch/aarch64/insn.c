@@ -9,12 +9,12 @@
 #include "instruments.h"
 #include "debug-monitors.h"
 
-
 /*
  * In ARMv8-A, A64 instructions have a fixed length of 32 bits and are always
  * little-endian.
  */
-int aarch64_insn_read(struct task_struct *task, unsigned long addr, uint32_t *insnp)
+int aarch64_insn_read(struct task_struct *task, unsigned long addr,
+		      uint32_t *insnp)
 {
 	int ret;
 	uint32_t val;
@@ -26,7 +26,8 @@ int aarch64_insn_read(struct task_struct *task, unsigned long addr, uint32_t *in
 	return ret?0:-1;
 }
 
-int aarch64_insn_write(struct task_struct *task, unsigned long addr, uint32_t insn)
+int aarch64_insn_write(struct task_struct *task, unsigned long addr,
+		       uint32_t insn)
 {
 	uint32_t *tp = (uint32_t *)addr;
 	int ret;
@@ -42,12 +43,12 @@ int aarch64_insn_write(struct task_struct *task, unsigned long addr, uint32_t in
 		//		     (uintptr_t)tp + AARCH64_INSN_SIZE);
 	}
 
-	return ret?0:-1;
+	return ret ? 0 : -1;
 }
 
 // see arch/arm64/kernel/insn.c same function
 static inline long branch_imm_common(unsigned long pc, unsigned long addr,
-					long range)
+				     long range)
 {
 	long offset;
 
@@ -67,7 +68,7 @@ static inline long branch_imm_common(unsigned long pc, unsigned long addr,
 }
 
 static int aarch64_get_imm_shift_mask(enum aarch64_insn_imm_type type,
-						uint32_t *maskp, int *shiftp)
+				      uint32_t *maskp, int *shiftp)
 {
 	uint32_t mask;
 	int shift;
@@ -157,7 +158,7 @@ uint64_t aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type,
 }
 
 uint32_t aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
-			uint32_t insn, uint64_t imm)
+				       uint32_t insn, uint64_t imm)
 {
 	uint32_t immlo, immhi, mask;
 	int shift;
@@ -191,7 +192,7 @@ uint32_t aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
 }
 
 uint32_t aarch64_insn_gen_branch_imm(unsigned pc, unsigned long addr,
-				enum aarch64_insn_branch_type type)
+				     enum aarch64_insn_branch_type type)
 {
 	uint32_t insn;
 	long offset;
@@ -217,7 +218,7 @@ uint32_t aarch64_insn_gen_branch_imm(unsigned pc, unsigned long addr,
 	}
 
 	return aarch64_insn_encode_immediate(AARCH64_INSN_IMM_26, insn,
-				offset >> 2);
+					     offset >> 2);
 }
 
 uint32_t aarch64_func_bl_offset(void *func)

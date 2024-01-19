@@ -24,5 +24,3 @@ struct mcount_regs {
 #define ARG7(a) ((a)->x6)
 #define ARG8(a) ((a)->x7)
 
-
-

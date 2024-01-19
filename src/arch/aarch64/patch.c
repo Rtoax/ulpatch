@@ -11,14 +11,12 @@
 #include <utils/compiler.h>
 #include <patch/patch.h>
 
-
 enum aarch64_reloc_op {
 	RELOC_OP_NONE,
 	RELOC_OP_ABS,
 	RELOC_OP_PREL,
 	RELOC_OP_PAGE,
 };
-
 
 static uint64_t do_reloc(enum aarch64_reloc_op reloc_op, uint32_t *place,
 			 uint64_t val)
@@ -185,8 +183,7 @@ static int reloc_insn_imm(enum aarch64_reloc_op op, uint32_t *place,
 /**
  * See same name function in kernel source code.
  */
-static int reloc_insn_adrp(Elf64_Shdr *sechdrs,
-			   uint32_t *place, uint64_t val)
+static int reloc_insn_adrp(Elf64_Shdr *sechdrs, uint32_t *place, uint64_t val)
 {
 	return reloc_insn_imm(RELOC_OP_PAGE, place, val, 12, 21,
 			      AARCH64_INSN_IMM_ADR);

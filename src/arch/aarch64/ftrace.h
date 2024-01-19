@@ -7,4 +7,4 @@
 struct task_struct;
 
 int ftrace_modify_code(struct task_struct *task, unsigned long pc, uint32_t old,
-		uint32_t new, bool validate);
+		       uint32_t new, bool validate);

@@ -8,11 +8,11 @@
 
 #include "instruments.h"
 
-
 // see linux/scripts/recordmcount.c
-static unsigned char __unused ideal_nop5_x86_64[5] = { 0x0f, 0x1f, 0x44, 0x00, 0x00 };
-static unsigned char __unused ideal_nop5_x86_32[5] = { 0x3e, 0x8d, 0x74, 0x26, 0x00 };
-
+static unsigned char __unused ideal_nop5_x86_64[5] =
+	{ 0x0f, 0x1f, 0x44, 0x00, 0x00 };
+static unsigned char __unused ideal_nop5_x86_32[5] =
+	{ 0x3e, 0x8d, 0x74, 0x26, 0x00 };
 
 int text_opcode_size(uint8_t opcode)
 {
@@ -33,7 +33,7 @@ int text_opcode_size(uint8_t opcode)
 }
 
 void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
-		const void *addr, const void *dest)
+		    const void *addr, const void *dest)
 {
 	int size = text_opcode_size(opcode);
 
@@ -56,7 +56,8 @@ void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
 	return &insn->text;
 }
 
-/* find first callq instrument in the front of function body, it's mcount()
+/**
+ * find first callq instrument in the front of function body, it's mcount()
  * address.
  */
 uint32_t x86_64_func_callq_offset(void *func)

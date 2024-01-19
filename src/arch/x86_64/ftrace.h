@@ -6,5 +6,5 @@
 
 const char *ftrace_nop_replace(void);
 const char *ftrace_call_replace(union text_poke_insn *insn, unsigned long ip,
-			unsigned long addr);
+				unsigned long addr);
 
