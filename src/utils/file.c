@@ -189,9 +189,9 @@ int fcopy(const char *srcpath, const char *dstpath)
 char* fmktempfile(char *buf, int buf_len, char *seed)
 {
 	int fd;
-	char *_seed = seed?:"/tmp/temp-XXXXXX";
+	const char *_seed = seed ?: "/tmp/temp-XXXXXX";
 
-	snprintf(buf, buf_len, _seed);
+	snprintf(buf, buf_len, "%s", _seed);
 
 	fd = mkstemp(buf);
 	if (fd <= 0) {

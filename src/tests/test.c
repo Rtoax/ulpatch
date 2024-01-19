@@ -12,9 +12,8 @@
 int nr_tests = 0;
 
 
-struct test*
-create_test(char *category, char *name, test_prio prio, int (*cb)(void),
-	int expect_ret)
+struct test *create_test(char *category, char *name, test_prio prio,
+			 int (*cb)(void), int expect_ret)
 {
 	struct test *test = malloc(sizeof(struct test));
 
@@ -74,15 +73,15 @@ static int create_msqid(const char *file)
 	return msqid;
 }
 
-/* key: ftok(2) open/create a tmp file
- */
+/* key: ftok(2) open/create a tmp file */
 int task_wait_init(struct task_wait *task_wait, char *tmpfile)
 {
 	if (tmpfile)
-		snprintf(task_wait->tmpfile, sizeof(task_wait->tmpfile), tmpfile);
+		snprintf(task_wait->tmpfile, sizeof(task_wait->tmpfile), "%s",
+			 tmpfile);
 	else
-		fmktempfile(task_wait->tmpfile, sizeof(task_wait->tmpfile), NULL);
-
+		fmktempfile(task_wait->tmpfile, sizeof(task_wait->tmpfile),
+			    NULL);
 	return 0;
 }
 
