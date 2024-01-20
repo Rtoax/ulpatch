@@ -1,6 +1,7 @@
-hello
+/hello
+/test
+/core.*
 *.o
 *.d
 *.ulp
 *.ulp.no-build-id
-core.*

@@ -4,7 +4,6 @@
 #endif
 #include <ulpatch/meta.h>
 
-
 void ulp_asm_puts(unsigned long ul)
 {
 #if defined(__x86_64__)
@@ -36,12 +35,3 @@ void ulp_asm_puts(unsigned long ul)
 #endif
 }
 ULPATCH_INFO(ulp_asm_puts, print_hello, "Rong Tao");
-
-/* Only for test */
-#ifdef TEST_MAIN
-int main(void)
-{
-	ulp_asm_puts(3);
-	return 0;
-}
-#endif

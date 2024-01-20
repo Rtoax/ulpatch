@@ -14,6 +14,7 @@ CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
 
 TARGETS := hello
+TARGETS += test
 
 TARGETS_ULP := patch-print.ulp
 TARGETS_ULP += patch-empty.ulp
@@ -29,6 +30,7 @@ CFLAGS += -D__ULP_DEV
 build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
+test: test.o $(addsuffix .o, $(basename $(TARGETS_ULP)))
 
 CFLAGS_hello := -g -ggdb -flto -pthread
 
