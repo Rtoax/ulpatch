@@ -20,6 +20,7 @@
 #include <patch/patch.h>
 
 #include <utils/util.h>
+#include <utils/bitops.h>
 #include <utils/rbtree.h>
 #include <utils/list.h>
 #include <utils/compiler.h>

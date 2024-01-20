@@ -50,10 +50,6 @@
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 #endif
 
-#ifndef BIT
-#define BIT(n)		(1UL << (n))
-#endif
-
 #if defined(KERNEL_HEADERS_CONST_H)
 #include <linux/const.h>
 #endif
