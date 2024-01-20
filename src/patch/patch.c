@@ -757,6 +757,12 @@ static int kick_target_process(const struct load_info *info)
 	new_insn = (void *)&jmp_entry;
 	insn_sz = sizeof(struct jmp_table_entry);
 
+	ldebug("Jmp table: from %s(%lx) jump to %s(%lx)\n",
+		info->ulp_strtab.dst_func,
+		info->ulp_info->target_func_addr,
+		info->ulp_strtab.src_func,
+		info->ulp_info->patch_func_addr);
+
 	/**
 	 * The struct ulpatch_info.orig_value MUST store the original code.
 	 */
