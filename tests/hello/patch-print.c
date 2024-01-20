@@ -13,8 +13,8 @@ static void ulpatch_internal_print_hello(unsigned long ul)
 	internal_print_hello(ul);
 }
 
-void ulpatch_print_hello_print(unsigned long ul)
+void ulp_print(unsigned long ul)
 {
 	ulpatch_internal_print_hello(ul);
 }
-ULPATCH_INFO(ulpatch_print_hello_print, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_print, print_hello, "Rong Tao");

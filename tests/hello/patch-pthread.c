@@ -20,7 +20,7 @@ void *routine(void *arg)
 	}
 }
 
-void ulpatch_print_hello_print(unsigned long ul)
+void ulp_pthread(unsigned long ul)
 {
 	if (not_created) {
 		printf("Hello World. Patched\n");
@@ -29,4 +29,4 @@ void ulpatch_print_hello_print(unsigned long ul)
 	}
 	internal_print_hello(ul);
 }
-ULPATCH_INFO(ulpatch_print_hello_print, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_pthread, print_hello, "Rong Tao");

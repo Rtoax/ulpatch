@@ -9,8 +9,8 @@
  */
 static int static_i;
 
-void ulpatch_print_hello(unsigned long ul)
+void ulp_failed_bss(unsigned long ul)
 {
 	static_i += 2;
 }
-ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_failed_bss, print_hello, "Rong Tao");

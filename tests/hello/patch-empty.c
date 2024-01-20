@@ -5,7 +5,7 @@
 #include <ulpatch/meta.h>
 
 
-void ulpatch_print_hello(unsigned long ul)
+void ulp_empty(unsigned long ul)
 {
 }
-ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_empty, print_hello, "Rong Tao");

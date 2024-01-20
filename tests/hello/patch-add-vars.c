@@ -10,7 +10,7 @@ static long static_i = 1024;
 char *local_s = "Dear";
 static char *static_s = "you";
 
-void ulpatch_print_hello(unsigned long ul)
+void ulp_add_var(unsigned long ul)
 {
 	int i, a = 10;
 
@@ -24,4 +24,4 @@ void ulpatch_print_hello(unsigned long ul)
 	for (i = 0; i < 3; i++)
 		printf("- %d -\n", i);
 }
-ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_add_var, print_hello, "Rong Tao");

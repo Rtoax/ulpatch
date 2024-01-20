@@ -5,7 +5,7 @@
 #include <ulpatch/meta.h>
 
 
-void ulpatch_print_hello_exit(unsigned long ul)
+void ulp_asm_write(unsigned long ul)
 {
 #if defined(__x86_64__)
 	/* write("Hello\n") */
@@ -51,4 +51,4 @@ void ulpatch_print_hello_exit(unsigned long ul)
 # warning Not supported CPU architecture yet.
 #endif
 }
-ULPATCH_INFO(ulpatch_print_hello_exit, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_asm_write, print_hello, "Rong Tao");

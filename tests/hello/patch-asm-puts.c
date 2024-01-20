@@ -5,7 +5,7 @@
 #include <ulpatch/meta.h>
 
 
-void ulpatch_print_hello(unsigned long ul)
+void ulp_asm_puts(unsigned long ul)
 {
 #if defined(__x86_64__)
 	asm(
@@ -35,13 +35,13 @@ void ulpatch_print_hello(unsigned long ul)
 # warning Not supported CPU architecture yet.
 #endif
 }
-ULPATCH_INFO(ulpatch_print_hello, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_asm_puts, print_hello, "Rong Tao");
 
 /* Only for test */
 #ifdef TEST_MAIN
 int main(void)
 {
-	ulpatch_print_hello(3);
+	ulp_asm_puts(3);
 	return 0;
 }
 #endif
