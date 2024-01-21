@@ -69,15 +69,13 @@ const char *st_visibility_string(const GElf_Sym *sym)
  */
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 {
-	printf(
-	" %#016lx %-7ld %-8s %-8s %-8s %s%s%s\n",
-	sym->st_value,
-	sym->st_size,
-	st_type_string(sym),
-	st_bind_string(sym),
-	st_visibility_string(sym),
-	symname, vername?"@":"", vername?:""
-	);
+	printf(" %#016lx %-7ld %-8s %-8s %-8s %s%s%s\n",
+		sym->st_value,
+		sym->st_size,
+		st_type_string(sym),
+		st_bind_string(sym),
+		st_visibility_string(sym),
+		symname, vername ? "@" : "", vername ?: "");
 
 	return 0;
 }
@@ -88,9 +86,9 @@ int is_undef_symbol(const GElf_Sym *sym)
 }
 
 
-GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
-	int isym, size_t *nsyms,
-	GElf_Sym *sym_mem, char **symname, char **pversion)
+GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
+			  size_t *nsyms, GElf_Sym *sym_mem, char **symname,
+			  char **pversion)
 {
 	Elf_Data *data = elf_getdata(scn, NULL);
 	size_t ndx = elf_ndxscn(scn);
@@ -252,7 +250,8 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 
 	for_each_symbol(elf, scn, sym, sym_mem, isym, nsym, symname, pversion) {
 
-		if (!sym) continue;
+		if (!sym)
+			continue;
 
 		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
 
@@ -302,7 +301,7 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 		.name = (char *)name,
 	};
 	struct rb_node *node = rb_search_node(&elf->symbols,
-						cmp_symbol_name, (unsigned long)&tmp);
+				       cmp_symbol_name, (unsigned long)&tmp);
 
 	return node?rb_entry(node, struct symbol, node):NULL;
 }
@@ -311,8 +310,8 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
 	struct rb_node *node = rb_insert_node(&elf->symbols, &s->node,
-						cmp_symbol_name, (unsigned long)s);
-	return node?-1:0;
+				       cmp_symbol_name, (unsigned long)s);
+	return node ? -1 : 0;
 }
 
 void free_symbol(struct symbol *s)
