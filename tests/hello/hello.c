@@ -1,13 +1,39 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
 #include <pthread.h>
 #include <signal.h>
+#ifdef WITH_DLOPEN_TEST
+#include <dlfcn.h>
+#endif
 
 static sig_atomic_t keep_running = true;
 static unsigned long count = 0;
+
+#ifdef WITH_DLOPEN_TEST
+typedef void (*print_hello_fn)(unsigned long);
+
+static print_hello_fn patch_hello;
+
+int load_patch_so(void)
+{
+	void *dp;
+
+	dp = dlopen("./patch.so", RTLD_LAZY);
+	if (!dp) {
+		printf("ERROR: Failed open patch.so.\n");
+		exit(1);
+	}
+	patch_hello = dlsym(dp, "patch_print");
+	if (!patch_hello) {
+		printf("ERROR: not found patch_print in patch.so.\n");
+		exit(1);
+	}
+}
+#endif
 
 void sig_handler(int sig)
 {
@@ -21,7 +47,14 @@ void sig_handler(int sig)
 
 void internal_print_hello(unsigned long ul)
 {
+#ifdef WITH_DLOPEN_TEST
+	void print_hello(unsigned long ul);
+	printf("Hello World. %d, %ld, %lx, %lx\n", count, ul,
+		(unsigned long)print_hello,
+		(unsigned long)patch_hello);
+#else
 	printf("Hello World. %d, %ld\n", count, ul);
+#endif
 }
 
 void print_hello(unsigned long ul)
@@ -50,6 +83,10 @@ int main(int argc, char *argv[])
 
 	signal(SIGINT, sig_handler);
 
+#ifdef WITH_DLOPEN_TEST
+	load_patch_so();
+#endif
+
 #define PRINT_ADDR(a)	printf("%-32s: %#016x\n", #a, a);
 	PRINT_ADDR(print_hello);
 	PRINT_ADDR(puts);
@@ -62,3 +99,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
