@@ -37,6 +37,7 @@ set(BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(BUILD_ULTASK ON CACHE BOOL "Build ultask")
 set(ENABLE_MAN ON CACHE BOOL "Build man pages")
 set(CMAKE_INSTALL_PREFIX /usr)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(ULPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/ulpatch/)
 set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
