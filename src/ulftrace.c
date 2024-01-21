@@ -48,7 +48,7 @@ static void print_help(void)
 	"\n"
 	" Base argument:\n"
 	"\n"
-	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"  -p, --pid [PID]     specify a process identifier(pid_t)\n"
 	"\n"
 	"\n"
 	" Ftrace argument:\n"

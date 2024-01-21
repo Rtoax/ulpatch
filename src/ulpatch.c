@@ -51,11 +51,11 @@ static void print_help(void)
 	"\n"
 	" Option argument:\n"
 	"\n"
-	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"  -p, --pid [PID]     specify a process identifier(pid_t)\n"
 	"\n"
 	" Operate argument:\n"
 	"\n"
-	"  --patch  [patch]    patch an object file into target task, and patch\n"
+	"  --patch  [PATCH]    patch an object file into target task, and patch\n"
 	"                      the patch.\n"
 	"\n");
 	print_usage_common(prog_name);

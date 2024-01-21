@@ -36,9 +36,9 @@ static void print_help(void)
 	"\n"
 	" Option argument:\n"
 	"\n"
-	"  -i, --patch         specify an patch file to check\n"
+	"  -i, --patch [FILE]  specify an patch file to check\n"
 	"\n"
-	"  -p, --pid           list all patches in specified PID process\n"
+	"  -p, --pid [PID]     list all patches in specified PID process\n"
 	"\n");
 	print_usage_common(prog_name);
 	exit(0);
