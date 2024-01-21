@@ -526,8 +526,11 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		sym = find_symbol(task->exe_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			if (addr)
+			if (addr) {
+				ldebug("Found %s in self, addr = %lx\n",
+					name, addr);
 				goto found;
+			}
 		}
 	}
 	ldebug("Not found %s in self ELF.\n", name);
@@ -537,8 +540,11 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 */
 	if (task->fto_flag & FTO_SELF_PLT) {
 		addr = objdump_elf_plt_symbol_address(task->objdump, name);
-		if (addr)
+		if (addr) {
+			ldebug("Found %s in self @plt, addr = %lx\n",
+				name, addr);
 			goto found;
+		}
 	}
 	ldebug("Not found %s in @plt.\n", name);
 
@@ -549,8 +555,11 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		sym = find_symbol(task->libc_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			if (addr)
+			if (addr) {
+				ldebug("Found %s in libc.so, addr = %lx\n",
+					name, addr);
 				goto found;
+			}
 		}
 	}
 	ldebug("Not found %s in libc.\n", name);
@@ -563,8 +572,14 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		sym = task_vma_find_symbol((struct task_struct *)task, name);
 		if (sym) {
 			addr = sym->sym.st_value;
-			if (addr)
+			if (addr) {
+				struct vma_struct *vma = sym->vma;
+				ldebug("Found %s in %s, addr = %lx\n",
+					name,
+					vma ? vma->name_ : "Unknown lib",
+					addr);
 				goto found;
+			}
 		}
 	}
 
@@ -613,23 +628,23 @@ static int simplify_symbols(const struct load_info *info)
 
 		case SHN_UNDEF:
 			ldebug("Resolve UNDEF sym %s\n", name);
-			const unsigned long symbol_addr =
+			const unsigned long addr =
 				resolve_symbol(info->target_task, name);
 			/* Ok if resolved.  */
-			if (symbol_addr) {
-				sym[i].st_value = symbol_addr;
+			if (addr) {
+				sym[i].st_value = addr;
 			}
 
 			/* Ok if weak.  */
-			if (!symbol_addr && GELF_ST_BIND(sym[i].st_info) == STB_WEAK) {
+			if (!addr && GELF_ST_BIND(sym[i].st_info) == STB_WEAK) {
 				break;
 			}
 
 			/* Not found symbol in any where */
-			ret = symbol_addr ? 0 : -ENOENT;
+			ret = addr ? 0 : -ENOENT;
 			if (ret) {
 				lerror("Unknown symbol %s's addr %lx (err %d)\n",
-					 name, symbol_addr, ret);
+					 name, addr, ret);
 			}
 			break;
 
