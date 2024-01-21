@@ -111,7 +111,7 @@ static struct objdump_symbol *find_sym(struct rb_root *root, const char *name)
 	struct rb_node *node = rb_search_node(root, cmp_sym,
 					(unsigned long)&tmp);
 
-	return node?rb_entry(node, struct objdump_symbol, node):NULL;
+	return node ? rb_entry(node, struct objdump_symbol, node) : NULL;
 }
 
 /* Insert OK, return 0, else return -1 */
@@ -119,7 +119,7 @@ static int link_sym(struct rb_root *root, struct objdump_symbol *s)
 {
 	struct rb_node *node = rb_insert_node(root, &s->node,
 						cmp_sym, (unsigned long)s);
-	return node?-1:0;
+	return node ? -1 : 0;
 }
 
 static struct objdump_symbol *next_sym(struct rb_root *root,
@@ -146,8 +146,8 @@ const char* objdump_symbol_name(struct objdump_symbol *symbol)
 	return symbol ? symbol->name : NULL;
 }
 
-unsigned long
-objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *name)
+unsigned long objdump_elf_plt_symbol_address(struct objdump_elf_file *file,
+					     const char *name)
 {
 	if (!file)
 		return 0;
@@ -274,14 +274,14 @@ static void disassemble_data(struct objdump_elf_file *file)
 
 	file->sorted_symcount = file->symcount ? file->symcount : file->dynsymcount;
 	file->sorted_syms = (asymbol **) malloc((file->sorted_symcount + file->synthcount)
-		* sizeof(asymbol *));
+						* sizeof(asymbol *));
 
 	if (file->sorted_symcount != 0) {
 		memcpy(file->sorted_syms, file->symcount ? file->syms : file->dynsyms,
 			file->sorted_symcount * sizeof(asymbol *));
 
 		file->sorted_symcount = remove_useless_symbols(file->sorted_syms,
-										file->sorted_symcount);
+							file->sorted_symcount);
 	}
 
 	for (i = 0; i < file->synthcount; ++i) {
@@ -408,7 +408,6 @@ int objdump_elf_close(struct objdump_elf_file *file)
 
 	return 0;
 }
-
 
 static void __rb_free_sym(struct rb_node *node)
 {
