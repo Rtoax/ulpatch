@@ -17,13 +17,17 @@
 #include <utils/task.h>
 #include <utils/compiler.h>
 
+#include <patch/patch.h>
+
 #include "common.c"
 
 
 enum {
 	ARG_MIN = ARG_COMMON_MAX,
-	ARG_VMAS, // print all vmas
-	ARG_DUMP_VMA, // dump one vma
+	ARG_JMP_FROM_ADDR,
+	ARG_JMP_TO_ADDR,
+	ARG_VMAS,
+	ARG_DUMP_VMA,
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
@@ -38,6 +42,8 @@ static bool flag_dump_vma = false;
 static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
 static unsigned long vma_addr = 0;
+static unsigned long jmp_addr_from = 0;
+static unsigned long jmp_addr_to = 0;
 static bool flag_list_symbols = false;
 static bool flag_print_threads = false;
 static bool flag_print_auxv = false;
@@ -62,18 +68,23 @@ static void print_help(void)
 	"\n"
 	" Essential argument:\n"
 	"\n"
-	"  -p, --pid           specify a process identifier(pid_t)\n"
+	"  -p, --pid [PID]     specify a process identifier(pid_t)\n"
 	"\n"
 	"  --vmas              print all vmas\n"
 	"                      show detail if specify verbose argument.\n"
-	"  --dump-vma          save VMA address space to console or to a file,\n"
+	"  --dump-vma [ADDR]   save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
+	"\n"
+	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
+	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
+	"                      you better ensure what you are doing.\n"
+	"\n"
 	"  --threads           dump threads\n"
 	"  --auxv              print auxv of task\n"
 	"\n"
-	"  --map-file          mmap a exist file into target process address space\n"
+	"  --map-file [FILE]   mmap a exist file into target process address space\n"
 	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by --map-file.\n"
 	"                      check with --vmas and --map-file.\n"
@@ -95,6 +106,8 @@ static int parse_config(int argc, char *argv[])
 		{ "threads",        no_argument,       0, ARG_THREADS },
 		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
+		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
+		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
@@ -123,6 +136,22 @@ static int parse_config(int argc, char *argv[])
 			vma_addr = strtoull(optarg, NULL, 16);
 			if (vma_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-vma.\n");
+				exit(1);
+			}
+			break;
+		case ARG_JMP_FROM_ADDR:
+			flag_rdonly = false;
+			jmp_addr_from = strtoull(optarg, NULL, 16);
+			if (jmp_addr_from == 0) {
+				fprintf(stderr, "Wrong address for --jmp-from.\n");
+				exit(1);
+			}
+			break;
+		case ARG_JMP_TO_ADDR:
+			flag_rdonly = false;
+			jmp_addr_to = strtoull(optarg, NULL, 16);
+			if (jmp_addr_to == 0) {
+				fprintf(stderr, "Wrong address for --jmp-to.\n");
 				exit(1);
 			}
 			break;
@@ -158,10 +187,16 @@ static int parse_config(int argc, char *argv[])
 	if (!flag_print_vmas &&
 		!flag_dump_vma &&
 		!map_file &&
+		(!jmp_addr_from || !jmp_addr_to) &&
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
 		!flag_print_auxv &&
 		!flag_print_threads) {
+		if ((!jmp_addr_from && jmp_addr_to) || \
+			(jmp_addr_from && !jmp_addr_to)) {
+			fprintf(stderr, "must specify --jmp-from and --jmp-to at the same time.\n");
+			exit(1);
+		}
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 		exit(1);
 	}
@@ -297,6 +332,7 @@ static void list_all_symbol(void)
 
 int main(int argc, char *argv[])
 {
+	int ret = 0;
 	int flags = FTO_ALL;
 
 	parse_config(argc, argv);
@@ -310,7 +346,8 @@ int main(int argc, char *argv[])
 
 	target_task = open_task(target_pid, flags);
 	if (!target_task) {
-		fprintf(stderr, "open pid %d failed. %s\n", target_pid, strerror(errno));
+		fprintf(stderr, "open pid %d failed. %s\n", target_pid,
+			strerror(errno));
 		return 1;
 	}
 
@@ -337,8 +374,38 @@ int main(int argc, char *argv[])
 	if (flag_print_threads)
 		dump_task_threads(target_task, config.verbose);
 
-	free_task(target_task);
+	if (jmp_addr_from && jmp_addr_to) {
+		struct vma_struct *vma_from, *vma_to;
+		vma_from = find_vma(target_task, jmp_addr_from);
+		vma_to = find_vma(target_task, jmp_addr_to);
+		if (!vma_from || !vma_to) {
+			fprintf(stderr,
+				"0x%lx ot 0x%lx not in process address space\n"
+				"check with /proc/%d/maps or gdb.\n",
+				jmp_addr_from, jmp_addr_to, target_pid);
+			ret = -1;
+			goto done;
+		}
+		size_t n, insn_sz;
+		char *new_insn;
+		struct jmp_table_entry jmp_entry;
 
-	return 0;
+		jmp_entry.jmp = arch_jmp_table_jmp();
+		jmp_entry.addr = jmp_addr_to;
+		new_insn = (void *)&jmp_entry;
+		insn_sz = sizeof(struct jmp_table_entry);
+
+		n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
+					insn_sz);
+		if (n == -1 || n < insn_sz) {
+			lerror("failed kick target process.\n");
+			ret = -1;
+			goto done;
+		}
+	}
+
+done:
+	free_task(target_task);
+	return ret;
 }
 
