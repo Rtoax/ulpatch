@@ -220,6 +220,8 @@ struct task_struct {
 	/* struct vma_struct.node_rb */
 	struct rb_root vmas_rb;
 
+	/* VMA_SELF ELF vma */
+	struct vma_struct *vma_self_elf;
 	struct vma_struct *libc_vma;
 
 	/* if we found libc library, open it when open task with PID, and load all

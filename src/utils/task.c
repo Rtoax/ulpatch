@@ -431,6 +431,9 @@ int vma_peek_phdr(struct vma_struct *vma)
 
 	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
+	if (vma->type == VMA_SELF)
+		task->vma_self_elf = vma;
+
 	/* VMA is ELF, handle it */
 	vma->vma_elf = malloc(sizeof(struct vma_elf));
 	if (!vma->vma_elf)

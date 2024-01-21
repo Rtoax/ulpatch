@@ -539,7 +539,11 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * Try find symbol address from @plt
 	 */
 	if (task->fto_flag & FTO_SELF_PLT) {
-		addr = objdump_elf_plt_symbol_address(task->objdump, name);
+		unsigned long plt =
+			objdump_elf_plt_symbol_address(task->objdump, name);
+		if (plt && task->vma_self_elf) {
+			addr = plt + task->vma_self_elf->vma_elf->load_offset;
+		}
 		if (addr) {
 			ldebug("Found %s in self @plt, addr = %lx\n",
 				name, addr);
