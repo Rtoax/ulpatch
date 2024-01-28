@@ -166,3 +166,8 @@ AT_ENTRY 0x5585750800
 # Share library
 
 TODO
+
+
+# Links
+
+- https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
