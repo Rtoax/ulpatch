@@ -1,12 +1,20 @@
 #include <stdio.h>
+#include <pthread.h>
 
 void internal_print_hello(unsigned long ul);
 
 static int a;
 static char *s = "Hello";
 
+static void *routine(void *arg)
+{
+	printf("thread %lx\n", pthread_self());
+	return NULL;
+}
+
 static void patch_internal_print_hello(unsigned long ul)
 {
+	pthread_t thread;
 	a++;
 	printf("Hello World. %s Patched %d\n", s, a);
 
@@ -18,6 +26,8 @@ static void patch_internal_print_hello(unsigned long ul)
 	 */
 	internal_print_hello(ul);
 #endif
+	pthread_create(&thread, NULL, routine, NULL);
+	pthread_join(thread, NULL);
 }
 
 void patch_print(unsigned long ul)
