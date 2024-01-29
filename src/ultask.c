@@ -278,7 +278,7 @@ static int munmap_an_vma(void)
 	struct task_struct *task = target_task;
 	unsigned long addr = 0;
 
-	struct vma_struct *vma = find_vma(task, vma_addr);
+	struct vm_area_struct *vma = find_vma(task, vma_addr);
 	if (!vma) {
 		fprintf(stderr, "vma not exist.\n");
 		return -1;
@@ -375,7 +375,7 @@ int main(int argc, char *argv[])
 		dump_task_threads(target_task, config.verbose);
 
 	if (jmp_addr_from && jmp_addr_to) {
-		struct vma_struct *vma_from, *vma_to;
+		struct vm_area_struct *vma_from, *vma_to;
 		vma_from = find_vma(target_task, jmp_addr_from);
 		vma_to = find_vma(target_task, jmp_addr_to);
 		if (!vma_from || !vma_to) {

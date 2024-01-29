@@ -175,7 +175,7 @@ free_out:
 /**
  * Get load_info from ULPatch vma
  */
-int vma_load_info(struct vma_struct *vma, struct load_info *info)
+int vma_load_info(struct vm_area_struct *vma, struct load_info *info)
 {
 	int ret;
 	struct vma_ulp *ulp;
@@ -577,7 +577,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr) {
-				struct vma_struct *vma = sym->vma;
+				struct vm_area_struct *vma = sym->vma;
 				ldebug("Found %s in %s, addr = %lx\n",
 					name,
 					vma ? vma->name_ : "Unknown lib",

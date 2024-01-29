@@ -63,11 +63,11 @@ int open_pid_mem_rw(pid_t pid)
 	return __open_pid_mem(pid, O_RDWR);
 }
 
-struct vma_struct *alloc_vma(struct task_struct *task)
+struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
-	struct vma_struct *vma = malloc(sizeof(struct vma_struct));
+	struct vm_area_struct *vma = malloc(sizeof(struct vm_area_struct));
 	assert(vma && "alloc vma failed.");
-	memset(vma, 0x00, sizeof(struct vma_struct));
+	memset(vma, 0x00, sizeof(struct vm_area_struct));
 
 	vma->task = task;
 	vma->type = VMA_NONE;
@@ -84,8 +84,8 @@ struct vma_struct *alloc_vma(struct task_struct *task)
 
 static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 {
-	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
-	struct vma_struct *new = (struct vma_struct *)key;
+	struct vm_area_struct *vma = rb_entry(node, struct vm_area_struct, node_rb);
+	struct vm_area_struct *new = (struct vm_area_struct *)key;
 
 	if (new->vm_end <= vma->vm_start)
 		return -1;
@@ -98,11 +98,11 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	return 0;
 }
 
-int insert_vma(struct task_struct *task, struct vma_struct *vma,
-	       struct vma_struct *prev)
+int insert_vma(struct task_struct *task, struct vm_area_struct *vma,
+	       struct vm_area_struct *prev)
 {
 	if (prev && strcmp(prev->name_, vma->name_) == 0) {
-		struct vma_struct *leader = prev->leader;
+		struct vm_area_struct *leader = prev->leader;
 
 		vma->leader = leader;
 
@@ -115,7 +115,7 @@ int insert_vma(struct task_struct *task, struct vma_struct *vma,
 	return 0;
 }
 
-int unlink_vma(struct task_struct *task, struct vma_struct *vma)
+int unlink_vma(struct task_struct *task, struct vm_area_struct *vma)
 {
 	list_del(&vma->node_list);
 	rb_erase(&vma->node_rb, &task->vmas_rb);
@@ -125,7 +125,7 @@ int unlink_vma(struct task_struct *task, struct vma_struct *vma)
 	return 0;
 }
 
-int free_vma(struct vma_struct *vma)
+int free_vma(struct vm_area_struct *vma)
 {
 	if (!vma)
 		return -1;
@@ -137,7 +137,7 @@ int free_vma(struct vma_struct *vma)
 
 static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 {
-	struct vma_struct *vma = rb_entry(node, struct vma_struct, node_rb);
+	struct vm_area_struct *vma = rb_entry(node, struct vm_area_struct, node_rb);
 
 	if (vma->vm_start > vaddr)
 		return -1;
@@ -147,38 +147,38 @@ static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 		return 1;
 }
 
-struct vma_struct *find_vma(struct task_struct *task, unsigned long vaddr)
+struct vm_area_struct *find_vma(struct task_struct *task, unsigned long vaddr)
 {
 	struct rb_node *rnode = rb_search_node(&task->vmas_rb, __find_vma_cmp,
 						vaddr);
 	if (rnode)
-		return rb_entry(rnode, struct vma_struct, node_rb);
+		return rb_entry(rnode, struct vm_area_struct, node_rb);
 	return NULL;
 }
 
-struct vma_struct *next_vma(struct task_struct *task, struct vma_struct *prev)
+struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct *prev)
 {
 	struct rb_node *next;
 	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vmas_rb);
-	return  next ? rb_entry(next, struct vma_struct, node_rb) : NULL;
+	return  next ? rb_entry(next, struct vm_area_struct, node_rb) : NULL;
 }
 
 unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 {
-	struct vma_struct *ivma;
+	struct vm_area_struct *ivma;
 	struct rb_node * rnode;
 
 	for (rnode = rb_first(&task->vmas_rb); rnode; rnode = rb_next(rnode)) {
-		ivma = rb_entry(rnode, struct vma_struct, node_rb);
+		ivma = rb_entry(rnode, struct vm_area_struct, node_rb);
 		struct rb_node *next_node = rb_next(rnode);
-		struct vma_struct *next_vma;
+		struct vm_area_struct *next_vma;
 		if (!next_node)
 			return 0;
 
 		ldebug("vma: %lx-%lx %s\n", ivma->vm_start, ivma->vm_end,
 			ivma->name_);
 
-		next_vma = rb_entry(next_node, struct vma_struct, node_rb);
+		next_vma = rb_entry(next_node, struct vm_area_struct, node_rb);
 		if (next_vma->vm_start - ivma->vm_end >= size)
 			return ivma->vm_end;
 	}
@@ -257,7 +257,7 @@ enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 	return type;
 }
 
-static bool elf_vma_is_interp_exception(struct vma_struct *vma)
+static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
 {
 	char *name = vma->name_;
 
@@ -284,7 +284,7 @@ static bool elf_vma_is_interp_exception(struct vma_struct *vma)
 	return false;
 }
 
-static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
+static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 			  unsigned long load_offset)
 {
 	unsigned long start = load_offset + phdr->p_vaddr;
@@ -297,7 +297,7 @@ static int match_vma_phdr(struct vma_struct *vma, GElf_Phdr *phdr,
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 }
 
-int alloc_ulp(struct vma_struct *vma)
+int alloc_ulp(struct vm_area_struct *vma)
 {
 	int ret;
 	void *mem;
@@ -334,7 +334,7 @@ int alloc_ulp(struct vma_struct *vma)
 	return 0;
 }
 
-void free_ulp(struct vma_struct *vma)
+void free_ulp(struct vm_area_struct *vma)
 {
 	struct vma_ulp *ulp = vma->ulp;
 
@@ -351,7 +351,7 @@ void free_ulp(struct vma_struct *vma)
 	vma->ulp = NULL;
 }
 
-int vma_load_ulp(struct vma_struct *vma)
+int vma_load_ulp(struct vm_area_struct *vma)
 {
 	int ret;
 	GElf_Ehdr ehdr = {};
@@ -381,7 +381,7 @@ int vma_load_ulp(struct vma_struct *vma)
 }
 
 /* Only FTO_VMA_ELF flag will load VMA ELF */
-int vma_peek_phdr(struct vma_struct *vma)
+int vma_peek_phdr(struct vm_area_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
 	struct task_struct *task = vma->task;
@@ -523,7 +523,7 @@ share_lib:
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
 		unsigned long pgoff;
-		struct vma_struct *sibling, *tmpvma;
+		struct vm_area_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
 		case PT_LOAD:
@@ -571,7 +571,7 @@ share_lib:
 
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
-		struct vma_struct *sibling, *tmpvma;
+		struct vm_area_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
 
@@ -601,7 +601,7 @@ share_lib:
 	return 0;
 }
 
-void vma_free_elf(struct vma_struct *vma)
+void vma_free_elf(struct vm_area_struct *vma)
 {
 	if (!vma->is_elf || vma->type == VMA_ULPATCH)
 		return;
@@ -617,7 +617,7 @@ void vma_free_elf(struct vma_struct *vma)
 unsigned long task_vma_symbol_value(const struct symbol *sym)
 {
 	unsigned long addr = 0;
-	struct vma_struct *vma_leader = sym->vma;
+	struct vm_area_struct *vma_leader = sym->vma;
 
 	if (vma_leader != vma_leader->leader) {
 		lerror("Symbol vma must be leader.\n");
@@ -655,7 +655,7 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 	 */
 	if (vma_leader->is_share_lib) {
 		unsigned long off = sym->sym.st_value;
-		struct vma_struct *vma, *tmpvma;
+		struct vm_area_struct *vma, *tmpvma;
 
 		list_for_each_entry_safe(vma, tmpvma,
 			&vma_leader->siblings, siblings) {
@@ -711,7 +711,7 @@ int task_vma_link_symbol(struct task_struct *task, struct symbol *s)
  *
  * @vma - self vma
  */
-static int load_self_vma_symbols(struct vma_struct *vma)
+static int load_self_vma_symbols(struct vm_area_struct *vma)
 {
 	int err = 0;
 	struct task_struct *task = vma->task;
@@ -749,7 +749,7 @@ static int load_self_vma_symbols(struct vma_struct *vma)
 	return err;
 }
 
-int vma_load_all_symbols(struct vma_struct *vma)
+int vma_load_all_symbols(struct vm_area_struct *vma)
 {
 	if (!vma->is_elf || !vma->vma_elf)
 		return 0;
@@ -908,7 +908,7 @@ out_free:
  */
 int read_task_vmas(struct task_struct *task, bool update_ulp)
 {
-	struct vma_struct *vma, *prev = NULL;
+	struct vm_area_struct *vma, *prev = NULL;
 	int mapsfd;
 	FILE *mapsfp;
 
@@ -927,7 +927,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		char perms[5], name_[256];
 		int r;
 		char line[1024];
-		struct vma_struct __unused *old;
+		struct vm_area_struct __unused *old;
 
 		start = end = pgoff = major = minor = inode = 0;
 
@@ -997,7 +997,7 @@ int update_task_vmas_ulp(struct task_struct *task)
 	return read_task_vmas(task, true);
 }
 
-void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail)
+void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail)
 {
 	int i;
 
@@ -1066,7 +1066,7 @@ int dump_task(const struct task_struct *task)
 void dump_task_vmas(struct task_struct *task, bool detail)
 {
 	int first_line = 1;
-	struct vma_struct *vma;
+	struct vm_area_struct *vma;
 
 	list_for_each_entry(vma, &task->vma_list, node_list) {
 		print_vma(stdout, first_line, vma, detail);
@@ -1095,7 +1095,7 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 			return -1;
 		}
 	}
-	struct vma_struct *vma = find_vma(task, addr);
+	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
 		lerror("vma not exist.\n");
 		return -1;
@@ -1124,7 +1124,7 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 			  unsigned long addr)
 {
 	size_t vma_size = 0;
-	struct vma_struct *vma = find_vma(task, addr);
+	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
 		lerror("vma not exist.\n");
 		return -1;
@@ -1150,7 +1150,7 @@ void dump_task_threads(struct task_struct *task, bool detail)
 
 int free_task_vmas(struct task_struct *task)
 {
-	struct vma_struct *vma, *tmpvma;
+	struct vm_area_struct *vma, *tmpvma;
 
 	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node_list) {
 		unlink_vma(task, vma);
@@ -1354,13 +1354,13 @@ struct task_struct *open_task(pid_t pid, int flag)
 	}
 
 	if (flag & FTO_VMA_ELF) {
-		struct vma_struct *tmp_vma;
+		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
 			vma_peek_phdr(tmp_vma);
 	}
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
-		struct vma_struct *tmp_vma;
+		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
 			vma_load_all_symbols(tmp_vma);
 	}
@@ -1488,7 +1488,7 @@ int free_task(struct task_struct *task)
 	close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {
-		struct vma_struct *tmp_vma;
+		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
 			vma_free_elf(tmp_vma);
 	}

@@ -133,7 +133,7 @@ int show_task_patch_info(pid_t pid)
 		printf(" %-41s", "Build ID");
 	printf("\033[m\n");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
-		struct vma_struct *vma = ulp->vma;
+		struct vm_area_struct *vma = ulp->vma;
 		printf("%-8d %-20s %-16lx %-16s",
 			i, ulp_info_strftime(&ulp->info),
 			vma->vm_start, ulp->strtab.dst_func);

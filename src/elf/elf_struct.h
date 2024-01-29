@@ -66,7 +66,7 @@ struct elf_file {
 	struct list_head node;
 };
 
-struct vma_struct;
+struct vm_area_struct;
 
 struct symbol {
 	/* strdup() */
@@ -74,7 +74,7 @@ struct symbol {
 	GElf_Sym sym;
 
 	/* Maybe belongs to a VMA */
-	struct vma_struct *vma;
+	struct vm_area_struct *vma;
 	/**
 	 * ROOT is one of the following:
 	 * struct elf_file.symbols

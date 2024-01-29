@@ -60,7 +60,7 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 	NULL
 };
 
-struct vma_struct;
+struct vm_area_struct;
 
 struct vma_elf {
 	GElf_Ehdr ehdr;
@@ -76,7 +76,7 @@ struct vma_ulp {
 	void *elf_mem;
 
 	/* Belongs to */
-	struct vma_struct *vma;
+	struct vm_area_struct *vma;
 
 	char *str_build_id;
 
@@ -84,7 +84,7 @@ struct vma_ulp {
 	struct list_head node;
 };
 
-struct vma_struct {
+struct vm_area_struct {
 	unsigned long vm_start;
 	unsigned long vm_end;
 	unsigned long pgoff;
@@ -120,7 +120,7 @@ struct vma_struct {
 	/* All same name vma in one list, and the first vma is leader.
 	 * if vma == vma->leader means that this vma is leader.
 	 */
-	struct vma_struct *leader;
+	struct vm_area_struct *leader;
 	struct list_head siblings;
 
 	unsigned long voffset;
@@ -215,14 +215,14 @@ struct task_struct {
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
-	/* struct vma_struct.node_list */
+	/* struct vm_area_struct.node_list */
 	struct list_head vma_list;
-	/* struct vma_struct.node_rb */
+	/* struct vm_area_struct.node_rb */
 	struct rb_root vmas_rb;
 
 	/* VMA_SELF ELF vma */
-	struct vma_struct *vma_self_elf;
-	struct vma_struct *libc_vma;
+	struct vm_area_struct *vma_self_elf;
+	struct vm_area_struct *libc_vma;
 
 	/* if we found libc library, open it when open task with PID, and load all
 	 * symbol. when patch/ftrace command launched, it is useful to handle rela
@@ -232,7 +232,7 @@ struct task_struct {
 	 */
 	struct elf_file *libc_elf;
 
-	struct vma_struct *stack;
+	struct vm_area_struct *stack;
 
 	/* save all symbol for fast search
 	 * struct symbol.node
@@ -256,7 +256,7 @@ int open_pid_mem_rw(pid_t pid);
 bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
 
-struct vma_struct *next_vma(struct task_struct *task, struct vma_struct *prev);
+struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct *prev);
 
 /* Get task's first vma in rbtree */
 #define first_vma(task) next_vma(task, NULL)
@@ -264,7 +264,7 @@ struct vma_struct *next_vma(struct task_struct *task, struct vma_struct *prev);
 #define task_for_each_vma(vma, task) \
 		for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
-struct vma_struct *find_vma(struct task_struct *task, unsigned long vaddr);
+struct vm_area_struct *find_vma(struct task_struct *task, unsigned long vaddr);
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task_struct *task, size_t size);
 int read_task_vmas(struct task_struct *task, bool update_ulp);
@@ -275,7 +275,7 @@ enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
 
 int dump_task(const struct task_struct *t);
 
-void print_vma(FILE *fp, bool first_line, struct vma_struct *vma, bool detail);
+void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
 void dump_task_vmas(struct task_struct *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
@@ -284,8 +284,8 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 void dump_task_threads(struct task_struct *task, bool detail);
 void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 
-int alloc_ulp(struct vma_struct *vma);
-void free_ulp(struct vma_struct *vma);
+int alloc_ulp(struct vm_area_struct *vma);
+void free_ulp(struct vm_area_struct *vma);
 
 int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv);
 int print_task_auxv(FILE *fp, struct task_struct *task);
