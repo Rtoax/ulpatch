@@ -171,3 +171,4 @@ TODO
 # Links
 
 - https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
+- https://jvns.ca/blog/2018/01/09/resolving-symbol-addresses/
