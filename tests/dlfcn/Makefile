@@ -6,12 +6,14 @@ CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
 
 TARGETS := hello
+TARGETS += pdlsym_tst
 
 TARGETS_PATCH_SO := patch.so
 
 build: ${TARGETS} ${TARGETS_PATCH_SO}
 
 hello: hello.o
+pdlsym_tst: pdlsym_tst.o pdlsym.o
 
 CFLAGS_hello := -g -ggdb -flto -pthread -DWITH_DLOPEN_TEST=1
 
