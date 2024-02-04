@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <getopt.h>
 
 
@@ -11,6 +12,7 @@ void usage(int exitcode)
 	fprintf(stderr, "options:\n");
 	fprintf(stderr, "  -p,--pid  [PID]\n");
 	fprintf(stderr, "  -a,--base [ADDR]\n");
+	fprintf(stderr, "  -s,--sym  [SYM]\n");
 	fprintf(stderr, "\n");
 	exit(exitcode);
 }
@@ -20,16 +22,18 @@ int main(int argc, char *argv[])
 	pid_t pid = 0;
 	unsigned long base_addr = 0;
 	void *addr;
+	char *sym = NULL;
 
 	struct option options[] = {
 		{"pid", required_argument, 0, 'p'},
 		{"base", required_argument, 0, 'a'},
+		{"sym", required_argument, 0, 's'},
 		{"help", no_argument, 0, 'h'},
 		{0, 0, 0, 0}
 	};
 	while (1) {
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "p:a:h", options, &option_index);
+		char c = getopt_long(argc, argv, "p:a:s:h", options, &option_index);
 
 		if (c == -1)
 			break;
@@ -37,6 +41,9 @@ int main(int argc, char *argv[])
 		switch (c) {
 		case 'p':
 			pid = atoi(optarg);
+			break;
+		case 's':
+			sym = strdup(optarg);
 			break;
 		case 'a':
 			if (optarg[0] != '0' || optarg[1] != 'x') {
@@ -59,11 +66,15 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	if (base_addr == 0) {
-		fprintf(stderr, "ERROR: Must specify pid with -a.\n");
+		fprintf(stderr, "ERROR: Must specify base address with -a.\n");
+		exit(1);
+	}
+	if (!sym) {
+		fprintf(stderr, "ERROR: Must specify sym with -s.\n");
 		exit(1);
 	}
 
-	char *symbol = "print_hello";
+	char *symbol = sym;
 	addr = pdlsym(pid, (void *)base_addr, symbol);
 	fprintf(stdout, "%s : %lx\n", symbol, (unsigned long)addr);
 
