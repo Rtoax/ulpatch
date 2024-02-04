@@ -80,6 +80,12 @@ struct pelf *openp(pid_t pid, off_t base)
 
 		switch (phdr.p_type) {
 		case PT_LOAD:
+			if (ehdr.e_type == ET_EXEC) {
+				if (vaddr - offset < base) {
+					errno = -EFAULT;
+					goto fatal;
+				}
+			}
 			break;
 		case PT_DYNAMIC:
 			break;
@@ -93,6 +99,8 @@ struct pelf *openp(pid_t pid, off_t base)
 	return pelf;
 fatal:
 	free(pelf);
+	if (mem_fd)
+		close(mem_fd);
 	return NULL;
 }
 
