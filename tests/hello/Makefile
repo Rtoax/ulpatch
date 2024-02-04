@@ -49,4 +49,4 @@ $(TARGETS): %:
 	strip $(@) -o $(@).stripped
 
 clean:
-	rm -f $(TARGETS) *.o *.ulp core.* *.ulp.no-build-id
+	rm -f $(TARGETS) *.o *.ulp core.* *.ulp.no-build-id *.stripped

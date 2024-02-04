@@ -31,4 +31,4 @@ $(TARGETS): %:
 	strip $(@) -o $(@).stripped
 
 clean:
-	rm -f $(TARGETS) $(TARGETS_PATCH_SO) *.o
+	rm -f $(TARGETS) $(TARGETS_PATCH_SO) *.o *.stripped
