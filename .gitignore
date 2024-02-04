@@ -6,6 +6,7 @@ cmake_install.cmake
 # elf
 *.a
 *.o
+*.elf
 *.op
 *.oS
 *.oc
