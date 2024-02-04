@@ -1,5 +1,6 @@
 /**
  * https://gist.github.com/Rtoax/fb62eebd02879816c49497b22c106703
+ * https://github.com/resilar/psyscall.git
  */
 #include <errno.h>
 #include <stdint.h>
