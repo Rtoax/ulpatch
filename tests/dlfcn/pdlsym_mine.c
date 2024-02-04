@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <sys/ptrace.h>
 #include <sys/types.h>
@@ -24,6 +25,36 @@ static int readp(int mem_fd, off_t addr, void *buf, size_t len)
 	if (ret <= 0)
 		fprintf(stderr, "ERROR: pread failed. %s\n", strerror(errno));
 	return ret;
+}
+
+static int readpstr(int mem_fd, off_t addr, char *buf, size_t buf_len)
+{
+	int ret, n;
+	char *s = buf;
+	size_t i, j;
+	size_t len = 0;
+	bool end = false;
+
+	for (j = 0; j < buf_len && !end; j += sizeof(long)) {
+		s = buf + j;
+		ret = readp(mem_fd, addr + j, s, sizeof(long));
+		if (ret < sizeof(long)) {
+			fprintf(stderr, "read string failed.\n");
+			break;
+		}
+		for (i = 0; i < sizeof(long); i++) {
+			if (s[i] == '\0') {
+				end = true;
+				break;
+			}
+		}
+		len += i;
+	}
+	if (j == buf_len || !end) {
+		fprintf(stderr, "Not found string.\n");
+		return -ENOENT;
+	}
+	return 0;
 }
 
 struct pelf *openp(pid_t pid, off_t base)
@@ -186,7 +217,6 @@ static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value)
 
 	if (*stridx < pelf->strsz && pelf->ehdr.e_type != ET_EXEC) {
 		*value = sym.st_value + pelf->base;
-		fprintf(stderr, "value = %lx\n", *value);
 		return 1;
 	}
 
@@ -200,7 +230,7 @@ off_t dlsymp(struct pelf *pelf, const char *symbol)
 	int i, ret;
 	uint32_t stridx;
 	off_t strtab;
-	uintptr_t value = 0;
+	uintptr_t value = 0, ret_value = 0;
 	size_t size = strlen(symbol) + 1;
 
 	//strtab = pelf->strtab + (pelf->strtab < pelf->base) ? pelf->base : 0;
@@ -208,17 +238,12 @@ off_t dlsymp(struct pelf *pelf, const char *symbol)
 	for (i = 0; symiter(pelf, i, &stridx, &value); value = 0, i++) {
 		if (value && stridx + size <= pelf->strsz) {
 			char buf[512];
-			/**
-			 * TODO: Only read some specified length.
-			 */
-			ret = readp(pelf->mem_fd, strtab + stridx, buf, size);
-			if (ret < size) {
-				fprintf(stderr, "Failed read symbol.\n");
-				continue;
-			}
+			readpstr(pelf->mem_fd, strtab + stridx, buf, sizeof(buf));
 			fprintf(stderr, "sym: %s : %lx\n", buf, value);
+			if (!strcmp(symbol, buf))
+				ret_value = value;
 		}
 	}
-	return (off_t)value;
+	return (off_t)ret_value;
 }
 
