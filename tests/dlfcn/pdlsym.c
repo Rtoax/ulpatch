@@ -127,6 +127,9 @@ static int loadelf(pid_t pid, const void *addr, struct elf *elf)
 		elf->W = (2 << elf->class);
 	} else {
 		/* Bad ELF */
+		char *m = (char *)&magic;
+		fprintf(stderr, "Bad ELF, magic: %d %d %d %d\n",
+			m[0], m[1], m[2], m[3]);
 		return 0;
 	}
 
