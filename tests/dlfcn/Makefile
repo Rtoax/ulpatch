@@ -28,6 +28,7 @@ CFLAGS_hello := -g -ggdb -flto -pthread -DWITH_DLOPEN_TEST=1
 $(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
 	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
+	strip $(@) -o $(@).stripped
 
 clean:
 	rm -f $(TARGETS) $(TARGETS_PATCH_SO) *.o
