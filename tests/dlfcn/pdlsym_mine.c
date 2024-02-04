@@ -13,7 +13,7 @@ struct pelf {
 	pid_t pid;
 	Elf64_Ehdr ehdr;
 	int mem_fd;
-	unsigned long base_addr;
+	unsigned long base;
 	off_t strtab, symtab, strsz, syment;
 };
 
@@ -147,6 +147,7 @@ struct pelf *openp(pid_t pid, off_t base)
 
 	pelf->pid = pid;
 	pelf->mem_fd = mem_fd;
+	pelf->base = base;
 	memcpy(&pelf->ehdr, &ehdr, sizeof(Elf64_Ehdr));
 	pelf->strtab = strtab;
 	pelf->symtab = symtab;
@@ -161,8 +162,63 @@ fatal:
 	return NULL;
 }
 
-off_t dlsymp(struct pelf *pelf, off_t base, const char *symbol)
+static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value)
 {
+	int ret;
+	Elf64_Sym sym;
+	off_t sym_addr = pelf->symtab + i * pelf->syment;
 
+	if (i * pelf->syment >= pelf->strtab - pelf->symtab) {
+		fprintf(stderr, "Out of bound.\n");
+		return 0;
+	}
+
+	if (pelf->symtab < pelf->base)
+		sym_addr += pelf->base;
+
+	ret = readp(pelf->mem_fd, sym_addr, &sym, sizeof(Elf64_Sym));
+	if (ret < sizeof(Elf64_Sym)) {
+		fprintf(stderr, "Read sym failed.\n");
+		return 0;
+	}
+
+	*stridx = sym.st_name;
+
+	if (*stridx < pelf->strsz && pelf->ehdr.e_type != ET_EXEC) {
+		*value = sym.st_value + pelf->base;
+		fprintf(stderr, "value = %lx\n", *value);
+		return 1;
+	}
+
+	fprintf(stderr, "End of sym iter. %ld, %ld\n",
+		sym.st_name, pelf->strsz);
+	return 0;
+}
+
+off_t dlsymp(struct pelf *pelf, const char *symbol)
+{
+	int i, ret;
+	uint32_t stridx;
+	off_t strtab;
+	uintptr_t value = 0;
+	size_t size = strlen(symbol) + 1;
+
+	//strtab = pelf->strtab + (pelf->strtab < pelf->base) ? pelf->base : 0;
+	strtab = pelf->strtab;
+	for (i = 0; symiter(pelf, i, &stridx, &value); value = 0, i++) {
+		if (value && stridx + size <= pelf->strsz) {
+			char buf[512];
+			/**
+			 * TODO: Only read some specified length.
+			 */
+			ret = readp(pelf->mem_fd, strtab + stridx, buf, size);
+			if (ret < size) {
+				fprintf(stderr, "Failed read symbol.\n");
+				continue;
+			}
+			fprintf(stderr, "sym: %s : %lx\n", buf, value);
+		}
+	}
+	return (off_t)value;
 }
 
