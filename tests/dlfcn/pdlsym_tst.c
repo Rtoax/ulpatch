@@ -6,6 +6,9 @@
 
 void *pdlsym(pid_t pid, void *base, const char *symbol);
 
+struct pelf;
+struct pelf *openp(pid_t pid, off_t base);
+
 void usage(int exitcode)
 {
 	fprintf(stderr, "tst [options]\n");
@@ -74,9 +77,13 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+#if 0
 	char *symbol = sym;
 	addr = pdlsym(pid, (void *)base_addr, symbol);
 	fprintf(stdout, "%s : %lx\n", symbol, (unsigned long)addr);
+#else
+	struct pelf *pelf = openp(pid, base_addr);
+#endif
 
 	return 0;
 }
