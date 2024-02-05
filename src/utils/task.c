@@ -412,8 +412,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 * Add more check here, skip some VMA peek, because some vma pread()
 	 * will failed, and it's not necessary to check is ELF or not.
 	 */
-	if (!strncmp(vma->name_, "/etc", 4)
-	 || !strncmp(vma->name_, "/sys", 4)) {
+	if (!strncmp(vma->name_, "/etc", 4) ||
+	    !strncmp(vma->name_, "/sys", 4)) {
 		ldebug("Skip peek vma %s\n", vma->name_);
 		return 0;
 	}
@@ -447,14 +447,9 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	phaddr = vma->vm_start + vma->vma_elf->ehdr.e_phoff;
 	phsz = vma->vma_elf->ehdr.e_phnum * sizeof(GElf_Phdr);
 
-	/* if no program headers, just return. we don't need it, such as:
-	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr
-	 * memshow() like:
-	 *
-	 * |.ELF............|
-	 * |/lib64/./usr/lib|
-	 * |64/.............|
-	 * |................|
+	/**
+	 * If no program headers, just return. we don't need it, such as:
+	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr.
 	 */
 	if (phsz == 0) {
 		lwarning("%s: no phdr, e_phoff %lx, skip it.\n",
