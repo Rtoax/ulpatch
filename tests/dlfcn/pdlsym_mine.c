@@ -217,9 +217,16 @@ static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value,
 	*stridx = sym.st_name;
 	memcpy(psym, &sym, sizeof(sym));
 
-	if (*stridx < pelf->strsz && pelf->ehdr.e_type != ET_EXEC) {
-		*value = sym.st_value + pelf->base;
-		return 1;
+	if (*stridx < pelf->strsz) {
+		switch (pelf->ehdr.e_type) {
+		case ET_EXEC:
+			/* TODO: not support yet. */
+			fprintf(stderr, "Is ET_EXEC ELF.\n");
+			return 0;
+		default:
+			*value = sym.st_value + pelf->base;
+			return 1;
+		}
 	}
 
 	fprintf(stderr, "End of sym iter. %ld, %ld\n",
