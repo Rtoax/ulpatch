@@ -60,7 +60,13 @@ int main(int argc, char *argv[])
 			usage(0);
 			break;
 		default:
-			fprintf(stderr, "ERROR: unknown arg option %s.\n", optarg);
+			fprintf(stderr, "ERROR: unknown arg option %d %s.\n",
+				c, optarg);
+			/**
+			 * FIXME: I don't know why c==255 on ThinkForce aarch64
+			 */
+			if (pid != 0 && base_addr != 0 && sym != 0)
+				goto while_done;
 			usage(1);
 		}
 	}
@@ -78,6 +84,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+while_done:
 	char *symbol = sym;
 	struct pelf *pelf = openp(pid, base_addr);
 	addr = dlsymp(pelf, symbol);
