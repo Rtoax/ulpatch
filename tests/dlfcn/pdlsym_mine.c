@@ -193,7 +193,8 @@ fatal:
 	return NULL;
 }
 
-static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value)
+static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value,
+		   Elf64_Sym *psym)
 {
 	int ret;
 	Elf64_Sym sym;
@@ -214,6 +215,7 @@ static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value)
 	}
 
 	*stridx = sym.st_name;
+	memcpy(psym, &sym, sizeof(sym));
 
 	if (*stridx < pelf->strsz && pelf->ehdr.e_type != ET_EXEC) {
 		*value = sym.st_value + pelf->base;
@@ -232,14 +234,16 @@ off_t dlsymp(struct pelf *pelf, const char *symbol)
 	off_t strtab;
 	uintptr_t value = 0, ret_value = 0;
 	size_t size = strlen(symbol) + 1;
+	Elf64_Sym sym;
 
 	//strtab = pelf->strtab + (pelf->strtab < pelf->base) ? pelf->base : 0;
 	strtab = pelf->strtab;
-	for (i = 0; symiter(pelf, i, &stridx, &value); value = 0, i++) {
-		if (value && stridx + size <= pelf->strsz) {
+	for (i = 0; symiter(pelf, i, &stridx, &value, &sym); value = 0, i++) {
+		if (value && stridx + size <= pelf->strsz && sym.st_size > 0) {
 			char buf[512];
 			readpstr(pelf->mem_fd, strtab + stridx, buf, sizeof(buf));
-			fprintf(stderr, "sym: %s : %lx\n", buf, value);
+			fprintf(stderr, "sym: %s : %lx , sz %d\n", buf, value,
+				sym.st_size);
 			if (!strcmp(symbol, buf))
 				ret_value = value;
 		}

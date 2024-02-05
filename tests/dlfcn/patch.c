@@ -4,6 +4,8 @@
 
 static int a;
 static char *s = "Hello";
+int global_a;
+char *global_s = "Hello";
 
 static void *routine(void *arg)
 {
