@@ -1026,6 +1026,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 		vma->name_);
 
 	if (detail) {
+		/* Detail with gray color */
 		if (fp == stdout || fp == stderr)
 			fprintf(fp, "\033[2m");
 		if (vma->vma_elf) {

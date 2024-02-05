@@ -10,6 +10,15 @@
 
 TEST(Elf_Ehdr,	print,	0)
 {
-	// TODO
+	Elf64_Ehdr ehdr1 = {
+		.e_ident[EI_MAG0] = ELFMAG0,
+		.e_ident[EI_MAG1] = ELFMAG1,
+		.e_ident[EI_MAG2] = ELFMAG2,
+		.e_ident[EI_MAG3] = ELFMAG3,
+		.e_type = ET_EXEC,
+		.e_version = EV_CURRENT,
+		.e_entry = 0xffff,
+	};
+	print_ehdr(NULL, &ehdr1);
 	return 0;
 }

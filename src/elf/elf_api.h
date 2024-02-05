@@ -45,6 +45,7 @@ int elf_file_close(const char *filepath);
 
 /* ELF Ehdr api */
 bool ehdr_magic_ok(const GElf_Ehdr *ehdr);
+int print_ehdr(FILE *fp, const GElf_Ehdr *ehdr);
 
 /* ELF Phdr api */
 int handle_phdrs(struct elf_file *elf);
