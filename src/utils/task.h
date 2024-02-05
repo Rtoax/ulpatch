@@ -117,7 +117,8 @@ struct vm_area_struct {
 	/* struct task_struct.vmas_rb */
 	struct rb_node node_rb;
 
-	/* All same name vma in one list, and the first vma is leader.
+	/**
+	 * All same name vma in one list, and the first vma is leader.
 	 * if vma == vma->leader means that this vma is leader.
 	 */
 	struct vm_area_struct *leader;
@@ -132,7 +133,8 @@ struct thread {
 	struct list_head node;
 };
 
-/* When task opening, what do you want to do?
+/**
+ * When task opening, what do you want to do?
  *
  * FTO means Flag of Task when Open.
  *
@@ -193,7 +195,8 @@ struct task_struct_auxv {
 	unsigned long auxv_entry;
 };
 
-/* This struct use to discript a running process in system, like you can see in
+/**
+ * This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
 struct task_struct {
@@ -224,9 +227,10 @@ struct task_struct {
 	struct vm_area_struct *vma_self_elf;
 	struct vm_area_struct *libc_vma;
 
-	/* if we found libc library, open it when open task with PID, and load all
-	 * symbol. when patch/ftrace command launched, it is useful to handle rela
-	 * symbol.
+	/**
+	 * if we found libc library, open it when open task with PID, and load
+	 * all symbol. when patch/ftrace command launched, it is useful to
+	 * handle rela symbol.
 	 *
 	 * Check FTO_LIBC
 	 */
@@ -234,7 +238,8 @@ struct task_struct {
 
 	struct vm_area_struct *stack;
 
-	/* save all symbol for fast search
+	/**
+	 * save all symbol for fast search
 	 * struct symbol.node
 	 */
 	struct rb_root vma_symbols;
