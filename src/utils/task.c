@@ -1033,6 +1033,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 			fprintf(fp, "%10s  load_offset = 0x%lx\n", "",
 				vma->vma_elf->load_offset);
 			bool first = true;
+			print_ehdr(fp, &vma->vma_elf->ehdr);
 			for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 				GElf_Phdr *pphdr = &vma->vma_elf->phdrs[i];
 				if (pphdr->p_type != PT_LOAD)
