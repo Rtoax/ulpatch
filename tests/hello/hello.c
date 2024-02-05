@@ -13,6 +13,11 @@
 static sig_atomic_t keep_running = true;
 static unsigned long count = 0;
 
+/* Some global variable for testing */
+int global_i = 1;
+char global_c = '\0';
+float global_f = 3.14;
+
 #ifdef WITH_DLOPEN_TEST
 typedef void (*print_hello_fn)(unsigned long);
 
