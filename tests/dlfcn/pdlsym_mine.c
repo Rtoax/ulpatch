@@ -138,20 +138,20 @@ struct pelf *openp(pid_t pid, off_t base)
 				}
 				switch (dyn.d_tag) {
 				case DT_STRTAB:
-					fprintf(stderr, "DT_STRTAB\n");
 					strtab = dyn.d_un.d_val;
+					fprintf(stderr, "DT_STRTAB %lx\n", strtab);
 					break;
 				case DT_SYMTAB:
-					fprintf(stderr, "DT_SYMTAB\n");
 					symtab = dyn.d_un.d_val;
+					fprintf(stderr, "DT_SYMTAB %lx\n", symtab);
 					break;
 				case DT_STRSZ:
-					fprintf(stderr, "DT_STRSZ\n");
 					strsz = dyn.d_un.d_val;
+					fprintf(stderr, "DT_STRSZ %lx\n", strsz);
 					break;
 				case DT_SYMENT:
-					fprintf(stderr, "DT_SYMENT\n");
 					syment = dyn.d_un.d_val;
+					fprintf(stderr, "DT_SYMENT %lx\n", syment);
 					break;
 				}
 			}

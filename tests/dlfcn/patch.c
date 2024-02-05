@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
 
-void internal_print_hello(unsigned long ul);
 
 static int a;
 static char *s = "Hello";
@@ -19,6 +18,7 @@ static void patch_internal_print_hello(unsigned long ul)
 	printf("Hello World. %s Patched %d\n", s, a);
 
 #if defined(TEST_TARGET_SYMBOL)
+	void internal_print_hello(unsigned long ul);
 	/**
 	 * Dynamic libraries after dlopen cannot reference symbols in the
 	 * original process, but can they be used in other libraries?
