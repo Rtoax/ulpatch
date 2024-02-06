@@ -19,8 +19,9 @@ Specify a target process's PID.
 \fB\-\-patch\fR [ULPATCH.ELF]
 Specify a ulpatch.elf file to patch to target process.
 .TP
-\fB\-\-log-level\fR[=\fI\,LEVEL\/\fR]
-Specify a log level.
+\fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
+Specify a log level. The LEVEL could be number(see /usr/include/sys/syslog.h) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
+For example, if you want to set log level to LOG_ERR, just: --lv=error.
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.

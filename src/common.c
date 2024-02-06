@@ -16,15 +16,17 @@ void print_usage_common(const char *progname)
 	printf(
 	" Common argument:\n"
 	"\n"
-	"  --log-level [NUM]   set log level, default(%d)\n"
+	"  --log-level [NUM|STR]\n"
+	"  --lv [NUM|STR]      set log level, default(%d)\n"
 	"                      EMERG(%d),ALERT(%d),CRIT(%d),ERR(%d),WARN(%d)\n"
 	"                      NOTICE(%d),INFO(%d),DEBUG(%d)\n"
+	"                      or %s\n"
 	"  --log-debug         set log level to DEBUG(%d)\n"
 	"  --log-error         set log level to ERR(%d)\n"
 	"\n",
 	config.log_level,
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
-	LOG_DEBUG,
+	LOG_DEBUG, log_level_list(),
 	LOG_DEBUG,
 	LOG_ERR);
 	printf(
@@ -39,6 +41,7 @@ void print_usage_common(const char *progname)
 	{ "version",        no_argument,       0, 'V' },	\
 	{ "help",           no_argument,       0, 'h' },	\
 	{ "log-level",      required_argument, 0, ARG_LOG_LEVEL },	\
+	{ "lv",             required_argument, 0, ARG_LOG_LEVEL },	\
 	{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },	\
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
 	{ "verbose",        no_argument,       0, 'v' },
@@ -58,6 +61,8 @@ void print_usage_common(const char *progname)
 		break;	\
 	case ARG_LOG_LEVEL:	\
 		config.log_level = atoi(optarg);	\
+		if (!config.log_level)	\
+			config.log_level = str2loglevel(optarg);	\
 		break;	\
 	case ARG_LOG_DEBUG:	\
 		config.log_level = LOG_DEBUG;	\
