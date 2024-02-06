@@ -791,6 +791,11 @@ static void sig_handler(int signum)
 		/* exit abnormal */
 		exit(1);
 		break;
+	case SIGSEGV:
+		lemerg("Segv fault.\n");
+		do_backtrace();
+		exit(1);
+		break;
 	}
 }
 
