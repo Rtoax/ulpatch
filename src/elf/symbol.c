@@ -21,8 +21,9 @@ const char *st_bind_string(const GElf_Sym *sym)
 	case STB_WEAK:    return "WEAK";	/* Weak symbol */
 	case STB_NUM:     return "NUM";		/* Number of defined types.  */
 	case STB_LOOS:    return "LOOS";	/* Start of OS-specific */
-	/* same as STB_LOOS */
-	// case STB_GNU_UNIQUE:  return "GNU_UNIQUE";/* Unique symbol.  */
+#if STB_LOOS != STB_GNU_UNIQUE
+	case STB_GNU_UNIQUE:  return "GNU_UNIQUE";/* Unique symbol.  */
+#endif
 	case STB_HIOS:    return "HIOS";	/* End of OS-specific */
 	case STB_LOPROC:  return "LOPROC";	/* Start of processor-specific */
 	case STB_HIPROC:  return "HIPROC";	/* End of processor-specific */
@@ -42,8 +43,9 @@ const char *st_type_string(const GElf_Sym *sym)
 	case STT_TLS:     return "TLS";		/* Symbol is thread-local data object*/
 	case STT_NUM:     return "NUM";		/* Number of defined types.  */
 	case STT_LOOS:    return "LOOS";	/* Start of OS-specific */
-	/* same as STT_LOOS */
-	//case STT_GNU_IFUNC: return "GNU_IFUNC";/* Symbol is indirect code object */
+#if STT_LOOS != STT_GNU_IFUNC
+	case STT_GNU_IFUNC: return "GNU_IFUNC";/* Symbol is indirect code object */
+#endif
 	case STT_HIOS:    return "HIOS";	/* End of OS-specific */
 	case STT_LOPROC:  return "LOPROC";	/* Start of processor-specific */
 	case STT_HIPROC:  return "HIPROC";	/* End of processor-specific */
@@ -301,16 +303,17 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 		.name = (char *)name,
 	};
 	struct rb_node *node = rb_search_node(&elf->symbols,
-				       cmp_symbol_name, (unsigned long)&tmp);
-
-	return node?rb_entry(node, struct symbol, node):NULL;
+					      cmp_symbol_name,
+					      (unsigned long)&tmp);
+	return node ? rb_entry(node, struct symbol, node) : NULL;
 }
 
 /* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
 	struct rb_node *node = rb_insert_node(&elf->symbols, &s->node,
-				       cmp_symbol_name, (unsigned long)s);
+					      cmp_symbol_name,
+					      (unsigned long)s);
 	return node ? -1 : 0;
 }
 
