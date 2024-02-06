@@ -242,20 +242,20 @@ void print_rela(GElf_Rela *rela)
 	({int __ret = 0; __ret;})
 
 
-static int
-handle_relocs_rel(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
+static int handle_relocs_rel(struct elf_file *elf, GElf_Shdr *shdr,
+			     Elf_Scn *scn)
 {
 	lwarning("SHT_REL not support yet.\n");
 	return -1;
 }
 
-static int
-handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
+static int handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr,
+			      Elf_Scn *scn)
 {
+	int i, cnt;
 	int __unused class = gelf_getclass(elf->elf);
 	size_t sh_entsize = gelf_fsize (elf->elf, ELF_T_RELA, 1, EV_CURRENT);
 	int nentries = shdr->sh_size / sh_entsize;
-	struct elf_iter iter;
 
 	/* Get the data of the section.  */
 	Elf_Data *data = elf_getdata(scn, NULL);
@@ -311,19 +311,18 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 
 	int is_statically_linked = 0;
 
-	for (int cnt = 0; cnt < nentries; ++cnt) {
-
+	for (cnt = 0; cnt < nentries; ++cnt) {
 		GElf_Rela relmem;
-		GElf_Rela *rel = gelf_getrela (data, cnt, &relmem);
+		GElf_Rela *rel = gelf_getrela(data, cnt, &relmem);
 
-		if (likely (rel != NULL)) {
+		if (likely(rel != NULL)) {
 			GElf_Sym symmem;
 			Elf32_Word xndx;
-			GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata,
-				GELF_R_SYM (rel->r_info),
-				&symmem, &xndx);
+			GElf_Sym *sym = gelf_getsymshndx(symdata, xndxdata,
+						GELF_R_SYM(rel->r_info),
+						&symmem, &xndx);
 
-			if (unlikely (sym == NULL)) {
+			if (unlikely(sym == NULL)) {
 				/* As a special case we have to handle relocations in static
 				 * executables.  This only happens for IRELATIVE relocations
 				 * (so far).  There is no symbol table.  */
@@ -335,8 +334,8 @@ handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 					if (elf->ehdr->e_type == ET_EXEC) {
 						is_statically_linked = 1;
 
-						elf_for_each_phdr(elf, &iter) {
-							GElf_Phdr *phdr = iter.phdr;
+						for (i = 0; i < elf->phdrnum; i++) {
+							GElf_Phdr *phdr = &elf->phdrs[i];
 							if (phdr != NULL && phdr->p_type == PT_INTERP) {
 								is_statically_linked = -1;
 								break;

@@ -54,11 +54,6 @@ int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
 const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
 const char *phdr_type_str_unsafe(GElf_Phdr *pphdr);
 
-#define elf_for_each_phdr(elf, iter)                                        \
-	for ((iter)->i = 0, (iter)->nr = (elf)->phdrnum;                        \
-		(iter)->i < (iter)->nr && ((iter)->phdr = &elf->phdrs[(iter)->i]);  \
-		(iter)->i++)
-
 /* ELF Shdr api */
 #define elf_for_each_shdr(elf, iter)                                        \
 	for ((iter)->i = 0, (iter)->nr = elf->shdrnum,                          \

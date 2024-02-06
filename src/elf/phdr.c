@@ -56,10 +56,10 @@ int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first)
 
 int handle_phdrs(struct elf_file *elf)
 {
-	struct elf_iter iter;
+	int i;
 
-	elf_for_each_phdr(elf, &iter) {
-		GElf_Phdr *phdr = iter.phdr;
+	for (i = 0; i < elf->phdrnum; i++) {
+		GElf_Phdr *phdr = &elf->phdrs[i];
 
 		switch (phdr->p_type) {
 		case PT_INTERP:
