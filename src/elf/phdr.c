@@ -14,6 +14,7 @@
 const char *phdr_type_str_unsafe(GElf_Phdr *pphdr)
 {
 	switch (pphdr->p_type) {
+	case PT_INTERP:	return "INTERP";
 	case PT_LOAD:	return "LOAD";
 	/* TODO: more */
 	}
@@ -65,6 +66,9 @@ int handle_phdrs(struct elf_file *elf)
 			elf->elf_interpreter = elf->rawfile + phdr->p_offset;
 			ldebug("[Requesting program interpreter: %s]\n",
 				elf->elf_interpreter);
+			break;
+		case PT_LOAD:
+			ldebug("get a PT_LOAD program header.\n");
 			break;
 		default:
 			break;

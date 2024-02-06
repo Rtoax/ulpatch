@@ -1333,8 +1333,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		goto free_task;
 	}
 
-	/* Load libc ELF file if needed
-	 */
+	/* Load libc ELF file if needed */
 	if (flag & FTO_LIBC) {
 		task->libc_elf = elf_file_open(task->libc_vma->name_);
 		if (!task->libc_elf) {
