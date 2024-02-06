@@ -38,3 +38,6 @@ void set_log_debug(void);
 void set_log_error(void);
 void set_log_prefix(bool on);
 
+int str2loglevel(const char *str);
+const char *log_level_list(void);
+

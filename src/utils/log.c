@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
 #include <utils/log.h>
 
@@ -64,6 +65,36 @@ FILE *get_log_fp(void)
 	if (!log_fp)
 		set_log_fp(stdout);
 	return log_fp;
+}
+
+int str2loglevel(const char *str)
+{
+	assert(str && "NULL string pointer");
+	if (!strcasecmp(str, "debug") || !strcasecmp(str, "dbg"))
+		return LOG_DEBUG;
+	else if (!strcasecmp(str, "info") || !strcasecmp(str, "inf"))
+		return LOG_INFO;
+	else if (!strcasecmp(str, "notice") || !strcasecmp(str, "note"))
+		return LOG_NOTICE;
+	else if (!strcasecmp(str, "warning") || !strcasecmp(str, "warn"))
+		return LOG_WARNING;
+	else if (!strcasecmp(str, "error") || !strcasecmp(str, "err"))
+		return LOG_ERR;
+	else if (!strcasecmp(str, "crit"))
+		return LOG_CRIT;
+	else if (!strcasecmp(str, "alert"))
+		return LOG_ALERT;
+	else if (!strcasecmp(str, "emerg"))
+		return LOG_EMERG;
+	else {
+		fprintf(stderr, "Unknown log level string %s\n", str);
+		exit(1);
+	}
+}
+
+const char *log_level_list(void)
+{
+	return "debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg";
 }
 
 int __attribute__((format(printf, 6, 7)))

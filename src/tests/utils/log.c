@@ -17,6 +17,8 @@ TEST(Log,	log,	0)
 	lalert("ALERT\n");
 	lemerg("EMERG\n");
 
+	lwarning("LIST: %s\n", log_level_list());
+
 	return 0;
 }
 
@@ -78,6 +80,19 @@ TEST(Log,	set_log_prefix,	0)
 	lalert("ALERT\n");
 	lemerg("EMERG\n");
 
+	return 0;
+}
+
+TEST(Log,	str2loglevel,	0)
+{
+	if (LOG_INFO != str2loglevel("info") || LOG_INFO != str2loglevel("INFO"))
+		return -1;
+	if (LOG_INFO != str2loglevel("inf"))
+		return -1;
+	if (LOG_DEBUG != str2loglevel("debug"))
+		return -1;
+	if (LOG_DEBUG != str2loglevel("dbg"))
+		return -1;
 	return 0;
 }
 
