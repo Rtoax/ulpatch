@@ -54,15 +54,6 @@ int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
 const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
 const char *phdr_type_str_unsafe(GElf_Phdr *pphdr);
 
-/* ELF Shdr api */
-#define elf_for_each_shdr(elf, iter)                                        \
-	for ((iter)->i = 0, (iter)->nr = elf->shdrnum,                          \
-		 (iter)->str_idx = elf->shdrstrndx;                                 \
-		((iter)->scn = elf_getscn(elf->elf, (iter)->i)) &&                  \
-		 ((iter)->shdr = &elf->shdrs[(iter)->i]) &&                         \
-		 (iter)->i < elf->shdrnum;                                          \
-		(iter)->i++)
-
 /* ELF Symbol api */
 const char *st_bind_string(const GElf_Sym *sym);
 const char *st_type_string(const GElf_Sym *sym);

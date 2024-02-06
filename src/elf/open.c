@@ -21,19 +21,16 @@ static LIST_HEAD(elf_file_list);
 
 static int handle_sections(struct elf_file *elf)
 {
-	int ret = 0;
+	int i, ret = 0;
 
-	struct elf_iter iter;
+	for (i = 0; i < elf->shdrnum; i++) {
+		GElf_Shdr *shdr = &elf->shdrs[i];
+		Elf_Scn *scn = elf_getscn(elf->elf, i);
 
-	elf_for_each_shdr(elf, &iter) {
+		elf->shdrnames[i] = elf_strptr(elf->elf, elf->shdrstrndx,
+						shdr->sh_name);
 
-		GElf_Shdr *shdr = iter.shdr;
-		Elf_Scn *scn = iter.scn;
-
-		elf->shdrnames[iter.i] =
-			elf_strptr(elf->elf, elf->shdrstrndx, shdr->sh_name);
-
-		if (elf->shdrnames[iter.i] == NULL) {
+		if (elf->shdrnames[i] == NULL) {
 			lerror("couldn't get section name: %s\n", elf_errmsg(-1));
 			return -ENOENT;
 		}
@@ -42,24 +39,24 @@ static int handle_sections(struct elf_file *elf)
 		switch (shdr->sh_type) {
 		case SHT_PROGBITS:
 			/* .plt */
-			if (strcmp(elf->shdrnames[iter.i], ".plt") == 0) {
-				ldebug("%s PLT: %ld\n", elf->filepath, iter.i);
+			if (strcmp(elf->shdrnames[i], ".plt") == 0) {
+				ldebug("%s PLT: %d\n", elf->filepath, i);
 				elf->plt_data = elf_getdata(scn, NULL);
-				elf->plt_shdr_idx = iter.i;
+				elf->plt_shdr_idx = i;
 			/* .got */
-			} else if (strcmp(elf->shdrnames[iter.i], ".got") == 0) {
-				ldebug("%s GOT: %ld\n", elf->filepath, iter.i);
+			} else if (strcmp(elf->shdrnames[i], ".got") == 0) {
+				ldebug("%s GOT: %d\n", elf->filepath, i);
 				elf->got_data = elf_getdata(scn, NULL);
-				elf->got_shdr_idx = iter.i;
+				elf->got_shdr_idx = i;
 			}
 			break;
 		case SHT_SYMTAB:
 			elf->symtab_data = elf_getdata(scn, NULL);
-			elf->symtab_shdr_idx = iter.i;
+			elf->symtab_shdr_idx = i;
 			break;
 		case SHT_DYNSYM:
 			elf->dynsym_data = elf_getdata(scn, NULL);
-			elf->dynsym_shdr_idx = iter.i;
+			elf->dynsym_shdr_idx = i;
 			break;
 		case SHT_NOTE:
 			handle_notes(elf, shdr, scn);
@@ -131,7 +128,6 @@ struct elf_file *elf_file_open(const char *filepath)
 	int i, fd;
 	size_t size;
 	struct elf_file *elf = NULL;
-	struct elf_iter iter;
 
 	/* Already open */
 	list_for_each_entry(elf, &elf_file_list, node) {
@@ -212,10 +208,9 @@ struct elf_file *elf_file_open(const char *filepath)
 		goto free_shdrs;
 	}
 
-	elf_for_each_shdr(elf, &iter) {
-
-		GElf_Shdr *shdr = iter.shdr;
-		Elf_Scn *scn = iter.scn;
+	for (i = 0; i < elf->shdrnum; i++) {
+		GElf_Shdr *shdr = &elf->shdrs[i];
+		Elf_Scn *scn = elf_getscn(elf->elf, i);
 
 		if (gelf_getshdr(scn, shdr) == NULL) {
 			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
