@@ -106,8 +106,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 
 	Elf32_Word xndx;
 	GElf_Sym *sym = gelf_getsymshndx(data, elf->xndx_data, isym,
-		sym_mem, &xndx);
-
+					 sym_mem, &xndx);
 	if (unlikely(sym == NULL))
 		return NULL;
 

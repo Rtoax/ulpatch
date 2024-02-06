@@ -26,7 +26,6 @@ int handle_sections(struct elf_file *elf)
 
 		elf->shdrnames[i] = elf_strptr(elf->elf, elf->shdrstrndx,
 						shdr->sh_name);
-
 		if (elf->shdrnames[i] == NULL) {
 			lerror("couldn't get section name: %s\n", elf_errmsg(-1));
 			return -ENOENT;
@@ -60,9 +59,7 @@ int handle_sections(struct elf_file *elf)
 			break;
 		case SHT_REL:
 		case SHT_RELA:
-			if ((ret = handle_relocs(elf, shdr, scn)) != 0) {
-				return ret;
-			}
+			handle_relocs(elf, shdr, scn);
 			break;
 		case SHT_GNU_ATTRIBUTES:
 		case SHT_GNU_LIBLIST:
@@ -76,36 +73,32 @@ int handle_sections(struct elf_file *elf)
 		Elf_Scn *runscn = NULL;
 
 		while ((runscn = elf_nextscn(elf->elf, runscn)) != NULL) {
-
 			GElf_Shdr runshdr_mem;
 			GElf_Shdr *runshdr = gelf_getshdr(runscn, &runshdr_mem);
-
-			if (!runshdr) continue;
+			if (!runshdr)
+				continue;
 
 			/* Handle section header by type */
 			switch (runshdr->sh_type) {
-
-			/* Bingo, found the version information.  Now get the data.  */
-			case SHT_GNU_versym: // .gnu.version
-				if (runshdr->sh_link == elf_ndxscn(scn)) {
+			/* Bingo, found the version information. Now get the data. */
+			case SHT_GNU_versym:
+				if (runshdr->sh_link == elf_ndxscn(scn))
 					elf->versym_data = elf_getdata(runscn, NULL);
-				}
 				break;
-			/* This is the information about the needed versions.  */
-			case SHT_GNU_verneed: // .gnu.version_r
+			/* This is the information about the needed versions. */
+			case SHT_GNU_verneed:
 				elf->verneed_data = elf_getdata(runscn, NULL);
 				elf->verneed_stridx = runshdr->sh_link;
 				break;
-			/* This is the information about the defined versions.  */
+			/* This is the information about the defined versions. */
 			case SHT_GNU_verdef:
 				elf->verdef_data = elf_getdata(runscn, NULL);
 				elf->verdef_stridx = runshdr->sh_link;
 				break;
-			/* Extended section index.  */
+			/* Extended section index. */
 			case SHT_SYMTAB_SHNDX:
-				if (runshdr->sh_link == elf_ndxscn(scn)) {
+				if (runshdr->sh_link == elf_ndxscn(scn))
 					elf->xndx_data = elf_getdata(runscn, NULL);
-				}
 				break;
 			}
 		}
