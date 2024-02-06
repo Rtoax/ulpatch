@@ -246,6 +246,7 @@ static void print_help(void)
 	role_string[ROLE_TRIGGER],
 	role_string[ROLE_LISTENER]
 	);
+	print_usage_common(prog_name);
 }
 
 enum {
