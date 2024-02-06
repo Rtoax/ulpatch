@@ -66,9 +66,9 @@ FILE *get_log_fp(void)
 	return log_fp;
 }
 
-int __attribute__((format(printf, 5, 6)))
-_____log(int level, const char *file, const char *func, unsigned long int line,
-	 char *fmt, ...)
+int __attribute__((format(printf, 6, 7)))
+_____log(int level, bool has_prefix, const char *file, const char *func,
+	 unsigned long int line, char *fmt, ...)
 {
 	int n = 0;
 	FILE *fp = get_log_fp();
@@ -78,7 +78,7 @@ _____log(int level, const char *file, const char *func, unsigned long int line,
 	if (level > log_level)
 		return 0;
 
-	if (likely(prefix_on)) {
+	if (has_prefix && likely(prefix_on)) {
 		char buffer[32];
 		time_t timestamp = time(NULL);
 
