@@ -14,12 +14,45 @@
 bool ehdr_magic_ok(const GElf_Ehdr *ehdr)
 {
 	if (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-		ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-		ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-		ehdr->e_ident[EI_MAG3] != ELFMAG3) {
+	    ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
+	    ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
+	    ehdr->e_ident[EI_MAG3] != ELFMAG3) {
+		lerror("Wrong ELF magic\n");
 		return false;
 	}
 	return true;
+}
+
+bool ehdr_ok(const GElf_Ehdr *ehdr)
+{
+	if (ehdr->e_type == ET_NONE) {
+		lerror("unknown elf type %d\n", ehdr->e_type);
+		goto not_ok;
+	}
+	if (ehdr->e_machine == EM_NONE) {
+		lerror("unknown elf machine %d\n", ehdr->e_machine);
+		goto not_ok;
+	}
+	if (ehdr->e_version != EV_CURRENT) {
+		lerror("unknown elf version %d\n", ehdr->e_version);
+		goto not_ok;
+	}
+	/* Only support 64bit system */
+	if (ehdr->e_ident[EI_CLASS] != ELFCLASS64) {
+		lerror("unsupport %d\n", ehdr->e_ident[EI_CLASS]);
+		goto not_ok;
+	}
+	if (ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
+		lerror("unsupport %d\n", ehdr->e_ident[EI_DATA]);
+		goto not_ok;
+	}
+	if (!ehdr_magic_ok(ehdr)) {
+		goto not_ok;
+	}
+
+	return true;
+not_ok:
+	return false;
 }
 
 static const char *ei_class_string(const GElf_Ehdr *ehdr)

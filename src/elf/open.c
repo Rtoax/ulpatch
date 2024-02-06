@@ -180,25 +180,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	elf->ehdr = malloc(sizeof(GElf_Ehdr));
 	assert(elf->ehdr && "Malloc failed.");
 	elf->ehdr = gelf_getehdr(__elf, elf->ehdr);
-	/* ET_REL, ET_EXEC, ET_DYN, ET_CORE */
-	if (elf->ehdr->e_type == ET_NONE) {
-		lerror("unknown elf type %d\n", elf->ehdr->e_type);
-		goto free_elf;
-	}
-	/* EM_386, EM_MIPS, EM_X86_64, EM_AARCH64, EM_BPF ... */
-	if (elf->ehdr->e_machine == EM_NONE) {
-		lerror("unknown elf machine %d\n", elf->ehdr->e_machine);
-		goto free_elf;
-	}
-	if (elf->ehdr->e_version != EV_CURRENT) {
-		lerror("unknown elf version %d\n", elf->ehdr->e_version);
-		goto free_elf;
-	}
-	if (elf->ehdr->e_ident[EI_CLASS] != ELFCLASS64) {
-		lerror("unsupport %d\n", elf->ehdr->e_ident[EI_CLASS]);
-		goto free_elf;
-	}
-	if (elf->ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
+	if (!ehdr_ok(elf->ehdr)) {
 		lerror("unsupport %d\n", elf->ehdr->e_ident[EI_DATA]);
 		goto free_elf;
 	}
