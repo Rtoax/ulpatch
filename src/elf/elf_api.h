@@ -54,6 +54,9 @@ int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
 const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
 const char *phdr_type_str_unsafe(GElf_Phdr *pphdr);
 
+/* ELF Sections api */
+int handle_sections(struct elf_file *elf);
+
 /* ELF Symbol api */
 const char *st_bind_string(const GElf_Sym *sym);
 const char *st_type_string(const GElf_Sym *sym);
