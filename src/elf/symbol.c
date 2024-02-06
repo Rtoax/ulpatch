@@ -247,10 +247,14 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 {
 	size_t nsym = 0, isym = 0;
-	GElf_Sym __unused *sym, sym_mem;
+	GElf_Sym *sym, sym_mem;
 	char *symname, *pversion;
 
-	for_each_symbol(elf, scn, sym, sym_mem, isym, nsym, symname, pversion) {
+	for (isym = 0, sym = get_next_symbol(elf, scn, isym, &nsym, &sym_mem,
+					     &symname, &pversion);
+	     isym < nsym;
+	     isym++, sym = get_next_symbol(elf, scn, isym, &nsym, &sym_mem,
+					   &symname, &pversion)) {
 
 		if (!sym)
 			continue;
