@@ -37,6 +37,7 @@ enum {
 
 static pid_t target_pid = -1;
 
+static bool flag_print_task = true;
 static bool flag_print_vmas = false;
 static bool flag_dump_vma = false;
 static bool flag_unmap_vma = false;
@@ -191,6 +192,7 @@ static int parse_config(int argc, char *argv[])
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
 		!flag_print_auxv &&
+		!flag_print_task &&
 		!flag_print_threads) {
 		if ((!jmp_addr_from && jmp_addr_to) || \
 			(jmp_addr_from && !jmp_addr_to)) {
@@ -350,6 +352,9 @@ int main(int argc, char *argv[])
 			strerror(errno));
 		return 1;
 	}
+
+	if (flag_print_task)
+		print_task(stdout, target_task, config.verbose);
 
 	if (map_file)
 		mmap_a_file();

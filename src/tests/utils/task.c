@@ -92,7 +92,7 @@ TEST(Task,	dump_task,	0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
-	dump_task(task);
+	dump_task(task, true);
 	dump_task_vmas(task, true);
 	dump_task_threads(task, true);
 

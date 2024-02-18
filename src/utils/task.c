@@ -431,8 +431,22 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 
 	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
-	if (vma->type == VMA_SELF)
+	if (vma->type == VMA_SELF) {
 		task->vma_self_elf = vma;
+		/**
+		 * Executable file only could be ET_EXEC or ET_DYN, if ET_DYN,
+		 * the ELF was compiled with -fPIE.
+		 *
+		 * You could see binutils [0] binutils/readelf.c::is_pie()
+		 * function implement.
+		 *
+		 * [0] https://sourceware.org/git/binutils-gdb.git
+		 */
+		if (ehdr.e_type == ET_DYN) {
+			ldebug("%s is PIE.\n", vma->name_);
+			task->is_pie = true;
+		}
+	}
 
 	/* VMA is ELF, handle it */
 	vma->vma_elf = malloc(sizeof(struct vma_elf));
@@ -479,7 +493,9 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 * library.
 	 *
 	 * Actually, if the ELF executable file need share libraries(not compile
-	 * with '-static'), it's ET_DYN, not ET_EXEC.
+	 * with '-static'), it's ET_DYN, not ET_EXEC. And, if the executable
+	 * file is compiled with '-fPIE'(Position-Independent Executable file),
+	 * it's ET_DYN too.
 	 */
 	if (vma->vma_elf->ehdr.e_type != ET_DYN) {
 		is_share_lib = false;
@@ -992,6 +1008,24 @@ int update_task_vmas_ulp(struct task_struct *task)
 	return read_task_vmas(task, true);
 }
 
+void print_task(FILE *fp, const struct task_struct *task, bool detail)
+{
+	if (!task || !fp)
+		return;
+
+	fprintf(fp, "Command: %-32s\n", task->comm);
+	fprintf(fp, "Exe:     %-32s\n", task->exe);
+	fprintf(fp, "Pid:     %-32d\n", task->pid);
+	fprintf(fp, "PIE:     %-32s\n", task->is_pie ? "PIE" : "Not PIE");
+
+	if (!detail)
+		return;
+
+	/* Detail */
+	fprintf(fp, "FTO:     %-32x\n", task->fto_flag);
+	fprintf(fp, "MemFD:   %-32d\n", task->proc_mem_fd);
+}
+
 void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail)
 {
 	int i;
@@ -1053,10 +1087,9 @@ void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
 	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
 }
 
-int dump_task(const struct task_struct *task)
+int dump_task(const struct task_struct *task, bool detail)
 {
-	printf("COMM: %s\nPID:  %d\nEXE:  %s\n",
-		task->comm, task->pid, task->exe);
+	print_task(stdout, task, detail);
 	return 0;
 }
 
@@ -1280,7 +1313,7 @@ close_exit:
 	return ret;
 }
 
-int print_task_auxv(FILE *fp, struct task_struct *task)
+int print_task_auxv(FILE *fp, const struct task_struct *task)
 {
 	const struct task_struct_auxv *pauxv = &task->auxv;
 

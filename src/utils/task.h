@@ -210,6 +210,8 @@ struct task_struct {
 	/* realpath of /proc/PID/exe */
 	char *exe;
 
+	bool is_pie;
+
 	struct task_struct_auxv auxv;
 
 	/* If FTO_SELF set, load SELF ELF file when open. */
@@ -278,25 +280,26 @@ int free_task_vmas(struct task_struct *task);
 
 enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
 
-int dump_task(const struct task_struct *t);
+int dump_task(const struct task_struct *t, bool detail);
 
-void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
 void dump_task_vmas(struct task_struct *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
 void dump_task_threads(struct task_struct *task, bool detail);
+void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
 void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 
 int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
 
 int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv);
-int print_task_auxv(FILE *fp, struct task_struct *task);
+int print_task_auxv(FILE *fp, const struct task_struct *task);
 
 struct task_struct *open_task(pid_t pid, int flag);
 int free_task(struct task_struct *task);
+void print_task(FILE *fp, const struct task_struct *task, bool detail);
 
 int task_attach(pid_t pid);
 int task_detach(pid_t pid);

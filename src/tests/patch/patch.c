@@ -85,7 +85,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		return -1;
 	}
 
-	dump_task(task);
+	dump_task(task, true);
 	linfo("SELF: _mcount: st_value: %lx %lx\n",
 		rel_s->sym.st_value, mcount_addr);
 	linfo("LIBC: _mcount: st_value: %lx %lx\n",
