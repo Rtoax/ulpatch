@@ -163,6 +163,10 @@ AT_BASE  0x7f8c1de000
 AT_ENTRY 0x5585750800
 ```
 
+> Must support PIE ELF.
+> PIE: Position-Independent-Executable
+
+
 # Share library
 
 TODO
