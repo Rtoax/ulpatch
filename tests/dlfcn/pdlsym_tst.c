@@ -87,6 +87,9 @@ int main(int argc, char *argv[])
 while_done:
 	char *symbol = sym;
 	struct pelf *pelf = openp(pid, base_addr);
+	if (!pelf)
+		return -1;
+
 	addr = dlsymp(pelf, symbol);
 	fprintf(stderr, "%s address %lx\n", symbol, addr);
 
