@@ -90,16 +90,6 @@ struct symbol {
 	struct rb_node node;
 };
 
-
-struct file_info {
-	file_type type;
-	const char *name;
-	bool client_select;
-	/* If ELF, else = NULL */
-	const char *elf_build_id;
-};
-
-
 /* see elfutils/src/readelf.c */
 #ifdef __linux__
 #define CORE_SIGILL  SIGILL

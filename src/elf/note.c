@@ -47,9 +47,8 @@
 
 
 
-static const void *
-convert(Elf *core, Elf_Type type, uint_fast16_t count,
-	void *value, const void *data, size_t size)
+static const void *convert(Elf *core, Elf_Type type, uint_fast16_t count,
+			   void *value, const void *data, size_t size)
 {
 	Elf_Data valuedata = {
 		.d_type = type,
@@ -68,7 +67,7 @@ convert(Elf *core, Elf_Type type, uint_fast16_t count,
 	/* not support 32bit yet */
 	Elf_Data *d = (gelf_getclass(core) == ELFCLASS32
 		? elf32_xlatetom : elf64_xlatetom)
-			(&valuedata, &indata, elf_getident (core, NULL)[EI_DATA]);
+			(&valuedata, &indata, elf_getident(core, NULL)[EI_DATA]);
 	if (d == NULL) {
 		lerror("cannot convert core note data: %s", elf_errmsg(-1));
 		return 0;
@@ -79,29 +78,27 @@ convert(Elf *core, Elf_Type type, uint_fast16_t count,
 
 typedef uint8_t GElf_Byte;
 
-static bool
-buf_has_data(unsigned char const *ptr, unsigned char const *end, size_t sz)
+static bool buf_has_data(unsigned char const *ptr, unsigned char const *end,
+			 size_t sz)
 {
 	return ptr < end && (size_t) (end - ptr) >= sz;
 }
 
-static bool
-buf_read_int(Elf *core, unsigned char const **ptrp, unsigned char const *end,
-	int *retp)
+static bool buf_read_int(Elf *core, unsigned char const **ptrp,
+			 unsigned char const *end, int *retp)
 {
-	if (! buf_has_data(*ptrp, end, 4))
+	if (!buf_has_data(*ptrp, end, 4))
 		return false;
 
-	*ptrp = convert (core, ELF_T_WORD, 1, retp, *ptrp, 4);
+	*ptrp = convert(core, ELF_T_WORD, 1, retp, *ptrp, 4);
 	return true;
 }
 
-static bool
-buf_read_ulong(Elf *core, unsigned char const **ptrp, unsigned char const *end,
-	uint64_t *retp)
+static bool buf_read_ulong(Elf *core, unsigned char const **ptrp,
+			   unsigned char const *end, uint64_t *retp)
 {
 	size_t sz = gelf_fsize(core, ELF_T_ADDR, 1, EV_CURRENT);
-	if (! buf_has_data (*ptrp, end, sz))
+	if (!buf_has_data(*ptrp, end, sz))
 		return false;
 
 	union {
@@ -118,8 +115,8 @@ buf_read_ulong(Elf *core, unsigned char const **ptrp, unsigned char const *end,
 	return true;
 }
 
-static void __unused
-handle_siginfo_note(struct elf_file *elf, GElf_Word descsz, GElf_Off desc_pos)
+static void __unused handle_siginfo_note(struct elf_file *elf, GElf_Word descsz,
+					 GElf_Off desc_pos)
 {
 	Elf *core = elf->elf;
 	Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
@@ -177,22 +174,21 @@ fail:
 	}
 }
 
-static void __unused
-handle_file_note (struct elf_file *elf, GElf_Word descsz, GElf_Off desc_pos)
+static void __unused handle_file_note(struct elf_file *elf, GElf_Word descsz,
+				      GElf_Off desc_pos)
 {
 	Elf *core = elf->elf;
-	Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
+	Elf_Data *data = elf_getdata_rawchunk(core, desc_pos, descsz, ELF_T_BYTE);
 	if (data == NULL) {
-		lerror("cannot convert core note data: %s", elf_errmsg (-1));
+		lerror("cannot convert core note data: %s", elf_errmsg(-1));
 	}
 
 	unsigned char const *ptr = data->d_buf;
 	unsigned char const *const end = data->d_buf + data->d_size;
 
 	uint64_t count, page_size;
-	if (! buf_read_ulong (core, &ptr, end, &count)
-		|| ! buf_read_ulong (core, &ptr, end, &page_size))
-	{
+	if (!buf_read_ulong(core, &ptr, end, &count) ||
+	    !buf_read_ulong(core, &ptr, end, &page_size)) {
 fail:
 		printf("    Not enough data in NT_FILE note.\n");
 		return;
@@ -205,15 +201,14 @@ fail:
 
 	/* Where file names are stored.  */
 	unsigned char const *const fstart = ptr + 3 * count * addrsize;
-	char const *fptr = (char *) fstart;
+	char const *fptr = (char *)fstart;
 
 	printf("    %" PRId64 " files:\n", count);
 	for (uint64_t i = 0; i < count; ++i) {
 		uint64_t mstart, mend, moffset;
-		if (! buf_read_ulong (core, &ptr, fstart, &mstart)
-		  || ! buf_read_ulong (core, &ptr, fstart, &mend)
-		  || ! buf_read_ulong (core, &ptr, fstart, &moffset))
-		{
+		if (!buf_read_ulong(core, &ptr, fstart, &mstart) ||
+		    !buf_read_ulong(core, &ptr, fstart, &mend) ||
+		    !buf_read_ulong(core, &ptr, fstart, &moffset)) {
 			goto fail;
 		}
 
@@ -222,8 +217,9 @@ fail:
 			goto fail;
 
 		int __unused ct = printf("      %08" PRIx64 "-%08" PRIx64
-	       " %08" PRIx64 " %" PRId64,
-	       mstart, mend, moffset * page_size, mend - mstart);
+					 " %08" PRIx64 " %" PRId64,
+					 mstart, mend, moffset * page_size,
+					 mend - mstart);
 		printf("%*s%s\n", ct > 50 ? 3 : 53 - ct, "", fptr);
 
 		fptr = fnext + 1;
@@ -255,9 +251,9 @@ int print_elf_build_id(FILE *fp, uint8_t *build_id, size_t descsz)
 	return 0;
 }
 
-static void __unused
-elf_object_note(struct elf_file *elf, uint32_t namesz, const char *name,
-	uint32_t type, uint32_t descsz, const char *desc)
+static void elf_object_note(struct elf_file *elf, uint32_t namesz,
+			    const char *name, uint32_t type, uint32_t descsz,
+			    const char *desc)
 {
 	/* NT_VERSION doesn't have any info.  All data is in the name.  */
 	if (descsz == 0 && type == NT_VERSION)
@@ -275,9 +271,11 @@ elf_object_note(struct elf_file *elf, uint32_t namesz, const char *name,
 			char *build_id = malloc(descsz * 2 + 1);
 			assert(build_id && "Malloc fatal.");
 
-			// save Build ID, see:
-			// $ readelf -n /bin/ls | grep "Build ID"
-			//  Build ID: 49c2fad65d0c2df70025644c9bc7485b28bab899
+			/**
+			 * save Build ID, see:
+			 * $ readelf -n /bin/ls | grep "Build ID"
+			 *  Build ID: 49c2fad65d0c2df70025644c9bc7485b28bab899
+			 */
 
 			for (i = 0; i < descsz - 1; ++i) {
 				sprintf(v, "%02" PRIx8, (uint8_t) desc[i]);
@@ -313,20 +311,21 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 	size_t name_offset;
 	size_t desc_offset;
 
-	while (offset < data->d_size
-		&& (offset = gelf_getnote(data, offset,
-			&nhdr, &name_offset, &desc_offset)) > 0)
-	{
+	while (offset < data->d_size &&
+		(offset = gelf_getnote(data, offset, &nhdr, &name_offset,
+				       &desc_offset)) > 0) {
 		const char *name = nhdr.n_namesz == 0 ? "" : data->d_buf + name_offset;
 		const char __unused *desc = data->d_buf + desc_offset;
 
-		/* GNU Build Attributes are weird, they store most of their data
+		/**
+		 * GNU Build Attributes are weird, they store most of their data
 		 * into the owner name field.  Extract just the owner name
-		 * prefix here, then use the rest later as data. */
+		 * prefix here, then use the rest later as data.
+		 */
 		bool is_gnu_build_attr =
 			ulpatch_startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX);
 
-		// if name has "GA" prefix
+		/* if name has "GA" prefix */
 		const char *print_name = (is_gnu_build_attr
 			? ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX : name);
 
@@ -337,13 +336,13 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		/* Filter out invalid entries.  */
 		if (memchr(name, '\0', nhdr.n_namesz) != NULL
 			/* XXX For now help broken Linux kernels.  */
-			|| 1)
-		{
+			|| 1) {
 			if (elf->ehdr->e_type == ET_CORE) {
-				// TODO
+				/* TODO */
 			} else {
-				elf_object_note(elf, nhdr.n_namesz, name, nhdr.n_type,
-					nhdr.n_descsz, desc);
+				elf_object_note(elf, nhdr.n_namesz, name,
+						nhdr.n_type, nhdr.n_descsz,
+						desc);
 			}
 		}
 	}
