@@ -33,6 +33,11 @@ I think I should detail the inspiration of ULPatch from these open source projec
 - [ ] `loongarch64`: ready to go
 
 
+# Installing
+
+See [INSTALL.md](INSTALL.md) for installation steps on your platform.
+
+
 # Theroy
 
 ## ULPatch
