@@ -1,4 +1,4 @@
-![ULPatch Logo](images/logo.png)
+<center><a href="images/logo.png"><img src="images/logo.png" border=0 width=300></a></center>
 
 ULPatch
 ========
