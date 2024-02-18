@@ -185,6 +185,22 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
+	/**
+	 * It is necessary to specify a valid process ID.
+	 */
+	if (target_pid == -1) {
+		fprintf(stderr, "Specify pid with -p, --pid.\n");
+		exit(1);
+	}
+
+	if (!proc_pid_exist(target_pid)) {
+		fprintf(stderr, "pid %d not exist.\n", target_pid);
+		exit(1);
+	}
+
+	/**
+	 * There needs to be one action, or more than one action.
+	 */
 	if (!flag_print_vmas &&
 		!flag_dump_vma &&
 		!map_file &&
@@ -192,7 +208,6 @@ static int parse_config(int argc, char *argv[])
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
 		!flag_print_auxv &&
-		!flag_print_task &&
 		!flag_print_threads) {
 		if ((!jmp_addr_from && jmp_addr_to) || \
 			(jmp_addr_from && !jmp_addr_to)) {
@@ -200,7 +215,13 @@ static int parse_config(int argc, char *argv[])
 			exit(1);
 		}
 		fprintf(stderr, "nothing to do, -h, --help.\n");
-		exit(1);
+	} else {
+		/**
+		 * If no command line arguments are specified, some task
+		 * information will be printed by default, but if command line
+		 * arguments are specified, it will not be printed.
+		 */
+		flag_print_task = false;
 	}
 
 	if (flag_dump_vma && !output_file) {
@@ -215,16 +236,6 @@ static int parse_config(int argc, char *argv[])
 
 	if (output_file && fexist(output_file)) {
 		fprintf(stderr, "%s is already exist.\n", output_file);
-		exit(1);
-	}
-
-	if (target_pid == -1) {
-		fprintf(stderr, "Specify pid with -p, --pid.\n");
-		exit(1);
-	}
-
-	if (!proc_pid_exist(target_pid)) {
-		fprintf(stderr, "pid %d not exist.\n", target_pid);
 		exit(1);
 	}
 
