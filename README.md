@@ -45,8 +45,12 @@ See [INSTALL.md](INSTALL.md) for installation steps on your platform.
 ![ulpatch](docs/images/ulpatch.drawio.svg)
 
 
-## Ftrace
+## UFtrace
 
 Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compile option.
 `BUILD_ULFTRACE` decides whether to compile `ulftrace`.
 
+
+# Releases
+
+See [RELEASE.md](RELEASE.md) for releases.
