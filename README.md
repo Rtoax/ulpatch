@@ -1,3 +1,5 @@
+![ULPatch Logo](images/logo.png)
+
 ULPatch
 ========
 
