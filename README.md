@@ -17,11 +17,11 @@ Hot patching in the kernel is already a relatively mature technology. Implementi
 
 ## Related Projects
 
-ULPatch draws on several excellent open source projects, such as [cloudlinux/libcare](https://github.com/cloudlinux/libcare), and Huawei’s secondary development [openeuler/libcareplus](https://gitee.com/openeuler/libcareplus). SUSE has also open sourced its own hot patch solution [SUSE/libpulp](https://github.com/SUSE/libpulp).
+ULPatch draws on several excellent open source projects, such as [cloudlinux/libcare](https://github.com/cloudlinux/libcare), and Huawei’s secondary development [openeuler/libcareplus](https://gitee.com/openeuler/libcareplus). SUSE has also open sourced its own live patch solution [SUSE/libpulp](https://github.com/SUSE/libpulp).
 
 At the same time, the implementation of the kernel's `finit_module(2)` and `init_module(2)` system calls is also of great reference value. Even in the early stages of development, the relocation code was transplanted from these two system calls.
 
-Judging from the current research on outstanding projects, the hot patch function relies on modifying the assembly instructions at the function entrance to make it jump to a new function, thereby realizing the hot patch function.
+Judging from the current research on outstanding projects, the live patch function relies on modifying the assembly instructions at the function entrance to make it jump to a new function, thereby realizing the live patch function.
 
 I think I should detail the inspiration of ULPatch from these open source projects in another document instead of a README file.
 
