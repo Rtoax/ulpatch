@@ -1016,7 +1016,7 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 	fprintf(fp, "Command: %-32s\n", task->comm);
 	fprintf(fp, "Exe:     %-32s\n", task->exe);
 	fprintf(fp, "Pid:     %-32d\n", task->pid);
-	fprintf(fp, "PIE:     %-32s\n", task->is_pie ? "PIE" : "Not PIE");
+	fprintf(fp, "PIE:     %-32s\n", task->is_pie ? "YES" : "NO");
 
 	if (!detail)
 		return;
