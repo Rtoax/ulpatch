@@ -12,7 +12,7 @@
 ULPatch is open source user space live patch tool.
 
 
-## Background Introduction
+## Background
 
 For a process like Qemu that cannot be interrupted and restarted, vulnerability fixing is very difficult. Especially for cloud vendors, the live patch function is very important.
 
@@ -31,6 +31,8 @@ I think I should detail the inspiration of ULPatch from these open source projec
 
 
 # Support Architecture
+
+Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with or hope to support, if they do not contain what you need, you are welcome to co-develop.
 
 - [ ] `x86_64`: ready to go
 - [ ] `aarch64`: ready to go
