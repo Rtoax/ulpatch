@@ -1,4 +1,4 @@
-<center><a href="images/logo.png"><img src="images/logo.png" border=0 width=300></a></center>
+<center><a href="images/logo.drawio.svg"><img src="images/logo.drawio.svg" border=0 width=300></a></center>
 
 # ULPatch: A tool for userspace live path
 ![License GPL](images/License-GNU-GPL-blue.svg)
