@@ -1,6 +1,6 @@
 <center><a href="images/logo.drawio.svg"><img src="images/logo.drawio.svg" border=0 width=300></a></center>
 
-# ULPatch: A tool for userspace live path
+# ULPatch: A tool for userspace live patch
 ![License GPL](images/License-GNU-GPL-blue.svg)
 ![License GPL 2.0](images/License-GNU-GPL-2.0.svg)
 
