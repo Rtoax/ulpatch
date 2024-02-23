@@ -949,9 +949,8 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		if (!fgets(line, sizeof(line), mapsfp))
 			break;
 
-		r = sscanf(line, "%lx-%lx %s %lx %x:%x %ld %255s",
-				&start, &end, perms, &pgoff,
-				&major, &minor, &inode, name_);
+		r = sscanf(line, "%lx-%lx %s %lx %x:%x %ld %255s", &start,
+			   &end, perms, &pgoff, &major, &minor, &inode, name_);
 		if (r <= 0) {
 			lerror("sscanf failed.\n");
 			return -1;
@@ -960,7 +959,8 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		if (update_ulp) {
 			old = find_vma(task, start + 1);
 			/* Skip if alread exist. */
-			if (old && old->vm_start == start && old->vm_end == end) {
+			if (old && old->vm_start == start &&
+			    old->vm_end == end) {
 				lwarning("vma %s alread exist.\n", name_);
 				continue;
 			} else
