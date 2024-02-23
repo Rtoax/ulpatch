@@ -30,16 +30,16 @@
 
 int open_pid_maps(pid_t pid)
 {
-	int ret;
+	int mapsfd;
 	char maps[] = "/proc/1234567890/maps";
 
 	snprintf(maps, sizeof(maps), "/proc/%d/maps", pid);
-	ret = open(maps, O_RDONLY);
-	if (ret <= 0) {
+	mapsfd = open(maps, O_RDONLY);
+	if (mapsfd <= 0) {
 		lerror("open %s failed. %s\n", maps, strerror(errno));
-		ret = -errno;
+		mapsfd = -errno;
 	}
-	return ret;
+	return mapsfd;
 }
 
 static int __open_pid_mem(pid_t pid, int flags)
@@ -49,6 +49,7 @@ static int __open_pid_mem(pid_t pid, int flags)
 	int memfd = open(mem, flags);
 	if (memfd <= 0) {
 		lerror("open %s failed. %s\n", mem, strerror(errno));
+		memfd = -errno;
 	}
 	return memfd;
 }
