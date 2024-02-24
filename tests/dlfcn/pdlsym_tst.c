@@ -4,11 +4,9 @@
 #include <getopt.h>
 
 
-void *pdlsym(pid_t pid, void *base, const char *symbol);
-
 struct pelf;
 struct pelf *openp(pid_t pid, off_t base);
-off_t dlsymp(struct pelf *pelf, const char *symbol);
+off_t pdlsym(struct pelf *pelf, const char *symbol);
 
 void usage(int exitcode)
 {
@@ -90,7 +88,7 @@ while_done:
 	if (!pelf)
 		return -1;
 
-	addr = dlsymp(pelf, symbol);
+	addr = pdlsym(pelf, symbol);
 	fprintf(stderr, "%s address %lx\n", symbol, addr);
 
 	return 0;

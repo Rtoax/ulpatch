@@ -13,7 +13,7 @@ TARGETS_PATCH_SO := patch.so
 build: ${TARGETS} ${TARGETS_PATCH_SO}
 
 hello: hello.o
-pdlsym_tst: pdlsym_tst.o pdlsym.o pdlsym_mine.o
+pdlsym_tst: pdlsym_tst.o pdlsym_mine.o
 
 CFLAGS_hello := -g -ggdb -flto -pthread -DWITH_DLOPEN_TEST=1
 

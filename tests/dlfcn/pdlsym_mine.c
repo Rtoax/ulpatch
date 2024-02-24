@@ -234,7 +234,7 @@ static int symiter(struct pelf *pelf, int i, uint32_t *stridx, uintptr_t *value,
 	return 0;
 }
 
-off_t dlsymp(struct pelf *pelf, const char *symbol)
+off_t pdlsym(struct pelf *pelf, const char *symbol)
 {
 	int i, ret;
 	uint32_t stridx;
