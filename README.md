@@ -5,6 +5,7 @@
 ![License GPL](images/License-GNU-GPL-blue.svg)
 ![License GPL 2.0](images/License-GNU-GPL-2.0.svg)
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/Rtoax/ulpatch/pulls)
+[![docs](https://img.shields.io/badge/docs-latest-blue)](https://rtoax.github.io/ulpatch/)
 
 <br/>
 
