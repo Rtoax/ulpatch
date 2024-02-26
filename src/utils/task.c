@@ -985,7 +985,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		/* Find libc.so */
 		if (!task->libc_vma && vma->type == VMA_LIBC &&
 		    vma->prot & PROT_EXEC) {
-			ldebug("Get libc:\n");
+			ldebug("Get x libc: 0x%lx\n", vma->vm_start);
 			task->libc_vma = vma;
 		}
 
@@ -1802,11 +1802,13 @@ int task_syscall(struct task_struct *task, int nr,
 	unsigned char orig_code[sizeof(__syscall)];
 	unsigned long libc_base = task->libc_vma->vm_start;
 
+	errno = 0;
+
 #if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);
 #elif defined(__aarch64__)
 	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
-			(void*)&orig_regs_iov);
+		     (void*)&orig_regs_iov);
 #else
 # error "Unsupport architecture"
 #endif
