@@ -13,7 +13,7 @@ CFLAGS :=
 CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
 
-TARGETS := hello
+TARGETS := hello hello-pie
 TARGETS += test
 
 TARGETS_ULP := patch-print.ulp
@@ -30,13 +30,16 @@ CFLAGS += -D__ULP_DEV
 build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
+hello-pie: hello-pie.o
 test: test.o $(addsuffix .o, $(basename $(TARGETS_ULP)))
 
 CFLAGS_hello := -g -ggdb -flto -pthread
+CFLAGS_hello-pie := ${CFLAGS_hello} -fpie
+LDFLAGS_hello-pie := -pie
 
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
+	$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*))
 
 %.ulp: %.o
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
@@ -45,7 +48,7 @@ CFLAGS_hello := -g -ggdb -flto -pthread
 
 $(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
-	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
+	$(CC) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
 	strip $(@) -o $(@).stripped
 
 clean:

@@ -59,7 +59,8 @@ while true; do
 done
 
 [[ -z ${pid} ]] && pid=$(pidof hello || true)
-[[ -z ${pid} ]] && echo "ERROR: Run ./hello first or specify -p" && exit 1
+[[ -z ${pid} ]] && pid=$(pidof hello-pie || true)
+[[ -z ${pid} ]] && echo "ERROR: Run ./hello or ./hello-pie first or specify -p" && exit 1
 
 [[ -z ${patch} ]] && echo "ERROR: Must specify ulpatch with -u" && exit 1
 [[ ! -e ${patch} ]] && echo "ERROR: ${patch} is not exist." && exit 1
