@@ -17,6 +17,8 @@ nav:
 
 theme:
   name: material
+  logo: images/logo.drawio.svg
+  favicon: images/logo.drawio.svg
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default

@@ -1,9 +1,9 @@
-<center><a href="images/logo.drawio.svg"><img src="images/logo.drawio.svg" border=0 width=300></a></center>
+<center><a href="docs/images/logo.drawio.svg"><img src="docs/images/logo.drawio.svg" border=0 width=300></a></center>
 
 # ULPatch: A tool for userspace live patch
 
-![License GPL](images/License-GNU-GPL-blue.svg)
-![License GPL 2.0](images/License-GNU-GPL-2.0.svg)
+![License GPL](docs/images/License-GNU-GPL-blue.svg)
+![License GPL 2.0](docs/images/License-GNU-GPL-2.0.svg)
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/Rtoax/ulpatch/pulls)
 [![docs](https://img.shields.io/badge/docs-latest-blue)](https://rtoax.github.io/ulpatch/)
 
