@@ -1,13 +1,21 @@
 <center><a href="docs/images/logo.drawio.svg"><img src="docs/images/logo.drawio.svg" border=0 width=300></a></center>
+<br/>
+
+<div align="center" markdown>
 
 # ULPatch: A tool for userspace live patch
 
-![License GPL](docs/images/License-GNU-GPL-blue.svg)
-![License GPL 2.0](docs/images/License-GNU-GPL-2.0.svg)
+[![docs](https://github.com/Rtoax/ulpatch/actions/workflows/docs.yml/badge.svg)](https://rtoax.github.io/ulpatch/)
+[![license](https://img.shields.io/github/license/Rtoax/ulpatch.svg)](https://github.com/Rtoax/ulpatch/blob/master/LICENSE)
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/Rtoax/ulpatch/pulls)
 [![docs](https://img.shields.io/badge/docs-latest-blue)](https://rtoax.github.io/ulpatch/)
 
-<br/>
+[📝Documentation](https://rtoax.github.io/ulpatch/) |
+[🚀Installation](https://rtoax.github.io/ulpatch/INSTALL/) |
+[🎉Update News](https://rtoax.github.io/ulpatch/RELEASE/) |
+[🐛Reporting Issues](https://github.com/Rtoax/ulpatch/issues/new/choose)
+
+</div>
 
 
 # Introduction
