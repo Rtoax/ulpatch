@@ -12,18 +12,19 @@ test [-h|--help] [-u|--patch]
 -p, --pid  [PID]        specify pid
 -u, --patch [ULPATCH]    specify ulpatch file
 
--d, --debug             debug mode
-
+-d, --debug             debug mode for ulpatch
+-v, --verbose           set -x
 -h, --help              print this info
 "
 	exit ${1-0}
 }
 
 TEMP=$(getopt \
-	--options p:u:dh \
+	--options p:u:dvh \
 	--long pid: \
 	--long patch: \
 	--long debug \
+	--long verbose \
 	--long help \
 	-n ulpatch-hello-test -- "$@")
 
@@ -47,6 +48,10 @@ while true; do
 		shift
 		debug=$1
 		;;
+	-v|--verbose)
+		shift
+		set -x
+		;;
 	-h|--help)
 		shift
 		__usage__
@@ -58,9 +63,9 @@ while true; do
 	esac
 done
 
-[[ -z ${pid} ]] && pid=$(pidof hello || true)
-[[ -z ${pid} ]] && pid=$(pidof hello-pie || true)
-[[ -z ${pid} ]] && echo "ERROR: Run ./hello or ./hello-pie first or specify -p" && exit 1
+[[ -z ${pid} ]] && pid=( $(pidof hello hello-pie || true) )
+[[ -z "${pid}" ]] && echo "ERROR: Run ./hello or ./hello-pie first or specify -p" && exit 1
+[[ ${#pid[@]} -gt 1 ]] && echo "ERROR: too much processes are running." && exit 1
 
 [[ -z ${patch} ]] && echo "ERROR: Must specify ulpatch with -u" && exit 1
 [[ ! -e ${patch} ]] && echo "ERROR: ${patch} is not exist." && exit 1
