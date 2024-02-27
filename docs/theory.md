@@ -11,5 +11,6 @@
 
 # ULFtrace
 
-Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compile option.
+Same as [linux ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html), need gcc `-pg` compile option.
 `BUILD_ULFTRACE` decides whether to compile `ulftrace`.
+

@@ -6,13 +6,24 @@ ULPatch Install
 ## Fedora/RHEL/ALmaLinux
 
 ```bash
-$ sudo dnf install -y glibc-devel cmake gcc binutils-devel elfutils-libelf-devel libunwind-devel
+$ sudo dnf install -y \
+	binutils-devel \
+	cmake \
+	elfutils-libelf-devel \
+	gcc \
+	glibc-devel \
+	libunwind-devel
 ```
 
 ## Debian/Ubuntu
 
 ```bash
-$ sudo apt install -y libc6 cmake gcc binutils-dev libunwind-dev
+$ sudo apt install -y \
+	binutils-dev \
+	cmake \
+	gcc \
+	libc6 \
+	libunwind-dev
 ```
 
 # Compile
@@ -21,7 +32,11 @@ $ sudo apt install -y libc6 cmake gcc binutils-dev libunwind-dev
 $ cd ulpatch
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_TESTING=OFF -DBUILD_ULFTRACE=OFF -DBUILD_ULTASK=OFF ..
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr \
+	-DBUILD_TESTING=OFF \
+	-DBUILD_ULFTRACE=OFF \
+	-DBUILD_ULTASK=OFF \
+	..
 $ make -j$(nproc)
 ```
 
