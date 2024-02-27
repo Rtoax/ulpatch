@@ -13,6 +13,7 @@ nav:
   - Related Knowledge:
     - Relocations: relocations.md
     - Symbol Value: symbol-value.md
+  - Releases: RELEASE.md
 
 theme:
   name: material
@@ -117,6 +118,7 @@ plugins:
             Related Knowledge: 相关知识
             Relocations: 重定向
             Symbol Value: 符号地址
+            Releases: 发布
 
 extra:
   generator: false

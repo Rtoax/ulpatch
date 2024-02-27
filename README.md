@@ -68,7 +68,7 @@ Same as [linux](https://github.com/torvalds/linux) ftrace, need gcc `-pg` compil
 
 # Releases
 
-See [RELEASE.md](RELEASE.md) for releases.
+See [docs/RELEASE.md](docs/RELEASE.md) for releases.
 
 
 # Warnings
