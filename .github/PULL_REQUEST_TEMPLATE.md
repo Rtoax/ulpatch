@@ -7,7 +7,8 @@ Then please complete the checklist.
 ##### Checklist
 
 - [ ] You have read the [Contributing Guidelines on pull requests](https://github.com/Rtoax/ulpatch/blob/master/CONTRIBUTING.md)
-- [ ] Help information changes are updated in `man/` and if needed in `docs/`.
+- [ ] Help information changes are updated in `man/` and if needed in `docs/` and `mkdocs.yml`.
+- [ ] If this is your first submission, maybe you need to add your name to the `AUTHORS`.
 - [ ] The new behaviour is covered by tests.
 
 ## Motivation
