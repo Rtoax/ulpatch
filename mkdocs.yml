@@ -6,9 +6,13 @@ copyright: Copyright &copy; 2021 - 2024 Rong Tao
 
 nav:
   - Home: index.md
+  - Installation: INSTALL.md
   - Tutorials:
     - Code Style: code-style.md
     - Developer: developers.md
+  - Related Knowledge:
+    - Relocations: relocations.md
+    - Symbol Value: symbol-value.md
 
 theme:
   name: material
@@ -106,9 +110,13 @@ plugins:
           name: 中文
           nav_translations:
             Home: 主页
+            Installation: 安装
             Tutorials: 教程
             Code Style: 代码风格
             Developer: 开发者
+            Related Knowledge: 相关知识
+            Relocations: 重定向
+            Symbol Value: 符号地址
 
 extra:
   generator: false

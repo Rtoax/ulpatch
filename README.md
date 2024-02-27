@@ -50,7 +50,7 @@ Due to my limited personal experience, I can't understand and master all the arc
 
 # Installing
 
-See [INSTALL.md](INSTALL.md) for installation steps on your platform.
+See [docs/INSTALL.md](docs/INSTALL.md) for installation steps on your platform.
 
 
 # Theroy
