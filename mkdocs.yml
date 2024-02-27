@@ -7,6 +7,7 @@ copyright: Copyright &copy; 2021 - 2024 Rong Tao
 nav:
   - Home: index.md
   - Installation: INSTALL.md
+  - Theory: theory.md
   - Tutorials:
     - Code Style: code-style.md
     - Developer: developers.md
@@ -114,6 +115,7 @@ plugins:
           nav_translations:
             Home: 主页
             Installation: 安装
+            Theory: 原理
             Tutorials: 教程
             Code Style: 代码风格
             Developer: 开发者
