@@ -27,6 +27,10 @@ TARGETS_ULP += patch-pthread.ulp
 
 CFLAGS += -D__ULP_DEV
 
+ifdef MCOUNT
+	CFLAGS += -pg
+endif
+
 build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
