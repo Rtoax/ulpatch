@@ -32,10 +32,11 @@ add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
 
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
+# If you modify, update docs/INSTALL.md
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 set(BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(BUILD_ULTASK ON CACHE BOOL "Build ultask")
-set(ENABLE_MAN ON CACHE BOOL "Build man pages")
+set(BUILD_MAN ON CACHE BOOL "Build man pages")
 set(CMAKE_INSTALL_PREFIX /usr)
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -157,10 +158,10 @@ PROGRAMS
 DESTINATION ${ULPATCH_SHARE_DIR}
 )
 
-if (ENABLE_MAN)
+if (BUILD_MAN)
 	set(CMAKE_INSTALL_MANDIR "/usr/share/man/")
 	add_subdirectory(man)
-endif(ENABLE_MAN)
+endif(BUILD_MAN)
 
 # uninstall targets
 if(NOT TARGET uninstall)
