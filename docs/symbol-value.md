@@ -1,11 +1,11 @@
 
 ## LSB executable
 
-### Example 1: on x86_64
+### Example 1: on x86_64 non-PIE
 
 The `PT_LOAD` in ELF file:
 
-```
+```bash
 $ readelf -l /home/rongtao/Git/ulpatch/tests/hello/hello
 Program Headers:
   Type           Offset             VirtAddr           PhysAddr
@@ -22,7 +22,7 @@ Program Headers:
 
 The `PT_LOAD` in `VMA` address space:
 
-```
+```bash
 $ cat /proc/$(pidof hello)/maps
 00400000-00401000 r--p 00000000 08:10 9547381   /home/rongtao/Git/ulpatch/tests/hello/hello
 00401000-00402000 r-xp 00001000 08:10 9547381   /home/rongtao/Git/ulpatch/tests/hello/hello
@@ -34,7 +34,7 @@ $ cat /proc/$(pidof hello)/maps
 
 The symbol value in ELF file:
 
-```
+```bash
 $ readelf --syms /home/rongtao/Git/ulpatch/tests/hello/hello
 [...]
 Symbol table '.symtab' contains 46 entries:
@@ -53,7 +53,7 @@ Symbol table '.symtab' contains 46 entries:
 
 The symbol value in address space:
 
-```
+```bash
 $ gdb -q -p $(pidof hello)
 [...]
 (gdb) p &keep_running
@@ -74,7 +74,7 @@ $2 = {int (int, char **)} 0x401235 <main>
 
 And the auxiliary vector:
 
-```
+```bash
 $ ultask -p $(pidof hello) --auxv
 TYPE     VALUE
 AT_PHDR  0x400040
@@ -86,18 +86,18 @@ There are two different situation. The first is the `p_vaddr != 0`, then the min
 
 For example `print_hello`:
 
-```
+```bash
 maps:	0x0000000000400000
 ELF:	0x00000000004011cb
 GDB:	0x00000000004011cb
 ```
 
 
-### Example 2: on aarch64
+### Example 2: on aarch64 PIE
 
 The `PT_LOAD` in ELF file:
 
-```
+```bash
 $ readelf -l /home/rongtao/Git/ulpatch/tests/hello/hello
 Program Headers:
   Type           Offset             VirtAddr           PhysAddr
@@ -110,7 +110,7 @@ Program Headers:
 
 The `PT_LOAD` in `VMA` address space:
 
-```
+```bash
 $ cat /proc/$(pidof hello)/maps
 5585750000-5585751000 r-xp 00000000 b3:02 1061352   /home/rongtao/Git/ulpatch/tests/hello/hello
 558576f000-5585770000 r--p 0000f000 b3:02 1061352   /home/rongtao/Git/ulpatch/tests/hello/hello
@@ -118,7 +118,7 @@ $ cat /proc/$(pidof hello)/maps
 ```
 The symbol value in ELF file:
 
-```
+```bash
 $ readelf --syms /home/rongtao/Git/ulpatch/tests/hello/hello
 Symbol table '.symtab' contains 128 entries:
    Num:    Value          Size Type    Bind   Vis      Ndx Name
@@ -136,7 +136,7 @@ Symbol table '.symtab' contains 128 entries:
 
 The symbol value in address space:
 
-```
+```bash
 $ gdb -q -p $(pidof hello)
 [...]
 (gdb) p sig_handler
@@ -153,7 +153,7 @@ $5 = {int (int, char **)} 0x5585750a10 <main>
 
 And the auxiliary vector:
 
-```
+```bash
 $ ultask -p $(pidof hello) --auxv
 TYPE     VALUE
 AT_PHDR  0x5585750040
@@ -161,13 +161,15 @@ AT_BASE  0x7f8c1de000
 AT_ENTRY 0x5585750800
 ```
 
-> Must support PIE ELF.
-> PIE: Position-Independent-Executable
-
 
 ## Share library
 
 TODO
+
+
+## Notes
+
+- Must support PIE ELF(PIE: Position-Independent-Executable);
 
 
 ## Links
