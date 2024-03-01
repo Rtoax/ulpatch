@@ -1,5 +1,5 @@
-Relocations
-===========
+
+## Relocations
 
 Relocation is the process of connecting symbolic references with symbolic definitions. For example, when a program calls a function, the associated call instruction must transfer control to the proper destination address at execution.
 
@@ -30,9 +30,9 @@ typedef struct {
 ```
 
 
-# Dynamic Relocations
+## Dynamic Relocations
 
-# Links
+## Links
 
 - GitHub: [Application Binary Interface for the Arm® Architecture](https://github.com/ARM-software/abi-aa/releases)
 - https://refspecs.linuxbase.org/: [Relocation](https://refspecs.linuxbase.org/elf/gabi4+/ch4.reloc.html)

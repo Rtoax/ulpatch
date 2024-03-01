@@ -1,9 +1,11 @@
-ULPatch Install
-===============
+---
+hide:
+  - navigation
+---
 
-# Install Dependences
+## Install Dependences
 
-## Fedora/RHEL/ALmaLinux
+### Fedora/RHEL/ALmaLinux
 
 ```bash
 $ sudo dnf install -y \
@@ -16,7 +18,7 @@ $ sudo dnf install -y \
 ```
 
 
-## Debian/Ubuntu
+### Debian/Ubuntu
 
 ```bash
 $ sudo apt install -y \
@@ -28,7 +30,7 @@ $ sudo apt install -y \
 ```
 
 
-# Compile
+## Compile
 
 ```bash
 $ cd ulpatch
@@ -89,13 +91,13 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_MAN=0 ..
 ```
 
-# Install
+## Install
 
 ```bash
 $ sudo make install
 ```
 
-# Uninstall
+## Uninstall
 
 ```bash
 $ sudo make uninstall

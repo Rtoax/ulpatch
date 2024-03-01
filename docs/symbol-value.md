@@ -1,9 +1,7 @@
-Symbol Value
-============
 
-# LSB executable
+## LSB executable
 
-## Example 1: on x86_64
+### Example 1: on x86_64
 
 The `PT_LOAD` in ELF file:
 
@@ -95,7 +93,7 @@ GDB:	0x00000000004011cb
 ```
 
 
-## Example 2: on aarch64
+### Example 2: on aarch64
 
 The `PT_LOAD` in ELF file:
 
@@ -167,12 +165,12 @@ AT_ENTRY 0x5585750800
 > PIE: Position-Independent-Executable
 
 
-# Share library
+## Share library
 
 TODO
 
 
-# Links
+## Links
 
 - https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
 - https://jvns.ca/blog/2018/01/09/resolving-symbol-addresses/
