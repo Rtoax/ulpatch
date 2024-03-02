@@ -156,6 +156,8 @@ const char *strbuildid(uint8_t *bid, size_t descsz, char *buf, size_t buf_len);
 
 /* ELF Rela api */
 int handle_relocs(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
+const char *rela_type_string(int r);
+void print_rela(GElf_Rela *rela);
 
 /* ELF Auxv api */
 int auxv_type_info(GElf_Xword a_type, const char **name, const char **format);

@@ -69,6 +69,7 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	Elf64_Sym *sym;
 	void *loc;
 	uint64_t val;
+	int r_type = 0;
 
 	ldebug("Applying relocate section %u to %u\n", relsec, sechdrs[relsec].sh_info);
 
@@ -90,15 +91,15 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			+ ELF64_R_SYM(rel[i].r_info);
 
 		const char *symname = strtab + sym->st_name;
-
+		r_type = (int)ELF64_R_TYPE(rel[i].r_info);
 		val = sym->st_value + rel[i].r_addend;
 
-		ldebug("RELA: %s, st_name %d, type %d, st_value %lx, r_addend %lx, loc %lx, val %lx\n",
-			symname, sym->st_name,
-			(int)ELF64_R_TYPE(rel[i].r_info),
+		ldebug("RELA: %s, st_name %d, type %d, st_value %lx, "
+		       "r_addend %lx, loc %lx, val %lx\n",
+			symname, sym->st_name, r_type,
 			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
 
-		switch (ELF64_R_TYPE(rel[i].r_info)) {
+		switch (r_type) {
 
 		case R_X86_64_NONE:
 			lwarning("Handle R_X86_64_NONE\n");
@@ -116,8 +117,11 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
-			if (val != *(uint32_t *)loc)
+			if (val != *(uint32_t *)loc) {
+				lerror("R_X86_64_32 overflow val(%lx) != loc(%x)\n",
+					val, *(uint32_t *)loc);
 				goto overflow;
+			}
 			break;
 
 		case R_X86_64_32S:
@@ -180,8 +184,8 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		default:
-			lerror("Unknown rela relocation: %lu\n",
-					ELF64_R_TYPE(rel[i].r_info));
+			lerror("Unknown rela relocation: %s\n",
+				rela_type_string(r_type));
 			return -ENOEXEC;
 		}
 	}
@@ -190,13 +194,13 @@ int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 invalid_relocation:
 	lerror("x86: Skipping invalid relocation target, "
-		"existing value is nonzero for type %d, loc %p, val %lx\n",
-		(int)ELF64_R_TYPE(rel[i].r_info), loc, val);
+		"existing value is nonzero for type %s(%d), loc %p, val %lx\n",
+		rela_type_string(r_type), r_type, loc, val);
 	return -ENOEXEC;
 
 overflow:
-	lerror("overflow in relocation type %d val %lx\n",
-		(int)ELF64_R_TYPE(rel[i].r_info), val);
+	lerror("overflow in relocation type %s(%d) val %lx\n",
+		rela_type_string(r_type), r_type, val);
 	lerror("likely not compiled with -mcmodel=kernel.\n");
 	return -ENOEXEC;
 }
