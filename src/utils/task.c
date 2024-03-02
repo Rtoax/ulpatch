@@ -704,10 +704,12 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
 }
 
 /* Insert OK, return 0, else return -1 */
-int task_vma_link_symbol(struct task_struct *task, struct symbol *s)
+static int task_vma_link_symbol(struct task_struct *task, struct symbol *s,
+				struct vm_area_struct *vma)
 {
 	struct rb_node *node;
 
+	s->vma = vma;
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
 			      (unsigned long)s);
 	if (unlikely(node))
@@ -730,7 +732,8 @@ static int load_self_vma_symbols(struct vm_area_struct *vma)
 
 	struct symbol *sym, *tmp;
 
-	rbtree_postorder_for_each_entry_safe(sym, tmp, &task->exe_elf->symbols,
+	rbtree_postorder_for_each_entry_safe(sym, tmp,
+					     &task->exe_elf->elf_file_symbols,
 					     node) {
 		struct symbol *new;
 
@@ -750,10 +753,7 @@ static int load_self_vma_symbols(struct vm_area_struct *vma)
 		}
 
 		ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
-
-		new->vma = vma;
-
-		err = task_vma_link_symbol(task, new);
+		err = task_vma_link_symbol(task, new, vma);
 		if (err)
 			free_symbol(new);
 	}
@@ -882,9 +882,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	syms = (GElf_Sym *)buffer;
 
 	for (i = 0; i < symtab_sz / sizeof(GElf_Sym); i++) {
-
 		struct symbol *s;
-
 		GElf_Sym *sym = syms + i;
 		const char *symname = buffer + symtab_sz + syms[i].st_name;
 
@@ -900,9 +898,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 			continue;
 		}
 
-		s->vma = vma;
-
-		err = task_vma_link_symbol(task, s);
+		err = task_vma_link_symbol(task, s, vma);
 		if (err)
 			free_symbol(s);
 	}

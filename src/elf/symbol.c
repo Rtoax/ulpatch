@@ -87,7 +87,6 @@ int is_undef_symbol(const GElf_Sym *sym)
 	return sym->st_shndx == SHN_UNDEF || sym->st_shndx >= SHN_LORESERVE;
 }
 
-
 GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 			  size_t *nsyms, GElf_Sym *sym_mem, char **symname,
 			  char **pversion)
@@ -258,7 +257,8 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		if (!sym)
 			continue;
 
-		ldebug("%s%s%s\n", symname, pversion?"@":"", pversion?:"");
+		ldebug("%s%s%s\n", symname, pversion ? "@" : "",
+			pversion ?: "");
 
 		/* save symbol to rbtree */
 		struct symbol *s = alloc_symbol(symname, sym);
@@ -305,7 +305,7 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 	struct symbol tmp = {
 		.name = (char *)name,
 	};
-	struct rb_node *node = rb_search_node(&elf->symbols,
+	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
 					      cmp_symbol_name,
 					      (unsigned long)&tmp);
 	return node ? rb_entry(node, struct symbol, node) : NULL;
@@ -314,7 +314,7 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 /* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
-	struct rb_node *node = rb_insert_node(&elf->symbols, &s->node,
+	struct rb_node *node = rb_insert_node(&elf->elf_file_symbols, &s->node,
 					      cmp_symbol_name,
 					      (unsigned long)s);
 	return node ? -1 : 0;

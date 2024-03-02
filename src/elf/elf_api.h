@@ -61,10 +61,11 @@ struct elf_file {
 	GElf_Word verneed_stridx;
 	GElf_Word verdef_stridx;
 
-	/* save all symbol for fast search
+	/**
+	 * Save all symbol for fast search
 	 * struct symbol.node
 	 */
-	struct rb_root symbols;
+	struct rb_root elf_file_symbols;
 
 	/* has fentry, mcount(), etc. */
 	bool support_ftrace;
