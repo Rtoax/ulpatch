@@ -1253,6 +1253,12 @@ static int __get_exe(struct task_struct *task)
 		return -errno;
 	}
 	realpath[ret] = '\0';
+
+	if (!fexist(realpath)) {
+		lerror("Execute %s is removed!\n", realpath);
+		return -ENOENT;
+	}
+
 	task->exe = strdup(realpath);
 
 	return 0;
@@ -1355,7 +1361,9 @@ struct task_struct *open_task(pid_t pid, int flag)
 	task->fto_flag = flag;
 	task->pid = pid;
 	__get_comm(task);
-	__get_exe(task);
+	if (__get_exe(task))
+		goto free_task;
+
 	task->proc_mem_fd = memfd;
 
 	read_task_vmas(task, false);
