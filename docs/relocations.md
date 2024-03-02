@@ -32,6 +32,21 @@ typedef struct {
 
 ## Dynamic Relocations
 
+TODO
+
+
+## Live Process Relocation
+
+TODO
+
+
+## PIE Relocation
+
+> PIE: Position-Independent-Executable
+
+TODO
+
+
 ## Links
 
 - GitHub: [Application Binary Interface for the Arm® Architecture](https://github.com/ARM-software/abi-aa/releases)
