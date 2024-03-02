@@ -20,6 +20,11 @@ hide:
 ULPatch is open source user space live patch tool, under GPL-2.0 or later license.
 
 
+### Logo
+
+I drew the ULPatch logo shown above using [drawio](https://github.com/jgraph/drawio-desktop/releases). The meaning of this logo is obvious, the penguin means that ULPatch supports Linux, and he looks different from [Linux Tux](https://www.techrepublic.com/article/tux-a-brief-history-of-the-linux-mascot/). And at the same time, you can see that the penguin is made up of patches and that he is alive.
+
+
 ## Background
 
 For a process like Qemu that cannot be interrupted and restarted, vulnerability fixing is very difficult. Especially for cloud vendors, the live patch is very important.
