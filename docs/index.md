@@ -7,6 +7,12 @@ hide:
 
 # ULPatch Main Page
 
+<center>
+	<a href="images/logo.drawio.svg">
+		<img src="images/logo.drawio.svg" border=0 width=300>
+	</a>
+</center>
+
 </div>
 
 ## Description
