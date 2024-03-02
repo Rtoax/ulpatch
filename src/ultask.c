@@ -318,7 +318,7 @@ static void list_all_symbol(void)
 
 	/* Get vma name strlen for pretty print */
 	rbtree_postorder_for_each_entry_safe(sym, tmp,
-		&target_task->vma_symbols, node) {
+					     &target_task->vma_symbols, node) {
 
 		int len = strlen(basename(sym->vma->name_));
 		if (max_name_len < len)
@@ -330,7 +330,7 @@ static void list_all_symbol(void)
 		"ADDR", "ST_VALUE", "ST_SIZE", "BIND", "TYPE", "SYMBOL");
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp,
-		&target_task->vma_symbols, node) {
+					     &target_task->vma_symbols, node) {
 
 		printf("%-*s %#016lx %#016lx %-8ld %-8s %-8s %s\n",
 			max_name_len, basename(sym->vma->name_),

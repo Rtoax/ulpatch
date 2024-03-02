@@ -636,41 +636,12 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 		return 0;
 	}
 
-	/* After get symbol's st_value from target process's memory, we need to
-	 * handle shared library manually, for example, libc.so LOAD headers:
-	 *
-	 *  $ readelf -l /usr/lib64/libc.so.6
-	 *  ...
-	 *  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
-	 *                 0x0000000000027ed8 0x0000000000027ed8  R      0x1000
-	 *  LOAD           0x0000000000028000 0x0000000000028000 0x0000000000028000
-	 *                 0x00000000001742fc 0x00000000001742fc  R E    0x1000
-	 *  LOAD           0x000000000019d000 0x000000000019d000 0x000000000019d000
-	 *                 0x0000000000057df8 0x0000000000057df8  R      0x1000
-	 *  LOAD           0x00000000001f58d0 0x00000000001f68d0 0x00000000001f68d0
-	 *                 0x0000000000004fb8 0x00000000000126e0  RW     0x1000
-	 *
-	 * That is to say, we have vma start address, LOAD offset and symbol value.
-	 *
-	 *   00007fd4c72f6000 vma start
-	 *   0000000000028000 LOAD offset
-	 *   00007fd4c733d3d0 gdb> p printf
-	 *   000000000006f3d0 symbol 'printf' st_value
-	 *
-	 * How should we get 'printf' function virtual address? That is easy:
-	 *
-	 *   00007fd4c733d3d0 gdb> p printf
-	 * - 00007fd4c72f6000 vma start
-	 * = 00000000000473d0
-	 * + 0000000000028000 LOAD offset
-	 * = 000000000006f3d0 symbol 'printf' st_value
-	 */
 	if (vma_leader->is_share_lib) {
 		unsigned long off = sym->sym.st_value;
 		struct vm_area_struct *vma, *tmpvma;
 
-		list_for_each_entry_safe(vma, tmpvma,
-			&vma_leader->siblings, siblings) {
+		list_for_each_entry_safe(vma, tmpvma, &vma_leader->siblings,
+					 siblings) {
 
 			/* Ignore vma holes, ---p */
 			if (vma->prot == PROT_NONE)
