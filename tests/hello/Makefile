@@ -12,8 +12,13 @@ endif
 CFLAGS :=
 CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
+CFLAGS += -D__ULP_DEV
+ifdef MCOUNT
+	CFLAGS += -pg
+endif
 
-TARGETS := hello hello-pie
+TARGETS := hello
+TARGETS += hello-pie
 TARGETS += test
 
 TARGETS_ULP := patch-print.ulp
@@ -25,10 +30,10 @@ TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
 TARGETS_ULP += patch-pthread.ulp
 
-CFLAGS += -D__ULP_DEV
-
-ifdef MCOUNT
-	CFLAGS += -pg
+CFLAGS_ULP :=
+CFLAGS_ULP += -O0
+ifdef ULP_PIC
+	CFLAGS_ULP += -fpic
 endif
 
 build: ${TARGETS_ULP} ${TARGETS}
@@ -45,7 +50,11 @@ LDFLAGS_hello-pie := -pie
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*))
 
-%.ulp: %.o
+%.ulpo: %.c
+	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	$(CC) -o $(@) -c $(<) $(CFLAGS_ULP)
+
+%.ulp: %.ulpo
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	cp $(<) $(@).no-build-id
 	$(LD) -relocatable -o $(@) --build-id=sha1 $(<)
@@ -56,4 +65,4 @@ $(TARGETS): %:
 	strip $(@) -o $(@).stripped
 
 clean:
-	rm -f $(TARGETS) *.o *.ulp core.* *.ulp.no-build-id *.stripped
+	rm -f $(TARGETS) *.o *.ulp *.ulpo core.* *.ulp.no-build-id *.stripped
