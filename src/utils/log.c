@@ -105,6 +105,18 @@ _____log(int level, bool has_prefix, const char *file, const char *func,
 	FILE *fp = get_log_fp();
 	va_list va;
 	int _en = errno;
+	static bool syslog_init = false;
+
+	if (unlikely(!syslog_init)) {
+		setlogmask(LOG_UPTO(LOG_ERR));
+		openlog("ulpatch", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
+		syslog_init = true;
+	}
+
+	/* syslog anyway */
+	va_start(va, fmt);
+	vsyslog(level, fmt, va);
+	va_end(va);
 
 	if (level > log_level)
 		return 0;

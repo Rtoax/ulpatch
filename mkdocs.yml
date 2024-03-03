@@ -11,6 +11,7 @@ nav:
   - Tutorials:
     - Code Style: code-style.md
     - Developer: developers.md
+    - Log: LOG.md
   - Knowledge:
     - Relocations: relocations.md
     - Symbol Value: symbol-value.md
@@ -119,6 +120,7 @@ plugins:
             Tutorials: 教程
             Code Style: 代码风格
             Developer: 开发者
+            Log: 日志
             Knowledge: 相关知识
             Relocations: 重定向
             Symbol Value: 符号地址
