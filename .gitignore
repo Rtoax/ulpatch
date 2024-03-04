@@ -23,6 +23,7 @@ cmake_install.cmake
 *.patch
 *.ulp
 *.ulpo
+*.ulp.*
 *.up
 
 # Temp
