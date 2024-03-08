@@ -36,6 +36,10 @@ ifdef ULP_PIC
 	CFLAGS_ULP += -fpic
 endif
 
+LDFLAGS_ULP :=
+LDFLAGS_ULP += -relocatable --build-id=sha1
+LDFLAGS_ULP += -z noexecstack --no-warn-rwx-segments
+
 build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
@@ -57,7 +61,7 @@ LDFLAGS_hello-pie := -pie
 %.ulp: %.ulpo
 	@echo -e "Gen ulpatch  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	cp $(<) $(@).no-build-id
-	$(LD) -relocatable -o $(@) --build-id=sha1 $(<)
+	$(LD) ${LDFLAGS_ULP} -o $(@) $(<)
 
 $(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
