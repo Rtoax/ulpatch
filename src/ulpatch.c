@@ -127,7 +127,7 @@ static int parse_config(int argc, char *argv[])
 int check_patch_file(const char *file)
 {
 	int err = 0;
-	struct load_info info;
+	struct load_info info = {0};
 
 	if (!file)
 		return -EEXIST;

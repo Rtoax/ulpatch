@@ -73,6 +73,7 @@ void release_load_info(struct load_info *info)
 		free(info->str_build_id);
 		info->str_build_id = NULL;
 	}
+
 	if (info->ulp_name) {
 		free(info->ulp_name);
 		info->ulp_name = NULL;
@@ -890,6 +891,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 
 	struct load_info info = {
 		.target_task = task,
+		.str_build_id = NULL,
 	};
 
 	if (!(task->fto_flag & FTO_PROC)) {
