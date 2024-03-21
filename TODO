@@ -11,6 +11,7 @@
 
 # Further
 
+- Support static executable ELF (no need to any dynamic libraries).
 - Support sign and check.
 - Anon vma for each patch and use prctl(2)(CONFIG_ANON_VMA_NAME) set vma's name.
 - How to patch to strip ELF process.
