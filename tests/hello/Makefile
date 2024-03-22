@@ -1,9 +1,8 @@
 CC = gcc
 LD = ld
 
-DHR_META=/usr/include/ulpatch/meta.h
-HAVE_INSTALLED=$(shell if [ -e ${DHR_META} ]; then echo YES; fi)
-ifeq (${HAVE_INSTALLED},YES)
+HDR_META=/usr/include/ulpatch/meta.h
+ifneq ($(wildcard ${HDR_META}),)
 $(info Already install ulpatch)
 else
 $(error Please install ulpatch first)
