@@ -11,8 +11,10 @@ hide:
 $ sudo dnf install -y \
 	binutils-devel \
 	cmake \
+	elfutils-devel \
 	elfutils-libelf-devel \
 	gcc \
+	gcc-c++ \
 	glibc-devel \
 	libunwind-devel
 ```
@@ -25,6 +27,7 @@ $ sudo apt install -y \
 	binutils-dev \
 	cmake \
 	gcc \
+	gcc-c++ \
 	libc6 \
 	libunwind-dev
 ```
