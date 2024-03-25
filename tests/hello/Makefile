@@ -37,7 +37,10 @@ endif
 
 LDFLAGS_ULP :=
 LDFLAGS_ULP += -relocatable --build-id=sha1
-LDFLAGS_ULP += -z noexecstack --no-warn-rwx-segments
+LDFLAGS_ULP += -z noexecstack
+ifneq ($(shell ld --help | grep no-warn-rwx-segments || true),)
+LDFLAGS_ULP += --no-warn-rwx-segments
+endif
 
 build: ${TARGETS_ULP} ${TARGETS}
 
