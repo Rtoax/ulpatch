@@ -11,6 +11,7 @@ hide:
 $ sudo dnf install -y \
 	binutils-devel \
 	cmake \
+	elfutils-devel \
 	elfutils-libelf-devel \
 	gcc \
 	gcc-c++ \
