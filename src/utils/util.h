@@ -167,6 +167,9 @@ extern struct config config;
 
 void ulpatch_env_init(void);
 
+/* Check some thing */
+bool is_root(const char *prog);
+
 int ulpatch_version_major(void);
 int ulpatch_version_minor(void);
 int ulpatch_version_patch(void);
