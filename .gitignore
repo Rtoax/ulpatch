@@ -34,3 +34,15 @@ core.*
 
 # mkdocs
 site
+
+# Archive
+*.tar.*
+
+# rpm
+BUILD
+BUILDROOT
+RPMS
+SRPMS
+SOURCES
+*.rpm
+
