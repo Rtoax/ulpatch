@@ -3,9 +3,11 @@ hide:
   - navigation
 ---
 
-## Install Dependences
+## From Source Code
 
-### Fedora/RHEL/ALmaLinux
+### Install Dependences
+
+#### Fedora/RHEL/ALmaLinux
 
 ```bash
 $ sudo dnf install -y \
@@ -20,7 +22,7 @@ $ sudo dnf install -y \
 ```
 
 
-### Debian/Ubuntu
+#### Debian/Ubuntu
 
 ```bash
 $ sudo apt install -y \
@@ -33,7 +35,7 @@ $ sudo apt install -y \
 ```
 
 
-## Compile
+### Compile
 
 ```bash
 $ cd ulpatch
@@ -48,9 +50,9 @@ $ make -j$(nproc)
 ```
 
 
-## CMake Macros
+### CMake Macros
 
-### CMAKE_BUILD_TYPE
+#### CMAKE_BUILD_TYPE
 
 You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD_TYPE=Debug`(`Release`,`Debug`,`RelWithDebInfo`,`MinSizeRel`), such as:
 
@@ -58,7 +60,7 @@ You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD
 $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
-### BUILD_TESTING
+#### BUILD_TESTING
 
 You can specify `BUILD_TESTING` to determine compile `ulpatch_test` or not, default `ON`.
 If you want to turn it off, such as:
@@ -67,7 +69,7 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_TESTING=0 ..
 ```
 
-### BUILD_ULFTRACE
+#### BUILD_ULFTRACE
 
 You can specify `BUILD_ULFTRACE` to determine compile `ulftrace` or not, default `ON`.
 If you want to turn it off, such as:
@@ -76,7 +78,7 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_ULFTRACE=0 ..
 ```
 
-### BUILD_ULTASK
+#### BUILD_ULTASK
 
 You can specify `BUILD_ULTASK` to determine compile `ultask` or not, default `ON`.
 If you want to turn it off, such as:
@@ -85,7 +87,7 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_ULTASK=0 ..
 ```
 
-### BUILD_MAN
+#### BUILD_MAN
 
 You can specify `BUILD_MAN` to determine compile manual pages of ULPatch or not, default `ON`.
 If you want to turn it off, such as:
@@ -94,14 +96,36 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_MAN=0 ..
 ```
 
-## Install
+### Install
 
 ```bash
 $ sudo make install
 ```
 
-## Uninstall
+### Uninstall
 
 ```bash
 $ sudo make uninstall
 ```
+
+
+## From RPM Package
+
+### Download
+
+Download rpm packages from [Release page](https://github.com/Rtoax/ulpatch/releases).
+
+### Install
+
+Then, use `rpm` or `dnf` command to install the rpm packages.
+
+```
+$ sudo dnf install ulpatch-VERSION.rpm
+```
+
+Or
+
+```
+$ sudo rpm -ivh ulpatch-VERSION.rpm
+```
+
