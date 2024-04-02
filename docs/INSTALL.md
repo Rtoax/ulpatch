@@ -129,3 +129,21 @@ Or
 $ sudo rpm -ivh ulpatch-VERSION.rpm
 ```
 
+### Build RPM Packages Your Own
+
+> Only support rpm management software system, such as Fedora, Almalinux, etc.
+
+You need to install the rpm-build depends package.
+
+```
+$ sudo dnf install rpm-build
+```
+
+Then, install the depends of ulpatch according to spec:
+
+```
+$ sudo dnf builddep ulpatch.spec
+```
+
+Now, you can compile with rpmbuild. In the root directory of this project, I have written an rpmbuild(`rpmbuild.sh`) example for you.
+
