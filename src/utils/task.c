@@ -1190,7 +1190,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 static int __get_comm(struct task_struct *task)
 {
 	char path[128];
-	ssize_t ret;
+	int ret;
 	FILE *fp = NULL;
 
 	ret = snprintf(path, sizeof(path), "/proc/%d/comm", task->pid);
@@ -1201,7 +1201,11 @@ static int __get_comm(struct task_struct *task)
 
 	fp = fopen(path, "r");
 
-	fscanf(fp, "%s", task->comm);
+	ret = fscanf(fp, "%s", task->comm);
+	if (ret == EOF) {
+		lerror("fscanf(%s) %m\n", path);
+		return -errno;
+	}
 
 	fclose(fp);
 

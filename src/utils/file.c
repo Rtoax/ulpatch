@@ -222,7 +222,7 @@ int fmemcpy(void *mem, int mem_len, const char *file)
 	n = fread(mem, size, 1, fp);
 	if (n != size) {
 		fprintf(stderr, "fread: %s\n", strerror(errno));
-		return NULL;
+		return n;
 	}
 	fclose(fp);
 
