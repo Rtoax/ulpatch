@@ -220,9 +220,9 @@ int fmemcpy(void *mem, int mem_len, const char *file)
 
 	fp = fopen(file, "r");
 	n = fread(mem, size, 1, fp);
-	if (n != size) {
-		fprintf(stderr, "fread: %s\n", strerror(errno));
-		return n;
+	if (n != 1) {
+		lerror("fread: %m\n");
+		return 0;
 	}
 	fclose(fp);
 

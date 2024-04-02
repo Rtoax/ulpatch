@@ -72,9 +72,9 @@ done
 
 make
 
-ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9}
+ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v}
 cat /proc/${pid}/maps
-ulpinfo -p ${pid} ${debug:+--log-level=9}
+ulpinfo -p ${pid} ${debug:+--log-level=9 -v}
 
 dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
