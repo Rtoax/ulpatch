@@ -130,7 +130,7 @@ file_type ftype(const char *filepath)
 static int _file_copy(const char *srcpath, const char *dstpath)
 {
 	FILE *in, *out;
-	int nbytes = 0;
+	int n, nbytes = 0;
 
 	in = fopen(srcpath, "r");
 	if (!in) {
@@ -147,11 +147,13 @@ static int _file_copy(const char *srcpath, const char *dstpath)
 	while (1) {
 		uint8_t c;
 
-		fread(&c, 1, 1, in);
-		if (feof(in))
+		n = fread(&c, 1, 1, in);
+		if (n != 1 || feof(in))
 			break;
 
-		fwrite(&c, 1, 1, out);
+		n = fwrite(&c, 1, 1, out);
+		if (n != 1)
+			break;
 
 		nbytes++;
 	}
@@ -214,10 +216,14 @@ char* fmktempname(char *buf, int buf_len, char *seed)
 int fmemcpy(void *mem, int mem_len, const char *file)
 {
 	FILE *fp;
-	int size = MIN(mem_len, fsize(file));
+	int n, size = MIN(mem_len, fsize(file));
 
 	fp = fopen(file, "r");
-	fread(mem, size, 1, fp);
+	n = fread(mem, size, 1, fp);
+	if (n != size) {
+		fprintf(stderr, "fread: %s\n", strerror(errno));
+		return NULL;
+	}
 	fclose(fp);
 
 	return size;
@@ -227,6 +233,7 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 				      int m_flags, int prot,
 				      size_t truncate_size)
 {
+	int ret;
 	struct mmap_struct *mem = NULL;
 
 	if (!(o_flags & O_CREAT) && !fexist(filepath)) {
@@ -248,8 +255,13 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 		goto free_mem;
 	}
 
-	if (truncate_size)
-		ftruncate(mem->fd, truncate_size);
+	if (truncate_size) {
+		ret = ftruncate(mem->fd, truncate_size);
+		if (ret != 0) {
+			fprintf(stderr, "ftruncate: %s\n", strerror(errno));
+			return NULL;
+		}
+	}
 
 	mem->size = truncate_size ?: fsize(filepath);
 	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
