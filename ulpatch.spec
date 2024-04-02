@@ -8,10 +8,15 @@ URL:		https://github.com/Rtoax/ulpatch
 
 Source0:	ulpatch-v%{version}.tar.gz
 
+BuildRequires:	binutils-devel
 BuildRequires:  cmake
+BuildRequires:	elfutils-devel
+BuildRequires:	elfutils-libelf-devel
+BuildRequires:	glibc-devel
 BuildRequires:  libunwind-devel
 
 Requires:	libunwind
+Requires:	elfutils-libelf
 
 Provides:	%{name} = %{version}-%{release}
 
