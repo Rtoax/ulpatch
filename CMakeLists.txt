@@ -8,7 +8,7 @@ PROJECT(ulpatch)
 # version number components.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 2)
+set(ULPATCH_VERSION_PATCH 3)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags

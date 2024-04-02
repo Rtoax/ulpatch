@@ -1,12 +1,12 @@
 Name:		ulpatch
-Version:	0.5.2
+Version:	0.5.3
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
 License:	GPL-2.0
 URL:		https://github.com/Rtoax/ulpatch
 
-Source0:	ulpatch-v0.5.2.tar.gz
+Source0:	ulpatch-v%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  libunwind-devel
@@ -53,6 +53,6 @@ popd
 %{_datadir}/ulpatch/ulpatch-hello.obj
 
 %changelog
-* Tue Apr 02 2024 Rong Tao <rtoax@foxmail.com> - 0.5.2-0
+* Tue Apr 02 2024 Rong Tao <rtoax@foxmail.com> - 0.5.3-0
 - Create this.
 
