@@ -25,7 +25,7 @@ echo "Build"
 pushd %{_builddir}/ulpatch-v%{version}
 mkdir build
 pushd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j4
 popd
 popd
