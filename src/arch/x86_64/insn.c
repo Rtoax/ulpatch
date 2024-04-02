@@ -16,7 +16,7 @@ static unsigned char __unused ideal_nop5_x86_32[5] =
 
 int text_opcode_size(uint8_t opcode)
 {
-	int size;
+	int size = 0;
 
 #define __CASE(insn)	\
 	case INST_##insn: size = insn##_INSN_SIZE; break
