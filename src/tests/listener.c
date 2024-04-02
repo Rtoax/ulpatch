@@ -137,6 +137,7 @@ static unsigned int test_nr_clients = 0;
 
 static void handle_msg_symbol(struct test_client *client, struct clt_msg *msg)
 {
+	int ret;
 	struct clt_msg ack;
 	const char *s = msg->body.symbol_request.s;
 	struct test_symbol *sym = find_test_symbol(s);
@@ -145,18 +146,28 @@ static void handle_msg_symbol(struct test_client *client, struct clt_msg *msg)
 	ack.hdr.code = TEST_MC_SYMBOL;
 	ack.body.symbol_response.addr = sym ? sym->addr : 0;
 
-	write(client->connfd, &ack, sizeof(ack));
+	ret = write(client->connfd, &ack, sizeof(ack));
+	if (ret != sizeof(ack)) {
+		lerror("write(2): %s\n", strerror(errno));
+	}
 }
 
 int listener_helper_close(int fd, int *rslt)
 {
+	int ret;
 	struct clt_msg req, rsp;
 
 	req.hdr.type = TEST_MT_REQUEST;
 	req.hdr.code = TEST_MC_CLOSE;
 
-	write(fd, &req, sizeof(req));
-	read(fd, &rsp, sizeof(rsp));
+	ret = write(fd, &req, sizeof(req));
+	if (ret != sizeof(req)) {
+		lerror("write(2): %s\n", strerror(errno));
+	}
+	ret = read(fd, &rsp, sizeof(rsp));
+	if (ret != sizeof(rsp)) {
+		lerror("read(2): %s\n", strerror(errno));
+	}
 
 	*rslt = rsp.body.close_response.rslt;
 
@@ -165,6 +176,7 @@ int listener_helper_close(int fd, int *rslt)
 
 int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
 {
+	int ret;
 	struct clt_msg req, rsp;
 
 	req.hdr.type = TEST_MT_REQUEST;
@@ -173,8 +185,14 @@ int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
 	strncpy(req.body.symbol_request.s, sym,
 		sizeof(req.body.symbol_request.s) - 1);
 
-	write(fd, &req, sizeof(req));
-	read(fd, &rsp, sizeof(rsp));
+	ret = write(fd, &req, sizeof(req));
+	if (ret != sizeof(req)) {
+		lerror("write(2): %s\n", strerror(errno));
+	}
+	ret = read(fd, &rsp, sizeof(rsp));
+	if (ret != sizeof(rsp)) {
+		lerror("read(2): %s\n", strerror(errno));
+	}
 
 	*addr = rsp.body.symbol_response.addr;
 
@@ -186,6 +204,7 @@ static bool listener_need_close = false;
 
 static void recv_test_client_msg(struct test_client *client)
 {
+	int ret;
 	size_t nbytes;
 	struct clt_msg msg, ack;
 
@@ -213,7 +232,10 @@ static void recv_test_client_msg(struct test_client *client)
 		ack.hdr.code = TEST_MC_CLOSE;
 		ack.body.close_response.rslt = 0;
 
-		write(client->connfd, &ack, sizeof(ack));
+		ret = write(client->connfd, &ack, sizeof(ack));
+		if (ret != sizeof(ack)) {
+			lerror("write(2): %s\n", strerror(errno));
+		}
 
 		break;
 
