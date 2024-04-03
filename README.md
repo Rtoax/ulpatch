@@ -22,31 +22,31 @@
 
 ULPatch is open source user space live patch tool.
 
-More to see [docs/index.md](docs/index.md).
+More to see [docs/index.md](docs/index.md). Alternatively, you can directly access the [ULPatch website main page](https://rtoax.github.io/ulpatch/) to view the documentation.
 
 
 # Support Architecture
 
-Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with or hope to support, if they do not contain what you need, you are welcome to co-develop.
+Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with and I want to support, if they do not contain what you need, you are welcome to co-develop.
 
-- [ ] `x86_64`: ready to go
-- [ ] `aarch64`: ready to go
+- [ ] `x86_64`: ready to go, support some easy demo already.
+- [ ] `aarch64`: ready to go, support some easy demo already.
 - [ ] `loongarch64`: ready to go
 
 
 # Installing
 
-See [docs/INSTALL.md](docs/INSTALL.md) for installation steps on your platform.
+See [docs/INSTALL.md](docs/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/) for installation steps on your platform.
 
 
 # Theory
 
-See [docs/theory.md](docs/theory.md) for theory.
+See [docs/theory.md](docs/theory.md) or [website](https://rtoax.github.io/ulpatch/theory/) for theory.
 
 
 # Releases
 
-See [docs/RELEASE.md](docs/RELEASE.md) for releases.
+See [docs/RELEASE.md](docs/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/) for releases.
 
 
 # Warnings
