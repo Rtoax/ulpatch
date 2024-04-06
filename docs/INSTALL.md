@@ -156,6 +156,6 @@ $ ./archive.sh
 Build the RPM packages:
 
 ```bash
-$ rpmbuild.sh
+$ ./rpmbuild.sh
 ```
 
