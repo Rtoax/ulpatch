@@ -145,5 +145,17 @@ Then, install the depends of ulpatch according to spec:
 $ sudo dnf builddep ulpatch.spec
 ```
 
-Now, you can compile with rpmbuild. In the root directory of this project, I have written an rpmbuild(`rpmbuild.sh`) example for you.
+Now, you can compile with rpmbuild. In the root directory of this project, I have written an rpmbuild(`rpmbuild.sh`) example for you. And of course, you need to archive the source code to tar package.
+
+Generate tar archive:
+
+```bash
+$ ./archive.sh
+```
+
+Build the RPM packages:
+
+```bash
+$ rpmbuild.sh
+```
 
