@@ -5,7 +5,7 @@ hide:
 
 ## Theroy
 
-TODO
+This page will only introduce the principle of ULPatch, but not the implementation details.
 
 
 ## ULPatch
