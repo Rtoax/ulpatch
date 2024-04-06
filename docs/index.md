@@ -24,6 +24,8 @@ ULPatch is open source user space live patch tool, under GPL-2.0 or later licens
 
 I drew the ULPatch logo shown above using [drawio](https://github.com/jgraph/drawio-desktop/releases). The meaning of this logo is obvious, the penguin means that ULPatch supports Linux, and he looks different from [Linux Tux](https://www.techrepublic.com/article/tux-a-brief-history-of-the-linux-mascot/). And at the same time, you can see that the penguin is made up of patches and that he is alive.
 
+The heart of a penguin is a CPU, which of course is closely related to the instruction set. This CPU icon is not made up of patches, I mean, ULPatch can only be applied to the user space, after all, the kernel space has a more complete [livepatch mechanism](https://docs.kernel.org/livepatch/livepatch.html).
+
 
 ## Background
 
