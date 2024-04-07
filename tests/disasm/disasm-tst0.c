@@ -46,7 +46,11 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size) {
   stream_state ss = {};
 
   disassemble_info disasm_info = {};
+#if BINUTILS_VERSION_MINOR>=39
+  init_disassemble_info(&disasm_info, &ss, dis_fprintf, NULL);
+#else
   init_disassemble_info(&disasm_info, &ss, dis_fprintf);
+#endif
   disasm_info.arch = bfd_arch_i386;
   disasm_info.mach = bfd_mach_x86_64;
   disasm_info.read_memory_func = buffer_read_memory;

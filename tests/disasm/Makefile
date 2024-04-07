@@ -3,6 +3,18 @@ TARGETS += disasm-tst1
 
 CFLAGS = -lopcodes -Wall -O0 -g -ggdb
 
+BINUTILS_VERSION = $(shell ld -v | grep -o [0-9].[0-9]\.)
+BINUTILS_VERSION_MAJOR = $(shell echo ${BINUTILS_VERSION} | awk -F '.' '{print $$1}')
+BINUTILS_VERSION_MINOR = $(shell echo ${BINUTILS_VERSION} | awk -F '.' '{print $$2}')
+
+$(info Binutils version ${BINUTILS_VERSION_MAJOR}.${BINUTILS_VERSION_MINOR})
+ifneq (${BINUTILS_VERSION_MAJOR},2)
+$(error Not support binutils ${BINUTILS_VERSION})
+endif
+
+CFLAGS += -DBINUTILS_VERSION_MAJOR=${BINUTILS_VERSION_MAJOR}
+CFLAGS += -DBINUTILS_VERSION_MINOR=${BINUTILS_VERSION_MINOR}
+
 build: ${TARGETS}
 
 disasm-tst0: disasm-tst0.o
