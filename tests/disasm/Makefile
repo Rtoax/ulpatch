@@ -1,7 +1,16 @@
 TARGETS := disasm-tst0
 TARGETS += disasm-tst1
 
-CFLAGS = -lopcodes -Wall -O0 -g -ggdb
+CC = gcc
+
+CFLAGS :=
+LDFLAGS :=
+
+CFLAGS += -lopcodes -Wall
+CFLAGS += -O0 -g -ggdb
+CFLAGS += -lbfd
+
+LDFLAGS += -lbfd
 
 BINUTILS_VERSION = $(shell ld -v | grep -o [0-9].[0-9]\.)
 BINUTILS_VERSION_MAJOR = $(shell echo ${BINUTILS_VERSION} | awk -F '.' '{print $$1}')
