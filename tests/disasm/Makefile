@@ -6,11 +6,11 @@ CC = gcc
 CFLAGS :=
 LDFLAGS :=
 
-CFLAGS += -lopcodes -Wall
+CFLAGS += -lbfd -lopcodes
+CFLAGS += -Wall
 CFLAGS += -O0 -g -ggdb
-CFLAGS += -lbfd
 
-LDFLAGS += -lbfd
+LDFLAGS += -lbfd -lopcodes
 
 BINUTILS_VERSION = $(shell ld -v | grep -o [0-9].[0-9]\.)
 BINUTILS_VERSION_MAJOR = $(shell echo ${BINUTILS_VERSION} | awk -F '.' '{print $$1}')
