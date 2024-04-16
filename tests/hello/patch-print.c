@@ -9,7 +9,9 @@ extern void internal_print_hello(unsigned long ul);
 
 static void ulpatch_internal_print_hello(unsigned long ul)
 {
+#if !defined(NOLIBC)
 	printf("Hello World. Patched\n");
+#endif
 	internal_print_hello(ul);
 }
 

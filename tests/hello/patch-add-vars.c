@@ -20,11 +20,13 @@ void ulp_add_var(unsigned long ul)
 	static_i++;
 	static_i += 2;
 
+#if !defined(NOLIBC)
 	printf("Hello World. Patched %ld %d, %ld, %d, %d\n",
 		ul, local_i, local_l, static_i, a);
 	printf("%s %s\n", local_s, static_s);
 
 	for (i = 0; i < 3; i++)
 		printf("- %d -\n", i);
+#endif
 }
 ULPATCH_INFO(ulp_add_var, print_hello, "Rong Tao");
