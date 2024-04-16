@@ -34,6 +34,7 @@ CFLAGS_ULP += -O0
 ifdef ULP_PIC
 	CFLAGS_ULP += -fpic
 	CFLAGS_ULP += -fno-PIE
+	CFLAGS_ULP += -fno-common
 endif
 
 LDFLAGS_ULP :=
