@@ -246,7 +246,8 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 	 * 0xFFFFFFFFUL, maybe i should use jmp_table, see arch_jmp_table_jmp()
 	 * or, maybe we could use jmp/bl to register.
 	 *
-	 * The base address on aarch64 is bigger than 4bytes length, such as:
+	 * Such ad base address on ASLR process address space(PIC ELF) is
+	 * bigger than 4 bytes, Such as:
 	 * $ cat /proc/$(pidof hello)/maps
 	 * 5583490000-5583491000 r-xp 00000000 b3:02 1061933 /hello
 	 */

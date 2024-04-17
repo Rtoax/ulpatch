@@ -166,10 +166,18 @@ struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct 
 
 unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 {
-	struct vm_area_struct *ivma;
+	struct vm_area_struct *ivma, *first_vma;
 	struct rb_node *first, *rnode;
 
 	first = rb_first(&task->vmas_rb);
+	first_vma = rb_entry(first, struct vm_area_struct, node_rb);
+
+	/**
+	 * Return the minimal address if the space is enough to store 'size'.
+	 */
+	if (first_vma->vm_start > MIN_ULP_START_VMA_ADDR &&
+	    first_vma->vm_start - MIN_ULP_START_VMA_ADDR >= size)
+		return MIN_ULP_START_VMA_ADDR;
 
 	for (rnode = first; rnode; rnode = rb_next(rnode)) {
 		ivma = rb_entry(rnode, struct vm_area_struct, node_rb);
