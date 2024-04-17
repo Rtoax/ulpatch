@@ -201,7 +201,7 @@ invalid_relocation:
 overflow:
 	lerror("overflow in relocation type %s(%d) val %lx\n",
 		rela_type_string(r_type), r_type, val);
-	lerror("likely not compiled with -mcmodel=kernel.\n");
+	lerror("likely not compiled with -fpic and -fno-PIE.\n");
 	return -ENOEXEC;
 }
 
