@@ -8,7 +8,7 @@
 #include <utils/list.h>
 #include <utils/task.h>
 
-#include "../../test_api.h"
+#include "../test_api.h"
 
 
 #if defined(__x86_64__)

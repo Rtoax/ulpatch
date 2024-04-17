@@ -7,7 +7,7 @@
 #include <utils/list.h>
 #include <utils/task.h>
 
-#include "../../test_api.h"
+#include "../test_api.h"
 
 
 TEST(Arch,	mcount,	0)
