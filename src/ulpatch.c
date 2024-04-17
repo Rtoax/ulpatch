@@ -136,7 +136,7 @@ int check_patch_file(const char *file)
 		ldebug("%s is not exist.\n", file);
 		return -EEXIST;
 	}
-	err = alloc_patch_file(patch_file, "temp.up", &info);
+	err = alloc_patch_file(patch_file, "temp.ulp", &info);
 	if (err) {
 		lerror("Parse %s failed.\n", patch_file);
 		return err;
