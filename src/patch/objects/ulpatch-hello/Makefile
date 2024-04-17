@@ -15,7 +15,7 @@ CFLAGS += -O0
 ifdef INCS1
 CFLAGS += $(INCS1)
 else
-CFLAGS += -I ../../../
+CFLAGS += -I../../../
 endif
 
 ALL: $(TARGETS)
@@ -30,4 +30,4 @@ $(TARGETS): hello.o
 
 clean:
 	@echo -e "Clean   \033[1;32m$(@)\033[m"
-	@rm -f ${TARGETS} *.oc *.oS
+	@rm -f ${TARGETS} *.oc *.oS *.o
