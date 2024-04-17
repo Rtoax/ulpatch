@@ -89,6 +89,6 @@ popd
 %{_bindir}/ulpatch_test
 
 %changelog
-* Tue Apr 17 2024 Rong Tao <rtoax@foxmail.com> - 0.5.4-0
+* Wed Apr 17 2024 Rong Tao <rtoax@foxmail.com> - 0.5.4-0
 - Create this.
 
