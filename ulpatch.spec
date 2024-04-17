@@ -1,3 +1,4 @@
+# All changes to build and install RPM packages go here.
 Name:		ulpatch
 Version:	0.5.3
 Release:	1%{?dist}
@@ -44,6 +45,11 @@ ULPatch tests.
 
 %prep
 echo "Prep"
+%ifnarch aarch64 x86_64
+echo "Not support architecture but aarch64, x86_64"
+exit 1
+%endif
+
 %setup -q -n ulpatch-v%{version}
 
 %build
