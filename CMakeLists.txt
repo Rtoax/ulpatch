@@ -5,10 +5,11 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 PROJECT(ulpatch)
 
-# version number components.
+# Version number components. You _MUST_ modify ulpatch.spec file at the same,
+# if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 3)
+set(ULPATCH_VERSION_PATCH 4)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags

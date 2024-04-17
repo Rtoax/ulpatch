@@ -1,7 +1,7 @@
 # All changes to build and install RPM packages go here.
 Name:		ulpatch
-Version:	0.5.3
-Release:	1%{?dist}
+Version:	0.5.4
+Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
 License:	GPL-2.0
@@ -89,6 +89,6 @@ popd
 %{_bindir}/ulpatch_test
 
 %changelog
-* Tue Apr 02 2024 Rong Tao <rtoax@foxmail.com> - 0.5.3-1
+* Tue Apr 17 2024 Rong Tao <rtoax@foxmail.com> - 0.5.4-0
 - Create this.
 
