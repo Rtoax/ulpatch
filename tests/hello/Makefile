@@ -15,9 +15,6 @@ CFLAGS += -D__ULP_DEV
 ifdef MCOUNT
 	CFLAGS += -pg
 endif
-ifdef NOLIBC
-	CFLAGS += -DNOLIBC=1
-endif
 
 TARGETS := hello
 TARGETS += hello-pie
@@ -40,7 +37,12 @@ ifdef ULP_PIC
 	CFLAGS_ULP += -fno-common
 endif
 ifdef NOLIBC
+	CFLAGS += -DNOLIBC=1
 	CFLAGS_ULP += -DNOLIBC=1
+endif
+ifdef NOSTATIC
+	CFLAGS += -DNOSTATIC=1
+	CFLAGS_ULP += -DNOSTATIC=1
 endif
 
 LDFLAGS_ULP :=
