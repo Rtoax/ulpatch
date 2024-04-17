@@ -91,23 +91,6 @@ struct symbol {
 	struct rb_node node;
 };
 
-/* see elfutils/src/readelf.c */
-#ifdef __linux__
-#define CORE_SIGILL  SIGILL
-#define CORE_SIGBUS  SIGBUS
-#define CORE_SIGFPE  SIGFPE
-#define CORE_SIGSEGV SIGSEGV
-#define CORE_SI_USER SI_USER
-#else
-/* We want the linux version of those as that is what shows up in the core files. */
-#define CORE_SIGILL  4  /* Illegal instruction (ANSI).  */
-#define CORE_SIGBUS  7  /* BUS error (4.2 BSD).  */
-#define CORE_SIGFPE  8  /* Floating-point exception (ANSI).  */
-#define CORE_SIGSEGV 11 /* Segmentation violation (ANSI).  */
-#define CORE_SI_USER 0  /* Sent by kill, sigsend.  */
-#endif
-
-
 struct elf_file *elf_file_open(const char *filepath);
 int elf_file_close(const char *filepath);
 

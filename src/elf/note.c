@@ -150,10 +150,10 @@ fail:
 
 	if (si_code > 0) {
 		switch (si_signo) {
-		case CORE_SIGILL:
-		case CORE_SIGFPE:
-		case CORE_SIGSEGV:
-		case CORE_SIGBUS:
+		case SIGILL:
+		case SIGFPE:
+		case SIGSEGV:
+		case SIGBUS:
 		{
 			uint64_t addr;
 			if (! buf_read_ulong (core, &ptr, end, &addr))
@@ -165,7 +165,7 @@ fail:
 			;
 		}
 
-	} else if (si_code == CORE_SI_USER) {
+	} else if (si_code == SI_USER) {
 		int pid, uid;
 		if (! buf_read_int (core, &ptr, end, &pid)
 			|| ! buf_read_int (core, &ptr, end, &uid))
