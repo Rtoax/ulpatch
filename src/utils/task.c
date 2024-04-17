@@ -167,9 +167,11 @@ struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct 
 unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 {
 	struct vm_area_struct *ivma;
-	struct rb_node * rnode;
+	struct rb_node *first, *rnode;
 
-	for (rnode = rb_first(&task->vmas_rb); rnode; rnode = rb_next(rnode)) {
+	first = rb_first(&task->vmas_rb);
+
+	for (rnode = first; rnode; rnode = rb_next(rnode)) {
 		ivma = rb_entry(rnode, struct vm_area_struct, node_rb);
 		struct rb_node *next_node = rb_next(rnode);
 		struct vm_area_struct *next_vma;
