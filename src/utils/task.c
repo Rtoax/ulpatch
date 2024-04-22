@@ -1780,6 +1780,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	int ret;
 	struct user_regs_struct old_regs, regs, syscall_regs;
 	unsigned char __syscall[] = {SYSCALL_INSTR};
+	unsigned char orig_code[sizeof(__syscall)];
+	unsigned long libc_base = task->libc_vma->vm_start;
 
 #if defined(__aarch64__)
 	struct iovec orig_regs_iov, regs_iov;
@@ -1791,9 +1793,6 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 #endif
 
 	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5, arg6);
-
-	unsigned char orig_code[sizeof(__syscall)];
-	unsigned long libc_base = task->libc_vma->vm_start;
 
 	errno = 0;
 
