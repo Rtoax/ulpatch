@@ -128,8 +128,19 @@ struct vm_area_struct {
 	unsigned long voffset;
 };
 
+/* see /usr/include/sys/user.h */
+#if defined(__x86_64__)
+typedef unsigned long long int pc_addr_t;
+#elif defined(__aarch64__)
+typedef unsigned long long pc_addr_t;
+#else
+# error Not support architecture
+#endif
+
 struct thread {
 	pid_t tid;
+	/* TODO */
+	pc_addr_t ip;
 	/* struct task_struct.threads_list */
 	struct list_head node;
 };
