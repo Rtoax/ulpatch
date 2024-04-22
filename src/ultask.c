@@ -266,10 +266,9 @@ static int mmap_a_file(void)
 		goto close_ret;
 	}
 
-	map_v = task_mmap(task,
-				0UL, map_len,
-				PROT_READ | PROT_WRITE | PROT_EXEC,
-				MAP_PRIVATE, map_fd, 0);
+	map_v = task_mmap(task, 0UL, map_len,
+			  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE,
+			  map_fd, 0);
 	if (!map_v) {
 		fprintf(stderr, "ERROR: remote mmap failed.\n");
 		goto close_ret;
