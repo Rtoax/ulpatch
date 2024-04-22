@@ -85,8 +85,10 @@ struct vm_area_struct *alloc_vma(struct task_struct *task)
 
 static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 {
-	struct vm_area_struct *vma = rb_entry(node, struct vm_area_struct, node_rb);
+	struct vm_area_struct *vma;
 	struct vm_area_struct *new = (struct vm_area_struct *)key;
+
+	vma = rb_entry(node, struct vm_area_struct, node_rb);
 
 	if (new->vm_end <= vma->vm_start)
 		return -1;
@@ -138,7 +140,9 @@ int free_vma(struct vm_area_struct *vma)
 
 static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 {
-	struct vm_area_struct *vma = rb_entry(node, struct vm_area_struct, node_rb);
+	struct vm_area_struct *vma;
+
+	vma = rb_entry(node, struct vm_area_struct, node_rb);
 
 	if (vma->vm_start > vaddr)
 		return -1;
@@ -157,7 +161,8 @@ struct vm_area_struct *find_vma(struct task_struct *task, unsigned long vaddr)
 	return NULL;
 }
 
-struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct *prev)
+struct vm_area_struct *next_vma(struct task_struct *task,
+				struct vm_area_struct *prev)
 {
 	struct rb_node *next;
 	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vmas_rb);
@@ -1768,10 +1773,9 @@ int wait_for_stop(struct task_struct *task)
 	return 0;
 }
 
-int task_syscall(struct task_struct *task, int nr,
-		unsigned long arg1, unsigned long arg2, unsigned long arg3,
-		unsigned long arg4, unsigned long arg5, unsigned long arg6,
-		unsigned long *res)
+int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
+		 unsigned long arg2, unsigned long arg3, unsigned long arg4,
+		 unsigned long arg5, unsigned long arg6, unsigned long *res)
 {
 	int ret;
 	struct user_regs_struct old_regs, regs, syscall_regs;
@@ -1842,7 +1846,7 @@ int task_syscall(struct task_struct *task, int nr,
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &regs);
 #elif defined(__aarch64__)
 	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
-			(void*)&regs_iov);
+		     (void*)&regs_iov);
 #else
 # error "Unsupport architecture"
 #endif
@@ -1857,7 +1861,7 @@ int task_syscall(struct task_struct *task, int nr,
 	ret = ptrace(PTRACE_SETREGS, task->pid, NULL, &old_regs);
 #elif defined(__aarch64__)
 	ret = ptrace(PTRACE_SETREGSET, task->pid, (void*)NT_PRSTATUS,
-			(void*)&orig_regs_iov);
+		     (void*)&orig_regs_iov);
 #else
 # error "Unsupport architecture"
 #endif
@@ -1878,8 +1882,9 @@ poke_back:
 	return ret;
 }
 
-unsigned long task_mmap(struct task_struct *task, unsigned long addr, size_t length,
-			int prot, int flags, int fd, off_t offset)
+unsigned long task_mmap(struct task_struct *task, unsigned long addr,
+			size_t length, int prot, int flags, int fd,
+			off_t offset)
 {
 	int ret;
 	unsigned long result;
@@ -1902,12 +1907,14 @@ int task_munmap(struct task_struct *task, unsigned long addr, size_t size)
 	return result;
 }
 
-int task_msync(struct task_struct *task, unsigned long addr, size_t length, int flags)
+int task_msync(struct task_struct *task, unsigned long addr, size_t length,
+	       int flags)
 {
 	int ret;
 	unsigned long result;
 
-	ret = task_syscall(task, __NR_msync, addr, length, flags, 0, 0, 0, &result);
+	ret = task_syscall(task, __NR_msync, addr, length, flags, 0, 0, 0,
+			   &result);
 	if (ret < 0)
 		return -1;
 	return result;
@@ -1917,7 +1924,8 @@ int task_msync_sync(struct task_struct *task, unsigned long addr, size_t length)
 {
 	return task_msync(task, addr, length, MS_SYNC);
 }
-int task_msync_async(struct task_struct *task, unsigned long addr, size_t length)
+int task_msync_async(struct task_struct *task, unsigned long addr,
+		     size_t length)
 {
 	return task_msync(task, addr, length, MS_ASYNC);
 }
@@ -1925,9 +1933,7 @@ int task_msync_async(struct task_struct *task, unsigned long addr, size_t length
 unsigned long task_malloc(struct task_struct *task, size_t length)
 {
 	unsigned long remote_addr;
-	remote_addr = task_mmap(task,
-				0UL, length,
-				PROT_READ | PROT_WRITE,
+	remote_addr = task_mmap(task, 0UL, length, PROT_READ | PROT_WRITE,
 				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (remote_addr == (unsigned long)MAP_FAILED) {
 		lerror("Remote malloc failed, %ld\n", remote_addr);
@@ -1955,7 +1961,8 @@ int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode)
 	memcpy_to_task(task, name, pathname, name_len);
 
 #if defined(__x86_64__)
-	ret = task_syscall(task, __NR_open, name, flags, mode, 0, 0, 0, &result);
+	ret = task_syscall(task, __NR_open, name, flags, mode, 0, 0, 0,
+			   &result);
 #elif defined(__aarch64__)
 	ret = task_syscall(task, __NR_openat, AT_FDCWD, name, flags, mode, 0, 0,
 			   &result);
