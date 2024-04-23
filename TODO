@@ -1,3 +1,5 @@
+TODO
+=====
 
 # Now
 
@@ -16,6 +18,7 @@
 - Anon vma for each patch and use prctl(2)(CONFIG_ANON_VMA_NAME) set vma's name.
 - How to patch to strip ELF process.
 - loongarch64 support.
+- GUI support, like GTK/Qt, etc.
 
 
 # No support (ideal is plump, reality is bony)
