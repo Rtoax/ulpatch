@@ -403,6 +403,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	struct task_struct *task = vma->task;
 	unsigned long phaddr;
 	unsigned int phsz = 0;
+	int ret;
 	int i;
 	bool is_share_lib = true;
 	unsigned long lowest_vaddr = ULONG_MAX;
@@ -435,8 +436,10 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	}
 
 	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
+
 	/* Is not ELF? */
-	if (memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr)) < sizeof(ehdr)) {
+	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
+	if (ret < sizeof(ehdr)) {
 		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
