@@ -44,6 +44,14 @@ ifdef NOSTATIC
 	CFLAGS += -DNOSTATIC=1
 	CFLAGS_ULP += -DNOSTATIC=1
 endif
+ifeq ($(shell uname -m),x86_64)
+	CFLAGS_ULP += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx
+	CFLAGS_ULP += -fcf-protection=branch -fno-jump-tables
+	CFLAGS_ULP += -m64 -falign-jumps=1
+endif
+ifeq ($(shell uname -m),aarch64)
+	# TODO
+endif
 
 LDFLAGS_ULP :=
 LDFLAGS_ULP += -relocatable --build-id=sha1
