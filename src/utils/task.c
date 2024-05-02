@@ -1075,7 +1075,7 @@ void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
 
 void print_fd(FILE *fp, struct task_struct *task, struct fd *fd)
 {
-	fprintf(fp, "fd %d\n", fd->fd);
+	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);
 }
 
 int dump_task(const struct task_struct *task, bool detail)
@@ -1488,7 +1488,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		struct dirent *entry;
 		int ifd;
 		struct fd *fd;
-		char proc_fd_dir[] = {"/proc/1234567890abc/fd/"};
+		char proc_fd_dir[PATH_MAX] = {"/proc/1234567890abc/fd/"};
 		sprintf(proc_fd_dir, "/proc/%d/fd/", task->pid);
 		dir = opendir(proc_fd_dir);
 		if (!dir) {
@@ -1500,8 +1500,16 @@ struct task_struct *open_task(pid_t pid, int flag)
 				continue;
 			ldebug("FD %s\n", entry->d_name);
 			ifd = atoi(entry->d_name);
+
 			fd = malloc(sizeof(struct fd));
+			memset(fd, 0x00, sizeof(struct fd));
+
 			fd->fd = ifd;
+
+			/* Read symbol link */
+			sprintf(proc_fd_dir, "/proc/%d/fd/%d", task->pid, ifd);
+			readlink(proc_fd_dir, fd->symlink, PATH_MAX);
+
 			list_init(&fd->node);
 			list_add(&fd->node, &task->fds_list);
 		}

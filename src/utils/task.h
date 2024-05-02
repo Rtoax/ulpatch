@@ -152,6 +152,8 @@ struct thread {
  */
 struct fd {
 	int fd;
+	/* Like /proc/self/fd/0 -> /dev/pts/3 */
+	char symlink[PATH_MAX];
 	/* struct task_struct.fds_list */
 	struct list_head node;
 };
