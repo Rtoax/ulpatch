@@ -95,6 +95,7 @@ TEST(Task,	dump_task,	0)
 	dump_task(task, true);
 	dump_task_vmas(task, true);
 	dump_task_threads(task, true);
+	dump_task_fds(task, true);
 
 	return free_task(task);
 }

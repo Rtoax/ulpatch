@@ -146,6 +146,17 @@ struct thread {
 };
 
 /**
+ * Record all file descriptors of target task
+ *
+ * @fd - read from /proc/PID/fd/
+ */
+struct fd {
+	int fd;
+	/* struct task_struct.fds_list */
+	struct list_head node;
+};
+
+/**
  * When task opening, what do you want to do?
  *
  * FTO means Flag of Task when Open.
@@ -164,6 +175,7 @@ struct thread {
  *                 ftrace/patch will need those @plt address value.
  * @FTO_THREADS open /proc/PID/task/ and record it.
  * @FTO_RDWR Open task with read and write permission, otherwise readonly.
+ * @FTO_FD open /proc/PID/fd/ directory and for each FD.
  */
 #define FTO_NONE	0x0
 #define FTO_SELF	BIT(0)
@@ -175,6 +187,7 @@ struct thread {
 #define FTO_SELF_PLT	BIT(6)
 #define FTO_THREADS	BIT(7)
 #define FTO_RDWR	BIT(8)
+#define FTO_FD		BIT(9)
 
 #define FTO_ALL 0xffffffff
 
@@ -183,7 +196,8 @@ struct thread {
 			FTO_VMA_ELF_SYMBOLS | \
 			FTO_SELF_PLT | \
 			FTO_THREADS | \
-			FTO_RDWR)
+			FTO_RDWR | \
+			FTO_FD)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
 /* under ROOT_DIR/PID/ */
@@ -265,6 +279,9 @@ struct task_struct {
 
 	/* struct thread.node */
 	struct list_head threads_list;
+
+	/* struct fd.node */
+	struct list_head fds_list;
 };
 
 
@@ -300,8 +317,11 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
 void dump_task_threads(struct task_struct *task, bool detail);
+void dump_task_fds(struct task_struct *task, bool detail);
+
 void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
 void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
+void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);
 
 int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);

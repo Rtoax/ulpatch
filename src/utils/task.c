@@ -1073,6 +1073,11 @@ void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
 	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
 }
 
+void print_fd(FILE *fp, struct task_struct *task, struct fd *fd)
+{
+	fprintf(fp, "fd %d\n", fd->fd);
+}
+
 int dump_task(const struct task_struct *task, bool detail)
 {
 	print_task(stdout, task, detail);
@@ -1164,6 +1169,19 @@ void dump_task_threads(struct task_struct *task, bool detail)
 		print_thread(stdout, task, thread);
 }
 
+void dump_task_fds(struct task_struct *task, bool detail)
+{
+	struct fd *fd;
+
+	if (!(task->fto_flag & FTO_FD)) {
+		lerror("Not set FTO_FD(%ld) flag\n", FTO_FD);
+		return;
+	}
+
+	list_for_each_entry(fd, &task->fds_list, node)
+		print_fd(stdout, task, fd);
+}
+
 int free_task_vmas(struct task_struct *task)
 {
 	struct vm_area_struct *vma, *tmpvma;
@@ -1176,6 +1194,7 @@ int free_task_vmas(struct task_struct *task)
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
+	list_init(&task->fds_list);
 	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
@@ -1342,6 +1361,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
+	list_init(&task->fds_list);
 	rb_init(&task->vmas_rb);
 
 	if (load_task_auxv(pid, &task->auxv))
@@ -1462,6 +1482,32 @@ struct task_struct *open_task(pid_t pid, int flag)
 		closedir(dir);
 	}
 
+	/* /proc/PID/fd/xxx */
+	if (flag & FTO_FD) {
+		DIR *dir;
+		struct dirent *entry;
+		int ifd;
+		struct fd *fd;
+		char proc_fd_dir[] = {"/proc/1234567890abc/fd/"};
+		sprintf(proc_fd_dir, "/proc/%d/fd/", task->pid);
+		dir = opendir(proc_fd_dir);
+		if (!dir) {
+			lerror("opendir %s failed.\n", proc_fd_dir);
+			goto free_task;
+		}
+		while ((entry = readdir(dir)) != NULL) {
+			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
+				continue;
+			ldebug("FD %s\n", entry->d_name);
+			ifd = atoi(entry->d_name);
+			fd = malloc(sizeof(struct fd));
+			fd->fd = ifd;
+			list_init(&fd->node);
+			list_add(&fd->node, &task->fds_list);
+		}
+		closedir(dir);
+	}
+
 	return task;
 
 free_task:
@@ -1533,6 +1579,13 @@ int free_task(struct task_struct *task)
 		struct thread *thread, *tmpthread;
 		list_for_each_entry_safe(thread, tmpthread, &task->threads_list, node) {
 			free(thread);
+		}
+	}
+
+	if (task->fto_flag & FTO_FD) {
+		struct fd *fd, *tmpfd;
+		list_for_each_entry_safe(fd, tmpfd, &task->fds_list, node) {
+			free(fd);
 		}
 	}
 

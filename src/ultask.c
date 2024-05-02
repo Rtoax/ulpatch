@@ -31,6 +31,7 @@ enum {
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
+	ARG_FDS,
 	ARG_AUXV,
 	ARG_LIST_SYMBOLS,
 };
@@ -47,6 +48,7 @@ static unsigned long jmp_addr_from = 0;
 static unsigned long jmp_addr_to = 0;
 static bool flag_list_symbols = false;
 static bool flag_print_threads = false;
+static bool flag_print_fds = false;
 static bool flag_print_auxv = false;
 static const char *output_file = NULL;
 /* Default: read only */
@@ -83,6 +85,7 @@ static void print_help(void)
 	"                      you better ensure what you are doing.\n"
 	"\n"
 	"  --threads           dump threads\n"
+	"  --fds               dump fds\n"
 	"  --auxv              print auxv of task\n"
 	"\n"
 	"  --map-file [FILE]   mmap a exist file into target process address space\n"
@@ -105,6 +108,7 @@ static int parse_config(int argc, char *argv[])
 		{ "pid",            required_argument, 0, 'p' },
 		{ "vmas",           no_argument,       0, ARG_VMAS },
 		{ "threads",        no_argument,       0, ARG_THREADS },
+		{ "fds",            no_argument,       0, ARG_FDS },
 		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
@@ -171,6 +175,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_THREADS:
 			flag_print_threads = true;
 			break;
+		case ARG_FDS:
+			flag_print_fds = true;
+			break;
 		case ARG_AUXV:
 			flag_print_auxv = true;
 			break;
@@ -208,7 +215,8 @@ static int parse_config(int argc, char *argv[])
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
 		!flag_print_auxv &&
-		!flag_print_threads) {
+		!flag_print_threads &&
+		!flag_print_fds) {
 		if ((!jmp_addr_from && jmp_addr_to) || \
 			(jmp_addr_from && !jmp_addr_to)) {
 			fprintf(stderr, "must specify --jmp-from and --jmp-to at the same time.\n");
@@ -388,6 +396,9 @@ int main(int argc, char *argv[])
 
 	if (flag_print_threads)
 		dump_task_threads(target_task, config.verbose);
+
+	if (flag_print_fds)
+		dump_task_fds(target_task, config.verbose);
 
 	if (jmp_addr_from && jmp_addr_to) {
 		struct vm_area_struct *vma_from, *vma_to;
