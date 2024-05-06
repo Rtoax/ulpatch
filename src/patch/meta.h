@@ -29,24 +29,24 @@
  * @author: who wrote this patch code
  */
 #define ULPATCH_INFO(src_func, dst_func, author) \
-__asm__ (	\
-	"	.pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
-	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"	\
-	"	.string \"" #src_func "\" \n"	\
-	"	.string \"" #dst_func "\" \n"	\
-	"	.string \"" author "\" \n"	\
-	"	.popsection \n"	\
-	"	.pushsection " SEC_ULPATCH_INFO ", \"aw\", @progbits\n"	\
-	"	.quad 0\n" /* target function address */	\
-	"	.quad 0\n" /* patch function address */	\
-	"	.quad 0\n" /* virtual address to modify in target process */	\
-	"	.quad 0\n" /* original value1 */	\
-	"	.quad 0\n" /* original value2 */	\
-	"	.quad 0\n" /* patched time(2) */	\
-	"	.long 0\n" /* flag */	\
-	"	.long " ULPATCH_FILE_VERSION " \n"	\
-	"	.byte 1, 2, 3, 4 \n"	\
-	"	.popsection \n"	\
+__asm__ (								\
+	".pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
+	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"			\
+	"	.string \"" #src_func "\" \n"				\
+	"	.string \"" #dst_func "\" \n"				\
+	"	.string \"" author "\" \n"				\
+	".popsection \n"						\
+	".pushsection " SEC_ULPATCH_INFO ", \"aw\", @progbits\n"	\
+	"	.quad 0\n" /* target function address */		\
+	"	.quad 0\n" /* patch function address */			\
+	"	.quad 0\n" /* address to modify in target process */	\
+	"	.quad 0\n" /* original value1 */			\
+	"	.quad 0\n" /* original value2 */			\
+	"	.quad 0\n" /* patched time(2) */			\
+	"	.long 0\n" /* flag */					\
+	"	.long " ULPATCH_FILE_VERSION " \n"			\
+	"	.byte 1, 2, 3, 4 \n"					\
+	".popsection \n"						\
 );
 
 /**
