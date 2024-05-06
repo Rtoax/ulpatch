@@ -2039,23 +2039,24 @@ int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode)
 	return result;
 }
 
-static int __check_remote_fd(int remote_fd)
+/* There are some file descriptors we should never close them. */
+static bool __should_skip_remote_fd(int remote_fd)
 {
 	int fd = remote_fd;
 	/* We should never close 0,1,2 fd of target process. */
 	if (fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
 		lwarning("Try to close remote 0,1,2 file descriptor.\n");
-		return -EINVAL;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 int task_close(struct task_struct *task, int remote_fd)
 {
 	int ret;
 	unsigned long result;
-	if (__check_remote_fd(remote_fd))
-		return -EINVAL;
+	if (__should_skip_remote_fd(remote_fd))
+		return 0;
 	ret = task_syscall(task, __NR_close, remote_fd, 0, 0, 0, 0, 0, &result);
 	return result | ret;
 }
@@ -2065,8 +2066,8 @@ int task_ftruncate(struct task_struct *task, int remote_fd, off_t length)
 	int ret;
 	unsigned long result;
 
-	if (__check_remote_fd(remote_fd))
-		return -EINVAL;
+	if (__should_skip_remote_fd(remote_fd))
+		return 0;
 	ret = task_syscall(task, __NR_ftruncate, remote_fd, length, 0, 0, 0, 0,
 			   &result);
 	if (ret < 0)
