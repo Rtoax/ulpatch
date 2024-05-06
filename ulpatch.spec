@@ -1,6 +1,6 @@
 # All changes to build and install RPM packages go here.
 Name:		ulpatch
-Version:	0.5.4
+Version:	0.5.5
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
@@ -89,6 +89,6 @@ popd
 %{_bindir}/ulpatch_test
 
 %changelog
-* Wed Apr 17 2024 Rong Tao <rtoax@foxmail.com> - 0.5.4-0
+* Wed Apr 17 2024 Rong Tao <rtoax@foxmail.com> - 0.5.5-0
 - Create this.
 
