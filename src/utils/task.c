@@ -37,7 +37,7 @@ int open_pid_maps(pid_t pid)
 	mapsfd = open(maps, O_RDONLY);
 	if (mapsfd <= 0) {
 		lerror("open %s failed. %s\n", maps, strerror(errno));
-		mapsfd = -errno;
+		mapsfd = -1;
 	}
 	return mapsfd;
 }
@@ -912,7 +912,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 	/* open(2) /proc/[PID]/maps */
 	mapsfd = open_pid_maps(task->pid);
 	if (mapsfd <= 0)
-		return -1;
+		return -errno;
 	lseek(mapsfd, 0, SEEK_SET);
 
 	mapsfp = fdopen(mapsfd, "r");
@@ -1370,12 +1370,14 @@ struct task_struct *open_task(pid_t pid, int flag)
 	task->fto_flag = flag;
 	task->pid = pid;
 	__get_comm(task);
+
 	if (__get_exe(task))
 		goto free_task;
 
 	task->proc_mem_fd = memfd;
 
-	read_task_vmas(task, false);
+	if (read_task_vmas(task, false))
+		goto free_task;
 
 	rb_init(&task->vma_symbols);
 
