@@ -1489,12 +1489,13 @@ struct task_struct *open_task(pid_t pid, int flag)
 		DIR *dir;
 		struct dirent *entry;
 		int ifd;
+		int ret;
 		struct fd *fd;
-		char proc_fd_dir[PATH_MAX] = {"/proc/1234567890abc/fd/"};
-		sprintf(proc_fd_dir, "/proc/%d/fd/", task->pid);
-		dir = opendir(proc_fd_dir);
+		char proc_fd[PATH_MAX] = {"/proc/1234567890abc/fd/"};
+		sprintf(proc_fd, "/proc/%d/fd/", task->pid);
+		dir = opendir(proc_fd);
 		if (!dir) {
-			lerror("opendir %s failed.\n", proc_fd_dir);
+			lerror("opendir %s failed.\n", proc_fd);
 			goto free_task;
 		}
 		while ((entry = readdir(dir)) != NULL) {
@@ -1509,8 +1510,12 @@ struct task_struct *open_task(pid_t pid, int flag)
 			fd->fd = ifd;
 
 			/* Read symbol link */
-			sprintf(proc_fd_dir, "/proc/%d/fd/%d", task->pid, ifd);
-			readlink(proc_fd_dir, fd->symlink, PATH_MAX);
+			sprintf(proc_fd, "/proc/%d/fd/%d", task->pid, ifd);
+			ret = readlink(proc_fd, fd->symlink, PATH_MAX);
+			if (ret < 0) {
+				lwarning("readlink %s failed\n", proc_fd);
+				strncpy(fd->symlink, "[UNKNOWN]", PATH_MAX);
+			}
 
 			list_init(&fd->node);
 			list_add(&fd->node, &task->fds_list);
