@@ -159,6 +159,11 @@ int main(int argc, char *argv[])
 
 	set_log_level(config.log_level);
 
+	if (!patch_file && !pid) {
+		fprintf(stderr, "Must specify ulp file or pid, see -h.\n");
+		return -EINVAL;
+	}
+
 	if (patch_file)
 		show_patch_info();
 
