@@ -73,7 +73,7 @@ struct load_info {
 #endif
 
 
-#define PATCH_VMA_TEMP_PREFIX	"patch-"
+#define PATCH_VMA_TEMP_PREFIX	"ulp-"
 
 struct jmp_table_entry {
 	unsigned long jmp;
