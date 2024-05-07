@@ -4,6 +4,7 @@ set -e
 pid=
 patch=
 debug=
+error=
 
 __usage__() {
 	echo "
@@ -13,6 +14,7 @@ test [-h|--help] [-u|--patch]
 -u, --patch [ULPATCH]    specify ulpatch file
 
 -d, --debug             debug mode for ulpatch
+    --error             error mode
 -v, --verbose           set -x
 -h, --help              print this info
 "
@@ -24,6 +26,7 @@ TEMP=$(getopt \
 	--long pid: \
 	--long patch: \
 	--long debug \
+	--long error \
 	--long verbose \
 	--long help \
 	-n ulpatch-hello-test -- "$@")
@@ -47,6 +50,10 @@ while true; do
 	-d|--debug)
 		shift
 		debug=$1
+		;;
+	--error)
+		shift
+		error=$1
 		;;
 	-v|--verbose)
 		shift
@@ -72,9 +79,9 @@ done
 
 make
 
-ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v}
+ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
 cat /proc/${pid}/maps
-ulpinfo -p ${pid} ${debug:+--log-level=9 -v}
+ulpinfo -p ${pid} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
 
 dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
