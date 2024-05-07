@@ -1333,6 +1333,40 @@ close_exit:
 	return ret;
 }
 
+int load_task_status(pid_t pid, struct task_status *status)
+{
+	int fd, ret = 0;
+	char buf[PATH_MAX];
+	FILE *fp;
+
+	memset(status, 0x00, sizeof(struct task_status));
+	snprintf(buf, PATH_MAX - 1, "/proc/%d/status", pid);
+
+	fd = open(buf, O_RDONLY);
+	fp = fdopen(fd, "r");
+	if (fd == -1 || !fd) {
+		lerror("Open %s failed, %s\n", buf, strerror(errno));
+		ret = -errno;
+		goto close_exit;
+	}
+
+	fseek(fp, 0, SEEK_SET);
+	do {
+		char line[1024];
+		if (!fgets(line, sizeof(line), fp))
+			break;
+		ldebug("Status: %s\n", line);
+
+		/* TODO: Parse line */
+
+	} while (true);
+
+close_exit:
+	fclose(fp);
+	close(fd);
+	return ret;
+}
+
 int print_task_auxv(FILE *fp, const struct task_struct *task)
 {
 	const struct task_struct_auxv *pauxv = &task->auxv;

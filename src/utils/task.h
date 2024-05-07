@@ -223,6 +223,14 @@ struct task_struct_auxv {
 	unsigned long auxv_entry;
 };
 
+struct task_status {
+	/**
+	 * Get from /proc/[pid]/status
+	 */
+	uid_t uid, euid, suid, fsuid;
+	gid_t gid, egid, sgid, fsgid;
+};
+
 /**
  * This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
@@ -241,6 +249,7 @@ struct task_struct {
 	bool is_pie;
 
 	struct task_struct_auxv auxv;
+	struct task_status status;
 
 	/* If FTO_SELF set, load SELF ELF file when open. */
 	struct elf_file *exe_elf;
