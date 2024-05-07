@@ -18,6 +18,11 @@ else
 CFLAGS += -I ../../../
 endif
 
+LDLIBS :=
+LDLIBS += -relocatable
+LDLIBS += --build-id=sha1
+LDLIBS += -z noexecstack
+
 ALL: $(TARGETS)
 
 %.oS: %.S
@@ -30,7 +35,7 @@ ALL: $(TARGETS)
 
 $(TARGETS): mcount.oc mcount.oS
 	@echo -e "Target   \033[1;32m$(@)\033[m"
-	@$(LD) -relocatable --build-id=sha1 -o $(@) $(^) $(STATIC_OPTS) $(LDLIBS)
+	@$(LD) -o $(@) $(^) $(LDLIBS)
 
 clean:
 	@echo -e "Clean   \033[1;32m$(@)\033[m"
