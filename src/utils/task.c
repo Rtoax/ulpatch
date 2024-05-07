@@ -1366,6 +1366,9 @@ int load_task_status(pid_t pid, struct task_status *status)
 		goto close_exit;
 	}
 
+	ts.uid = ts.euid = ts.suid = ts.fsuid = -1;
+	ts.gid = ts.egid = ts.sgid = ts.fsgid = -1;
+
 	fseek(fp, 0, SEEK_SET);
 	do {
 		int r;
@@ -1404,6 +1407,13 @@ int load_task_status(pid_t pid, struct task_status *status)
 		/* TODO: Parse more lines */
 
 	} while (true);
+
+	if (ts.uid == -1 || ts.euid == -1 || ts.suid == -1 || ts.fsuid == -1 ||
+	    ts.gid == -1 || ts.egid == -1 || ts.sgid == -1 || ts.fsgid == -1) {
+		lerror("Not found Uid: or Gid: in %s\n", buf);
+		ret = -ENOENT;
+		goto close_exit;
+	}
 
 	memcpy(status, &ts, sizeof(struct task_status));
 
