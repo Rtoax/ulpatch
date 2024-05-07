@@ -9,7 +9,7 @@ int local_i = 123;
 long int local_l = 123;
 char *local_s = "Dear";
 #if !defined(NOSTATIC)
-static long static_i = 1024;
+static long static_l = 1024;
 static char *static_s = "you";
 #endif
 
@@ -20,8 +20,8 @@ void ulp_add_var(unsigned long ul)
 	local_i++;
 	local_l++;
 #if !defined(NOSTATIC)
-	static_i++;
-	static_i += 2;
+	static_l++;
+	static_l += 2;
 #endif
 
 #if !defined(NOLIBC)
@@ -35,7 +35,7 @@ void ulp_add_var(unsigned long ul)
 	//printf("\n");
 
 # if !defined(NOSTATIC)
-	printf("Hello World. Patched S: %d %s\n", static_i, static_s);
+	printf("Hello World. Patched S: %ld %s\n", static_l, static_s);
 # endif
 #endif
 }

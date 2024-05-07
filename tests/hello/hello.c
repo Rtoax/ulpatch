@@ -58,7 +58,7 @@ void internal_print_hello(unsigned long ul)
 		(unsigned long)print_hello,
 		(unsigned long)patch_hello);
 #else
-	printf("Hello World. %d, %ld\n", count, ul);
+	printf("Hello World. %ld, %ld\n", count, ul);
 #endif
 }
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	load_patch_so();
 #endif
 
-#define PRINT_ADDR(a)	printf("%-32s: %#016x\n", #a, a);
+#define PRINT_ADDR(a)	printf("%-32s: %#016lx\n", #a, (unsigned long)a);
 	PRINT_ADDR(print_hello);
 	PRINT_ADDR(puts);
 
