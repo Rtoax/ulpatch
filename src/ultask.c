@@ -33,6 +33,7 @@ enum {
 	ARG_THREADS,
 	ARG_FDS,
 	ARG_AUXV,
+	ARG_STATUS,
 	ARG_LIST_SYMBOLS,
 };
 
@@ -50,6 +51,7 @@ static bool flag_list_symbols = false;
 static bool flag_print_threads = false;
 static bool flag_print_fds = false;
 static bool flag_print_auxv = false;
+static bool flag_print_status = false;
 static const char *output_file = NULL;
 /* Default: read only */
 static bool flag_rdonly = true;
@@ -87,6 +89,7 @@ static void print_help(void)
 	"  --threads           dump threads\n"
 	"  --fds               dump fds\n"
 	"  --auxv              print auxv of task\n"
+	"  --status            print status of task\n"
 	"\n"
 	"  --map-file [FILE]   mmap a exist file into target process address space\n"
 	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
@@ -110,6 +113,7 @@ static int parse_config(int argc, char *argv[])
 		{ "threads",        no_argument,       0, ARG_THREADS },
 		{ "fds",            no_argument,       0, ARG_FDS },
 		{ "auxv",           no_argument,       0, ARG_AUXV },
+		{ "status",         no_argument,       0, ARG_STATUS },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
 		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
@@ -181,6 +185,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_AUXV:
 			flag_print_auxv = true;
 			break;
+		case ARG_STATUS:
+			flag_print_status = true;
+			break;
 		case 'o':
 			output_file = optarg;
 			break;
@@ -215,6 +222,7 @@ static int parse_config(int argc, char *argv[])
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
 		!flag_print_auxv &&
+		!flag_print_status &&
 		!flag_print_threads &&
 		!flag_print_fds) {
 		if ((!jmp_addr_from && jmp_addr_to) || \
@@ -381,6 +389,9 @@ int main(int argc, char *argv[])
 
 	if (flag_print_auxv)
 		print_task_auxv(stdout, target_task);
+
+	if (flag_print_status)
+		print_task_status(stdout, target_task);
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)

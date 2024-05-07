@@ -1333,40 +1333,6 @@ close_exit:
 	return ret;
 }
 
-int load_task_status(pid_t pid, struct task_status *status)
-{
-	int fd, ret = 0;
-	char buf[PATH_MAX];
-	FILE *fp;
-
-	memset(status, 0x00, sizeof(struct task_status));
-	snprintf(buf, PATH_MAX - 1, "/proc/%d/status", pid);
-
-	fd = open(buf, O_RDONLY);
-	fp = fdopen(fd, "r");
-	if (fd == -1 || !fd) {
-		lerror("Open %s failed, %s\n", buf, strerror(errno));
-		ret = -errno;
-		goto close_exit;
-	}
-
-	fseek(fp, 0, SEEK_SET);
-	do {
-		char line[1024];
-		if (!fgets(line, sizeof(line), fp))
-			break;
-		ldebug("Status: %s\n", line);
-
-		/* TODO: Parse line */
-
-	} while (true);
-
-close_exit:
-	fclose(fp);
-	close(fd);
-	return ret;
-}
-
 int print_task_auxv(FILE *fp, const struct task_struct *task)
 {
 	const struct task_struct_auxv *pauxv = &task->auxv;
@@ -1379,6 +1345,83 @@ int print_task_auxv(FILE *fp, const struct task_struct *task)
 	fprintf(fp, "%-8s %-#16lx\n", "AT_BASE", pauxv->auxv_interp);
 	fprintf(fp, "%-8s %-#16lx\n", "AT_ENTRY", pauxv->auxv_entry);
 
+	return 0;
+}
+
+int load_task_status(pid_t pid, struct task_status *status)
+{
+	int fd, ret = 0;
+	char buf[PATH_MAX];
+	FILE *fp;
+	struct task_status ts;
+
+	memset(&ts, 0x00, sizeof(struct task_status));
+	snprintf(buf, PATH_MAX - 1, "/proc/%d/status", pid);
+
+	fd = open(buf, O_RDONLY);
+	fp = fdopen(fd, "r");
+	if (fd == -1 || !fd) {
+		lerror("Open %s failed, %s\n", buf, strerror(errno));
+		ret = -errno;
+		goto close_exit;
+	}
+
+	fseek(fp, 0, SEEK_SET);
+	do {
+		int r;
+		char line[1024], label[128];
+
+		if (!fgets(line, sizeof(line), fp))
+			break;
+		ldebug("Status: %s\n", line);
+
+		if (!strncmp(line, "Uid:", 4)) {
+			r = sscanf(line, "%s %d %d %d %d", label,
+					&ts.uid,
+					&ts.euid,
+					&ts.suid,
+					&ts.fsuid);
+			if (r <= 0) {
+				lerror("sscanf failed.\n");
+				ret = -errno;
+				goto close_exit;
+			}
+		}
+
+		if (!strncmp(line, "Gid:", 4)) {
+			r = sscanf(line, "%s %d %d %d %d", label,
+					&ts.gid,
+					&ts.egid,
+					&ts.sgid,
+					&ts.fsgid);
+			if (r <= 0) {
+				lerror("sscanf failed.\n");
+				ret = -errno;
+				goto close_exit;
+			}
+		}
+
+		/* TODO: Parse more lines */
+
+	} while (true);
+
+	memcpy(status, &ts, sizeof(struct task_status));
+
+close_exit:
+	fclose(fp);
+	close(fd);
+	return ret;
+}
+
+int print_task_status(FILE *fp, const struct task_struct *task)
+{
+	const struct task_status *ps = &task->status;
+
+	if (!fp)
+		fp = stdout;
+
+	fprintf(fp, "Uid:\t%d\t%d\t%d\t%d\n", ps->uid, ps->euid, ps->suid, ps->fsuid);
+	fprintf(fp, "Gid:\t%d\t%d\t%d\t%d\n", ps->gid, ps->egid, ps->sgid, ps->fsgid);
 	return 0;
 }
 
@@ -1404,6 +1447,9 @@ struct task_struct *open_task(pid_t pid, int flag)
 	rb_init(&task->vmas_rb);
 
 	if (load_task_auxv(pid, &task->auxv))
+		goto free_task;
+
+	if (load_task_status(pid, &task->status))
 		goto free_task;
 
 	task->fto_flag = flag;
