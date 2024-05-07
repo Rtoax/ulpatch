@@ -444,8 +444,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		return -EAGAIN;
 	}
 
-	/* If not ELF, return success */
-	if (!ehdr_magic_ok(&ehdr))
+	/* If it's not ELF, return success */
+	if (!ehdr_ok(&ehdr))
 		return 0;
 
 	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
@@ -560,6 +560,9 @@ share_lib:
 			lowest_vaddr = lowest_vaddr <= phdr->p_vaddr
 					? lowest_vaddr : phdr->p_vaddr;
 
+			ldebug("PT_LOAD: %s, lowest_vaddr %lx\n", vma->name_,
+				lowest_vaddr);
+
 			/* Virtual address offset */
 			pgoff = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
 
@@ -588,7 +591,9 @@ share_lib:
 	}
 
 	if (lowest_vaddr == ULONG_MAX) {
-		lerror("%s: unable to find lowest load address.\n", vma->name_);
+		lerror("%s: unable to find lowest load address(%lx).\n",
+			vma->name_, lowest_vaddr);
+		print_vma(stdout, true, vma, true);
 		free(vma->vma_elf->phdrs);
 		free(vma->vma_elf);
 		vma->vma_elf = NULL;
