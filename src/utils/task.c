@@ -1536,9 +1536,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 		char buffer[PATH_MAX];
 
 		/* ULP_PROC_ROOT_DIR/PID */
-		snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
-		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
-			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
+		snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d",
+			 task->pid);
+		if (mkdirat(0, buffer, MODE_0777) != 0 && errno != EEXIST) {
+			lerror("mkdirat(2) for %d:%s failed.\n", task->pid,
+			       task->exe);
 			goto free_task;
 		}
 
@@ -1550,9 +1552,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 		/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
 		snprintf(buffer, PATH_MAX - 1,
-			ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
-		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
-			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
+			 ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
+			 task->pid);
+		if (mkdirat(0, buffer, MODE_0777) != 0 && errno != EEXIST) {
+			lerror("mkdirat(2) for %d:%s failed.\n", task->pid,
+			       task->exe);
 			goto free_task;
 		}
 	}
@@ -1649,9 +1653,11 @@ static void rb_free_symbol(struct rb_node *node)
 	free_symbol(s);
 }
 
-static void __unused clean_task_proc(struct task_struct *task)
+static void __clean_task_proc(struct task_struct *task)
 {
 	char buffer[PATH_MAX];
+
+	ldebug("Task %s is not patched, clean task's proc.\n", task->comm);
 
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM,
@@ -1661,10 +1667,10 @@ static void __unused clean_task_proc(struct task_struct *task)
 			buffer, task->pid, task->exe, strerror(errno));
 
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
-		 task->pid);
+	snprintf(buffer, PATH_MAX - 1,
+		 ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 	/**
-	 * If process patched, we should not remove the proc directory,
+	 * If process was patched, we should not remove the proc directory,
 	 * and rmdir can't remove the directory has file in it.
 	 */
 	if (rmdir(buffer) != 0)
@@ -1678,11 +1684,20 @@ static void __unused clean_task_proc(struct task_struct *task)
 			task->exe, strerror(errno));
 }
 
-/**
- * TODO: Couldn't remove the proc if this process patched
- */
-static void free_task_proc(struct task_struct *task)
-{}
+static void __check_and_free_task_proc(struct task_struct *task)
+{
+	int ulp_cnt = 0;
+	struct vma_ulp *ulp, *tmpulp;
+
+	/**
+	 * If process was patched, we should not remove the proc directory.
+	 */
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node)
+		ulp_cnt++;
+
+	if (ulp_cnt == 0)
+		__clean_task_proc(task);
+}
 
 int close_task(struct task_struct *task)
 {
@@ -1707,7 +1722,7 @@ int close_task(struct task_struct *task)
 		elf_file_close(task->libc_vma->name_);
 
 	if (task->fto_flag & FTO_PROC)
-		free_task_proc(task);
+		__check_and_free_task_proc(task);
 
 	if (task->fto_flag & FTO_THREADS) {
 		struct thread *thread, *tmpthread;
