@@ -34,6 +34,12 @@ $ sudo apt install -y \
 	libunwind-dev
 ```
 
+If you want to compile the website, install
+
+```
+$ sudo apt install -y mkdocs
+```
+
 
 ### Compile
 
