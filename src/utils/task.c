@@ -1687,13 +1687,14 @@ static void __clean_task_proc(struct task_struct *task)
 static void __check_and_free_task_proc(struct task_struct *task)
 {
 	int ulp_cnt = 0;
-	struct vma_ulp *ulp, *tmpulp;
+	struct vm_area_struct *vma;
 
 	/**
 	 * If process was patched, we should not remove the proc directory.
 	 */
-	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node)
-		ulp_cnt++;
+	task_for_each_vma(vma, task)
+		if (vma->type == VMA_ULPATCH)
+			ulp_cnt++;
 
 	if (ulp_cnt == 0)
 		__clean_task_proc(task);
