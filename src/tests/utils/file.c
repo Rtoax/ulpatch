@@ -60,6 +60,11 @@ TEST(File,	ftouch_remove,	0)
 		ret |= fremove(files[i]);
 	}
 
+	for (i = 0; i < ARRAY_SIZE(files); i++) {
+		ret |= ftouch(files[i]);
+		ret |= fremove_recursive(files[i]);
+	}
+
 	return ret;
 }
 

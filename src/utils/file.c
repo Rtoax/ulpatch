@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <libgen.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 #include <gelf.h>
 
@@ -87,6 +88,51 @@ int ftouch(const char *filepath)
 	}
 	close(fd);
 	return 0;
+}
+
+static int __remove_recursive(const char *path)
+{
+	DIR *dirp;
+	struct dirent *dp;
+	struct stat dir_stat;
+	char dir_name[PATH_MAX];
+
+	/* path not exist */
+	if (!fexist(path)) {
+		return 0;
+	}
+
+	/* get attribution error */
+	if (stat(path, &dir_stat) == -1) {
+		lerror("get dir:%s stat error.\n", path);
+		return -1;
+	}
+
+	/* regular file, delete */
+	if (S_ISREG(dir_stat.st_mode)) {
+		ldebug("Delete file %s\n", path);
+		remove(path);
+	} else if (S_ISDIR(dir_stat.st_mode)) {
+		dirp = opendir(path);
+		while ((dp = readdir(dirp))!= NULL) {
+			if ((0 == strcmp(".", dp->d_name)) ||
+			    (0 == strcmp("..", dp->d_name)))
+				continue;
+			sprintf(dir_name, "%s/%s", path, dp->d_name);
+			__remove_recursive(dir_name);
+		}
+		closedir(dirp);
+		ldebug("Delete dir %s\n", path);
+		rmdir(path);
+	} else {
+		lerror("unknow type: %s!\n", path);
+	}
+	return 0;
+}
+
+int fremove_recursive(const char *filepath)
+{
+	return __remove_recursive(filepath);
 }
 
 static int _file_type_mem(struct mmap_struct *mem)
