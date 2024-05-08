@@ -1447,7 +1447,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 		return NULL;
 
 	task = malloc(sizeof(struct task_struct));
-	assert(task && "malloc failed");
+	if (!task) {
+		lerror("malloc task failed, %m.");
+		goto failed;
+	}
+
 	memset(task, 0x0, sizeof(struct task_struct));
 
 	list_init(&task->vma_list);
@@ -1622,6 +1626,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 free_task:
 	free_task(task);
+failed:
 	return NULL;
 }
 
@@ -1668,6 +1673,9 @@ static void free_task_proc(struct task_struct *task)
 
 int free_task(struct task_struct *task)
 {
+	if (!task)
+		return -EINVAL;
+
 	close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {
