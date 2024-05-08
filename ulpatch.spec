@@ -67,7 +67,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 	-DBUILD_ULFTRACE=OFF \
 %endif
 	..
-make -j4
+make %{?_smp_mflags}
 popd
 popd
 
