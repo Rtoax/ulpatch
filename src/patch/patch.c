@@ -911,6 +911,16 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	}
 
 	/**
+	 * Target task will open/mmap the object ulp file, thus, it must has
+	 * permission to open and modify the object file.
+	 */
+	err = chown(obj_to, task->status.uid, task->status.gid);
+	if (err) {
+		lerror("chown %s failed.\n", obj_to);
+		goto err;
+	}
+
+	/**
 	 * Create and mmap a temp file into target task, this temp file is under
 	 * ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES directory, it's named by
 	 * mktemp().
