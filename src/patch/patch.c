@@ -80,8 +80,8 @@ void release_load_info(struct load_info *info)
 	}
 }
 
-/* ULPatch is single thread, thus, this api is ok. */
-static char *__make_pid_objname(pid_t pid, char *buf, size_t buf_len)
+/* Make ulp file name. */
+static char *__make_pid_ulpname(pid_t pid, char *buf, size_t buf_len)
 {
 	char buffer1[PATH_MAX];
 	const char *s;
@@ -120,7 +120,7 @@ static int __chk_load_info_len(struct load_info *info)
 }
 
 /* see linux:kernel/module.c */
-int alloc_patch_file(const char *obj_from, const char *obj_to,
+int alloc_patch_file(const char *obj_from, const char *ulp_file,
 		     struct load_info *info)
 {
 	int err = 0;
@@ -132,7 +132,7 @@ int alloc_patch_file(const char *obj_from, const char *obj_to,
 	}
 
 	info->ulp_name = strdup(obj_from);
-	info->patch.path = strdup(obj_to);
+	info->patch.path = strdup(ulp_file);
 
 	info->len = fsize(obj_from);
 	if (info->len < sizeof(*(info->hdr))) {
@@ -890,7 +890,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 {
 	int err;
 	char buffer[PATH_MAX];
-	char *obj_to;
+	char *ulp_file;
 
 	struct load_info info = {
 		.target_task = task,
@@ -902,9 +902,9 @@ int init_patch(struct task_struct *task, const char *obj_file)
 		return -1;
 	}
 
-	obj_to = __make_pid_objname(task->pid, buffer, sizeof(buffer));
+	ulp_file = __make_pid_ulpname(task->pid, buffer, sizeof(buffer));
 
-	err = alloc_patch_file(obj_file, obj_to, &info);
+	err = alloc_patch_file(obj_file, ulp_file, &info);
 	if (err) {
 		lerror("Parse %s failed.\n", obj_file);
 		goto err;
@@ -914,9 +914,9 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	 * Target task will open/mmap the object ulp file, thus, it must has
 	 * permission to open and modify the object file.
 	 */
-	err = chown(obj_to, task->status.uid, task->status.gid);
+	err = chown(ulp_file, task->status.uid, task->status.gid);
 	if (err) {
-		lerror("chown %s failed.\n", obj_to);
+		lerror("chown %s failed.\n", ulp_file);
 		goto err;
 	}
 
@@ -945,8 +945,8 @@ err:
 	 * We must remove the ulp file if load patch failed, beacuse, the ulp
 	 * file cache will influence task clean.
 	 */
-	if (fexist(obj_to))
-		fremove(obj_to);
+	if (fexist(ulp_file))
+		fremove(ulp_file);
 	return err;
 }
 
