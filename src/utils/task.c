@@ -1210,7 +1210,7 @@ int free_task_vmas(struct task_struct *task)
 
 bool proc_pid_exist(pid_t pid)
 {
-	char path[128];
+	char path[PATH_MAX];
 	snprintf(path, sizeof(path), "/proc/%d", pid);
 	return fexist(path);
 }
@@ -1218,7 +1218,7 @@ bool proc_pid_exist(pid_t pid)
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;
-	char path[128];
+	char path[PATH_MAX];
 
 	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
 	ret = readlink(path, buf, bufsz);
@@ -1231,7 +1231,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 
 static int __get_comm(struct task_struct *task)
 {
-	char path[128];
+	char path[PATH_MAX];
 	int ret;
 	FILE *fp = NULL;
 
@@ -1256,7 +1256,7 @@ static int __get_comm(struct task_struct *task)
 
 static int __get_exe(struct task_struct *task)
 {
-	char path[128], realpath[128];
+	char path[PATH_MAX], realpath[PATH_MAX];
 	ssize_t ret;
 
 	snprintf(path, sizeof(path), "/proc/%d/exe", task->pid);
@@ -1440,6 +1440,12 @@ struct task_struct *open_task(pid_t pid, int flag)
 	struct task_struct *task = NULL;
 	int memfd;
 	int o_flags;
+
+	if (!proc_pid_exist(pid)) {
+		lerror("pid %d is not exist.\n", pid);
+		errno = -ENOENT;
+		return NULL;
+	}
 
 	o_flags = flag & FTO_RDWR ? O_RDWR : O_RDONLY;
 	memfd = __open_pid_mem(pid, o_flags);
