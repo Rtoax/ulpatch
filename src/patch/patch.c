@@ -88,7 +88,7 @@ static char *make_pid_objname(pid_t pid, char *buf, size_t buf_len)
 	int ret;
 
 make:
-	/* make patch-XXXXXX temp file name */
+	/* make ulp-XXXXXX temp file name */
 	s = fmktempname(buffer1, PATH_MAX, PATCH_VMA_TEMP_PREFIX "XXXXXX");
 	if (!s)
 		goto make;
