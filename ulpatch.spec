@@ -27,6 +27,7 @@ Provides:	%{name} = %{version}-%{release}
 
 %package devel
 Summary:	The ULPatch's development headers.
+BuildArch:	noarch
 License:	LGPLv2+ and MIT
 Requires:	%{name} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
