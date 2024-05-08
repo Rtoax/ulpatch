@@ -108,9 +108,12 @@
 #define SZ_2G				0x80000000
 
 
-/* all output need file store here, mkdir(2) it before running.
- */
+/* all output need file store here, mkdir(2) it before running. */
 #define ROOT_DIR	"/tmp/ulpatch"
+
+#define MODE_0777 (S_IRUSR | S_IWUSR | S_IXUSR | \
+		   S_IRGRP | S_IWGRP | S_IXGRP | \
+		   S_IROTH | S_IWOTH | S_IXOTH)
 
 
 /* Indirect stringification.  Doing two levels allows the parameter to be a
