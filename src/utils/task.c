@@ -1638,7 +1638,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	return task;
 
 free_task:
-	free_task(task);
+	close_task(task);
 failed:
 	return NULL;
 }
@@ -1684,7 +1684,7 @@ static void __unused clean_task_proc(struct task_struct *task)
 static void free_task_proc(struct task_struct *task)
 {}
 
-int free_task(struct task_struct *task)
+int close_task(struct task_struct *task)
 {
 	if (!task) {
 		lerror("Try free NULL task.\n");

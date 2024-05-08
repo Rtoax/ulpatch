@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 	delete_patch(target_task);
 
 done:
-	free_task(target_task);
+	close_task(target_task);
 
 	return ret;
 }

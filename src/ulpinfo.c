@@ -149,7 +149,7 @@ int show_task_patch_info(pid_t pid)
 	}
 
 free:
-	free_task(task);
+	close_task(task);
 	return 0;
 }
 

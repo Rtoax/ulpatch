@@ -133,7 +133,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 #elif defined(__aarch64__)
 
-	// TODO: how to get bl <_mcount> address (24)
+	/* TODO: how to get bl <_mcount> address (24) */
 	unsigned long pc =
 		(unsigned long)try_to_wake_up + aarch64_func_bl_offset(try_to_wake_up);
 	uint32_t new = aarch64_insn_gen_branch_imm(pc,
@@ -152,11 +152,11 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 #endif
 
-	// call again, custom_mcount() will be called.
-	// see macro ULPATCH_TEST code branch
+	/* call again, custom_mcount() will be called. see macro ULPATCH_TEST
+	 * code branch */
 	ret = try_to_wake_up(task, 1, 2);
 
-	free_task(task);
+	close_task(task);
 
 	return ret;
 }
@@ -249,7 +249,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 	else
 		ret = 0;
 
-	free_task(task);
+	close_task(task);
 	return ret;
 }
 
@@ -283,6 +283,6 @@ TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
 	else
 		ret = 0;
 
-	free_task(task);
+	close_task(task);
 	return ret;
 }

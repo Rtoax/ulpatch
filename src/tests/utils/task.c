@@ -29,8 +29,7 @@ TEST(Task_utils,	get_proc_pid_exe,	0)
 TEST(Task,	open_free,	0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
-
-	return free_task(task);
+	return close_task(task);
 }
 
 TEST(Task,	open_free_fto_flags,	0)
@@ -66,7 +65,7 @@ TEST(Task,	open_free_fto_flags,	0)
 
 	dump_task_vmas(task, true);
 
-	free_task(task);
+	close_task(task);
 
 	return ret;
 }
@@ -97,7 +96,7 @@ TEST(Task,	dump_task,	0)
 	dump_task_threads(task, true);
 	dump_task_fds(task, true);
 
-	return free_task(task);
+	return close_task(task);
 }
 
 TEST(Task,	attach_detach,	0)
@@ -153,7 +152,7 @@ TEST(Task,	for_each_vma,	0)
 		first_line = false;
 	}
 
-	return free_task(task);
+	return close_task(task);
 }
 
 TEST(Task,	find_vma,	0)
@@ -175,7 +174,7 @@ TEST(Task,	find_vma,	0)
 	}
 
 failed:
-	free_task(task);
+	close_task(task);
 	return ret;
 }
 
@@ -194,7 +193,7 @@ TEST(Task,	copy_from_task,	0)
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 		ret = -1;
 
-	free_task(task);
+	close_task(task);
 
 	return ret;
 }
@@ -216,7 +215,7 @@ TEST(Task,	copy_to_task,	0)
 		ret = -1;
 	}
 
-	free_task(task);
+	close_task(task);
 
 	return ret;
 }
@@ -271,7 +270,7 @@ TEST(Task,	mmap_malloc,	0)
 		waitpid(pid, &status, __WALL);
 		if (status != 0)
 			ret = -EINVAL;
-		free_task(task);
+		close_task(task);
 	} else
 		lerror("fork(2) error.\n");
 
@@ -341,7 +340,7 @@ TEST(Task,	fstat,	0)
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	} else {
 		lerror("fork(2) error.\n");
 	}
@@ -430,7 +429,7 @@ static int task_mmap_file(int prot)
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	} else {
 		lerror("fork(2) error.\n");
 	}
@@ -508,7 +507,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 		waitpid(pid, &status, __WALL);
 		if (status != 0)
 			ret = -EINVAL;
-		free_task(task);
+		close_task(task);
 	} else
 		lerror("fork(2) error.\n");
 
@@ -534,6 +533,6 @@ TEST(Task,	dump_task_vma_to_file,	0)
 			dump_task_vma_to_file("vdso.so", task, addr);
 	}
 
-	return free_task(task);
+	return close_task(task);
 }
 

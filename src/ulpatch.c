@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "What to do.\n");
 	}
 
-	free_task(target_task);
+	close_task(target_task);
 	if (patch_file)
 		free(patch_file);
 

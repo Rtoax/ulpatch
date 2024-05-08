@@ -85,7 +85,7 @@ out:
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	} else
 		lerror("fork(2) error.\n");
 
@@ -209,7 +209,7 @@ out:
 		waitpid(pid, &status, __WALL);
 		if (status != 0)
 			ret = -EINVAL;
-		free_task(task);
+		close_task(task);
 	} else
 		lerror("fork(2) error.\n");
 
@@ -275,7 +275,7 @@ out:
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	} else {
 		lerror("fork(2) error.\n");
 	}
@@ -330,7 +330,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	} else {
 		lerror("fork(2) error.\n");
 	}
@@ -477,7 +477,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 		if (status != 0) {
 			ret = -EINVAL;
 		}
-		free_task(task);
+		close_task(task);
 	}
 
 	task_wait_destroy(&waitqueue);

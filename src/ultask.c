@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
 	}
 
 done:
-	free_task(target_task);
+	close_task(target_task);
 	return ret;
 }
 
