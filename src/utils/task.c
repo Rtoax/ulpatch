@@ -1435,10 +1435,15 @@ int print_task_status(FILE *fp, const struct task_struct *task)
 	return 0;
 }
 
+/**
+ * Open target task
+ *
+ * @pid process Identifier
+ * @flags flag FTO_
+ */
 struct task_struct *open_task(pid_t pid, int flag)
 {
 	struct task_struct *task = NULL;
-	int memfd;
 	int o_flags;
 
 	if (!proc_pid_exist(pid)) {
@@ -1447,18 +1452,16 @@ struct task_struct *open_task(pid_t pid, int flag)
 		return NULL;
 	}
 
-	o_flags = flag & FTO_RDWR ? O_RDWR : O_RDONLY;
-	memfd = __open_pid_mem(pid, o_flags);
-	if (memfd <= 0)
-		return NULL;
-
 	task = malloc(sizeof(struct task_struct));
 	if (!task) {
-		lerror("malloc task failed, %m.");
+		lerror("malloc task failed, %m.\n");
 		goto failed;
 	}
 
 	memset(task, 0x0, sizeof(struct task_struct));
+
+	task->fto_flag = flag;
+	task->pid = pid;
 
 	list_init(&task->vma_list);
 	list_init(&task->ulp_list);
@@ -1472,14 +1475,18 @@ struct task_struct *open_task(pid_t pid, int flag)
 	if (load_task_status(pid, &task->status))
 		goto free_task;
 
-	task->fto_flag = flag;
-	task->pid = pid;
 	__get_comm(task);
 
 	if (__get_exe(task))
 		goto free_task;
 
-	task->proc_mem_fd = memfd;
+	/* Open target process memory */
+	o_flags = flag & FTO_RDWR ? O_RDWR : O_RDONLY;
+	task->proc_mem_fd = __open_pid_mem(pid, o_flags);
+	if (task->proc_mem_fd <= 0)
+		goto free_task;
+
+	task->proc_mem_fd = task->proc_mem_fd;
 
 	if (read_task_vmas(task, false))
 		goto free_task;
@@ -1679,10 +1686,13 @@ static void free_task_proc(struct task_struct *task)
 
 int free_task(struct task_struct *task)
 {
-	if (!task)
+	if (!task) {
+		lerror("Try free NULL task.\n");
 		return -EINVAL;
+	}
 
-	close(task->proc_mem_fd);
+	if (task->proc_mem_fd > STDERR_FILENO)
+		close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {
 		struct vm_area_struct *tmp_vma;
