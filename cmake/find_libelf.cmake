@@ -11,33 +11,29 @@
 #  ELF_GETSHDRSTRNDX - the libelf has elf_getshdrstrndx() api
 
 find_path(LIBELF_INCLUDE_DIRS
-  NAMES
-    libelf.h
-  PATH_SUFFIXES
-    libelf
-  PATHS
-    ENV CPATH)
+	NAMES libelf.h
+	PATH_SUFFIXES libelf
+	PATHS
+		ENV CPATH)
 
 find_library(LIBELF_LIBRARIES
-  NAMES
-    elf
-  PATH_SUFFIXES
-    libelf
-  PATHS
-    ENV LIBRARY_PATH
-    ENV LD_LIBRARY_PATH)
+	NAMES elf
+	PATH_SUFFIXES libelf
+	PATHS
+		ENV LIBRARY_PATH
+		ENV LD_LIBRARY_PATH)
 
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibElf "Please install the libelf development package"
-  LIBELF_LIBRARIES
-  LIBELF_INCLUDE_DIRS)
+	LIBELF_LIBRARIES
+	LIBELF_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <libelf.h>
-int main() {
+int main(void) {
 	Elf *e = (Elf*)0;
 	size_t sz;
 	elf_getshdrstrndx(e, &sz);

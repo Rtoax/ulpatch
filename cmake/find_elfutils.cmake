@@ -9,24 +9,21 @@
 #  ELFUTILS_VERSION_H - the elfutils has version.h header
 
 find_path(ELFUTILS_INCLUDE_DIRS
-  NAMES
-    version.h
-  PATH_SUFFIXES
-    elfutils
-  PATHS
-    ENV CPATH)
+	NAMES version.h
+	PATH_SUFFIXES elfutils
+	PATHS ENV CPATH)
 
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(elfutils-devel
 	"Please install the elfutils-devel(if rpm), libelf-dev(if deb) development package"
-  ELFUTILS_INCLUDE_DIRS)
+	ELFUTILS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <elfutils/version.h>
-int main() {
+int main(void) {
 	return 0;
 }" ELFUTILS_VERSION_H)
 SET(CMAKE_REQUIRED_LIBRARIES)

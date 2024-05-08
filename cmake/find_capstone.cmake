@@ -9,23 +9,20 @@
 #  CAPSTONE_CAPSTONE_H - the capstone has capstone.h header
 
 find_path(CAPSTONE_INCLUDE_DIRS
-  NAMES
-    capstone.h
-  PATH_SUFFIXES
-    capstone
-  PATHS
-    ENV CPATH)
+	NAMES capstone.h
+	PATH_SUFFIXES capstone
+	PATHS ENV CPATH)
 
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(capstone-devel "Please install the capstone-devel development package"
-  CAPSTONE_INCLUDE_DIRS)
+	CAPSTONE_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES capstone)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <capstone/capstone.h>
-int main() {
+int main(void) {
 	return 0;
 }" CAPSTONE_CAPSTONE_H)
 SET(CMAKE_REQUIRED_LIBRARIES)

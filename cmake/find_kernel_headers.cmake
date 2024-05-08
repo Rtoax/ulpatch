@@ -11,28 +11,25 @@
 #
 
 find_path(KERNEL_HEADERS_INCLUDE_DIRS
-  NAMES
-    version.h
-  PATH_SUFFIXES
-    linux
-  PATHS
-    ENV CPATH)
+	NAMES version.h
+	PATH_SUFFIXES linux
+	PATHS ENV CPATH)
 
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(kernel-headers "Please install the kernel-headers development package"
-  KERNEL_HEADERS_INCLUDE_DIRS)
+	KERNEL_HEADERS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <linux/const.h>
-int main() {
+int main(void) {
 	return 0;
 }" KERNEL_HEADERS_CONST_H)
 CHECK_C_SOURCE_COMPILES("
 #include <linux/const.h>
-int main() {
+int main(void) {
 	long a = __ALIGN_KERNEL(1, 0);
 	return 0;
 }" KERNEL_HEADERS_CONST___ALIGN_KERNEL_H)

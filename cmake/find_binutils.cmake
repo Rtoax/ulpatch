@@ -9,23 +9,20 @@
 #  BINUTILS_BFD_H - the binutils has version.h header
 
 find_path(BINUTILS_INCLUDE_DIRS
-  NAMES
-    bfd.h
-  PATHS
-    ENV CPATH)
+	NAMES bfd.h
+	PATHS ENV CPATH)
 
 find_library(BINUTILS_BFD_LIBRARIES
-  NAMES
-    bfd
-  PATHS
-    ENV LIBRARY_PATH
-    ENV LD_LIBRARY_PATH)
+	NAMES bfd
+	PATHS
+		ENV LIBRARY_PATH
+		ENV LD_LIBRARY_PATH)
 
 include(FindPackageHandleStandardArgs)
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils-devel development package"
-  BINUTILS_BFD_LIBRARIES
-  BINUTILS_INCLUDE_DIRS)
+	BINUTILS_BFD_LIBRARIES
+	BINUTILS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf)
 INCLUDE(CheckCSourceCompiles)
