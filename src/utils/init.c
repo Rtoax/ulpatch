@@ -26,19 +26,20 @@ void ulpatch_env_init(void)
 
 	/**
 	 * The target task could be belongs to any USER(uid), the target task
-	 * will rwx ROOT_DIR, thus, give 0777 permission.
+	 * will rwx ULP_PROC_ROOT_DIR, thus, give 0777 permission.
 	 */
-	if (!fexist(ROOT_DIR)) {
-		ret = mkdirat(0, ROOT_DIR, MODE_0777);
+	if (!fexist(ULP_PROC_ROOT_DIR)) {
+		ret = mkdirat(0, ULP_PROC_ROOT_DIR, MODE_0777);
 		if (ret != 0) {
-			lerror("Create %s failed, %m\n", ROOT_DIR);
+			lerror("Create %s failed, %m\n", ULP_PROC_ROOT_DIR);
 			exit(1);
 		}
 	} else {
-		ret = chmod(ROOT_DIR, MODE_0777);
+		ret = chmod(ULP_PROC_ROOT_DIR, MODE_0777);
 		if (ret != 0) {
-			lerror("Chmod %s failed, %m\n", ROOT_DIR);
-			lerror("You could remove %s and run again.\n", ROOT_DIR);
+			lerror("Chmod %s failed, %m\n", ULP_PROC_ROOT_DIR);
+			lerror("You could remove %s and run again.\n",
+				ULP_PROC_ROOT_DIR);
 			exit(1);
 		}
 	}

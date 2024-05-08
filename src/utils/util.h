@@ -109,7 +109,7 @@
 
 
 /* all output need file store here, mkdir(2) it before running. */
-#define ROOT_DIR	"/tmp/ulpatch"
+#define ULP_PROC_ROOT_DIR	"/tmp/ulpatch"
 
 #define MODE_0777 (S_IRUSR | S_IWUSR | S_IXUSR | \
 		   S_IRGRP | S_IWGRP | S_IXGRP | \

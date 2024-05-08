@@ -94,11 +94,13 @@ make:
 		goto make;
 
 	/**
-	 * Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems like:
-	 * /tmp/ulpatch/5465/map_files/patch-AbIRYY
+	 * Create ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES/obj_file, seems
+	 * like:
+	 *   /tmp/ulpatch/5465/map_files/patch-AbIRYY
 	 */
 	ret = snprintf(buf, buf_len - 1,
-			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid, s);
+		       ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES "/%s", pid,
+		       s);
 	if (ret <= 0)
 		/* try again */
 		goto make;
@@ -910,7 +912,8 @@ int init_patch(struct task_struct *task, const char *obj_file)
 
 	/**
 	 * Create and mmap a temp file into target task, this temp file is under
-	 * ROOT_DIR/PID/TASK_PROC_MAP_FILES directory, it's named by mktemp().
+	 * ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES directory, it's named by
+	 * mktemp().
 	 */
 	err = create_mmap_vma_file(task, &info);
 	if (err) {

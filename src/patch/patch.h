@@ -37,7 +37,7 @@ struct load_info {
 	unsigned long target_hdr;
 	struct task_struct *target_task;
 
-	/* Create ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
+	/* Create ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES/patch-XXXXXX */
 	struct {
 		char *path;
 		struct mmap_struct *mmap;

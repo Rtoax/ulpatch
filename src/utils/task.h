@@ -166,8 +166,9 @@ struct fd {
  * @FTO_LIBC in /proc/PID/maps specify a libc.so ELF file, if you want to
  *            open it when open task, set this flag.
  * @FTO_SELF task.exe or /proc/PID/exe specify a ELF file, open it or not.
- * @FTO_PROC Create '/proc' like directory under ROOT_DIR. If you need to map
- *            a file into target process address space, the flag is necessary.
+ * @FTO_PROC Create '/proc' like directory under ULP_PROC_ROOT_DIR. If you need
+ *           to map a file into target process address space, the flag is
+ *           necessary.
  * @FTO_PATCH parse patch VMA when open a task.
  * @FTO_VMA_ELF different with @FTO_LIBC, it's open target process address
  *               space's ELF VMA in memory.
@@ -202,7 +203,7 @@ struct fd {
 			FTO_FD)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
-/* under ROOT_DIR/PID/ */
+/* under ULP_PROC_ROOT_DIR/PID/ */
 #define TASK_PROC_COMM	"comm"
 #define TASK_PROC_MAP_FILES	"map_files"
 

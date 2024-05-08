@@ -43,22 +43,22 @@ TEST(Task,	open_free_fto_flags,	0)
 		ret = -1;
 	}
 
-	/* ROOT_DIR/PID */
-	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
+	/* ULP_PROC_ROOT_DIR/PID */
+	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
-	/* ROOT_DIR/PID/TASK_PROC_COMM */
+	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
 	snprintf(buffer, PATH_MAX - 1,
-		ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
+		ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}
 
-	/* ROOT_DIR/PID/patches */
+	/* ULP_PROC_ROOT_DIR/PID/patches */
 	snprintf(buffer, PATH_MAX - 1,
-		ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
+		ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 	if (!fexist(buffer)) {
 		ret = -1;
 	}

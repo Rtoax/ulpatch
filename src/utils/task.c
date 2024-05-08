@@ -1530,27 +1530,27 @@ struct task_struct *open_task(pid_t pid, int flag)
 		task->objdump = objdump_elf_load(task->exe);
 	}
 
-	/* Create a directory under ROOT_DIR */
+	/* Create a directory under ULP_PROC_ROOT_DIR */
 	if (flag & FTO_PROC) {
 		FILE *fp;
 		char buffer[PATH_MAX];
 
-		/* ROOT_DIR/PID */
-		snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
+		/* ULP_PROC_ROOT_DIR/PID */
+		snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
 		}
 
-		/* ROOT_DIR/PID/TASK_PROC_COMM */
+		/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
 		sprintf(buffer + strlen(buffer), "/" TASK_PROC_COMM);
 		fp = fopen(buffer, "w");
 		fprintf(fp, "%s", task->comm);
 		fclose(fp);
 
-		/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
+		/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
 		snprintf(buffer, PATH_MAX - 1,
-			ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
+			ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES, task->pid);
 		if (mkdirat(0, buffer, 0775) != 0 && errno != EEXIST) {
 			lerror("mkdirat(2) for %d:%s failed.\n", task->pid, task->exe);
 			goto free_task;
@@ -1653,15 +1653,15 @@ static void __unused clean_task_proc(struct task_struct *task)
 {
 	char buffer[PATH_MAX];
 
-	/* ROOT_DIR/PID/TASK_PROC_COMM */
-	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d/" TASK_PROC_COMM,
+	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
+	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM,
 		 task->pid);
 	if (unlink(buffer) != 0)
 		lerror("unlink(%s) for %d:%s failed, %s.\n",
 			buffer, task->pid, task->exe, strerror(errno));
 
-	/* ROOT_DIR/PID/TASK_PROC_MAP_FILES */
-	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
+	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
+	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
 		 task->pid);
 	/**
 	 * If process patched, we should not remove the proc directory,
@@ -1671,8 +1671,8 @@ static void __unused clean_task_proc(struct task_struct *task)
 		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
 			task->exe, strerror(errno));
 
-	/* ROOT_DIR/PID */
-	snprintf(buffer, PATH_MAX - 1, ROOT_DIR "/%d", task->pid);
+	/* ULP_PROC_ROOT_DIR/PID */
+	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 	if (rmdir(buffer) != 0)
 		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
 			task->exe, strerror(errno));
