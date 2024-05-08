@@ -81,7 +81,7 @@ void release_load_info(struct load_info *info)
 }
 
 /* ULPatch is single thread, thus, this api is ok. */
-static char *make_pid_objname(pid_t pid, char *buf, size_t buf_len)
+static char *__make_pid_objname(pid_t pid, char *buf, size_t buf_len)
 {
 	char buffer1[PATH_MAX];
 	const char *s;
@@ -902,12 +902,12 @@ int init_patch(struct task_struct *task, const char *obj_file)
 		return -1;
 	}
 
-	obj_to = make_pid_objname(task->pid, buffer, sizeof(buffer));
+	obj_to = __make_pid_objname(task->pid, buffer, sizeof(buffer));
 
 	err = alloc_patch_file(obj_file, obj_to, &info);
 	if (err) {
 		lerror("Parse %s failed.\n", obj_file);
-		return err;
+		goto err;
 	}
 
 	/**
@@ -918,17 +918,26 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	err = create_mmap_vma_file(task, &info);
 	if (err) {
 		release_load_info(&info);
-		return err;
+		goto err;
 	}
 
 	err = load_patch(&info);
 	if (err) {
 		delete_mmap_vma_file(task, &info);
 		release_load_info(&info);
-		return err;
+		goto err;
 	}
 
 	return 0;
+
+err:
+	/**
+	 * We must remove the ulp file if load patch failed, beacuse, the ulp
+	 * file cache will influence task clean.
+	 */
+	if (fexist(obj_to))
+		fremove(obj_to);
+	return err;
 }
 
 /* delete last patched patch, so, don't need any other arguments */
