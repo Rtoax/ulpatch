@@ -20,6 +20,19 @@ TEST(UtilsAnsi,	base,	0)
 		printf("%sX%s", ansi_gray(i), ANSI_RESET);
 	printf("\n");
 
+	pansi_clr(stdout);
+	pansi_red(stdout);
+	pansi_green(stdout);
+	pansi_yellow(stdout);
+	pansi_blue(stdout);
+	pansi_bold(stdout);
+	pansi_gray(stdout);
+	pansi_italic(stdout);
+	pansi_underline(stdout);
+	pansi_shine(stdout);
+	pansi_reverse(stdout);
+	pansi_reset(stdout);
+
 	return 0;
 }
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ansi.h"
 #include "compiler.h"
 #include "util.h"
 
@@ -43,5 +44,65 @@ const char *ansi_gray(int idx)
 	if (idx < 0 || idx >= ansi_gray_num())
 		return "";
 	return ANSI_COLORS_GRAY[idx];
+}
+
+int pansi_clr(FILE *fp)
+{
+	return fprintf(fp, ANSI_CLR);
+}
+
+int pansi_red(FILE *fp)
+{
+	return fprintf(fp, ANSI_RED);
+}
+
+int pansi_green(FILE *fp)
+{
+	return fprintf(fp, ANSI_GREEN);
+}
+
+int pansi_yellow(FILE *fp)
+{
+	return fprintf(fp, ANSI_YELLOW);
+}
+
+int pansi_blue(FILE *fp)
+{
+	return fprintf(fp, ANSI_BLUE);
+}
+
+int pansi_bold(FILE *fp)
+{
+	return fprintf(fp, ANSI_BOLD);
+}
+
+int pansi_gray(FILE *fp)
+{
+	return fprintf(fp, ANSI_GRAY);
+}
+
+int pansi_italic(FILE *fp)
+{
+	return fprintf(fp, ANSI_ITALIC);
+}
+
+int pansi_underline(FILE *fp)
+{
+	return fprintf(fp, ANSI_UNDERLINE);
+}
+
+int pansi_shine(FILE *fp)
+{
+	return fprintf(fp, ANSI_SHINE);
+}
+
+int pansi_reverse(FILE *fp)
+{
+	return fprintf(fp, ANSI_REVERSE);
+}
+
+int pansi_reset(FILE *fp)
+{
+	return fprintf(fp, ANSI_RESET);
 }
 
