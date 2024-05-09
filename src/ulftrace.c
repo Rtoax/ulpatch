@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	ulpatch_env_init();
+	ulpatch_init();
 
 	set_log_level(config.log_level);
 

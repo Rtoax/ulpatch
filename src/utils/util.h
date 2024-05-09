@@ -168,7 +168,7 @@ struct str_node {
 extern struct config config;
 
 
-void ulpatch_env_init(void);
+void ulpatch_init(void);
 
 /* Check some thing */
 bool is_root(const char *prog);

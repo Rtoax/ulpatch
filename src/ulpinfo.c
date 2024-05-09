@@ -157,6 +157,8 @@ int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
 
+	ulpatch_init();
+
 	set_log_level(config.log_level);
 
 	if (!patch_file && !pid) {

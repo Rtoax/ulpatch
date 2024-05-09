@@ -15,7 +15,15 @@
 #include "compiler.h"
 
 
-void ulpatch_env_init(void)
+static void __check_and_exit(void)
+{
+	/**
+	 * TODO
+	 * 1. check architecture
+	 */
+}
+
+static void __env_init(void)
 {
 	int ret;
 
@@ -43,5 +51,11 @@ void ulpatch_env_init(void)
 			exit(1);
 		}
 	}
+}
+
+void ulpatch_init(void)
+{
+	__check_and_exit();
+	__env_init();
 }
 

@@ -805,7 +805,7 @@ static void sig_handler(int signum)
  */
 int main(int argc, char *argv[])
 {
-	ulpatch_env_init();
+	ulpatch_init();
 
 	signal(SIGINT, sig_handler);
 
