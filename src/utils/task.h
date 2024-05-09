@@ -381,5 +381,8 @@ int task_syscall(struct task_struct *task, int nr,
 		unsigned long *res);
 
 struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name);
+int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma);
+int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
+			       GElf_Sym *sym);
 unsigned long task_vma_symbol_value(const struct symbol *sym);
 

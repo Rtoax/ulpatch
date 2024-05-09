@@ -205,9 +205,9 @@ int vma_load_info(struct vm_area_struct *vma, struct load_info *info)
 
 	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
-		ldebug("Sym: %s\n", name);
+		ldebug("ULP Sym: %s, %lx\n", name, sym[i].st_value);
 		/**
-		 * TODO: Maybe do something
+		 * TODO: Record ulp's symbols
 		 */
 	}
 	ulp->strtab = info->ulp_strtab;

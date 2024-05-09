@@ -698,10 +698,10 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
 }
 
 /* Insert OK, return 0, else return -1 */
-static int task_vma_link_symbol(struct task_struct *task, struct symbol *s,
-				struct vm_area_struct *vma)
+int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma)
 {
 	struct rb_node *node;
+	struct task_struct *task = vma->task;
 
 	s->vma = vma;
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
@@ -714,6 +714,35 @@ static int task_vma_link_symbol(struct task_struct *task, struct symbol *s,
 	return node ? -1 : 0;
 }
 
+int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
+			       GElf_Sym *sym)
+{
+	int err = 0;
+	struct symbol *new;
+
+	/* skip undefined symbols */
+	if (is_undef_symbol(sym)) {
+		ldebug("%s undef symbol: %s %lx\n", basename(vma->name_),
+			name, sym->st_value);
+		/* Skip undefined symbol */
+		return 0;
+	}
+
+	/* allocate a symbol, and add it to task struct */
+	new = alloc_symbol(name, sym);
+	if (!new) {
+		lerror("Alloc symbol failed, %s\n", name);
+		return -ENOMEM;
+	}
+
+	ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
+	err = task_vma_link_symbol(new, vma);
+	if (err)
+		free_symbol(new);
+
+	return err;
+}
+
 /**
  * load_self_vma_symbols - load self symbols from ELF file
  *
@@ -723,34 +752,11 @@ static int load_self_vma_symbols(struct vm_area_struct *vma)
 {
 	int err = 0;
 	struct task_struct *task = vma->task;
-
 	struct symbol *sym, *tmp;
+	struct rb_root *root = &task->exe_elf->elf_file_symbols;
 
-	rbtree_postorder_for_each_entry_safe(sym, tmp,
-					     &task->exe_elf->elf_file_symbols,
-					     node) {
-		struct symbol *new;
-
-		/* skip undefined symbols */
-		if (is_undef_symbol(&sym->sym)) {
-			ldebug("%s undef symbol: %s %lx\n",
-				basename(vma->name_), sym->name,
-				sym->sym.st_value);
-			continue;
-		}
-
-		/* allocate a symbol, and add it to task struct */
-		new = alloc_symbol(sym->name, &sym->sym);
-		if (!new) {
-			lerror("Alloc symbol failed, %s\n", sym->name);
-			continue;
-		}
-
-		ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
-		err = task_vma_link_symbol(task, new, vma);
-		if (err)
-			free_symbol(new);
-	}
+	rbtree_postorder_for_each_entry_safe(sym, tmp, root, node)
+		err |= task_vma_alloc_link_symbol(vma, sym->name, &sym->sym);
 
 	return err;
 }
@@ -892,7 +898,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 			continue;
 		}
 
-		err = task_vma_link_symbol(task, s, vma);
+		err = task_vma_link_symbol(s, vma);
 		if (err)
 			free_symbol(s);
 	}
