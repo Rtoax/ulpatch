@@ -15,9 +15,10 @@ link_libraries(${ELF}
 
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
-aux_source_directory(. LIB_SOURCES)
-
-add_library(ulpatch_patch STATIC ${LIB_SOURCES})
+add_library(ulpatch_patch STATIC
+	ftrace.c
+	patch.c
+)
 
 target_compile_definitions(ulpatch_patch PRIVATE ${UTILS_FLAGS})
 

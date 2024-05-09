@@ -15,10 +15,23 @@ if(BINUTILS_BFD_LIBRARIES)
 	find_library(BFD bfd /usr/lib64)
 endif()
 
-aux_source_directory(. LIB_SOURCES)
-
 link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
 
-add_library(ulpatch_utils STATIC ${LIB_SOURCES})
+add_library(ulpatch_utils STATIC
+	ansi.c
+	backtrace.c
+	callback.c
+	file.c
+	id.c
+	init.c
+	list.c
+	log.c
+	objdump.c
+	rbtree.c
+	string.c
+	task.c
+	time.c
+	version.c
+)
 
 target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_FLAGS})
