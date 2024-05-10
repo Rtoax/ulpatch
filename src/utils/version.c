@@ -2,8 +2,8 @@
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #include <stdio.h>
 
-#include "util.h"
-#include "compiler.h"
+#include <utils/util.h>
+#include <utils/compiler.h>
 
 
 const char *ulpatch_arch(void)

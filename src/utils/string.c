@@ -10,7 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "list.h"
+#include <utils/list.h>
 
 /**
  * @fp - if NULL, return directly

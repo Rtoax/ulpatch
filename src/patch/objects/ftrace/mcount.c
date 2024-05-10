@@ -4,9 +4,9 @@
 #include <patch/patch.h>
 
 #if defined(__x86_64__)
-#include "arch/x86_64/mcount.h"
+#include <arch/x86_64/mcount.h>
 #elif defined(__aarch64__)
-#include "arch/aarch64/mcount.h"
+#include <arch/aarch64/mcount.h>
 #endif
 
 

@@ -15,9 +15,9 @@
 #error "Must install binutils-devel"
 #endif
 
-#include "log.h"
-#include "util.h"
-#include "list.h"
+#include <utils/log.h>
+#include <utils/util.h>
+#include <utils/list.h>
 
 
 enum sym_type {

@@ -15,7 +15,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
-#include "patch.h"
+#include <patch/patch.h>
 
 
 const static char *___ftrace_entry_funcs[] = {

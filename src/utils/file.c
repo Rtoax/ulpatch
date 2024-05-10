@@ -18,9 +18,9 @@
 
 #include <elf/elf_api.h>
 
-#include "log.h"
-#include "task.h"
-#include "util.h"
+#include <utils/log.h>
+#include <utils/task.h>
+#include <utils/util.h>
 
 
 int fsize(const char *filepath)

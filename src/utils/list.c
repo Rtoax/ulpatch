@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "list.h"
-#include "compiler.h"
+#include <utils/list.h>
+#include <utils/compiler.h>
 
 
 typedef int (*cmp_func)(void *, struct list_head const *, struct list_head const *);

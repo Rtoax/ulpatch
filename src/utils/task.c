@@ -16,15 +16,15 @@
 
 #include <elf/elf_api.h>
 
-#include "log.h"
-#include "task.h"
+#include <utils/log.h>
+#include <utils/task.h>
 
 #if defined(__x86_64__)
-#include "arch/x86_64/regs.h"
-#include "arch/x86_64/instruments.h"
+#include <arch/x86_64/regs.h>
+#include <arch/x86_64/instruments.h>
 #elif defined(__aarch64__)
-#include "arch/aarch64/regs.h"
-#include "arch/aarch64/instruments.h"
+#include <arch/aarch64/regs.h>
+#include <arch/aarch64/instruments.h>
 #endif
 
 

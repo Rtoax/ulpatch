@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
-#include "log.h"
-#include "compiler.h"
+#include <utils/util.h>
+#include <utils/log.h>
+#include <utils/compiler.h>
 
 
 static void __check_and_exit(void)

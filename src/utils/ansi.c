@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "ansi.h"
-#include "compiler.h"
-#include "util.h"
+#include <utils/ansi.h>
+#include <utils/compiler.h>
+#include <utils/util.h>
 
 static const char *ANSI_COLORS_GRAY[] = {
 	"\033[48;5;255m",

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "util.h"
+#include <utils/util.h>
 
 
 unsigned long secs(void)
