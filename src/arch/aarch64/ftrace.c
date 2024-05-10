@@ -8,8 +8,8 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
-#include "instruments.h"
-#include "ftrace.h"
+#include <arch/aarch64/instruments.h>
+#include <arch/aarch64/ftrace.h>
 
 /*
  * Replace a single instruction, which may be a branch or NOP.

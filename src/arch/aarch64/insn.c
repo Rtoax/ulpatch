@@ -6,8 +6,8 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
-#include "instruments.h"
-#include "debug-monitors.h"
+#include <arch/aarch64/instruments.h>
+#include <arch/aarch64/debug-monitors.h>
 
 /*
  * In ARMv8-A, A64 instructions have a fixed length of 32 bits and are always

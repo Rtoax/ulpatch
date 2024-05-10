@@ -19,7 +19,7 @@
 #include <utils/task.h>
 #include <elf/elf_api.h>
 
-#include "test_api.h"
+#include <tests/test_api.h>
 
 
 static int epollfd = -1;

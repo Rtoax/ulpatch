@@ -8,9 +8,9 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
-#include "instruments.h"
-#include "ftrace.h"
-#include "nops.h"
+#include <arch/x86_64/instruments.h>
+#include <arch/x86_64/ftrace.h>
+#include <arch/x86_64/nops.h>
 
 const char *ftrace_nop_replace(void)
 {

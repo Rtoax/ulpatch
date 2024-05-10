@@ -5,7 +5,7 @@
 
 #include <utils/compiler.h>
 
-#include "nops.h"
+#include <arch/x86_64/nops.h>
 
 
 #ifdef K8_NOP1

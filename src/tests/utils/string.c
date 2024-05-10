@@ -2,11 +2,9 @@
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #include <sys/types.h>
 #include <unistd.h>
-
 #include <utils/log.h>
 #include <utils/list.h>
-
-#include "../test_api.h"
+#include <tests/test_api.h>
 
 
 static char docs[] = {

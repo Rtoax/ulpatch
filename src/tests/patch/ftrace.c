@@ -11,13 +11,13 @@
 #include <elf/elf_api.h>
 #include <patch/patch.h>
 
-#include "../test_api.h"
+#include <tests/test_api.h>
+
 
 #define STATIC_FUNC_FN	test_static_func
 static __unused void STATIC_FUNC_FN(void)
 {
 }
-
 
 TEST(Ftrace,	elf_static_func_addr,	0)
 {

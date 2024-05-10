@@ -6,7 +6,7 @@
 #include <utils/util.h>
 #include <elf/elf_api.h>
 
-#include "../test_api.h"
+#include <tests/test_api.h>
 
 TEST(Elf_Ehdr,	print,	0)
 {

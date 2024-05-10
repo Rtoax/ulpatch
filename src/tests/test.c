@@ -7,7 +7,7 @@
 #include <utils/list.h>
 #include <utils/task.h>
 
-#include "test_api.h"
+#include <tests/test_api.h>
 
 int nr_tests = 0;
 

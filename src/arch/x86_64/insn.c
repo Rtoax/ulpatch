@@ -6,7 +6,7 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
-#include "instruments.h"
+#include <arch/x86_64/instruments.h>
 
 // see linux/scripts/recordmcount.c
 static unsigned char __unused ideal_nop5_x86_64[5] =

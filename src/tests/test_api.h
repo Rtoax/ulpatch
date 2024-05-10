@@ -137,7 +137,7 @@ static struct test_symbol __unused test_symbols[] = {
 	},
 #define TEST_DYNSYM(s) { __stringify(s), 0, .type = TST_DYNSYM},
 #define TEST_SYM_SELF(s) { __stringify(s), 0, .type = TST_SELF_SYM},
-#include "test_symbols.h"
+#include <tests/test_symbols.h>
 #undef TEST_DYNSYM
 #undef TEST_SYM_SELF
 #undef TEST_SYM_NON_STATIC

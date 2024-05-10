@@ -9,7 +9,7 @@
 #include <elf/elf_api.h>
 #include <patch/patch.h>
 
-#include "../test_api.h"
+#include <tests/test_api.h>
 
 
 struct patch_test_arg {

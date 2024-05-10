@@ -4,8 +4,8 @@
 #include <utils/list.h>
 #include <utils/util.h>
 #include <elf/elf_api.h>
+#include <tests/test_api.h>
 
-#include "../test_api.h"
 
 #define USR_BIN_LS "/usr/bin/ls"
 

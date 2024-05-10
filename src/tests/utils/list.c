@@ -4,7 +4,7 @@
 #include <utils/list.h>
 #include <elf/elf_api.h>
 
-#include "../test_api.h"
+#include <tests/test_api.h>
 
 
 struct test_data {

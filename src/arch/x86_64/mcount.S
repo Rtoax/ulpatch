@@ -26,7 +26,7 @@
      child addr => 0x0000000000400693 <+13>:	movl   $0x1,-0x4(%rbp)
  */
 
-#include "utils/asm.h"
+#include <utils/asm.h>
 
 GLOBAL(_ftrace_mcount)
 	.cfi_startproc

@@ -6,7 +6,7 @@
 #include <elf/elf_api.h>
 
 #include <utils/util.h>
-#include "../test_api.h"
+#include <tests/test_api.h>
 
 
 static const char *test_files[] = {
