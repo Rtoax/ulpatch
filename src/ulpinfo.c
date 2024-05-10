@@ -142,7 +142,7 @@ int show_task_patch_info(pid_t pid)
 			printf(" %-41s", ulp->str_build_id);
 		printf("\n");
 		if (config.verbose) {
-			pansi_gray(stdout);
+			fpansi_gray(stdout);
 			print_vma(stdout, false, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);
 			print_ulp_info(stdout, "\t", &ulp->info);
@@ -158,7 +158,7 @@ int show_task_patch_info(pid_t pid)
 				firstline = 0;
 			}
 			fprintf(stdout, "\n");
-			pansi_reset(stdout);
+			fpansi_reset(stdout);
 		}
 		i++;
 	}

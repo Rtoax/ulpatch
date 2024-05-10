@@ -20,18 +20,18 @@ TEST(UtilsAnsi,	base,	0)
 		printf("%sX%s", ansi_gray(i), ANSI_RESET);
 	printf("\n");
 
-	pansi_clr(stdout);
-	pansi_red(stdout);
-	pansi_green(stdout);
-	pansi_yellow(stdout);
-	pansi_blue(stdout);
-	pansi_bold(stdout);
-	pansi_gray(stdout);
-	pansi_italic(stdout);
-	pansi_underline(stdout);
-	pansi_shine(stdout);
-	pansi_reverse(stdout);
-	pansi_reset(stdout);
+	fpansi_clr(stdout);
+	fpansi_red(stdout);
+	fpansi_green(stdout);
+	fpansi_yellow(stdout);
+	fpansi_blue(stdout);
+	fpansi_bold(stdout);
+	fpansi_gray(stdout);
+	fpansi_italic(stdout);
+	fpansi_underline(stdout);
+	fpansi_shine(stdout);
+	fpansi_reverse(stdout);
+	fpansi_reset(stdout);
 
 	return 0;
 }

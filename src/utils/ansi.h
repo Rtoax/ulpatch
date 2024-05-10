@@ -28,16 +28,16 @@
 int ansi_gray_num(void);
 const char *ansi_gray(int idx);
 
-int pansi_clr(FILE *fp);
-int pansi_red(FILE *fp);
-int pansi_green(FILE *fp);
-int pansi_yellow(FILE *fp);
-int pansi_blue(FILE *fp);
-int pansi_bold(FILE *fp);
-int pansi_gray(FILE *fp);
-int pansi_italic(FILE *fp);
-int pansi_underline(FILE *fp);
-int pansi_shine(FILE *fp);
-int pansi_reverse(FILE *fp);
-int pansi_reset(FILE *fp);
+int fpansi_clr(FILE *fp);
+int fpansi_red(FILE *fp);
+int fpansi_green(FILE *fp);
+int fpansi_yellow(FILE *fp);
+int fpansi_blue(FILE *fp);
+int fpansi_bold(FILE *fp);
+int fpansi_gray(FILE *fp);
+int fpansi_italic(FILE *fp);
+int fpansi_underline(FILE *fp);
+int fpansi_shine(FILE *fp);
+int fpansi_reverse(FILE *fp);
+int fpansi_reset(FILE *fp);
 
