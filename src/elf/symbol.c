@@ -326,3 +326,18 @@ void free_symbol(struct symbol *s)
 	free(s);
 }
 
+void rb_free_symbol(struct rb_node *node)
+{
+	struct symbol *s = rb_entry(node, struct symbol, node);
+	free_symbol(s);
+}
+
+int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
+{
+	int ret;
+	if (firstline)
+		fprintf(fp, "%-32s %16s\n", "NAME", "VALUE");
+	ret = fprintf(fp, "%-32s %#016lx\n", s->name, s->sym.st_value);
+	return ret;
+}
+

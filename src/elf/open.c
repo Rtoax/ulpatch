@@ -173,12 +173,6 @@ error_open:
 	return NULL;
 }
 
-
-static void rb_free_symbol(struct rb_node *node) {
-	struct symbol *s = rb_entry(node, struct symbol, node);
-	free_symbol(s);
-}
-
 int elf_file_close(const char *filepath)
 {
 	struct elf_file *elf = NULL, *tmp;

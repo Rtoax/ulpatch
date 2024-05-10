@@ -87,6 +87,7 @@ struct symbol {
 	 * ROOT is one of the following:
 	 * struct elf_file.symbols
 	 * struct task_struct.vma_symbols
+	 * struct vma_ulp.ulp_symbols
 	 */
 	struct rb_node node;
 };
@@ -120,9 +121,11 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn);
 
 struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
 void free_symbol(struct symbol *s);
+void rb_free_symbol(struct rb_node *node);
 int link_symbol(struct elf_file *elf, struct symbol *s);
 struct symbol *find_symbol(struct elf_file *elf, const char *name);
 int cmp_symbol_name(struct rb_node *n1, unsigned long key);
+int fprint_symbol(FILE *fp, struct symbol *s, int firstline);
 
 /**
  * stderr@GLIBC_2.2.5

@@ -146,6 +146,18 @@ int show_task_patch_info(pid_t pid)
 			print_vma(stdout, false, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);
 			print_ulp_info(stdout, "\t", &ulp->info);
+
+			fprintf(stdout, "\n");
+
+			struct symbol *sym, *tmp;
+			struct rb_root *root = &ulp->ulp_symbols;
+			int firstline = 1;
+
+			rbtree_postorder_for_each_entry_safe(sym, tmp, root, node) {
+				fprint_symbol(stdout, sym, firstline);
+				firstline = 0;
+			}
+			fprintf(stdout, "\n");
 			pansi_reset(stdout);
 		}
 		i++;
