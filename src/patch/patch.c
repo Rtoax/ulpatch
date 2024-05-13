@@ -1030,6 +1030,8 @@ int delete_patch(struct task_struct *task)
 		goto exit;
 	}
 
+	fremove(vma->name_);
+
 exit:
 	task_detach(task->pid);
 	return err;

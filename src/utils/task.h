@@ -95,7 +95,7 @@ struct vm_area_struct {
 	unsigned int major, minor;
 	unsigned long inode;
 	char perms[5];
-	char name_[256];
+	char name_[PATH_MAX];
 #define PROT_FMT "%c%c%c"
 #define PROT_ARGS(p) \
 	(p & PROT_READ) ? 'r' : '-', \
