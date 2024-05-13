@@ -43,7 +43,7 @@ __asm__ (								\
 	"	.quad 0\n" /* original value1 */			\
 	"	.quad 0\n" /* original value2 */			\
 	"	.quad 0\n" /* patched time(2) */			\
-	"	.long 0\n" /* flag */					\
+	"	.long 0\n" /* flags */					\
 	"	.long " ULPATCH_FILE_VERSION " \n"			\
 	"	.byte 1, 2, 3, 4 \n"					\
 	".popsection \n"						\
