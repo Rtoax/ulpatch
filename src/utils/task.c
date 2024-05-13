@@ -397,7 +397,11 @@ int vma_load_ulp(struct vm_area_struct *vma)
 
 	vma->is_elf = true;
 	alloc_ulp(vma);
-	vma_load_info(vma, &info);
+	vma_load_ulp_info(vma, &info);
+
+	if (task->max_ulp_id < info.ulp_info->ulp_id)
+		task->max_ulp_id = info.ulp_info->ulp_id;
+
 	return 0;
 }
 
@@ -1019,6 +1023,8 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 	fprintf(fp, "Exe:     %-32s\n", task->exe);
 	fprintf(fp, "Pid:     %-32d\n", task->pid);
 	fprintf(fp, "PIE:     %-32s\n", task->is_pie ? "YES" : "NO");
+	if (task->max_ulp_id)
+		fprintf(fp, "Patched: YES (num %d)\n", task->max_ulp_id);
 
 	if (!detail)
 		return;

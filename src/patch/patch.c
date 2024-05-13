@@ -44,6 +44,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 {
 	const char *prefix = pfx ?: "";
 
+	fprintf(fp, "%sID         : %d\n", prefix, inf->ulp_id);
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
@@ -178,7 +179,7 @@ free_out:
 /**
  * Get load_info from ULPatch vma
  */
-int vma_load_info(struct vm_area_struct *vma, struct load_info *info)
+int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 {
 	int ret;
 	struct vma_ulp *ulp;
@@ -786,6 +787,7 @@ static int solve_patch_symbols(struct load_info *info)
 		return -ENOENT;
 	}
 
+	info->ulp_info->ulp_id = ++task->max_ulp_id;
 	info->ulp_info->target_func_addr = task_vma_symbol_value(sym);
 	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */

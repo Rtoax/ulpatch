@@ -111,6 +111,7 @@ struct vm_area_struct {
 
 	/* Only elf has it */
 	struct vma_elf *vma_elf;
+
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;
 
@@ -291,6 +292,7 @@ struct task_struct {
 
 	/* struct vma_ulp.node */
 	struct list_head ulp_list;
+	unsigned int max_ulp_id;
 
 	/* struct thread.node */
 	struct list_head threads_list;

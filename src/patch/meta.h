@@ -34,6 +34,7 @@ __asm__ (								\
 	"	.string \"" author "\" \n"				\
 	".popsection \n"						\
 	".pushsection " SEC_ULPATCH_INFO ", \"aw\", @progbits\n"	\
+	"	.long 0\n" /* ulp_id */					\
 	"	.quad 0\n" /* target function address */		\
 	"	.quad 0\n" /* patch function address */			\
 	"	.quad 0\n" /* address to modify in target process */	\
@@ -92,13 +93,14 @@ struct ulpatch_strtab {
  * orig_value       = 0x55 48 89 e5 41 ...
  */
 struct ulpatch_info {
+#define ULP_ID_NONE	0
+	unsigned int ulp_id;
+
 	unsigned long target_func_addr;
 	unsigned long patch_func_addr;
 
 	unsigned long virtual_addr;
-	/**
-	 * We need area to store origin data in target process.
-	 */
+	/* store origin data in target process */
 	unsigned long orig_value[2];
 
 	/* Record the patch time */
@@ -107,7 +109,7 @@ struct ulpatch_info {
 	unsigned int flags;
 
 /* Use to check support version or not. */
-#define ULPATCH_FILE_VERSION	"1"
+#define ULPATCH_FILE_VERSION	"2"
 	unsigned int version;
 
 	char pad[4];

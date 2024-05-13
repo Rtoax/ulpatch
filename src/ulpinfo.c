@@ -129,14 +129,15 @@ int show_task_patch_info(pid_t pid)
 	}
 
 	printf("\033[1;7m");
-	printf("%-4s %-20s %-16s %-16s", "NUM", "DATE", "VMA_START", "TARGET_FUNC");
+	printf("%-4s %-4s %-20s %-16s %-16s", "NUM", "ID", "DATE", "VMA_START",
+	       "TARGET_FUNC");
 	if (config.verbose)
 		printf(" %-41s", "Build ID");
 	printf("\033[m\n");
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vm_area_struct *vma = ulp->vma;
-		printf("%-4d %-20s %#016lx %-16s",
-			i, ulp_info_strftime(&ulp->info),
+		printf("%-4d %-4d %-20s %#016lx %-16s",
+			i, ulp->info.ulp_id, ulp_info_strftime(&ulp->info),
 			vma->vm_start, ulp->strtab.dst_func);
 		if (config.verbose)
 			printf(" %-41s", ulp->str_build_id);
