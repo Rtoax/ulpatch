@@ -988,8 +988,50 @@ err:
 /* delete last patched patch, so, don't need any other arguments */
 int delete_patch(struct task_struct *task)
 {
-	// TODO:
+	int n, err;
+	size_t insn_sz;
+	struct vma_ulp *ulp, *tmpulp;
+	struct ulpatch_info *ulp_info;
+	struct vm_area_struct *vma;
 
-	return 0;
+	err = 0;
+	ulp_info = NULL;
+
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
+		if (task->max_ulp_id == ulp->info.ulp_id) {
+			linfo("Found last ulpatch vma.\n");
+			ulp_info = &ulp->info;
+			break;
+		}
+	}
+
+	if (!ulp_info) {
+		lerror("Not found any ulp.\n");
+		return -ENOENT;
+	}
+
+	insn_sz = sizeof(ulp_info->orig_value);
+	vma = ulp->vma;
+
+	task_attach(task->pid);
+
+	n = memcpy_to_task(task, ulp_info->virtual_addr, (void *)ulp_info->orig_value, insn_sz);
+	if (n == -1 || n < insn_sz) {
+		lerror("failed kick target process.\n");
+		err = -ENOEXEC;
+		goto exit;
+	}
+
+	err = task_munmap(task, vma->vm_start, vma->vm_end - vma->vm_start);
+	if (err) {
+		print_vma(stdout, true, vma, false);
+		lerror("failed to munmap vma.\n");
+		err = -ENOEXEC;
+		goto exit;
+	}
+
+exit:
+	task_detach(task->pid);
+	return err;
 }
 

@@ -173,8 +173,7 @@ static int command_patch(void)
 
 static int command_unpatch(void)
 {
-	/* TODO */
-	return 0;
+	return delete_patch(target_task);
 }
 
 int main(int argc, char *argv[])
