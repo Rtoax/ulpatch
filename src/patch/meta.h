@@ -18,9 +18,6 @@
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
 #define SEC_ULPATCH_INFO	".ulpatch.info"
 
-/* Use to check support version or not. */
-#define ULPATCH_FILE_VERSION	"1"
-
 /**
  * Every patch has this information, it's metadata for each patch.
  *
@@ -108,7 +105,10 @@ struct ulpatch_info {
 	unsigned long time;
 
 	unsigned int flags;
-	unsigned int ulpatch_version;
+
+/* Use to check support version or not. */
+#define ULPATCH_FILE_VERSION	"1"
+	unsigned int version;
 
 	char pad[4];
 };

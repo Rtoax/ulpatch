@@ -50,7 +50,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix, inf->orig_value[0], inf->orig_value[1]);
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time, ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
-	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->ulpatch_version);
+	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->version);
 	fprintf(fp, "%sPad[4]     : [%d,%d,%d,%d]\n", prefix,
 		inf->pad[0], inf->pad[1],
 		inf->pad[2], inf->pad[3]);
