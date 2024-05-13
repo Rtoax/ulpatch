@@ -9,7 +9,7 @@ PROJECT(ulpatch)
 # if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 5)
+set(ULPATCH_VERSION_PATCH 6)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags

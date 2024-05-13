@@ -4,7 +4,7 @@
 %global build_ulftrace	0
 
 Name:		ulpatch
-Version:	0.5.5
+Version:	0.5.6
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
@@ -102,6 +102,6 @@ popd
 %{_bindir}/ulpatch_test
 
 %changelog
-* Wed May 08 2024 Rong Tao <rtoax@foxmail.com> - 0.5.5-0
+* Mon May 13 2024 Rong Tao <rtoax@foxmail.com> - 0.5.6-0
 - Create this.
 
