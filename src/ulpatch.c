@@ -22,6 +22,7 @@
 enum command {
 	CMD_NONE,
 	CMD_PATCH,
+	CMD_UNPATCH,
 } command_type = CMD_NONE;
 
 
@@ -32,6 +33,7 @@ static char *patch_file = NULL;
 enum {
 	ARG_MIN = ARG_COMMON_MAX,
 	ARG_PATCH,
+	ARG_UNPATCH,
 };
 
 static const char *prog_name = "ulpatch";
@@ -57,6 +59,7 @@ static void print_help(void)
 	"\n"
 	"  --patch  [PATCH]    patch an object file into target task, and patch\n"
 	"                      the patch.\n"
+	"  --unpatch           unpatch the latest ulpatch from target task.\n"
 	"\n");
 	print_usage_common(prog_name);
 	exit(0);
@@ -69,6 +72,7 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{ "pid",            required_argument, 0, 'p' },
 		{ "patch",          required_argument, 0, ARG_PATCH },
+		{ "unpatch",        no_argument,       0, ARG_UNPATCH },
 		COMMON_OPTIONS
 		{ NULL }
 	};
@@ -88,6 +92,9 @@ static int parse_config(int argc, char *argv[])
 		case ARG_PATCH:
 			command_type = CMD_PATCH;
 			patch_file = strdup(optarg);
+			break;
+		case ARG_UNPATCH:
+			command_type = CMD_UNPATCH;
 			break;
 		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
@@ -164,6 +171,12 @@ static int command_patch(void)
 	return init_patch(target_task, patch_file);
 }
 
+static int command_unpatch(void)
+{
+	/* TODO */
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	parse_config(argc, argv);
@@ -175,13 +188,16 @@ int main(int argc, char *argv[])
 	target_task = open_task(target_pid, FTO_ALL);
 
 	if (!target_task) {
-		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
+		fprintf(stderr, "open %d failed. %m\n", target_pid);
 		return 1;
 	}
 
 	switch (command_type) {
 	case CMD_PATCH:
 		command_patch();
+		break;
+	case CMD_UNPATCH:
+		command_unpatch();
 		break;
 	case CMD_NONE:
 	default:
