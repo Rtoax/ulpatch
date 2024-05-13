@@ -3,6 +3,7 @@ set -e
 
 pid=
 patch=
+unpatch=
 debug=
 error=
 
@@ -11,8 +12,8 @@ __usage__() {
 test [-h|--help] [-u|--patch]
 
 -p, --pid  [PID]        specify pid
--u, --patch [ULPATCH]    specify ulpatch file
-
+-u, --patch [ULPATCH]   specify ulpatch file
+    --unpatch           unpatch a ulpatch
 -d, --debug             debug mode for ulpatch
     --error             error mode
 -v, --verbose           set -x
@@ -25,6 +26,7 @@ TEMP=$(getopt \
 	--options p:u:dvh \
 	--long pid: \
 	--long patch: \
+	--long unpatch \
 	--long debug \
 	--long error \
 	--long verbose \
@@ -46,6 +48,10 @@ while true; do
 		shift
 		patch=$1
 		shift
+		;;
+	--unpatch)
+		shift
+		unpatch=yes
 		;;
 	-d|--debug)
 		shift
@@ -74,12 +80,22 @@ done
 [[ -z "${pid}" ]] && echo "ERROR: Run ./hello or ./hello-pie first or specify -p" && exit 1
 [[ ${#pid[@]} -gt 1 ]] && echo "ERROR: too much processes are running." && exit 1
 
-[[ -z ${patch} ]] && echo "ERROR: Must specify ulpatch with -u" && exit 1
-[[ ! -e ${patch} ]] && echo "ERROR: ${patch} is not exist." && exit 1
+if [[ -z ${patch} ]] && [[ -z ${unpatch} ]]; then
+	echo "ERROR: Must specify ulpatch with -u or specify --unpatch" && exit 1
+fi
+if [[ ! -z ${patch} ]] && [[ ! -e ${patch} ]]; then
+	echo "ERROR: ${patch} is not exist." && exit 1
+fi
 
 make
 
-ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+if [[ ${patch} ]]; then
+	ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+fi
+if [[ ${unpatch} ]]; then
+	ulpatch -p ${pid} --unpatch ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+fi
+
 cat /proc/${pid}/maps
 ulpinfo -p ${pid} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
 
