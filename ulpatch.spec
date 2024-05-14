@@ -103,5 +103,5 @@ popd
 
 %changelog
 * Mon May 13 2024 Rong Tao <rtoax@foxmail.com> - 0.5.6-0
-- Create this.
+- First changelog.
 
