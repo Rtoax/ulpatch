@@ -13,7 +13,7 @@
 
 /**
  * This is target function to patch, the patch object see
- * src/patch/objects/ulpatch-hello/
+ * src/patch/objects/hello/
  */
 void hello_world(void)
 {

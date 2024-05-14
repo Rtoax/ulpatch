@@ -93,7 +93,7 @@ popd
 %{_mandir}/man8/ulpinfo.8.gz
 %{_mandir}/man8/ultask.8.gz
 %{_datadir}/ulpatch/ftrace-mcount.obj
-%{_datadir}/ulpatch/ulpatch-hello.obj
+%{_datadir}/ulpatch/hello.obj
 
 %files devel
 %{_includedir}/ulpatch/meta.h

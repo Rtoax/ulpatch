@@ -18,7 +18,7 @@ static const struct ulpatch_object {
 } ulpatch_objs[] = {
 	/* /usr/share/ulpatch/ftrace-mcount.obj */
 	{ULPATCH_FTRACE_OBJ_PATH},
-	/* /usr/share/ulpatch/ulpatch-hello.obj */
+	/* /usr/share/ulpatch/hello.obj */
 	{ULPATCH_HELLO_OBJ_PATH},
 };
 

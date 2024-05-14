@@ -4,7 +4,7 @@
 ifdef ULPATCH_HELLO_OBJ
 TARGETS = $(ULPATCH_HELLO_OBJ)
 else
-TARGETS = ulpatch-hello.obj
+TARGETS = hello.obj
 endif
 
 CC = gcc

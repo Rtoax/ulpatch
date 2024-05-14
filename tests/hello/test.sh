@@ -31,7 +31,7 @@ TEMP=$(getopt \
 	--long error \
 	--long verbose \
 	--long help \
-	-n ulpatch-hello-test -- "$@")
+	-n ulpatch-tests-hello -- "$@")
 
 test $? != 0 && __usage__ 1
 

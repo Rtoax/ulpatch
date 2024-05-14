@@ -45,8 +45,8 @@ set(ULPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/ulpatch/)
 set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
 # see src/patch/objects/ftrace/CMakeLists.txt
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
-# see src/patch/objects/ulpatch-hello/CMakeLists.txt
-set(ULPATCH_HELLO_OBJ ulpatch-hello.obj)
+# see src/patch/objects/hello/CMakeLists.txt
+set(ULPATCH_HELLO_OBJ hello.obj)
 
 # check processor architecture
 # only support x86_64 and aarch64 right now.
@@ -121,7 +121,7 @@ endif()
 
 # macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example
 set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
-# macro ULPATCH_HELLO_OBJ_PATH="/usr/share/ulpatch/ulpatch-hello.obj" for example
+# macro ULPATCH_HELLO_OBJ_PATH="/usr/share/ulpatch/hello.obj" for example
 set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_HELLO_OBJ_PATH="${ULPATCH_SHARE_DIR}${ULPATCH_HELLO_OBJ}")
 
 
@@ -155,7 +155,7 @@ DESTINATION ${ULPATCH_INCLUDE_DIR}
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
-	${PROJECT_SOURCE_DIR}/src/patch/objects/ulpatch-hello/${ULPATCH_HELLO_OBJ}
+	${PROJECT_SOURCE_DIR}/src/patch/objects/hello/${ULPATCH_HELLO_OBJ}
 DESTINATION ${ULPATCH_SHARE_DIR}
 )
 
