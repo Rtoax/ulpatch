@@ -1,7 +1,7 @@
 # All changes to build and install RPM packages go here.
 
 # Default disable ulftrace, beacuse it's is unimplemented.
-%global build_ulftrace	0
+%global with_ulftrace	0
 
 Name:		ulpatch
 Version:	0.5.6
@@ -63,7 +63,7 @@ pushd %{_builddir}/ulpatch-v%{version}
 mkdir build
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release \
-%if !%{build_ulftrace}
+%if !%{with_ulftrace}
 	-DBUILD_ULFTRACE=OFF \
 %endif
 	..
@@ -81,12 +81,12 @@ popd
 
 %files
 %{_bindir}/ulpatch
-%if %{build_ulftrace}
+%if %{with_ulftrace}
 %{_bindir}/ulftrace
 %endif
 %{_bindir}/ulpinfo
 %{_bindir}/ultask
-%if %{build_ulftrace}
+%if %{with_ulftrace}
 %{_mandir}/man8/ulftrace.8.gz
 %endif
 %{_mandir}/man8/ulpatch.8.gz
