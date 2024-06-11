@@ -2207,7 +2207,7 @@ int task_close(struct task_struct *task, int remote_fd)
 	int ret;
 	unsigned long result;
 	if (__should_skip_remote_fd(remote_fd))
-		return 0;
+		return -EINVAL;
 	ret = task_syscall(task, __NR_close, remote_fd, 0, 0, 0, 0, 0, &result);
 	return result | ret;
 }
@@ -2218,7 +2218,7 @@ int task_ftruncate(struct task_struct *task, int remote_fd, off_t length)
 	unsigned long result;
 
 	if (__should_skip_remote_fd(remote_fd))
-		return 0;
+		return -EINVAL;
 	ret = task_syscall(task, __NR_ftruncate, remote_fd, length, 0, 0, 0, 0,
 			   &result);
 	if (ret < 0)
