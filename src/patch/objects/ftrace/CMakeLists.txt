@@ -5,7 +5,7 @@ include_directories(../../../)
 
 enable_language(C ASM)
 
-set(FTRACE_OBJ_TARGET ulpatch_patch_obj)
+set(FTRACE_OBJ_TARGET ulpatch_patch_obj_ftrace)
 
 find_library(ELF elf /usr/lib64)
 

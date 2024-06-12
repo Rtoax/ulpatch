@@ -3,7 +3,7 @@
 #
 include_directories(../../../)
 
-set(ULPATCH_OBJ_TARGET ulpatch_hello_obj)
+set(ULPATCH_OBJ_TARGET ulpatch_patch_obj_hello)
 
 find_library(ELF elf /usr/lib64)
 

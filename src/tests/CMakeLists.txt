@@ -9,7 +9,8 @@ link_libraries(${ELF}
 	ulpatch_arch
 	ulpatch_elf
 	ulpatch_patch
-	ulpatch_patch_obj
+	ulpatch_patch_obj_ftrace
+	ulpatch_patch_obj_hello
 	ulpatch_utils
 )
 
