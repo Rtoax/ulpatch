@@ -96,6 +96,8 @@ message(STATUS "=== FOUND libelf")
 endif()
 
 set(UTILS_FLAGS)
+set(TESTS_FLAGS)
+
 if(ELFUTILS_INCLUDE_DIRS)
 	set(UTILS_FLAGS "${UTILS_FLAGS}" HAVE_ELFUTILS_DEVEL)
 endif()
@@ -124,11 +126,7 @@ set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_DIR}${
 # macro ULPATCH_HELLO_OBJ_PATH="/usr/share/ulpatch/hello.obj" for example
 set(UTILS_FLAGS "${UTILS_FLAGS}" ULPATCH_HELLO_OBJ_PATH="${ULPATCH_SHARE_DIR}${ULPATCH_HELLO_OBJ}")
 
-
-set(TESTS_FLAGS)
-
 add_subdirectory(src)
-
 
 # install targets
 if (BUILD_ULFTRACE)

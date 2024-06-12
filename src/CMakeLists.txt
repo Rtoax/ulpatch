@@ -1,13 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com>
 #
-add_subdirectory(utils)
+add_subdirectory(arch)
 add_subdirectory(elf)
 add_subdirectory(patch)
-add_subdirectory(arch)
-
-# No need right now
-#find_package(PkgConfig REQUIRED)
+add_subdirectory(utils)
 
 include_directories(.)
 
