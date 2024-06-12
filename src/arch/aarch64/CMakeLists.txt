@@ -9,6 +9,6 @@ add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 aux_source_directory(. LIB_SOURCES)
 
-add_library(ulpatch_utils_arch STATIC ${LIB_SOURCES})
+add_library(ulpatch_arch STATIC ${LIB_SOURCES})
 
-target_compile_definitions(ulpatch_utils_arch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_arch PRIVATE ${UTILS_FLAGS})

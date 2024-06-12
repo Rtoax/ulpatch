@@ -6,11 +6,11 @@ include_directories(..)
 find_library(ELF elf /usr/lib64)
 
 link_libraries(${ELF}
+	ulpatch_arch
 	ulpatch_elf
 	ulpatch_patch
 	ulpatch_patch_obj
 	ulpatch_utils
-	ulpatch_utils_arch
 )
 
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
