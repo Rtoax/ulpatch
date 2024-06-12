@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ ! -d .git/ ]]; then
-	echo "ERROR: You are not in git tree."
+	echo "ERROR: You are not in git tree." >&2
 	exit 1
 fi
 
