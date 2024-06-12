@@ -1098,8 +1098,8 @@ TEST(ulpatch_test,	wait_trigger,	0)
 	return ret;
 }
 
-static int
-test_listener_symbol(char request, char *sym, unsigned long expect_addr)
+static int test_listener_symbol(char request, char *sym,
+				unsigned long expect_addr)
 {
 	int ret = 0;
 	int status = 0;

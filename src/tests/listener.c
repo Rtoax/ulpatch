@@ -119,8 +119,6 @@ int listener_helper_close_test_client(int fd)
 	return close(fd);
 }
 
-
-
 #define MAX_EVENTS	64
 
 struct test_client {

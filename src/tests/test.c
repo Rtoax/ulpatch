@@ -146,7 +146,7 @@ int task_wait_trigger(struct task_wait *task_wait)
 #endif
 
 int task_wait_request(struct task_wait *task_wait, char request,
-	struct msgbuf *rx_buf, size_t rx_buf_size)
+		      struct msgbuf *rx_buf, size_t rx_buf_size)
 {
 	int ret;
 	int msqid = create_msqid(task_wait->tmpfile);
@@ -184,7 +184,8 @@ recv:
  * @makemsg create msgbuf, return msg text length
  */
 int task_wait_response(struct task_wait *task_wait,
-	int (*makemsg)(char request, struct msgbuf *buf, size_t buf_len))
+		       int (*makemsg)(char request, struct msgbuf *buf,
+			size_t buf_len))
 {
 	int ret, len;
 	int msqid = create_msqid(task_wait->tmpfile);
