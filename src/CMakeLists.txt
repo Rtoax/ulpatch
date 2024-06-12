@@ -12,9 +12,9 @@ find_library(ELF elf /usr/lib64)
 find_library(RT rt /usr/lib64)
 
 link_libraries(${ELF} ${RT}
-	ulpatch_arch
-	ulpatch_utils
 	ulpatch_elf
+	ulpatch_patch
+	ulpatch_utils
 )
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type -pg)
 

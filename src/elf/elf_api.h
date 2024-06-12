@@ -134,6 +134,7 @@ int fprint_symbol(FILE *fp, struct symbol *s, int firstline);
  */
 int print_sym(const GElf_Sym *sym, const char *symname, const char *vername);
 int is_undef_symbol(const GElf_Sym *sym);
+bool is_ftrace_entry(char *func);
 
 /* ELF Note api */
 int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);

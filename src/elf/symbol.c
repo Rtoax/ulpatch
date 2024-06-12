@@ -82,6 +82,30 @@ int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
 	return 0;
 }
 
+const static char *___ftrace_entry_funcs[] = {
+	"__cyg_profile_func_enter",
+	"__fentry__",
+	"mcount",
+	"_mcount",
+	"__gnu_mcount_nc",
+};
+
+/* If compile with -pg, there might be hava mcount() */
+bool is_ftrace_entry(char *func)
+{
+	int i;
+	bool ret = false;
+
+	for (i = 0; i < ARRAY_SIZE(___ftrace_entry_funcs); i++) {
+		if (!strcmp(___ftrace_entry_funcs[i], func)) {
+			ret = true;
+			break;
+		}
+	}
+
+	return ret;
+}
+
 int is_undef_symbol(const GElf_Sym *sym)
 {
 	return sym->st_shndx == SHN_UNDEF || sym->st_shndx >= SHN_LORESERVE;

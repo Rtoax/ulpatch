@@ -82,8 +82,6 @@ struct jmp_table_entry {
 
 struct task_struct;
 
-bool is_ftrace_entry(char *func);
-
 extern void _ftrace_mcount(void);
 extern void _ftrace_mcount_return(void);
 

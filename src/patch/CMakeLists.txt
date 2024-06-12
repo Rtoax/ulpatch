@@ -16,7 +16,6 @@ link_libraries(${ELF}
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 add_library(ulpatch_patch STATIC
-	ftrace.c
 	patch.c
 )
 
