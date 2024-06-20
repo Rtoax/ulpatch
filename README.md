@@ -52,4 +52,5 @@ See [docs/RELEASE.md](docs/RELEASE.md) or [website](https://rtoax.github.io/ulpa
 # Warnings
 
 - Before you do it, it's best to know what you're doing.
+- I don't have much free time, so the ulpatch code will be developed very slowly. If you think it's too slow, please join me.
 
