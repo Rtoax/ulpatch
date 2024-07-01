@@ -5,11 +5,12 @@ helps, and credit will always be given.
 
 ### Report Bugs
 
-Report bugs at https://github.com/Rtoax/ulpatch/issues
+Report bugs at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues)
 
 If you are reporting a bug, please include:
 
 * Your operating system name and version.
+* If your OS is customized by youself, please list `glibc`, `kernel`, `binutils`, `elfutils`, etc. versions.
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
@@ -31,7 +32,7 @@ articles, and such.
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at https://github.com/Rtoax/ulpatch/issues
+The best way to send feedback is to file an issue at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues)
 
 If you are proposing a feature:
 
