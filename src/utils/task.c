@@ -2017,7 +2017,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);
 #elif defined(__aarch64__)
 	ret = ptrace(PTRACE_GETREGSET, task->pid, (void *)NT_PRSTATUS,
-		     (void*)&orig_regs_iov);
+		     (void *)&orig_regs_iov);
 #else
 # error "Unsupport architecture"
 #endif
@@ -2062,7 +2062,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &regs);
 #elif defined(__aarch64__)
 	ret = ptrace(PTRACE_GETREGSET, task->pid, (void *)NT_PRSTATUS,
-		     (void*)&regs_iov);
+		     (void *)&regs_iov);
 #else
 # error "Unsupport architecture"
 #endif
