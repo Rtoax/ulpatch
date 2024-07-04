@@ -2016,7 +2016,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 #if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &old_regs);
 #elif defined(__aarch64__)
-	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
+	ret = ptrace(PTRACE_GETREGSET, task->pid, (void *)NT_PRSTATUS,
 		     (void*)&orig_regs_iov);
 #else
 # error "Unsupport architecture"
@@ -2061,7 +2061,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 #if defined(__x86_64__)
 	ret = ptrace(PTRACE_GETREGS, task->pid, NULL, &regs);
 #elif defined(__aarch64__)
-	ret = ptrace(PTRACE_GETREGSET, task->pid, (void*)NT_PRSTATUS,
+	ret = ptrace(PTRACE_GETREGSET, task->pid, (void *)NT_PRSTATUS,
 		     (void*)&regs_iov);
 #else
 # error "Unsupport architecture"
