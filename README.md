@@ -32,6 +32,7 @@ Due to my limited personal experience, I can't understand and master all the arc
 - [ ] `x86_64`: ready to go, support some easy demo already.
 - [ ] `aarch64`: ready to go, support some easy demo already.
 - [ ] `loongarch64`: ready to go
+- [ ] `riscv64`: ready to go
 
 
 # Installing
