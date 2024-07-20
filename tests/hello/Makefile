@@ -53,12 +53,8 @@ ifeq ($(shell uname -m),aarch64)
   # TODO
 endif
 
-LDFLAGS_ULP :=
-LDFLAGS_ULP += -relocatable --build-id=sha1
-LDFLAGS_ULP += -z noexecstack
-ifneq ($(shell ld --help | grep no-warn-rwx-segments || true),)
-  LDFLAGS_ULP += --no-warn-rwx-segments
-endif
+LDFLAGS_ULP := $(shell ulp-config --ldflags)
+$(info LDFLAGS_ULP = ${LDFLAGS_ULP})
 
 build: ${TARGETS_ULP} ${TARGETS}
 

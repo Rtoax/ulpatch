@@ -9,7 +9,7 @@ readonly ANSI_UNDERLINE="\033[4m"
 readonly ANSI_RESET="\033[m"
 
 already_run=
-declare -a cflags libs
+declare -a cflags libs ldflags
 
 
 __usage__()
@@ -29,6 +29,8 @@ ${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
 ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
 
    --cflags           Print the C compiler flags needed to use ULPatch headers.
+
+   --ldflags          Print the flags needed to link against ULPatch libraries.
 
    --libs             Print all the libraries needed to link against the speci-
                       fied ULPatch components, including any dependencies.
@@ -58,6 +60,20 @@ print_cflags()
 	echo -n ${cflags[@]}
 }
 
+print_ldflags()
+{
+	already_run=YES
+	ldflags+=( "-relocatable" )
+	ldflags+=( "--build-id=sha1" )
+	ldflags+=( "-z noexecstack" )
+
+	if [[ "$(ld --help | grep no-warn-rwx-segments 2>/dev/null || true)" ]]; then
+		ldflags+=( "--no-warn-rwx-segments" )
+	fi
+
+	echo -n ${ldflags[@]}
+}
+
 print_libs()
 {
 	already_run=YES
@@ -67,6 +83,7 @@ print_libs()
 TEMP=$(getopt \
 	--options h \
 	--long cflags \
+	--long ldflags \
 	--long libs \
 	--long help \
 	-n ulp-config -- "$@")
@@ -80,6 +97,10 @@ while true; do
 	--cflags)
 		shift
 		print_cflags
+		;;
+	--ldflags)
+		shift
+		print_ldflags
 		;;
 	--libs)
 		shift
