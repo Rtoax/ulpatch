@@ -9,7 +9,7 @@ PROJECT(ulpatch)
 # if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 6)
+set(ULPATCH_VERSION_PATCH 7)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags
@@ -140,6 +140,11 @@ install(TARGETS ulpinfo RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 if (BUILD_TESTING)
 install(TARGETS ulpatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
+install(
+PROGRAMS
+	${PROJECT_SOURCE_DIR}/src/ulp-config
+DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
 
 # install object file
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name

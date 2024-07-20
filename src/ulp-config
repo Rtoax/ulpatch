@@ -1,0 +1,68 @@
+#!/bin/bash
+# Copyright (C) 2024 Rong Tao
+#
+set -e
+
+readonly ANSI_BOLD="\033[1m"
+readonly ANSI_GRAY="\033[2m"
+readonly ANSI_UNDERLINE="\033[4m"
+readonly ANSI_RESET="\033[m"
+
+__usage__()
+{
+	echo -e "
+${ANSI_BOLD}NAME${ANSI_RESET}
+    ulp-config - Print ULPatch compilation options
+
+${ANSI_BOLD}SYNOPSIS${ANSI_RESET}
+    ${ANSI_BOLD}ulp-config${ANSI_RESET} [${ANSI_UNDERLINE}options${ANSI_RESET}]
+
+${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
+    ulp-config makes it easier to build ulpatch that use ULPatch. It  can print
+    the  compiler flags, linker  flags  and  object  libraries  needed  to link
+    against ULPatch.
+
+${ANSI_BOLD}ARGUMENT${ANSI_RESET}
+
+   -h, --help         show this help information
+   -v, --version      show version
+
+${ANSI_BOLD}SEE ALSO${ANSI_RESET}
+   ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
+
+" | more
+
+	exit ${1-0}
+}
+
+goodbye()
+{
+	local ret=$?
+	test $ret != 0 && echo "ERROR" && exit $ret
+}
+
+trap "goodbye" EXIT
+
+TEMP=$(getopt \
+	--options h \
+	--long help \
+	-n ulp-config -- "$@")
+
+test $? != 0 && __usage__ 1
+
+eval set -- "$TEMP"
+
+while true; do
+	case $1 in
+	-h|--help)
+		shift
+		__usage__
+		;;
+	--)
+		shift
+		break
+		;;
+	esac
+done
+
+echo "TODO: Not support yet."

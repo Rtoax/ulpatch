@@ -4,7 +4,7 @@
 %global with_ulftrace	0
 
 Name:		ulpatch
-Version:	0.5.6
+Version:	0.5.7
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
@@ -97,11 +97,13 @@ popd
 
 %files devel
 %{_includedir}/ulpatch/meta.h
+%{_bindir}/ulp-config
+%{_mandir}/man8/ulp-config.8.gz
 
 %files tests
 %{_bindir}/ulpatch_test
 
 %changelog
-* Mon May 13 2024 Rong Tao <rtoax@foxmail.com> - 0.5.6-0
+* Mon May 13 2024 Rong Tao <rtoax@foxmail.com> - 0.5.7-0
 - First changelog.
 

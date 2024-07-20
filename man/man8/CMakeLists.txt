@@ -1,6 +1,6 @@
 find_program(GZIP gzip REQUIRED)
 set(MAN_DOCS)
-set(MAN_DOCS ${MAN_DOCS} ulpatch.8 ulpinfo.8 ultask.8)
+set(MAN_DOCS ${MAN_DOCS} ulpatch.8 ulpinfo.8 ultask.8 ulp-config.8)
 if (BUILD_ULFTRACE)
 	set(MAN_DOCS ${MAN_DOCS} ulftrace.8)
 endif()
