@@ -8,6 +8,10 @@ readonly ANSI_GRAY="\033[2m"
 readonly ANSI_UNDERLINE="\033[4m"
 readonly ANSI_RESET="\033[m"
 
+already_run=
+declare -a cflags libs
+
+
 __usage__()
 {
 	echo -e "
@@ -24,13 +28,17 @@ ${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
 
 ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
 
+   --cflags           Print the C compiler flags needed to use ULPatch headers.
+
+   --libs             Print all the libraries needed to link against the speci-
+                      fied ULPatch components, including any dependencies.
+
    -h, --help         show this help information
-   -v, --version      show version
 
 ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
    ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
 
-" | more
+" >&2
 
 	exit ${1-0}
 }
@@ -38,13 +46,28 @@ ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
 goodbye()
 {
 	local ret=$?
-	test $ret != 0 && echo "ERROR" && exit $ret
 }
 
 trap "goodbye" EXIT
 
+print_cflags()
+{
+	already_run=YES
+	cflags+=( "-I/usr/include/" )
+	cflags+=( "-D_GNU_SOURCE" )
+	echo -n ${cflags[@]}
+}
+
+print_libs()
+{
+	already_run=YES
+	echo -n ${libs[@]}
+}
+
 TEMP=$(getopt \
 	--options h \
+	--long cflags \
+	--long libs \
 	--long help \
 	-n ulp-config -- "$@")
 
@@ -54,6 +77,14 @@ eval set -- "$TEMP"
 
 while true; do
 	case $1 in
+	--cflags)
+		shift
+		print_cflags
+		;;
+	--libs)
+		shift
+		print_libs
+		;;
 	-h|--help)
 		shift
 		__usage__
@@ -65,4 +96,9 @@ while true; do
 	esac
 done
 
-echo "TODO: Not support yet."
+if [[ -z ${already_run} ]]; then
+	__usage__ 1
+else
+	# Need newline(\n) here
+	echo
+fi
