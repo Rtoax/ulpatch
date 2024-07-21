@@ -7,7 +7,7 @@ ulp-config \- Print ULPatch compilation options
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
-ulp-config makes it easier to build ulpatch that use ULPatch. It  can print the  compiler flags, linker  flags  and  object  libraries  needed  to link against ULPatch.
+\fBulp-config\fP makes it easier to build ulpatch that use ULPatch. It  can print the  compiler flags, linker  flags  and  object  libraries  needed  to link against ULPatch.
 
 This program is also a basic command of ULPatch.
 
@@ -21,6 +21,12 @@ Print the flags needed to link against ULPatch libraries.
 .TP
 \fB\-\-libs\fR
 Print all the libraries needed to link against the specified ULPatch components, including any dependencies.
+.TP
+\fB\-\-cc\fR \fICOMPILER\fP
+Specify compiler, default: \fBgcc\fP, you should specify this argument before \fB--cflags\fP.
+.TP
+\fB\-\-ld\fR \fILINKER\fP
+Specify compiler, default: \fBld\fP, you should specify this argument before \fB--ldflags\fP and \fB--libs\fP.
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
