@@ -9,6 +9,9 @@ readonly ANSI_UNDERLINE="\033[4m"
 readonly ANSI_RESET="\033[m"
 
 already_run=
+run_cflags=
+run_libs=
+run_ldflags=
 declare -a cflags libs ldflags
 
 
@@ -54,7 +57,6 @@ trap "goodbye" EXIT
 
 print_cflags()
 {
-	already_run=YES
 	cflags+=( "-I/usr/include/" )
 	cflags+=( "-D_GNU_SOURCE" )
 	echo -n ${cflags[@]}
@@ -62,7 +64,6 @@ print_cflags()
 
 print_ldflags()
 {
-	already_run=YES
 	ldflags+=( "-relocatable" )
 	ldflags+=( "--build-id=sha1" )
 	ldflags+=( "-z noexecstack" )
@@ -76,7 +77,6 @@ print_ldflags()
 
 print_libs()
 {
-	already_run=YES
 	echo -n ${libs[@]}
 }
 
@@ -96,15 +96,18 @@ while true; do
 	case $1 in
 	--cflags)
 		shift
-		print_cflags
+		already_run=YES
+		run_cflags=YES
 		;;
 	--ldflags)
 		shift
-		print_ldflags
+		already_run=YES
+		run_ldflags=YES
 		;;
 	--libs)
 		shift
-		print_libs
+		already_run=YES
+		run_libs=YES
 		;;
 	-h|--help)
 		shift
@@ -120,6 +123,9 @@ done
 if [[ -z ${already_run} ]]; then
 	__usage__ 1
 else
+	[[ ${run_cflags} ]] && print_cflags
+	[[ ${run_ldflags} ]] && print_ldflags
+	[[ ${run_libs} ]] && print_libs
 	# Need newline(\n) here
 	echo
 fi
