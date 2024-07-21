@@ -1,7 +1,7 @@
 
 ## LSB executable
 
-### Example 1: on x86_64 non-PIE
+### x86_64 non-PIE
 
 The `PT_LOAD` in ELF file:
 
@@ -104,7 +104,7 @@ GDB:	0x0000000000404038
 ```
 
 
-### Example 2: on x86_64 PIE
+### x86_64 PIE
 
 The `PT_LOAD` in ELF file:
 
@@ -205,7 +205,7 @@ GDB:	0x000056399fbf8040
 ```
 
 
-### Example 3: on aarch64 PIE
+### aarch64 PIE
 
 The `PT_LOAD` in ELF file:
 
@@ -282,6 +282,56 @@ GDB:	0x000000558575098c
 ```
 
 
+### uprobe
+
+- Q: How bpftrace uprobe get symbol addresses?
+
+That's right, we can refer to bpftrace's implementation of uprobe, how to convert symbols into virtual addresses.
+
+In bpftrace uprobe/uretprobe, `semantic_analyser.cpp` call `CreateUSym()`, then, call `CreateUInt64()` to create a `unsigned long` to store virtual address. Such as [tools/bashreadline.bt](https://github.com/bpftrace/bpftrace/blob/master/tools/bashreadline.bt) probe `uretprobe:/bin/bash:readline`
+
+- A: Bpftrace only get the address in ELF file.
+
+```
+$ objdump -T /bin/bash | grep -w readline
+00000000000d1c70 g    DF .text	00000000000000c9  Base        readline
+```
+
+We just echo `p:uprobes/readline /bin/bash:0x00000000000d1c70 %ip %ax` to `/sys/kernel/debug/tracing/uprobe_events` could attach this uprobe.
+
+- Q: How kernel swap addr in ELF to addr in Memory?
+
+Like address in ELF:/bin/bash `0x00000000000d1c70` to `0x55b3a3a93c70` in memory(see gdb output)?
+
+```
+$ echo $SHELL
+/bin/bash
+$ gdb -q -p $$
+(gdb) print readline
+$1 = {<text variable, no debug info>} 0x55b3a3a93c70 <readline>
+```
+
+As for why the address is different, because bash is PIE, I won't repeat it here.
+
+```
+$ readelf -h /bin/bash
+Type:   DYN (Position-Independent Executable file)
+```
+
+So, let's read the kernel code in [5.10.13](https://github.com/Rtoax/linux-5.10.13)!!!
+
+Register `uprobe_events`
+
+```
+init_uprobe_trace() {
+  trace_create_file("uprobe_events", &uprobe_events_ops);
+}
+fs_initcall(init_uprobe_trace);
+```
+
+TODO
+
+
 ## Share library
 
 TODO
@@ -297,3 +347,4 @@ TODO
 - https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
 - https://jvns.ca/blog/2018/01/09/resolving-symbol-addresses/
 - [How gdb loads symbol files](https://sourceware.org/gdb/wiki/How%20gdb%20loads%20symbol%20files)
+- GitHub: [bpftrace](https://github.com/bpftrace/bpftrace)
