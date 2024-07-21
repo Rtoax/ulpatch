@@ -1,3 +1,4 @@
+# This is ULPatch test Makefile wrote by Rong Tao.
 CC = gcc
 LD = ld
 
@@ -8,6 +9,7 @@ ifeq ($(wildcard ${HDR_META}),)
   $(error Not found ${HDR_META}, Please install ulpatch first)
 endif
 
+# Since ULPatch support ulp-config command, we should use it first.
 ifeq ($(wildcard ${ULP_CONFIG}),)
   $(error Not found ulp-config, Please install ulpatch first)
 endif
