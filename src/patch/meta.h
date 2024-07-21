@@ -2,8 +2,9 @@
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #pragma once
 
+/* ulp-config --cflags will provides this macro. */
 #ifndef __ULP_DEV
-# error "Must define __ULPATCH_DEV, and make sure what do you do."
+# error "Must define __ULP_DEV, and make sure what do you do."
 #endif
 
 /* This header use to Identifier Patch metadata info in target process. If that,
@@ -103,7 +104,7 @@ struct ulpatch_info {
 	/* store origin data in target process */
 	unsigned long orig_value[2];
 
-	/* Record the patch time */
+	/* Record the live patch was patched time */
 	unsigned long time;
 
 	unsigned int flags;

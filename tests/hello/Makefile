@@ -15,7 +15,6 @@ endif
 CFLAGS :=
 CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
-CFLAGS += -D__ULP_DEV
 ifdef MCOUNT
   CFLAGS += -pg
 endif
@@ -67,10 +66,11 @@ test: test.o $(addsuffix .o, $(basename $(TARGETS_ULP)))
 CFLAGS_hello := -g -ggdb -flto -pthread
 CFLAGS_hello-pie := ${CFLAGS_hello} -fpie
 LDFLAGS_hello-pie := -pie
+CFLAGS_test := $(CFLAGS_ULP)
 
 %.o: %.c
 	@echo -e " CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*))
+	@$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*)) ${CFLAGS_ULP}
 
 %.ulpo: %.c
 	@echo -e " CC ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"

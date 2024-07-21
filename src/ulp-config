@@ -110,6 +110,8 @@ print_cflags()
 {
 	cflags+=( "-I/usr/include/" )
 	cflags+=( "-D_GNU_SOURCE" )
+	# See ulpatch/meta.h
+	cflags+=( "-D__ULP_DEV=1" )
 
 	if [[ $(uname -m) == x86_64 ]]; then
 		check_cc_option_and_add_cflags -mno-sse

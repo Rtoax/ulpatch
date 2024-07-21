@@ -2,9 +2,6 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <pthread.h>
-#ifndef __ULP_DEV
-#define __ULP_DEV
-#endif
 #include <ulpatch/meta.h>
 
 extern void internal_print_hello(unsigned long ul);
