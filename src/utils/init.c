@@ -15,6 +15,27 @@
 #include <utils/compiler.h>
 
 
+static int __page_size = 0;
+static int __page_shift = 0;
+
+int ulp_page_size(void)
+{
+	if (unlikely(__page_size == 0))
+		__page_size = getpagesize();
+	return __page_size;
+}
+
+int ulp_page_shift(void)
+{
+	int tmp, pgsz = ulp_page_size();
+
+	if (unlikely(__page_shift == 0)) {
+		for (tmp = 0; (0x1UL << tmp) != pgsz; tmp++);
+		__page_shift = tmp;
+	}
+	return __page_shift;
+}
+
 static void __check_and_exit(void)
 {
 	/**

@@ -445,8 +445,8 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 				test_symbols[i].alias ?: "",
 				test_symbols[i].alias ? "(alias)" : "",
 				addr,
-				task_vma_symbol_value(sym),
-				alias_sym ? task_vma_symbol_value(alias_sym) : 0,
+				task_vma_symbol_vaddr(sym),
+				alias_sym ? task_vma_symbol_vaddr(alias_sym) : 0,
 				plt_addr);
 
 			/* When relocate, we can use symbol's real virtual address in libc,
@@ -459,7 +459,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 				 * if have one. */
 				unsigned long alias_addr = 0;
 				if (alias_sym &&
-					(alias_addr = task_vma_symbol_value(alias_sym))) {
+					(alias_addr = task_vma_symbol_vaddr(alias_sym))) {
 				/* Couldn't found symbol in anyway. */
 				} else
 					ret = -1;

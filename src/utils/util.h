@@ -32,6 +32,14 @@
 #define MIN(a, b) ((a > b) ? b : a)
 #endif
 
+#ifndef PAGE_SIZE
+#define PAGE_SIZE (1UL << ulp_page_shift())
+#endif
+
+#ifndef PAGE_SHIFT
+#define PAGE_SHIFT ulp_page_shift()
+#endif
+
 #ifndef ROUND_DOWN
 #define ROUND_DOWN(x, m) ((x) & ~((m) - 1))
 #endif
@@ -40,10 +48,10 @@
 #endif
 
 #ifndef PAGE_DOWN
-#define PAGE_DOWN(x) ROUND_DOWN(x, getpagesize())
+#define PAGE_DOWN(x) ROUND_DOWN(x, PAGE_SIZE)
 #endif
 #ifndef PAGE_UP
-#define PAGE_UP(x) ROUND_UP(x, getpagesize())
+#define PAGE_UP(x) ROUND_UP(x, PAGE_SIZE)
 #endif
 
 #ifndef ARRAY_SIZE
@@ -169,6 +177,9 @@ extern struct config config;
 
 
 void ulpatch_init(void);
+
+int ulp_page_size(void);
+int ulp_page_shift(void);
 
 /* Check some thing */
 bool is_root(const char *prog);

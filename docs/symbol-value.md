@@ -329,7 +329,36 @@ init_uprobe_trace() {
 fs_initcall(init_uprobe_trace);
 ```
 
-TODO
+```
+uprobe_events_ops.write = probes_write()
+probes_write() {
+  trace_parse_run_command(..., create_or_delete_trace_uprobe);
+}
+```
+
+Finally, call `register_trace_uprobe()`
+
+```
+struct trace_uprobe *tu;
+tu->offset = 0x00000000000d1c70;
+tu->filename = /bin/bash;
+register_trace_uprobe(tu);
+```
+
+`register_trace_uprobe()` will call `register_uprobe_event()`.
+
+We don't seem to have found out how the symbolic address in the ELF file is translated into the virtual address of the process! Don't worry, let's look at `offset_to_vaddr()` function directly.
+
+Let's check function `build_map_info()`, it's swap offset to virtual address.
+
+```
+static unsigned long offset_to_vaddr(struct vm_area_struct *vma, loff_t offset)
+{
+	return vma->vm_start + offset - ((loff_t)vma->vm_pgoff << PAGE_SHIFT);
+}
+```
+
+That's it, bingo!
 
 
 ## Share library

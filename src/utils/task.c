@@ -561,7 +561,7 @@ share_lib:
 	 */
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
-		unsigned long pgoff;
+		unsigned long vm_pgoff;
 		struct vm_area_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
@@ -573,7 +573,7 @@ share_lib:
 				lowest_vaddr);
 
 			/* Virtual address offset */
-			pgoff = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
+			vm_pgoff = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
 
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
@@ -586,7 +586,7 @@ share_lib:
 				 * TODO: How to get the real offset of load
 				 * maybe i can use /proc/PID/auxv to get it.
 				 */
-				if (sibling->pgoff == pgoff) {
+				if (sibling->vm_pgoff == vm_pgoff) {
 					ldebug("Get %s voffset %lx\n",
 						vma->name_, phdr->p_vaddr);
 					sibling->voffset = phdr->p_vaddr;
@@ -654,11 +654,16 @@ void vma_free_elf(struct vm_area_struct *vma)
 	free(vma->vma_elf);
 }
 
+static unsigned long offset_to_vaddr(struct vm_area_struct *vma, loff_t offset)
+{
+	return vma->vm_start + offset - ((loff_t)vma->vm_pgoff << PAGE_SHIFT);
+}
+
 /**
  * This function use to calculate the real symbol value, because load_addr's
  * effect.
  */
-unsigned long task_vma_symbol_value(const struct symbol *sym)
+unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 {
 	unsigned long addr = 0;
 	struct vm_area_struct *vma_leader = sym->vma;
@@ -679,14 +684,14 @@ unsigned long task_vma_symbol_value(const struct symbol *sym)
 			if (vma->prot == PROT_NONE)
 				continue;
 
-			if (off < vma->pgoff)
+			if (off < vma->vm_pgoff)
 				break;
 		}
 
 		addr = vma->vm_start + (off - vma->voffset);
 
 	} else if (vma_leader->type == VMA_SELF) {
-		addr = sym->sym.st_value + vma_leader->vma_elf->load_offset;
+		addr = offset_to_vaddr(sym->vma, sym->sym.st_value);
 	} else
 		addr = sym->sym.st_value;
 
@@ -980,7 +985,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		vma->vm_end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
-		vma->pgoff = pgoff;
+		vma->vm_pgoff = pgoff;
 		vma->major = major;
 		vma->minor = minor;
 		vma->inode = inode;
@@ -1063,7 +1068,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 		vma->leader == vma ? "L" : "-");
 	fprintf(fp, "%11s %016lx %016lx %s\n",
 		"",
-		vma->pgoff,
+		vma->vm_pgoff,
 		vma->voffset,
 		vma->name_);
 
