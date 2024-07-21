@@ -694,8 +694,8 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 
 	} else if (vma_leader->type == VMA_SELF) {
 		/**
-		 * If PIE, we should call the vaddr, if no-PIE, use the offset
-		 * directly.
+		 * If PIE, we should call offset_to_vaddr(), if no-PIE, use
+		 * the offset directly.
 		 */
 		addr = task->is_pie ?
 			offset_to_vaddr(sym->vma, sym->sym.st_value) :
