@@ -361,6 +361,49 @@ static unsigned long offset_to_vaddr(struct vm_area_struct *vma, loff_t offset)
 That's it, bingo!
 
 
+### Data Address
+
+We just use tests/hello/hello command as example.
+
+Data address in no-PIE ELF file:
+
+```
+$ readelf --syms hello | grep global_i
+    14: 0000000000404038     4 OBJECT  LOCAL  DEFAULT   25 global_i
+```
+
+Data address in no-PIE ELF memory:
+
+```
+$ gdb -p $(pidof hello)
+(gdb) p &global_i
+$2 = (int *) 0x404038 <global_i>
+```
+
+`hello` vmas:
+
+```
+$ cat /proc/$(pidof hello)/maps
+00400000-00401000 r--p 00000000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
+00401000-00402000 r-xp 00001000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
+00402000-00403000 r--p 00002000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
+00403000-00404000 r--p 00002000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
+00404000-00405000 rw-p 00003000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
+```
+
+List all addresses:
+
+```
+vm_start = 0x00404000
+offset   = 0x00404038
+vm_pgoff = 0x00003000
+```
+
+As you can see from the above address, if it is a non-PIE, you can directly use the offset in the ELF file.
+
+TODO: Test PIE ELF here
+
+
 ## Share library
 
 TODO

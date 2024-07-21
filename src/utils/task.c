@@ -667,6 +667,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 {
 	unsigned long addr = 0;
 	struct vm_area_struct *vma_leader = sym->vma;
+	struct task_struct *task = vma_leader->task;
 
 	if (vma_leader != vma_leader->leader) {
 		lerror("Symbol vma must be leader.\n");
@@ -688,10 +689,17 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 				break;
 		}
 
+		/* FIXME: Maybe replace voffset here like VMA_SELF */
 		addr = vma->vm_start + (off - vma->voffset);
 
 	} else if (vma_leader->type == VMA_SELF) {
-		addr = offset_to_vaddr(sym->vma, sym->sym.st_value);
+		/**
+		 * If PIE, we should call the vaddr, if no-PIE, use the offset
+		 * directly.
+		 */
+		addr = task->is_pie ?
+			offset_to_vaddr(sym->vma, sym->sym.st_value) :
+			sym->sym.st_value + vma_leader->vma_elf->load_offset;
 	} else
 		addr = sym->sym.st_value;
 
