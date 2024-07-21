@@ -2,10 +2,14 @@ CC = gcc
 LD = ld
 
 HDR_META=/usr/include/ulpatch/meta.h
-ifneq ($(wildcard ${HDR_META}),)
-$(info Already install ulpatch)
-else
-$(error Please install ulpatch first)
+ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
+
+ifeq ($(wildcard ${HDR_META}),)
+  $(error Not found ${HDR_META}, Please install ulpatch first)
+endif
+
+ifeq ($(wildcard ${ULP_CONFIG}),)
+  $(error Not found ulp-config, Please install ulpatch first)
 endif
 
 CFLAGS :=
@@ -29,8 +33,9 @@ TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
 TARGETS_ULP += patch-pthread.ulp
 
-CFLAGS_ULP :=
+CFLAGS_ULP := $(shell ${ULP_CONFIG} --cflags)
 CFLAGS_ULP += -O0
+# FIXME: This PIC option should move to ulp-config, just for test here.
 ifdef ULP_PIC
   CFLAGS_ULP += -fpic
   CFLAGS_ULP += -fno-PIE
@@ -44,16 +49,13 @@ ifdef NOSTATIC
   CFLAGS += -DNOSTATIC=1
   CFLAGS_ULP += -DNOSTATIC=1
 endif
-ifeq ($(shell uname -m),x86_64)
-  CFLAGS_ULP += -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx
-  CFLAGS_ULP += -fcf-protection=branch -fno-jump-tables
-  CFLAGS_ULP += -m64 -falign-jumps=1
-endif
 ifeq ($(shell uname -m),aarch64)
   # TODO
 endif
 
-LDFLAGS_ULP := $(shell ulp-config --ldflags)
+LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ldflags)
+
+$(info CFLAGS_ULP = ${CFLAGS_ULP})
 $(info LDFLAGS_ULP = ${LDFLAGS_ULP})
 
 build: ${TARGETS_ULP} ${TARGETS}

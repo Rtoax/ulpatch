@@ -32,6 +32,8 @@ ${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
     the  compiler flags, linker  flags  and  object  libraries  needed  to link
     against ULPatch.
 
+    Good output to stdout, Wrong output to stderr.
+
 ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
 
    --cflags           Print the C compiler flags needed to use ULPatch headers.
@@ -48,6 +50,7 @@ ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
                       argument before --ldflags and --libs.
 
    -h, --help         show this help information
+   -v, --verbose      show verbose of running, just for debug.
 
 ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
    ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
@@ -63,6 +66,27 @@ goodbye()
 }
 
 trap "goodbye" EXIT
+
+# For example
+# check_cc_option -mno-sse3 : return YES if support -mno-sse3
+# check_cc_option -mno-not-exist : return NO
+check_cc_option()
+{
+	local flag=$1
+	echo "int main(void) { return 0; }" | \
+		${CC} -x c -Wall - ${flag} -o /dev/null 2>/dev/null 1>/dev/null || {
+			echo NO && true && return 0
+		}
+	echo YES && return 0
+}
+
+check_cc_option_and_add_cflags()
+{
+	local flag=$1
+	if [[ $(check_cc_option ${flag}) == YES ]]; then
+		cflags+=( ${flag} )
+	fi
+}
 
 set_ld()
 {
@@ -86,6 +110,20 @@ print_cflags()
 {
 	cflags+=( "-I/usr/include/" )
 	cflags+=( "-D_GNU_SOURCE" )
+
+	if [[ $(uname -m) == x86_64 ]]; then
+		check_cc_option_and_add_cflags -mno-sse
+		check_cc_option_and_add_cflags -mno-mmx
+		check_cc_option_and_add_cflags -mno-sse2
+		check_cc_option_and_add_cflags -mno-3dnow
+		check_cc_option_and_add_cflags -mno-avx
+		check_cc_option_and_add_cflags -fcf-protection=branch
+		check_cc_option_and_add_cflags -fno-jump-tables
+		check_cc_option_and_add_cflags -m64
+		check_cc_option_and_add_cflags -falign-jumps=1
+	# FIXME: Move arches
+	fi
+
 	echo -n ${cflags[@]}
 }
 
@@ -108,13 +146,14 @@ print_libs()
 }
 
 TEMP=$(getopt \
-	--options h \
+	--options vh \
 	--long cc: \
 	--long ld: \
 	--long cflags \
 	--long ldflags \
 	--long libs \
 	--long help \
+	--long verbose \
 	-n ulp-config -- "$@")
 
 test $? != 0 && __usage__ 1
@@ -152,6 +191,10 @@ while true; do
 		shift
 		__usage__
 		;;
+	-v|--verbose)
+		shift
+		set -x
+		;;
 	--)
 		shift
 		break
@@ -162,9 +205,10 @@ done
 if [[ -z ${already_run} ]]; then
 	__usage__ 1
 else
-	[[ ${run_cflags} ]] && print_cflags
-	[[ ${run_ldflags} ]] && print_ldflags
+	[[ ${run_cflags} ]] && print_cflags && echo -n " "
+	[[ ${run_ldflags} ]] && print_ldflags && echo -n " "
 	[[ ${run_libs} ]] && print_libs
 	# Need newline(\n) here
 	echo
 fi
+
