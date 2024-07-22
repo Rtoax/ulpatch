@@ -391,17 +391,53 @@ $ cat /proc/$(pidof hello)/maps
 00404000-00405000 rw-p 00003000 08:10 2641500 /home/sdb/Git/ulpatch/tests/hello/hello
 ```
 
-List all addresses:
+List all `global_i` addresses:
 
 ```
 vm_start = 0x00404000
 offset   = 0x00404038
 vm_pgoff = 0x00003000
+vaddr    = 0x00404038
 ```
 
 As you can see from the above address, if it is a non-PIE, you can directly use the offset in the ELF file.
 
-TODO: Test PIE ELF here
+If is PIE ELF, like `tests/hello/hello-pie`, data address in PIE ELF file:
+
+```
+$ readelf --syms hello-pie | grep global_i
+    14: 0000000000004040     4 OBJECT  LOCAL  DEFAULT   26 global_i
+```
+
+Data address in PIE ELF memory:
+
+```
+$ gdb -p $(pidof hello-pie)
+(gdb) p &global_i
+$2 = (int *) 0x559d2c798040 <global_i>
+```
+
+`hello-pie` vmas:
+
+```
+$ cat /proc/$(pidof hello-pie)/maps
+559d2c794000-559d2c795000 r--p 00000000 08:00 2172938143 /home/sda/git-repos/ulpatch/tests/hello/hello-pie
+559d2c795000-559d2c796000 r-xp 00001000 08:00 2172938143 /home/sda/git-repos/ulpatch/tests/hello/hello-pie
+559d2c796000-559d2c797000 r--p 00002000 08:00 2172938143 /home/sda/git-repos/ulpatch/tests/hello/hello-pie
+559d2c797000-559d2c798000 r--p 00002000 08:00 2172938143 /home/sda/git-repos/ulpatch/tests/hello/hello-pie
+559d2c798000-559d2c799000 rw-p 00003000 08:00 2172938143 /home/sda/git-repos/ulpatch/tests/hello/hello-pie
+```
+
+List all `global_i` addresses:
+
+```
+vm_start = 0x559d2c798000
+offset   = 0x000000004040
+vm_pgoff = 0x000000003000
+vaddr    = 0x559d2c798040
+```
+
+TODO: `offset_to_vaddr()` could not swap `0x000000004040` to `0x559d2c798040`.
 
 
 ## Share library
