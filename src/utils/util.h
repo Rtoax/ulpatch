@@ -16,12 +16,12 @@
 #endif
 
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE*)0)->MEMBER)
+#define offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE *)0)->MEMBER)
 #endif
 
 #ifndef container_of
 #define container_of(ptr, type, member) \
-	((type *)(((char *)(ptr)) - offsetof(type,member)))
+	((type *)(((char *)(ptr)) - offsetof(type, member)))
 #endif
 
 #ifndef MAX
@@ -55,7 +55,7 @@
 #endif
 
 #ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
 #if defined(KERNEL_HEADERS_CONST_H)
