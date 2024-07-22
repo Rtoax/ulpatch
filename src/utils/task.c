@@ -1076,7 +1076,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 		vma->leader == vma ? "L" : "-");
 	fprintf(fp, "%11s %016lx %016lx %s\n",
 		"",
-		vma->vm_pgoff,
+		vma->vm_pgoff << PAGE_SHIFT,
 		vma->voffset,
 		vma->name_);
 
