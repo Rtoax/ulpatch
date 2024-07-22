@@ -8,4 +8,7 @@ else
 	ELF="./$1"
 fi
 
-sudo bpftrace -e "uprobe:${ELF}:print_hello { printf(\"%-8d %s\n\", tid, comm); }"
+sudo bpftrace -e \
+	"uprobe:${ELF}:print_hello {
+		printf(\"%-8d %-16s %-16lx\n\", tid, comm, uaddr(\"print_hello\"));
+	}"
