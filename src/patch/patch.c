@@ -580,7 +580,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		unsigned long plt =
 			objdump_elf_plt_symbol_address(task->objdump, name);
 		if (plt && task->vma_self_elf) {
-			addr = plt + task->vma_self_elf->vma_elf->load_offset;
+			addr = plt + task->vma_self_elf->vma_elf->load_addr;
 		}
 		if (addr) {
 			ldebug("Found %s in self @plt, addr = %lx\n",

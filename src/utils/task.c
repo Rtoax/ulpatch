@@ -304,9 +304,9 @@ static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
  * FIXME: Important: some VMA match failed
  */
 static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
-			  unsigned long load_offset)
+			  unsigned long load_addr)
 {
-	unsigned long start = load_offset + phdr->p_vaddr;
+	unsigned long start = load_addr + phdr->p_vaddr;
 	unsigned long end = start + phdr->p_filesz;
 
 	start = PAGE_DOWN(start);
@@ -614,7 +614,7 @@ share_lib:
 		return -1;
 	}
 
-	vma->vma_elf->load_offset = vma->vm_start - lowest_vaddr;
+	vma->vma_elf->load_addr = vma->vm_start - lowest_vaddr;
 
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
@@ -625,7 +625,7 @@ share_lib:
 		case PT_LOAD:
 		case PT_GNU_RELRO:
 			/* leader */
-			if (match_vma_phdr(vma, phdr, vma->vma_elf->load_offset)) {
+			if (match_vma_phdr(vma, phdr, vma->vma_elf->load_addr)) {
 				vma->is_matched_phdr = true;
 			}
 
@@ -633,7 +633,7 @@ share_lib:
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
 
-				if (match_vma_phdr(sibling, phdr, vma->vma_elf->load_offset)) {
+				if (match_vma_phdr(sibling, phdr, vma->vma_elf->load_addr)) {
 					sibling->is_matched_phdr = true;
 				}
 			}
@@ -642,8 +642,8 @@ share_lib:
 		}
 	}
 
-	linfo("%s vma start %lx, load_offset %lx\n",
-		vma->name_, vma->vm_start, vma->vma_elf->load_offset);
+	linfo("%s vma start %lx, load_addr %lx\n",
+		vma->name_, vma->vm_start, vma->vma_elf->load_addr);
 
 	return 0;
 }
@@ -702,7 +702,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 		 */
 		addr = task->is_pie ?
 			offset_to_vaddr(sym->vma, sym->sym.st_value) :
-			sym->sym.st_value + vma_leader->vma_elf->load_offset;
+			sym->sym.st_value + vma_leader->vma_elf->load_addr;
 	} else
 		addr = sym->sym.st_value;
 
@@ -827,7 +827,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	assert(dynamics && "Malloc fatal.");
 
 	err = memcpy_from_task(task, dynamics,
-			       vma->vma_elf->load_offset + phdr->p_vaddr,
+			       vma->vma_elf->load_addr + phdr->p_vaddr,
 			       phdr->p_memsz);
 	if (err == -1 || err < phdr->p_memsz) {
 		lerror("Task read mem failed, %lx.\n", vma->vm_start + phdr->p_vaddr);
@@ -875,13 +875,13 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	assert(buffer && "Malloc fatal.");
 	memset(buffer, 0x0, symtab_sz + strtab_sz);
 
-	ldebug("%s: symtab_addr %lx, load_offset: %lx, vma start %lx\n",
+	ldebug("%s: symtab_addr %lx, load_addr: %lx, vma start %lx\n",
 		vma->name_,
 		symtab_addr,
-		vma->vma_elf->load_offset,
+		vma->vma_elf->load_addr,
 		vma->vm_start);
 
-	/* [vdso] need add load_offset or vma start address.
+	/* [vdso] need add load_addr or vma start address.
 	 *
 	 * $ readelf -S vdso.so
 	 * There are 16 section headers, starting at offset 0xe98:
@@ -892,7 +892,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	 *       0000000000000138  0000000000000018   A       4     1     8
 	 */
 	if (vma->type == VMA_VDSO)
-		symtab_addr += vma->vma_elf->load_offset;
+		symtab_addr += vma->vma_elf->load_addr;
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err == -1 || err < strtab_sz + symtab_sz) {
@@ -1088,8 +1088,8 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 		if (fp == stdout || fp == stderr)
 			fprintf(fp, "\033[2m");
 		if (vma->vma_elf) {
-			fprintf(fp, "%10s  load_offset = 0x%lx\n", "",
-				vma->vma_elf->load_offset);
+			fprintf(fp, "%10s  load_addr = 0x%lx\n", "",
+				vma->vma_elf->load_addr);
 			bool first = true;
 			print_ehdr(fp, &vma->vma_elf->ehdr);
 			for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {

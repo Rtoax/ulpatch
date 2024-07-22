@@ -65,7 +65,7 @@ struct vm_area_struct;
 struct vma_elf {
 	GElf_Ehdr ehdr;
 	GElf_Phdr *phdrs;
-	unsigned long load_offset;
+	unsigned long load_addr;
 };
 
 struct vma_ulp {
