@@ -3,6 +3,7 @@ TODO
 
 # Now
 
+- Support load symbol-file like gdb.
 - Some symbols will be optimized out.
 - support Qemu
 - support multi-thread and make each thread safety, use ptrace(2).
