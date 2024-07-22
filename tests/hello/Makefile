@@ -65,8 +65,9 @@ hello: hello.o
 hello-pie: hello-pie.o
 test: test.o $(addsuffix .o, $(basename $(TARGETS_ULP)))
 
-CFLAGS_hello := -g -ggdb -flto -pthread -no-pie
-CFLAGS_hello-pie := ${CFLAGS_hello} -fpie
+CFLAGS_hello_common := -g -ggdb -flto -pthread
+CFLAGS_hello := ${CFLAGS_hello_common} -no-pie
+CFLAGS_hello-pie := ${CFLAGS_hello_common} -fpie
 LDFLAGS_hello-pie := -pie
 CFLAGS_test := $(CFLAGS_ULP)
 
