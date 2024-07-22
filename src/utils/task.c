@@ -561,7 +561,7 @@ share_lib:
 	 */
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		GElf_Phdr *phdr = &vma->vma_elf->phdrs[i];
-		unsigned long vm_pgoff;
+		unsigned long vaddr;
 		struct vm_area_struct *sibling, *tmpvma;
 
 		switch (phdr->p_type) {
@@ -573,7 +573,7 @@ share_lib:
 				lowest_vaddr);
 
 			/* Virtual address offset */
-			vm_pgoff = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
+			vaddr = ALIGN_DOWN(phdr->p_vaddr, phdr->p_align);
 
 			list_for_each_entry_safe(sibling, tmpvma,
 				&vma->siblings, siblings) {
@@ -586,7 +586,7 @@ share_lib:
 				 * TODO: How to get the real offset of load
 				 * maybe i can use /proc/PID/auxv to get it.
 				 */
-				if (sibling->vm_pgoff == vm_pgoff) {
+				if ((sibling->vm_pgoff << PAGE_SHIFT) == vaddr) {
 					ldebug("Get %s voffset %lx\n",
 						vma->name_, phdr->p_vaddr);
 					sibling->voffset = phdr->p_vaddr;
@@ -685,7 +685,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 			if (vma->prot == PROT_NONE)
 				continue;
 
-			if (off < vma->vm_pgoff)
+			if (off < (vma->vm_pgoff << PAGE_SHIFT))
 				break;
 		}
 
@@ -993,7 +993,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		vma->vm_end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
-		vma->vm_pgoff = pgoff;
+		vma->vm_pgoff = (pgoff >> PAGE_SHIFT);
 		vma->major = major;
 		vma->minor = minor;
 		vma->inode = inode;
