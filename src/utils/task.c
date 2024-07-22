@@ -300,6 +300,9 @@ static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
 	return false;
 }
 
+/**
+ * FIXME: Important: some VMA match failed
+ */
 static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 			  unsigned long load_offset)
 {
