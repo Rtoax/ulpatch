@@ -114,6 +114,7 @@ print_cflags()
 	cflags+=( "-D__ULP_DEV=1" )
 
 	if [[ $(uname -m) == x86_64 ]]; then
+		check_cc_option_and_add_cflags -m64
 		check_cc_option_and_add_cflags -mno-sse
 		check_cc_option_and_add_cflags -mno-mmx
 		check_cc_option_and_add_cflags -mno-sse2
@@ -121,8 +122,16 @@ print_cflags()
 		check_cc_option_and_add_cflags -mno-avx
 		check_cc_option_and_add_cflags -fcf-protection=branch
 		check_cc_option_and_add_cflags -fno-jump-tables
-		check_cc_option_and_add_cflags -m64
 		check_cc_option_and_add_cflags -falign-jumps=1
+	elif [[ $(uname -m) == aarch64 ]]; then
+		check_cc_option_and_add_cflags -fshort-wchar
+		check_cc_option_and_add_cflags -funsigned-char
+		check_cc_option_and_add_cflags -fno-strict-aliasing
+		check_cc_option_and_add_cflags -mgeneral-regs-only
+		check_cc_option_and_add_cflags -fno-asynchronous-unwind-tables
+		check_cc_option_and_add_cflags -fno-unwind-tables
+		check_cc_option_and_add_cflags -mbranch-protection=pac-ret
+		check_cc_option_and_add_cflags -fno-delete-null-pointer-checks
 	# FIXME: Move arches
 	fi
 
