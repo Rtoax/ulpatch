@@ -15,7 +15,87 @@ if (ET_EXEC)
 elif (ET_DYN)
 	load_bias = Non-Zero Value (random)
 
-elf_map(file, load_bias + vaddr, ...)
+elf_map(file, load_bias + vaddr, ...) {
+	size = p_filesz + ELF_PAGEOFFSET(p_vaddr);
+	off = p_offset - ELF_PAGEOFFSET(p_vaddr);
+
+	addr = load_bias + p_vaddr
+
+	addr = ELF_PAGESTART(addr);
+	size = ELF_PAGEALIGN(size);
+
+	vm_mmap(filep, addr, size, ..., off);
+}
+```
+
+And example of `elf_map()` tracing of non-PIE:
+
+```bash
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x00000000000006c8 0x00000000000006c8  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                 0x0000000000000379 0x0000000000000379  R E    0x1000
+
+  # .rodata .eh_frame_hdr .eh_frame
+  LOAD           0x0000000000002000 0x0000000000402000 0x0000000000402000
+                 0x00000000000001d4 0x00000000000001d4  R      0x1000
+
+  # .init_array .fini_array .dynamic .got .got.plt .data .bss
+  LOAD           0x0000000000002e00 0x0000000000403e00 0x0000000000403e00
+                 0x0000000000000258 0x0000000000000270  RW     0x1000
+
+$ sudo ./elf_map.bt  | grep hello
+TIME     PID      ADDR(e)          SIZE(e)  PROT ADDR(m)          SIZE(m)  OFF              MAP ADDR         COMM
+16:33:52 205279   400000           0        r--- 400000           1000     0               400000           hello
+16:33:52 205279   401000           0        r-x- 401000           1000     1000            401000           hello
+16:33:52 205279   402000           0        r--- 402000           1000     2000            402000           hello
+16:33:52 205279   403e00           0        rw-- 403000           2000     2000            403000           hello
+
+MAP1: 400000 - 4006c8
+MAP2: 401000 - 401379
+MAP3: 402000 - 4021d4
+MAP4: 403e00 - 404170
+
+00400000-00401000 r--p 00000000 fd:03 202332043 /ulpatch/tests/hello/hello
+00401000-00402000 r-xp 00001000 fd:03 202332043 /ulpatch/tests/hello/hello
+00402000-00403000 r--p 00002000 fd:03 202332043 /ulpatch/tests/hello/hello
+00403000-00404000 r--p 00002000 fd:03 202332043 /ulpatch/tests/hello/hello
+00404000-00405000 rw-p 00003000 fd:03 202332043 /ulpatch/tests/hello/hello
+```
+
+And example of `elf_map()` tracing of PIE:
+
+```bash
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000000778 0x0000000000000778  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000001000 0x0000000000001000
+                 0x00000000000003c5 0x00000000000003c5  R E    0x1000
+
+  # .rodata .eh_frame_hdr .eh_frame
+  LOAD           0x0000000000002000 0x0000000000002000 0x0000000000002000
+                 0x00000000000001ac 0x00000000000001ac  R      0x1000
+
+  # .init_array .fini_array .data.rel.ro .dynamic .got .got.plt .data .bss
+  LOAD           0x0000000000002dd8 0x0000000000003dd8 0x0000000000003dd8
+                 0x0000000000000288 0x00000000000002a0  RW     0x1000
+
+TIME     PID      ADDR(e)          SIZE(e)  PROT ADDR(m)          SIZE(m)  OFF             MAP ADDR         COMM
+16:35:30 205810   55cc6668e000     4078     r--- 55cc6668e000     5000     0               55cc6668e000     hello-pie
+16:35:30 205810   55cc6668f000     0        r-x- 55cc6668f000     1000     1000            55cc6668f000     hello-pie
+16:35:30 205810   55cc66690000     0        r--- 55cc66690000     1000     2000            55cc66690000     hello-pie
+16:35:30 205810   55cc66691dd8     0        rw-- 55cc66691000     2000     2000            55cc66691000     hello-pie
+
+55cc6668e000-55cc6668f000 r--p 00000000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
+55cc6668f000-55cc66690000 r-xp 00001000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
+55cc66690000-55cc66691000 r--p 00002000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
+55cc66691000-55cc66692000 r--p 00002000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
+55cc66692000-55cc66693000 rw-p 00003000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
 ```
 
 

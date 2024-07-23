@@ -40,6 +40,12 @@
 #define PAGE_SHIFT ulp_page_shift()
 #endif
 
+#define ELF_MIN_ALIGN	PAGE_SIZE
+
+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))
+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN-1))
+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))
+
 #ifndef ROUND_DOWN
 #define ROUND_DOWN(x, m) ((x) & ~((m) - 1))
 #endif

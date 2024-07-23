@@ -89,8 +89,16 @@ struct vma_ulp {
 };
 
 struct vm_area_struct {
+	/**
+	 * vaddr = load_bias + p_vaddr
+	 * addr = ELF_PAGESTART(addr)
+	 */
 	unsigned long vm_start;
 	unsigned long vm_end;
+	/**
+	 * off = p_offset - ELF_PAGEOFFSET(p_vaddr)
+	 * vm_pgoff = off >> PAGE_SHIFT
+	 */
 	unsigned long vm_pgoff;
 	unsigned int major, minor;
 	unsigned long inode;

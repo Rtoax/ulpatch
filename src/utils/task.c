@@ -954,7 +954,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 	mapsfp = fdopen(mapsfd, "r");
 	fseek(mapsfp, 0, SEEK_SET);
 	do {
-		unsigned long start, end, pgoff;
+		unsigned long start, end, off;
 		unsigned int major, minor;
 		unsigned long inode;
 		char perms[5], name_[256];
@@ -962,7 +962,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		char line[1024];
 		struct vm_area_struct __unused *old;
 
-		start = end = pgoff = major = minor = inode = 0;
+		start = end = off = major = minor = inode = 0;
 
 		memset(perms, 0, sizeof(perms));
 		memset(name_, 0, sizeof(name_));
@@ -972,7 +972,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 			break;
 
 		r = sscanf(line, "%lx-%lx %s %lx %x:%x %ld %255s", &start,
-			   &end, perms, &pgoff, &major, &minor, &inode, name_);
+			   &end, perms, &off, &major, &minor, &inode, name_);
 		if (r <= 0) {
 			lerror("sscanf failed.\n");
 			return -1;
@@ -996,7 +996,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		vma->vm_end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
 		vma->prot = __perms2prot(perms);
-		vma->vm_pgoff = (pgoff >> PAGE_SHIFT);
+		vma->vm_pgoff = (off >> PAGE_SHIFT);
 		vma->major = major;
 		vma->minor = minor;
 		vma->inode = inode;
@@ -1065,7 +1065,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 		fprintf(fp, "%10s: %16s %16s %6s %4s\n",
 			"TYPE", "Start", "End", "Perm", "Role");
 		fprintf(fp, "%11s %16s %16s %s\n",
-			"", "pgoff", "Voffset", "Name");
+			"", "off", "Voffset", "Name");
 	}
 
 	fprintf(fp, "%10s: %016lx-%016lx %6s %s%s%s%s\n",
