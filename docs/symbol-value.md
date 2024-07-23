@@ -133,6 +133,29 @@ $ cat /proc/$$/maps
 5650ca772000-5650ca77b000 rw-p 00145000 fd:03 201680556     /usr/bin/bash
 ```
 
+It can be seen that the mappings have overlapping parts, which can be verified in this way.
+
+```
+$ printf '0x%lx\n' $(( 0x5650ca735000 + $((0x00141000 - 0x00109000)) ))
+0x5650ca76d000
+
+$ ultask -p $$ --dump-addr 0x5650ca76d000 --dump-size 4096 -o a.elf
+$ hexdump -C a.elf | head -5
+00000000  18 42 0e 10 42 0e 08 47  0b 00 00 00 60 00 00 00  |.B..B..G....`...|
+00000010  38 a1 01 00 5c dc fb ff  78 01 00 00 00 46 0e 10  |8...\...x....F..|
+00000020  8f 02 47 0e 18 8e 03 42  0e 20 8d 04 46 0e 28 8c  |..G....B. ..F.(.|
+00000030  05 48 0e 30 86 06 44 0e  38 83 07 4f 0e 50 03 1e  |.H.0..D.8..O.P..|
+00000040  01 0a 0e 38 41 0e 30 41  0e 28 42 0e 20 42 0e 18  |...8A.0A.(B. B..|
+
+$ ultask -p $$ --dump-addr 0x5650ca76e000 --dump-size 4096 -o b.elf
+$ hexdump -C b.elf | head -5
+00000000  18 42 0e 10 42 0e 08 47  0b 00 00 00 60 00 00 00  |.B..B..G....`...|
+00000010  38 a1 01 00 5c dc fb ff  78 01 00 00 00 46 0e 10  |8...\...x....F..|
+00000020  8f 02 47 0e 18 8e 03 42  0e 20 8d 04 46 0e 28 8c  |..G....B. ..F.(.|
+00000030  05 48 0e 30 86 06 44 0e  38 83 07 4f 0e 50 03 1e  |.H.0..D.8..O.P..|
+00000040  01 0a 0e 38 41 0e 30 41  0e 28 42 0e 20 42 0e 18  |...8A.0A.(B. B..|
+```
+
 
 ## Kernel UProbes
 

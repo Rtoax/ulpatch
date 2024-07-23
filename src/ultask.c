@@ -28,6 +28,8 @@ enum {
 	ARG_JMP_TO_ADDR,
 	ARG_VMAS,
 	ARG_DUMP_VMA,
+	ARG_DUMP_ADDR,
+	ARG_DUMP_SIZE,
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
@@ -42,9 +44,12 @@ static pid_t target_pid = -1;
 static bool flag_print_task = true;
 static bool flag_print_vmas = false;
 static bool flag_dump_vma = false;
+static bool flag_dump_addr = false;
 static bool flag_unmap_vma = false;
 static const char *map_file = NULL;
 static unsigned long vma_addr = 0;
+static unsigned long dump_addr = 0;
+static unsigned long dump_size = 0;
 static unsigned long jmp_addr_from = 0;
 static unsigned long jmp_addr_to = 0;
 static bool flag_list_symbols = false;
@@ -82,6 +87,10 @@ static void print_help(void)
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"\n"
+	"  --dump-addr [ADDR]  dump address memory to file, need --dump-size\n"
+	"\n"
+	"  --dump-size [SIZE]  dump size\n"
+	"\n"
 	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
 	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
 	"                      you better ensure what you are doing.\n"
@@ -115,6 +124,8 @@ static int parse_config(int argc, char *argv[])
 		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "status",         no_argument,       0, ARG_STATUS },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
+		{ "dump-addr",      required_argument, 0, ARG_DUMP_ADDR },
+		{ "dump-size",      required_argument, 0, ARG_DUMP_SIZE },
 		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
 		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
@@ -145,6 +156,21 @@ static int parse_config(int argc, char *argv[])
 			vma_addr = strtoull(optarg, NULL, 16);
 			if (vma_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-vma.\n");
+				exit(1);
+			}
+			break;
+		case ARG_DUMP_ADDR:
+			flag_dump_addr = true;
+			dump_addr = strtoull(optarg, NULL, 16);
+			if (dump_addr == 0) {
+				fprintf(stderr, "Wrong address for --dump-addr.\n");
+				exit(1);
+			}
+			break;
+		case ARG_DUMP_SIZE:
+			dump_size = strtoull(optarg, NULL, 16);
+			if (dump_size == 0) {
+				fprintf(stderr, "Wrong value for --dump-size.\n");
 				exit(1);
 			}
 			break;
@@ -217,6 +243,7 @@ static int parse_config(int argc, char *argv[])
 	 */
 	if (!flag_print_vmas &&
 		!flag_dump_vma &&
+		!flag_dump_addr &&
 		!map_file &&
 		(!jmp_addr_from || !jmp_addr_to) &&
 		!flag_unmap_vma &&
@@ -244,6 +271,17 @@ static int parse_config(int argc, char *argv[])
 		fprintf(stderr, "--dump-vma need output file(-o).\n");
 		exit(1);
 	}
+
+	if (flag_dump_addr && !output_file) {
+		fprintf(stderr, "--dump-addr need output file(-o).\n");
+		exit(1);
+	}
+
+	if (flag_dump_addr && (!dump_addr || !dump_size)) {
+		fprintf(stderr, "--dump-addr need --dump-size.\n");
+		exit(1);
+	}
+
 
 	if (map_file && !fexist(map_file)) {
 		fprintf(stderr, "%s is not exist.\n", map_file);
@@ -400,6 +438,10 @@ int main(int argc, char *argv[])
 	/* dump an VMA */
 	if (flag_dump_vma)
 		dump_task_vma_to_file(output_file, target_task, vma_addr);
+
+	if (flag_dump_addr)
+		dump_task_addr_to_file(output_file, target_task, dump_addr,
+				       dump_size);
 
 	if (flag_list_symbols)
 		list_all_symbol();

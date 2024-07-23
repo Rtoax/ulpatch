@@ -26,6 +26,12 @@ Dump process's VMA, see also /proc/PID/maps.
 \fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
 Dump process's VMA to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix.
 .TP
+\fB\-\-dump-addr\fR[=\fI\,ADDR\/\fR]
+Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Need specify \fB--dump-size\fR too.
+.TP
+\fB\-\-dump-size\fR[=\fI\,SIZE\/\fR]
+Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix.
+.TP
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
 Specify a jump entry SRC address, must use with --jmp-to. the string may include a "0x" prefix.
 .TP
