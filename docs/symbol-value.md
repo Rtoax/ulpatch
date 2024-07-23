@@ -4,7 +4,7 @@
 - PIE: Position-Independent-Executable
 
 
-## Kernel Load ELF
+## Kernel ELF File Map
 
 See kernel `load_elf_binary()` function, it will load all `PT_LOAD` section to memory, the location is what we care about.
 
@@ -27,6 +27,8 @@ elf_map(file, load_bias + vaddr, ...) {
 	vm_mmap(filep, addr, size, ..., off);
 }
 ```
+
+### non-PIE
 
 And example of `elf_map()` tracing of non-PIE:
 
@@ -66,6 +68,9 @@ MAP4: 403e00 - 404170
 00404000-00405000 rw-p 00003000 fd:03 202332043 /ulpatch/tests/hello/hello
 ```
 
+
+### PIE (hello-pie)
+
 And example of `elf_map()` tracing of PIE:
 
 ```bash
@@ -97,6 +102,9 @@ TIME     PID      ADDR(e)          SIZE(e)  PROT ADDR(m)          SIZE(m)  OFF  
 55cc66691000-55cc66692000 r--p 00002000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
 55cc66692000-55cc66693000 rw-p 00003000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
 ```
+
+
+### PIE (bash)
 
 And example of `elf_map()` tracing of bash(is PIE):
 
@@ -222,7 +230,7 @@ We could get `readline()` addresses:
 ```
 vm_start = 0x56212af13000
 offset   = 0x0000000d1c70
-pgoff    = 0x000000022000
+off      = 0x000000022000
 pagesize = 4096
 vm_pgoff = 34
 vaddr    = 0x56212afc2c70
@@ -273,7 +281,7 @@ List all `global_i` addresses:
 ```
 vm_start = 0x404000
 offset   = 0x404038
-pgoff    = 0x003000
+off      = 0x003000
 vm_pgoff =        3
 vaddr    = 0x404038
 ```
@@ -466,7 +474,7 @@ For example, the function `print_hello` addresses be like:
 ```bash
 vm_start = 0x56399fbf5000
 offset   = 0x0000000011e8
-pgoff    = 0x000000001000
+off      = 0x000000001000
 vm_pgoff =              1
 vaddr    = 0x56399fbf51e8
 ```
@@ -483,7 +491,7 @@ And the variable `global_i` addresses be like:
 ```bash
 vm_start = 0x56399fbf8000
 offset   = 0x000000004040
-pgoff    = 0x000000003000
+off      = 0x000000003000
 vm_pgoff =              3
 vaddr    = 0x56399fbf8040
 ```
