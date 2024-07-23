@@ -98,6 +98,41 @@ TIME     PID      ADDR(e)          SIZE(e)  PROT ADDR(m)          SIZE(m)  OFF  
 55cc66692000-55cc66693000 rw-p 00003000 fd:03 202332046 /ulpatch/tests/hello/hello-pie
 ```
 
+And example of `elf_map()` tracing of bash(is PIE):
+
+```
+$ readelf -l /usr/bin/bash
+
+Elf file type is DYN (Shared object file)
+Entry point 0x31d30
+There are 13 program headers, starting at offset 64
+
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x000000000002dd58 0x000000000002dd58  R      0x1000
+  LOAD           0x000000000002e000 0x000000000002e000 0x000000000002e000
+                 0x00000000000da4d5 0x00000000000da4d5  R E    0x1000
+  LOAD           0x0000000000109000 0x0000000000109000 0x0000000000109000
+                 0x0000000000038a74 0x0000000000038a74  R      0x1000
+  LOAD           0x0000000000141c10 0x0000000000142c10 0x0000000000142c10
+                 0x000000000000ba80 0x0000000000016a48  RW     0x1000
+
+TIME     PID      ADDR(e)          SIZE(e)  PROT ADDR(m)          SIZE(m)  OFF             MAP ADDR         COMM
+17:29:44 215642   5650ca62c000     159658   r--- 5650ca62c000     15a000   0               5650ca62c000     bash
+17:29:44 215642   5650ca65a000     0        r-x- 5650ca65a000     db000    2e000           5650ca65a000     bash
+17:29:44 215642   5650ca735000     0        r--- 5650ca735000     39000    109000          5650ca735000     bash
+17:29:44 215642   5650ca76ec10     0        rw-- 5650ca76e000     d000     141000          5650ca76e000     bash
+
+$ cat /proc/$$/maps
+5650ca62c000-5650ca65a000 r--p 00000000 fd:03 201680556     /usr/bin/bash
+5650ca65a000-5650ca735000 r-xp 0002e000 fd:03 201680556     /usr/bin/bash
+5650ca735000-5650ca76e000 r--p 00109000 fd:03 201680556     /usr/bin/bash
+5650ca76e000-5650ca772000 r--p 00141000 fd:03 201680556     /usr/bin/bash
+5650ca772000-5650ca77b000 rw-p 00145000 fd:03 201680556     /usr/bin/bash
+```
+
 
 ## Kernel UProbes
 
