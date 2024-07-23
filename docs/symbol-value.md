@@ -408,7 +408,7 @@ vaddr    = 0x404038
 As we could see, the PIE ELF process, ELF `offset` in ELF file equal to `vaddr`.
 
 
-### PIE
+### PIE (hello-pie)
 
 The `PT_LOAD` in ELF file:
 
@@ -486,6 +486,8 @@ $ printf '0x%lx\n' $((0x000056399fbf5000 + 0x00000000000011e8 - $((1 << 12))))
 0x56399fbf51e8
 ```
 
+It's accurate.
+
 And the variable `global_i` addresses be like:
 
 ```bash
@@ -495,6 +497,59 @@ off      = 0x000000003000
 vm_pgoff =              3
 vaddr    = 0x56399fbf8040
 ```
+
+I guess:
+
+```
+vaddr = vm_start + offset - (off + (p_vaddr - p_offset))
+```
+
+
+### PIE (bash)
+
+In ELF file:
+
+```
+$ readelf -l /bin/bash
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000
+                 0x0000000000021428 0x0000000000021428  R      0x1000
+  LOAD           0x0000000000022000 0x0000000000022000 0x0000000000022000
+                 0x00000000000ee301 0x00000000000ee301  R E    0x1000
+  LOAD           0x0000000000111000 0x0000000000111000 0x0000000000111000
+                 0x00000000000346a4 0x00000000000346a4  R      0x1000
+  LOAD           0x0000000000145a30 0x0000000000146a30 0x0000000000146a30
+                 0x000000000000bda0 0x0000000000016da8  RW     0x1000
+
+$ readelf --syms /bin/bash | grep -e readline -e ps1_prompt -w
+   937: 00000000000d1c70   201 FUNC    GLOBAL DEFAULT   17 readline
+  1020: 0000000000153148     8 OBJECT  GLOBAL DEFAULT   28 ps1_prompt
+```
+
+VMAs:
+
+```
+$ cat /proc/$$/maps
+5635990bd000-5635990df000 r--p 00000000 103:03 4212 /usr/bin/bash
+5635990df000-5635991ce000 r-xp 00022000 103:03 4212 /usr/bin/bash
+5635991ce000-563599203000 r--p 00111000 103:03 4212 /usr/bin/bash
+563599203000-563599207000 r--p 00145000 103:03 4212 /usr/bin/bash
+563599207000-563599210000 rw-p 00149000 103:03 4212 /usr/bin/bash
+```
+
+Address in memory:
+
+```
+$ gdb -q -p $$
+(gdb) p readline
+$1 = {<text variable, no debug info>} 0x56359918ec70 <readline>
+(gdb) p &ps1_prompt
+$2 = (<data variable, no debug info> *) 0x563599210148 <ps1_prompt>
+```
+
+TODO
 
 
 ## Share library
