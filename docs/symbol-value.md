@@ -229,7 +229,7 @@ We could get `readline()` addresses:
 
 ```
 vm_start = 0x56212af13000
-offset   = 0x0000000d1c70
+offset   = 0x0000000d1c70 (st_value)
 off      = 0x000000022000
 pagesize = 4096
 vm_pgoff = 34
@@ -280,7 +280,7 @@ List all `global_i` addresses:
 
 ```
 vm_start = 0x404000
-offset   = 0x404038
+offset   = 0x404038 (st_value)
 off      = 0x003000
 vm_pgoff =        3
 vaddr    = 0x404038
@@ -318,7 +318,7 @@ List all `global_i` addresses:
 
 ```
 vm_start = 0x559d2c798000
-offset   = 0x000000004040
+offset   = 0x000000004040 (st_value)
 pgoff    = 0x000000003000
 vm_pgoff =              3
 vaddr    = 0x559d2c798040
@@ -393,7 +393,7 @@ For example, the function `print_hello` addresses be like:
 
 ```bash
 vm_start = 0x400000
-offset   = 0x4011cb
+offset   = 0x4011cb (st_value)
 vaddr    = 0x4011cb
 ```
 
@@ -401,7 +401,7 @@ And the variable `global_i` addresses be like:
 
 ```bash
 vm_start = 0x400000
-offset   = 0x404038
+offset   = 0x404038 (st_value)
 vaddr    = 0x404038
 ```
 
@@ -473,7 +473,7 @@ For example, the function `print_hello` addresses be like:
 
 ```bash
 vm_start = 0x56399fbf5000
-offset   = 0x0000000011e8
+offset   = 0x0000000011e8 (st_value)
 off      = 0x000000001000
 vm_pgoff =              1
 vaddr    = 0x56399fbf51e8
@@ -490,7 +490,7 @@ And the variable `global_i` addresses be like:
 
 ```bash
 vm_start = 0x56399fbf8000
-offset   = 0x000000004040
+offset   = 0x000000004040 (st_value)
 off      = 0x000000003000
 vm_pgoff =              3
 vaddr    = 0x56399fbf8040
