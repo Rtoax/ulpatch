@@ -44,6 +44,7 @@ $ sudo apt install -y mkdocs
 ### Compile
 
 ```bash
+$ git clone https://github.com/rtoax/ulpatch
 $ cd ulpatch
 $ mkdir build
 $ cd build
@@ -126,18 +127,18 @@ Download rpm packages from [Release page](https://github.com/Rtoax/ulpatch/relea
 Then, use `rpm` or `dnf` command to install the rpm packages.
 
 ```
-$ sudo dnf install ulpatch-VERSION.rpm
+$ sudo dnf install ulpatch-*.rpm
 ```
 
 Or
 
 ```
-$ sudo rpm -ivh ulpatch-VERSION.rpm
+$ sudo rpm -ivh ulpatch-*.rpm
 ```
 
 ### Build RPM Packages Your Own
 
-> Only support rpm management software system, such as Fedora, Almalinux, etc.
+> Only support rpm management software system, such as Fedora, RHEL and its derivatives.
 
 You need to install the rpm-build depends package.
 
