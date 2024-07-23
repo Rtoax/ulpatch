@@ -301,19 +301,28 @@ static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
 }
 
 /**
- * FIXME: Important: some VMA match failed
+ * FIXME: Important: some VMA match failed, we need to check why rw vma splice
+ * to two VMAs.
  */
 static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 			  unsigned long load_addr)
 {
-	unsigned long start = load_addr + phdr->p_vaddr;
-	unsigned long end = start + phdr->p_filesz;
+	int ret = 0;
+	unsigned long addr, size, off;
 
-	start = PAGE_DOWN(start);
-	end = PAGE_UP(end);
+	addr = load_addr + phdr->p_vaddr;
+	size = phdr->p_filesz + ELF_PAGEOFFSET(phdr->p_vaddr);
+	off = phdr->p_offset - ELF_PAGEOFFSET(phdr->p_vaddr);
 
-	return (start == vma->vm_start) && (end == vma->vm_end) &&
+	addr = ELF_PAGESTART(addr);
+	size = ELF_PAGEALIGN(size);
+	/* also check off? */
+	(void)off;
+
+	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
+
+	return ret;
 }
 
 int alloc_ulp(struct vm_area_struct *vma)
