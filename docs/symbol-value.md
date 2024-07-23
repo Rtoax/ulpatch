@@ -4,6 +4,21 @@
 - PIE: Position-Independent-Executable
 
 
+## Kernel Load ELF
+
+See kernel `load_elf_binary()` function, it will load all `PT_LOAD` section to memory, the location is what we care about.
+
+```
+load_bias = 0
+vaddr = elf_ppnt->p_vaddr
+if (ET_EXEC)
+elif (ET_DYN)
+	load_bias = Non-Zero Value (random)
+
+elf_map(file, load_bias + vaddr, ...)
+```
+
+
 ## Kernel UProbes
 
 ### Function Address
