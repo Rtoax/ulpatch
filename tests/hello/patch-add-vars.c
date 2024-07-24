@@ -5,7 +5,7 @@
 int local_i = 123;
 long int local_l = 123;
 char *local_s = "Dear";
-#if !defined(NOSTATIC)
+#if !defined(NO_STATIC_VAR)
 static long static_l = 1024;
 static char *static_s = "you";
 #endif
@@ -16,12 +16,12 @@ void ulp_add_var(unsigned long ul)
 
 	local_i++;
 	local_l++;
-#if !defined(NOSTATIC)
+#if !defined(NO_STATIC_VAR)
 	static_l++;
 	static_l += 2;
 #endif
 
-#if !defined(NOLIBC)
+#if !defined(NO_LIBC)
 	printf("Hello World. Patched L: %d, %ld, %s\n", local_i, local_l, local_s);
 	printf("Hello World. Patched F: %ld %d\n", ul, a);
 
@@ -31,7 +31,7 @@ void ulp_add_var(unsigned long ul)
 	/* FIXME: This will segfault. Why? */
 	//printf("\n");
 
-# if !defined(NOSTATIC)
+# if !defined(NO_STATIC_VAR)
 	printf("Hello World. Patched S: %ld %s\n", static_l, static_s);
 # endif
 #endif

@@ -42,13 +42,13 @@ ifdef ULP_PIC
   CFLAGS_ULP += -fno-PIE
   CFLAGS_ULP += -fno-common
 endif
-ifdef NOLIBC
-  CFLAGS += -DNOLIBC=1
-  CFLAGS_ULP += -DNOLIBC=1
+ifdef NO_LIBC
+  CFLAGS += -DNO_LIBC=1
+  CFLAGS_ULP += -DNO_LIBC=1
 endif
-ifdef NOSTATIC
-  CFLAGS += -DNOSTATIC=1
-  CFLAGS_ULP += -DNOSTATIC=1
+ifdef NO_STATIC_VAR
+  CFLAGS += -DNO_STATIC_VAR=1
+  CFLAGS_ULP += -DNO_STATIC_VAR=1
 endif
 ifeq ($(shell uname -m),aarch64)
   # TODO
