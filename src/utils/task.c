@@ -64,7 +64,7 @@ int open_pid_mem_rw(pid_t pid)
 	return __open_pid_mem(pid, O_RDWR);
 }
 
-struct vm_area_struct *alloc_vma(struct task_struct *task)
+static struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
 	struct vm_area_struct *vma = malloc(sizeof(struct vm_area_struct));
 	assert(vma && "alloc vma failed.");
@@ -101,41 +101,33 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	return 0;
 }
 
-int insert_vma(struct task_struct *task, struct vm_area_struct *vma,
-	       struct vm_area_struct *prev)
+static void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
+		       struct vm_area_struct *prev)
 {
 	if (prev && strcmp(prev->name_, vma->name_) == 0) {
 		struct vm_area_struct *leader = prev->leader;
-
 		vma->leader = leader;
-
 		list_add(&vma->siblings, &leader->siblings);
 	}
 
 	list_add(&vma->node_list, &task->vma_list);
 	rb_insert_node(&task->vmas_rb, &vma->node_rb,
 		__vma_rb_cmp, (unsigned long)vma);
-	return 0;
 }
 
-int unlink_vma(struct task_struct *task, struct vm_area_struct *vma)
+static void unlink_vma(struct task_struct *task, struct vm_area_struct *vma)
 {
 	list_del(&vma->node_list);
 	rb_erase(&vma->node_rb, &task->vmas_rb);
-
 	list_del(&vma->siblings);
-
-	return 0;
 }
 
-int free_vma(struct vm_area_struct *vma)
+static void free_vma(struct vm_area_struct *vma)
 {
 	if (!vma)
-		return -1;
-
+		return;
 	free_ulp(vma);
 	free(vma);
-	return 0;
 }
 
 static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
@@ -229,7 +221,7 @@ static int __prot2flags(unsigned int prot)
 
 int free_task_vmas(struct task_struct *task);
 
-enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
+static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 {
 	enum vma_type type = VMA_NONE;
 	char s_pid[64];

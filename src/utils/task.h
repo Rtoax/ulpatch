@@ -332,8 +332,6 @@ int read_task_vmas(struct task_struct *task, bool update_ulp);
 int update_task_vmas_ulp(struct task_struct *task);
 int free_task_vmas(struct task_struct *task);
 
-enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
-
 int dump_task(const struct task_struct *t, bool detail);
 
 void dump_task_vmas(struct task_struct *task, bool detail);
