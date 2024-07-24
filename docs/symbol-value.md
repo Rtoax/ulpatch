@@ -643,6 +643,29 @@ _dl_start() {
 }
 ```
 
+Let's see the PIE program.
+
+```
+555555554000-555555555000 r--p 00000000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555555000-555555556000 r-xp 00001000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555556000-555555557000 r--p 00002000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555557000-555555559000 rw-p 00002000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+```
+
+Tracing `mprotect(2)`:
+
+```
+mprotect(0x555555557000, 0x4096, PROT_READ);
+```
+
+```
+555555554000-555555555000 r--p 00000000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555555000-555555556000 r-xp 00001000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555556000-555555557000 r--p 00002000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555557000-555555558000 r--p 00002000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+555555558000-555555559000 rw-p 00003000 08:10 3115207 /ulpatch/tests/hello/hello-pie
+```
+
 
 ## Share library
 
