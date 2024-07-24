@@ -549,7 +549,23 @@ $1 = {<text variable, no debug info>} 0x56359918ec70 <readline>
 $2 = (<data variable, no debug info> *) 0x563599210148 <ps1_prompt>
 ```
 
-TODO
+And the variable `ps1_prompt` addresses be like:
+
+```bash
+vm_start = 0x563599207000
+offset   = 0x000000153148 (st_value)
+off      = 0x000000149000
+vm_pgoff = 0x000000000149
+vaddr    = 0x563599210148
+```
+
+```
+vaddr = vm_start + offset - (off + (p_vaddr - p_offset))
+$ printf '0x%lx\n' $(( 0x563599207000 + 0x000000153148 - (0x000000149000 + (0x0000000000146a30 - 0x0000000000145a30)) ))
+0x563599210148
+```
+
+We could see the result `vaddr=0x563599210148` is correct.
 
 
 ## Share library
