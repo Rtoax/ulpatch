@@ -666,6 +666,10 @@ mprotect(0x555555557000, 0x4096, PROT_READ);
 555555558000-555555559000 rw-p 00003000 08:10 3115207 /ulpatch/tests/hello/hello-pie
 ```
 
+We should know why linker modify `addr=0x555555557000,len=0x4096` memory to readonly.
+
+TODO
+
 
 ## Share library
 
