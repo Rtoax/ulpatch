@@ -568,6 +568,82 @@ $ printf '0x%lx\n' $(( 0x563599207000 + 0x000000153148 - (0x000000149000 + (0x00
 We could see the result `vaddr=0x563599210148` is correct.
 
 
+## Process's VMAs
+
+In `/proc/PID/maps`, we could see the process's VMAs, kernel will load `PT_LOAD` into memory, and `linker`(for example `/lib64/ld-linux-x86-64.so.2` on `x86_64` fedora40) will seperate some vma. for example:
+
+non-PIE hello's `PT_LOAD`
+
+```
+Program Headers:
+  Type           Offset             VirtAddr           PhysAddr
+                 FileSiz            MemSiz              Flags  Align
+  LOAD           0x0000000000000000 0x0000000000400000 0x0000000000400000
+                 0x0000000000000650 0x0000000000000650  R      0x1000
+  LOAD           0x0000000000001000 0x0000000000401000 0x0000000000401000
+                 0x0000000000000379 0x0000000000000379  R E    0x1000
+  LOAD           0x0000000000002000 0x0000000000402000 0x0000000000402000
+                 0x00000000000001d4 0x00000000000001d4  R      0x1000
+  LOAD           0x0000000000002df8 0x0000000000403df8 0x0000000000403df8
+                 0x0000000000000248 0x0000000000000260  RW     0x1000
+```
+
+we just start the `hello` with gdb, and `break` on linker's `_dl_start()`:
+
+```
+$ gdb ./hello
+(gdb) b _dl_start
+(gdb) r
+Breakpoint 1, _dl_start (arg=0x7fffffffd830) at rtld.c:517
+517	{
+```
+
+Then, check VMAs:
+
+```
+$ cat /proc/$(pidof hello)/maps
+00400000-00401000 r--p 00000000 08:10 3115204 /ulpatch/tests/hello/hello
+00401000-00402000 r-xp 00001000 08:10 3115204 /ulpatch/tests/hello/hello
+00402000-00403000 r--p 00002000 08:10 3115204 /ulpatch/tests/hello/hello
+00403000-00405000 rw-p 00002000 08:10 3115204 /ulpatch/tests/hello/hello
+```
+
+Then, `continue` run process:
+
+```
+(gdb) continue
+```
+
+Check VMAs again:
+
+```
+$ cat /proc/$(pidof hello)/maps
+00400000-00401000 r--p 00000000 08:10 3115204 /ulpatch/tests/hello/hello
+00401000-00402000 r-xp 00001000 08:10 3115204 /ulpatch/tests/hello/hello
+00402000-00403000 r--p 00002000 08:10 3115204 /ulpatch/tests/hello/hello
+00403000-00404000 r--p 00002000 08:10 3115204 /ulpatch/tests/hello/hello
+00404000-00405000 rw-p 00003000 08:10 3115204 /ulpatch/tests/hello/hello
+```
+
+Why linker split vma `00403000-00405000 rw-p 00002000` to two different vmas `00403000-00404000 r--p 00002000` and `00404000-00405000 rw-p 00003000`? Let's see the linker's call stack.
+
+```
+_dl_start() {
+  _dl_start_final() {
+    _dl_sysdep_start() {
+      dl_main(dl_main_args.phdr, dl_main_args.phnum, ...) {
+        _dl_relocate_object() {
+          _dl_protect_relro() {
+            mprotect(2)
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+
 ## Share library
 
 TODO
