@@ -54,6 +54,10 @@ ifeq ($(shell uname -m),aarch64)
   # TODO
 endif
 
+ifdef STATIC
+  CFLAGS += -static
+endif
+
 LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ldflags)
 
 $(info CFLAGS_ULP = ${CFLAGS_ULP})
