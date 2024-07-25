@@ -115,7 +115,13 @@ struct vm_area_struct {
 
 	bool is_elf;
 	bool is_share_lib;
-	bool is_matched_phdr;
+	struct {
+		bool is_matched_phdr;
+		/**
+		 * Point to leader ELF VMA's vma::vma_elf->phdrs[i] if matched.
+		 */
+		GElf_Phdr phdr;
+	};
 
 	/* Only elf has it */
 	struct vma_elf *vma_elf;

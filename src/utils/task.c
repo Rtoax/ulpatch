@@ -314,6 +314,14 @@ static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 
+	ldebug("MatchPhdr: %lx-%lx vs %lx-%lx ret=%d\n", addr, addr + size,
+		vma->vm_start, vma->vm_end, ret);
+
+	if (ret) {
+		vma->is_matched_phdr = true;
+		memcpy(&vma->phdr, phdr, sizeof(vma->phdr));
+	}
+
 	return ret;
 }
 
@@ -626,17 +634,11 @@ share_lib:
 		case PT_LOAD:
 		case PT_GNU_RELRO:
 			/* leader */
-			if (match_vma_phdr(vma, phdr, vma->vma_elf->load_addr)) {
-				vma->is_matched_phdr = true;
-			}
-
+			match_vma_phdr(vma, phdr, vma->vma_elf->load_addr);
 			/* siblings */
 			list_for_each_entry_safe(sibling, tmpvma,
-				&vma->siblings, siblings) {
-
-				if (match_vma_phdr(sibling, phdr, vma->vma_elf->load_addr)) {
-					sibling->is_matched_phdr = true;
-				}
+						 &vma->siblings, siblings) {
+				match_vma_phdr(sibling, phdr, vma->vma_elf->load_addr);
 			}
 
 			break;
