@@ -625,7 +625,7 @@ $ cat /proc/$(pidof hello)/maps
 00404000-00405000 rw-p 00003000 08:10 3115204 /ulpatch/tests/hello/hello
 ```
 
-Why linker split vma `00403000-00405000 rw-p 00002000` to two different vmas `00403000-00404000 r--p 00002000` and `00404000-00405000 rw-p 00003000`? Let's see the linker's call stack.
+Why linker split vma `00403000-00405000 rw-p 00002000` to two different vmas `00403000-00404000 r--p 00002000` and `00404000-00405000 rw-p 00003000`? Let's see the linker's call stack in [glibc](https://sourceware.org/git/glibc) source code(my version `glibc-2.40.9000-13-g22958014ab`).
 
 ```
 _dl_start() {
@@ -634,7 +634,11 @@ _dl_start() {
       dl_main(dl_main_args.phdr, dl_main_args.phnum, ...) {
         _dl_relocate_object() {
           _dl_protect_relro() {
-            mprotect(2)
+            start = PAGE_DOWN(load_bias + p_vaddr);
+            end = PAGE_DOWN(load_bias + p_vaddr + p_memsz);
+            if (start != end) {
+              mprotect(start, end - start, PROT_READ);
+            }
           }
         }
       }
