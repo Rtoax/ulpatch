@@ -104,7 +104,7 @@ int print_ehdr(FILE *fp, const GElf_Ehdr *ehdr);
 int handle_phdrs(struct elf_file *elf);
 int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
 const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
-const char *phdr_type_str_unsafe(GElf_Phdr *pphdr);
+const char *phdr_type_str(GElf_Phdr *pphdr);
 
 /* ELF Sections api */
 int handle_sections(struct elf_file *elf);

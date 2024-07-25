@@ -11,12 +11,32 @@
 #include <utils/log.h>
 
 
-const char *phdr_type_str_unsafe(GElf_Phdr *pphdr)
+const char *phdr_type_str(GElf_Phdr *pphdr)
 {
 	switch (pphdr->p_type) {
-	case PT_INTERP:	return "INTERP";
+	case PT_NULL: return "NULL";
 	case PT_LOAD:	return "LOAD";
-	/* TODO: more */
+	case PT_DYNAMIC: return "DYNAMIC";
+	case PT_INTERP:	return "INTERP";
+	case PT_NOTE: return "NOTE";
+	case PT_SHLIB: return "SHLIB";
+	case PT_PHDR: return "PHDR";
+	case PT_TLS: return "TLS";
+	case PT_NUM: return "NUM";
+	case PT_LOOS: return "LOOS";
+	case PT_GNU_EH_FRAME: return "GNU_EH_FRAME";
+	case PT_GNU_STACK: return "GNU_STACK";
+	case PT_GNU_RELRO: return "GNU_RELRO";
+	case PT_GNU_PROPERTY: return "GNU_PROPERTY";
+	case PT_GNU_SFRAME: return "GNU_SFRAME";
+	/* same as PT_SUNWBSS */
+	case PT_LOSUNW: return "LOSUNW";
+	case PT_SUNWSTACK: return "SUNWSTACK";
+	/* same ad PT_HISUNW */
+	case PT_HIOS: return "HIOS";
+	case PT_LOPROC: return "LOPROC";
+	case PT_HIPROC: return "HIPROC";
+	default: return "UNKNOWN";
 	}
 	return "Unknown, see /usr/include/elf.h";
 }
@@ -40,7 +60,7 @@ int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first)
 			"", "FileSize", "MemSize", "Flags", "Align");
 	}
 	fprintf(fp, "  %-8s %016lx %016lx %016lx\n",
-		phdr_type_str_unsafe(pphdr),
+		phdr_type_str(pphdr),
 		pphdr->p_offset,
 		pphdr->p_vaddr,
 		pphdr->p_paddr);
