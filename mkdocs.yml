@@ -12,6 +12,7 @@ nav:
     - Code Style: code-style.md
     - Developer: developers.md
     - Log: LOG.md
+    - ULPatch: ulpatch.md
     - Contributing: CONTRIBUTING.md
   - Knowledge:
     - Relocations: relocations.md
@@ -123,6 +124,7 @@ plugins:
             Code Style: 代码风格
             Developer: 开发者
             Log: 日志
+            ULPatch: 用户态热补丁
             Contributing: 贡献
             Knowledge: 相关知识
             Relocations: 重定向
