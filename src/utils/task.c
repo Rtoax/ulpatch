@@ -495,7 +495,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		break;
 	}
 
-	/* is ELF or already peek */
+	/* Just skip already peeked ELF */
 	if (vma->vma_elf != NULL || vma->is_elf)
 		return 0;
 
@@ -511,14 +511,16 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 
 	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
 
-	/* Is not ELF? */
+	/**
+	 * Read the ELF header from target task memory.
+	 */
 	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret < sizeof(ehdr)) {
 		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
 
-	/* If it's not ELF, return success */
+	/* If it's not ELF, return success, skip the non-ELF VMAs */
 	if (!ehdr_ok(&ehdr))
 		return 0;
 
@@ -528,7 +530,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		task->vma_self_elf = vma;
 		/**
 		 * Executable file only could be ET_EXEC or ET_DYN, if ET_DYN,
-		 * the ELF was compiled with -fPIE.
+		 * the ELF was compiled with -fPIE, and it's PIE executable
+		 * ELF file.
 		 *
 		 * You could see binutils [0] binutils/readelf.c::is_pie()
 		 * function implement.
@@ -538,6 +541,9 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		if (ehdr.e_type == ET_DYN) {
 			ldebug("%s is PIE.\n", vma->name_);
 			task->is_pie = true;
+		}  else {
+			ldebug("%s is not PIE.\n", vma->name_);
+			task->is_pie = false;
 		}
 	}
 
@@ -546,7 +552,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	if (!vma->vma_elf)
 		return -ENOMEM;
 
-	memset(vma->vma_elf, 0x0, sizeof(struct vma_elf));
+	memset(vma->vma_elf, 0x00, sizeof(struct vma_elf));
 
 	/* Copy ehdr from load var */
 	memcpy(&vma->vma_elf->ehdr, &ehdr, sizeof(ehdr));
@@ -560,7 +566,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 */
 	if (phsz == 0) {
 		lwarning("%s: no phdr, e_phoff %lx, skip it.\n",
-			vma->name_, vma->vma_elf->ehdr.e_phoff);
+			 vma->name_, vma->vma_elf->ehdr.e_phoff);
 		free(vma->vma_elf);
 		return 0;
 	}
@@ -571,6 +577,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		return -ENOMEM;
 	}
 
+	/* Read all program headers from target task memory space */
 	ldebug("peek phdr from target addr %lx, len %d\n", phaddr, phsz);
 	if (memcpy_from_task(task, vma->vma_elf->phdrs, phaddr, phsz) < phsz) {
 		free(vma->vma_elf->phdrs);
@@ -585,10 +592,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 * If type of the ELF is not ET_DYN, this is definitely not a shared
 	 * library.
 	 *
-	 * Actually, if the ELF executable file need share libraries(not compile
-	 * with '-static'), it's ET_DYN, not ET_EXEC. And, if the executable
-	 * file is compiled with '-fPIE'(Position-Independent Executable file),
-	 * it's ET_DYN too.
+	 * Actually, if the executable file is compiled with '-fPIE'(Position-
+	 * Independent Executable file), it's ET_DYN too.
 	 */
 	if (vma->vma_elf->ehdr.e_type != ET_DYN) {
 		is_share_lib = false;
