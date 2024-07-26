@@ -13,3 +13,9 @@ In my opinion, if you want to develop and participate in the development of this
 - How the Linux kernel runs an ELF executable;
 - How the GNU linker works;
 
+
+### Precautions
+
+You can view unfinished development tasks in [TODO-List](./TODO.md), and you neeto obey the [coding style](./code-style.md) rules.
+
+

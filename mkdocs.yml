@@ -20,6 +20,7 @@ nav:
     - Symbol Value: symbol-value.md
     - Data Structure: data-structure.md
   - Releases: RELEASE.md
+  - TODO: TODO.md
 
 theme:
   name: material
@@ -133,6 +134,7 @@ plugins:
             Symbol Value: 符号地址
             Data Structure: 数据结构
             Releases: 发布
+            TODO: 未完待续
 
 extra:
   generator: false
