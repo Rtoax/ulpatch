@@ -634,8 +634,9 @@ _dl_start() {
       dl_main(dl_main_args.phdr, dl_main_args.phnum, ...) {
         _dl_relocate_object() {
           _dl_protect_relro() {
-            start = PAGE_DOWN(load_bias + p_vaddr);
-            end = PAGE_DOWN(load_bias + p_vaddr + p_memsz);
+            phdr = PT_GNU_RELRO
+            start = PAGE_DOWN(load_bias + phdr->p_vaddr);
+            end = PAGE_DOWN(load_bias + phdr->p_vaddr + phdr->p_memsz);
             if (start != end) {
               mprotect(start, end - start, PROT_READ);
             }
@@ -672,7 +673,7 @@ mprotect(0x555555557000, 0x4096, PROT_READ);
 
 We should know why linker modify `addr=0x555555557000,len=0x4096` memory to readonly.
 
-TODO
+As we can see in `readelf -l /bin/bash` output, the `.data.rel.ro` in the last `PT_LOAD` program header and `PT_GNU_RELRO` program header, kernel will load all `PT_LOAD` into memory, then, GNU Linker will set the `.data.rel.ro` to readonly permission by `mprotect(2)` syscall, see the linker pseudocode show above. Thus, the vma `555555557000-555555559000 rw-p 00002000` will splited to two different vma `555555557000-555555558000 r--p 00002000` and `555555558000-555555559000 rw-p 00003000`.
 
 
 ## Share library

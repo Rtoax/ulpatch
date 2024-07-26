@@ -293,11 +293,54 @@ static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
 }
 
 /**
- * FIXME: Important: some VMA match failed, we need to check why rw vma splice
- * to two VMAs.
+ * data vma will splited by linker(GNU linker ld) according to PT_GNU_RELRO,
+ * see ".data.rel.ro" section, which in the last PT_LOAD and has single PHDR.
+ * at the same time, it's in PT_GNU_RELRO, which will be set to readonly by
+ * GNU Linker by mprotect(2) syscall.
+ */
+static int _relro_dl_mprotect(struct vm_area_struct *vma, GElf_Phdr *phdr,
+			      unsigned long load_addr, GElf_Phdr *relro_phdr)
+{
+	int ret = 0;
+	unsigned long start, end;
+
+	struct range {
+		unsigned long start, end;
+	} range[2];
+
+	if (!relro_phdr)
+		return 0;
+
+	start = PAGE_DOWN(load_addr + relro_phdr->p_vaddr);
+	end = PAGE_DOWN(load_addr + relro_phdr->p_vaddr + relro_phdr->p_memsz);
+
+	/**
+	 * This is PT_GNU_RELRO VMA
+	 */
+	range[0].start = start;
+	range[0].end = end;
+	/**
+	 * This is the last PT_LOAD, who splited by GNU linker
+	 * _dl_protect_relro() function. Current vma will match to this range.
+	 */
+	range[1].start = end;
+	range[1].end = vma->vm_end;
+
+#if 0
+	ret |= (range[0].start == vma->vm_start) &&
+		(range[0].end == vma->vm_end);
+#endif
+	ret |= (range[1].start == vma->vm_start) &&
+		(range[1].end == vma->vm_end);
+
+	return ret;
+}
+
+/**
+ * Match VMA with PT_LOAD
  */
 static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
-			  unsigned long load_addr)
+			  unsigned long load_addr, GElf_Phdr *relro_phdr)
 {
 	int ret = 0;
 	unsigned long addr, size, off;
@@ -314,8 +357,17 @@ static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 
-	ldebug("MatchPhdr: %lx-%lx vs %lx-%lx ret=%d\n", addr, addr + size,
-		vma->vm_start, vma->vm_end, ret);
+	ldebug("MatchPhdr: %lx-%lx vs %lx-%lx "PROT_FMT" ret=%d\n",
+		addr, addr + size, vma->vm_start, vma->vm_end,
+		PROT_ARGS(vma->prot), ret);
+
+	/**
+	 * If has PT_GNU_RELRO(".data.rel.ro" in it), the GNU linker will
+	 * set PT_GNU_RELRO to readonly in _dl_protect_relro() function.
+	 * At the same time, ".data.rel.ro" in the last PT_LOAD too.
+	 */
+	if (!ret && phdr->p_type == PT_LOAD && relro_phdr)
+		ret = _relro_dl_mprotect(vma, phdr, load_addr, relro_phdr);
 
 	if (ret) {
 		vma->is_matched_phdr = true;
@@ -428,6 +480,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	int i;
 	bool is_share_lib = true;
 	unsigned long lowest_vaddr = ULONG_MAX;
+	GElf_Phdr *gnu_relro_phdr = NULL;
 
 	/* Check VMA type, and skip it */
 	switch (vma->type) {
@@ -607,6 +660,7 @@ share_lib:
 
 			FALLTHROUGH;
 		case PT_GNU_RELRO:
+			gnu_relro_phdr = phdr;
 			break;
 		}
 	}
@@ -634,13 +688,17 @@ share_lib:
 		case PT_LOAD:
 		case PT_GNU_RELRO:
 			/* leader */
-			match_vma_phdr(vma, phdr, vma->vma_elf->load_addr);
+			match_vma_phdr(vma, phdr, vma->vma_elf->load_addr,
+				       gnu_relro_phdr);
 			/* siblings */
 			list_for_each_entry_safe(sibling, tmpvma,
 						 &vma->siblings, siblings) {
-				match_vma_phdr(sibling, phdr, vma->vma_elf->load_addr);
+				match_vma_phdr(sibling, phdr,
+					       vma->vma_elf->load_addr,
+					       gnu_relro_phdr);
 			}
-
+			break;
+		default:
 			break;
 		}
 	}
@@ -1103,6 +1161,8 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 				first = false;
 			}
 		}
+		if (vma->is_matched_phdr)
+			print_phdr(fp, &vma->phdr, true);
 		/* Add more information here */
 		if (fp == stdout || fp == stderr)
 			fprintf(fp, "\033[0m");
