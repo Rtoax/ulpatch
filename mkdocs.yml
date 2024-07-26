@@ -13,6 +13,7 @@ nav:
     - Developer: developers.md
     - Log: LOG.md
     - ULPatch: ulpatch.md
+    - ULTask: ultask.md
     - Contributing: CONTRIBUTING.md
   - Knowledge:
     - Relocations: relocations.md
@@ -125,6 +126,7 @@ plugins:
             Developer: 开发者
             Log: 日志
             ULPatch: 用户态热补丁
+            ULTask: 进程热修改器
             Contributing: 贡献
             Knowledge: 相关知识
             Relocations: 重定向

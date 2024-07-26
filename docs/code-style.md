@@ -19,11 +19,11 @@ set cc=80
 
 ## Code File Format
 
-ULPatch use **Unix format** not **DOS or Mac forma**.
+ULPatch use **Unix format** not **DOS or Mac format**.
 
 As you can see from manual of `dos2unix(1)`
 
 > In DOS/Windows text files a line break, also known as newline, is a combination of two characters: a Carriage Return (CR) followed by a Line Feed (LF). In Unix text files a line break is a single character: the Line Feed (LF). In Mac text files, prior to Mac OS X, a line break was single Carriage Return (CR) character. Nowadays Mac OS uses Unix style (LF) line breaks.
 
-You may often see the special character `^M` under Unix if DOS or Mac forma.
+You may often see the special character `^M` under Unix if DOS or Mac format.
 
