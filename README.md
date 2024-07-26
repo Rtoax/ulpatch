@@ -42,7 +42,7 @@ See [docs/INSTALL.md](docs/INSTALL.md) or [website](https://rtoax.github.io/ulpa
 
 # Theory
 
-See [docs/theory.md](docs/theory.md) or [website](https://rtoax.github.io/ulpatch/theory/) for theory.
+See [docs/THEORY.md](docs/THEORY.md) or [website](https://rtoax.github.io/ulpatch/theory/) for theory.
 
 
 # Releases

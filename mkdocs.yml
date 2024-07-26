@@ -7,7 +7,7 @@ copyright: Copyright &copy; 2021 - 2024 Rong Tao
 nav:
   - Home: index.md
   - Installation: INSTALL.md
-  - Theory: theory.md
+  - Theory: THEORY.md
   - Tutorials:
     - Code Style: code-style.md
     - Developer: developers.md

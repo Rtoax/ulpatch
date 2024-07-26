@@ -1,7 +1,7 @@
 
 ## ULPatch Introduction
 
-You could see the [theory](./theory.md) first, and **man ulpatch** is also helpful.
+You could see the [theory](./THEORY.md) first, and **man ulpatch** is also helpful.
 
 
 ## Make a ULPatch
