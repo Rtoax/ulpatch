@@ -9,7 +9,7 @@ In my opinion, if you want to develop and participate in the development of this
 
 - Linux Basics;
 - ELF file format;
-- ELF redirects;
+- ELF relocation;
 - How the Linux kernel runs an ELF executable;
 - How the GNU linker works;
 
