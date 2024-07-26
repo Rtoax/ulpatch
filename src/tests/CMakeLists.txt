@@ -4,8 +4,9 @@
 include_directories(..)
 
 find_library(ELF elf /usr/lib64)
+find_library(PTHREAD pthread /usr/lib64)
 
-link_libraries(${ELF}
+link_libraries(${ELF} ${PTHREAD}
 	ulpatch_arch
 	ulpatch_elf
 	ulpatch_patch

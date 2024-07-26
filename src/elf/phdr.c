@@ -27,8 +27,12 @@ const char *phdr_type_str(GElf_Phdr *pphdr)
 	case PT_GNU_EH_FRAME: return "GNU_EH_FRAME";
 	case PT_GNU_STACK: return "GNU_STACK";
 	case PT_GNU_RELRO: return "GNU_RELRO";
+#ifdef PT_GNU_PROPERTY
 	case PT_GNU_PROPERTY: return "GNU_PROPERTY";
+#endif
+#ifdef PT_GNU_SFRAME
 	case PT_GNU_SFRAME: return "GNU_SFRAME";
+#endif
 	/* same as PT_SUNWBSS */
 	case PT_LOSUNW: return "LOSUNW";
 	case PT_SUNWSTACK: return "SUNWSTACK";
