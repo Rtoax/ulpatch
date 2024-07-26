@@ -58,17 +58,17 @@ const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr)
 int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first)
 {
 	if (first) {
-		fprintf(fp, "  %-8s %-16s %-16s %-16s\n",
+		fprintf(fp, "  %-16s %-18s %-18s %-16s\n",
 			"Type", "Offset", "VirtAddr", "PhysAddr");
-		fprintf(fp, "  %-8s %-16s %-16s %-8s %-8s\n",
+		fprintf(fp, "  %-16s %-18s %-18s %-8s %-8s\n",
 			"", "FileSize", "MemSize", "Flags", "Align");
 	}
-	fprintf(fp, "  %-8s %016lx %016lx %016lx\n",
+	fprintf(fp, "  %-16s %#018lx %#018lx %016lx\n",
 		phdr_type_str(pphdr),
 		pphdr->p_offset,
 		pphdr->p_vaddr,
 		pphdr->p_paddr);
-	fprintf(fp, "  %-8s %016lx %016lx %-8s %08lx\n",
+	fprintf(fp, "  %-16s %#018lx %#018lx %-8s %08lx\n",
 		"",
 		pphdr->p_filesz,
 		pphdr->p_memsz,
