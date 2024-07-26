@@ -40,9 +40,9 @@ ULPatch draws on several excellent open source projects, such as [cloudlinux/lib
 
 At the same time, the implementation of the kernel's `finit_module(2)` and `init_module(2)` system calls is also of great reference value. Even in the early stages of development, the relocation code was transplanted from these two system calls.
 
-How to resolve symbol addresses? For examples, the implementation of [uprobe in the linux kernel](https://docs.kernel.org/trace/uprobetracer.html). At the same time, the implementation of application-level software, such as the implementation of [BCC](https://github.com/iovisor/bcc) and [bpftrace](https://github.com/iovisor/bpftrace).
+**How to resolve symbol addresses?** For examples, the implementation of [uprobe in the linux kernel](https://docs.kernel.org/trace/uprobetracer.html). At the same time, the implementation of application-level software, such as the implementation of [BCC](https://github.com/iovisor/bcc) and [bpftrace](https://github.com/iovisor/bpftrace).
 
-GDB’s implementation of symbol parsing, [binutils-gdb](https://sourceware.org/git/binutils-gdb) is helpful.
+GDB's implementation of symbol parsing, [binutils-gdb](https://sourceware.org/git/binutils-gdb) is helpful.
 
 Judging from the current research on outstanding projects, the live patch function relies on modifying the assembly instructions at the function entrance to make it jump to a new function, thereby realizing the live patch function.
 
@@ -51,9 +51,13 @@ I think I should detail the inspiration of ULPatch from these open source projec
 
 ## Author's Monologue
 
-I don't like to get involved in the License wars, so please forgive me if I misquote open source code. After all, this is not a commercial project.
+**I don't like to get involved in the License wars**, so please forgive me if I misquote open source code. After all, this is not a commercial project.
 
 My native language is Chinese, not English, so please excuse my poor English grammar.
+
+I drew all logo/svg shown in ULPatch using [drawio](https://github.com/jgraph/drawio-desktop/releases).
+
+I'm a Linux Newbie, little student.
 
 
 ## Links
