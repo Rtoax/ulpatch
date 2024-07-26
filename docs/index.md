@@ -48,7 +48,12 @@ Judging from the current research on outstanding projects, the live patch functi
 
 I think I should detail the inspiration of ULPatch from these open source projects in another document instead of a README file.
 
-> I don't like to get involved in the License wars, so please forgive me if I misquote open source code. After all, this is not a commercial project.
+
+## Author's Monologue
+
+I don't like to get involved in the License wars, so please forgive me if I misquote open source code. After all, this is not a commercial project.
+
+My native language is Chinese, not English, so please excuse my poor English grammar.
 
 
 ## Links
