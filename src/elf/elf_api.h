@@ -84,8 +84,11 @@ struct symbol {
 	/**
 	 * Maybe belongs to a VMA, and this vma is ELF format, which is the
 	 * leader of all other PT_LOAD vmas.
+	 *
+	 * If symbol from ELF file, vma will equal to NULL.
 	 */
 	struct vm_area_struct *vma;
+
 	/**
 	 * ROOT is one of the following:
 	 * struct elf_file.symbols
