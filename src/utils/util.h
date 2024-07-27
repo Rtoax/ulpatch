@@ -244,25 +244,6 @@ struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size);
 int fmunmap(struct mmap_struct *mem);
 
 
-/* Swap 'objdump' command to C code. */
-struct objdump_elf_file;
-struct objdump_symbol;
-
-struct objdump_elf_file* objdump_elf_load(const char *elf_file);
-int objdump_elf_close(struct objdump_elf_file *file);
-
-unsigned long
-objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym);
-
-
-struct objdump_symbol*
-objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
-		struct objdump_symbol *prev);
-unsigned long objdump_symbol_address(struct objdump_symbol *symbol);
-const char* objdump_symbol_name(struct objdump_symbol *symbol);
-
-int objdump_destroy(void);
-
 /* callback chain */
 struct callback_chain {
 	struct list_head head;

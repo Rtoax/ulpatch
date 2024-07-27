@@ -14,6 +14,7 @@ add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 add_library(ulpatch_elf STATIC
 	ehdr.c
 	note.c
+	objdump.c
 	open.c
 	phdr.c
 	relocs.c

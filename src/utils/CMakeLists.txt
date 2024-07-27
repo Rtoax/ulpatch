@@ -25,7 +25,6 @@ add_library(ulpatch_utils STATIC
 	init.c
 	list.c
 	log.c
-	objdump.c
 	rbtree.c
 	string.c
 	task.c
