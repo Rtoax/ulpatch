@@ -50,6 +50,9 @@ int handle_sections(struct elf_file *elf)
 			elf->symtab_data = elf_getdata(scn, NULL);
 			elf->symtab_shdr_idx = i;
 			break;
+		/**
+		 * Symbols import from dynamic library.
+		 */
 		case SHT_DYNSYM:
 			elf->dynsym_data = elf_getdata(scn, NULL);
 			elf->dynsym_shdr_idx = i;
