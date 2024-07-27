@@ -487,7 +487,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	case VMA_VVAR:
 	case VMA_STACK:
 	case VMA_VSYSCALL:
-		lwarning("not support %s\n", VMA_TYPE_NAME(vma->type));
+		lwarning("skip %s\n", VMA_TYPE_NAME(vma->type));
 		return 0;
 	case VMA_ULPATCH:
 		return vma_load_ulp(vma);
@@ -854,20 +854,22 @@ static int load_self_vma_symbols(struct vm_area_struct *vma)
 
 int vma_load_all_symbols(struct vm_area_struct *vma)
 {
-	if (!vma->is_elf || !vma->vma_elf)
-		return 0;
-
-	struct task_struct *task = vma->task;
-
 	int err = 0;
 	size_t i;
 	GElf_Dyn *dynamics = NULL;
-	GElf_Phdr *phdr;
+	GElf_Phdr *dynamic_phdr = NULL;
 	GElf_Sym *syms = NULL;
 	char *buffer = NULL;
+	struct task_struct *task;
 
 	unsigned long symtab_addr, strtab_addr;
 	unsigned long symtab_sz, strtab_sz;
+
+
+	if (!vma->is_elf || !vma->vma_elf)
+		return 0;
+
+	task = vma->task;
 
 	symtab_addr = strtab_addr = 0;
 	symtab_sz = strtab_sz = 0;
@@ -877,31 +879,38 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	if (vma->type == VMA_SELF)
 		return load_self_vma_symbols(vma);
 
+	/**
+	 * Find PT_DYNAMIC program header
+	 */
 	for (i = 0; i < vma->vma_elf->ehdr.e_phnum; i++) {
 		if (vma->vma_elf->phdrs[i].p_type == PT_DYNAMIC) {
-			phdr = &vma->vma_elf->phdrs[i];
+			dynamic_phdr = &vma->vma_elf->phdrs[i];
 			break;
 		}
 	}
 
-	if (i == vma->vma_elf->ehdr.e_phnum) {
+	if (!dynamic_phdr) {
 		lerror("No PT_DYNAMIC in %s\n", vma->name_);
-		return -1;
+		return -ENOENT;
 	}
 
-	dynamics = malloc(phdr->p_memsz);
-	assert(dynamics && "Malloc fatal.");
+	dynamics = malloc(dynamic_phdr->p_memsz);
+	if (!dynamics) {
+		lerror("Malloc dynamics failed %s\n", vma->name_);
+		return -ENOMEM;
+	}
 
 	err = memcpy_from_task(task, dynamics,
-			       vma->vma_elf->load_addr + phdr->p_vaddr,
-			       phdr->p_memsz);
-	if (err == -1 || err < phdr->p_memsz) {
-		lerror("Task read mem failed, %lx.\n", vma->vm_start + phdr->p_vaddr);
+			       vma->vma_elf->load_addr + dynamic_phdr->p_vaddr,
+			       dynamic_phdr->p_memsz);
+	if (err == -1 || err < dynamic_phdr->p_memsz) {
+		lerror("Task read mem failed, %lx.\n",
+			vma->vm_start + dynamic_phdr->p_vaddr);
 		goto out_free;
 	}
 
-	/* For each Dyn */
-	for (i = 0; i < phdr->p_memsz / sizeof(GElf_Dyn); i++) {
+	/* For each Dynamic */
+	for (i = 0; i < dynamic_phdr->p_memsz / sizeof(GElf_Dyn); i++) {
 		GElf_Dyn *curdyn = dynamics + i;
 
 		switch (curdyn->d_tag) {
@@ -929,12 +938,11 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	symtab_sz = (strtab_addr - symtab_addr);
 
 	if (strtab_sz == 0 || symtab_sz == 0) {
-		memshowinlog(LOG_INFO, dynamics, phdr->p_memsz);
-		lwarning(
-			"No strtab, p_memsz %ld, p_vaddr %lx. "
-			"strtab(%lx) symtab(%lx) %s %lx\n",
-			phdr->p_memsz, phdr->p_vaddr,
-			strtab_addr, symtab_addr, vma->name_, vma->vm_start);
+		memshowinlog(LOG_INFO, dynamics, dynamic_phdr->p_memsz);
+		lwarning("No strtab, p_memsz %ld, p_vaddr %lx. "
+			 "strtab(%lx) symtab(%lx) %s %lx\n",
+			 dynamic_phdr->p_memsz, dynamic_phdr->p_vaddr,
+			 strtab_addr, symtab_addr, vma->name_, vma->vm_start);
 	}
 
 	buffer = malloc(symtab_sz + strtab_sz);
@@ -947,7 +955,8 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 		vma->vma_elf->load_addr,
 		vma->vm_start);
 
-	/* [vdso] need add load_addr or vma start address.
+	/**
+	 * [vdso] need add load_addr or vma start address.
 	 *
 	 * $ readelf -S vdso.so
 	 * There are 16 section headers, starting at offset 0xe98:
