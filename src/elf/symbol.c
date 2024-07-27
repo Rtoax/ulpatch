@@ -69,9 +69,16 @@ const char *st_visibility_string(const GElf_Sym *sym)
  * symname = stderr
  * vername = GLIBC_2.2.5
  */
-int print_sym(const GElf_Sym *sym, const char *symname, const char *vername)
+int fprint_sym(FILE *fp, const GElf_Sym *sym, const char *symname,
+	       const char *vername, bool firstline)
 {
-	printf(" %#016lx %-7ld %-8s %-8s %-8s %s%s%s\n",
+	if (!fp)
+		fp = stdout;
+
+	if (firstline)
+		fprintf(fp, " %-18s %-7s %-8s %-8s %-8s %-8s\n",
+			"Value", "Size", "Type", "Bind", "Vis", "Name");
+	fprintf(fp, " %#018lx %-7ld %-8s %-8s %-8s %s%s%s\n",
 		sym->st_value,
 		sym->st_size,
 		st_type_string(sym),
@@ -362,6 +369,7 @@ int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
 	if (firstline)
 		fprintf(fp, "%-32s %16s\n", "NAME", "VALUE");
 	ret = fprintf(fp, "%-32s %#016lx\n", s->name, s->sym.st_value);
+	fprint_sym(fp, &s->sym, s->name, NULL, true);
 	return ret;
 }
 

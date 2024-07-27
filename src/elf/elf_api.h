@@ -138,7 +138,8 @@ int fprint_symbol(FILE *fp, struct symbol *s, int firstline);
  * symname = stderr
  * vername = GLIBC_2.2.5
  */
-int print_sym(const GElf_Sym *sym, const char *symname, const char *vername);
+int fprint_sym(FILE *fp, const GElf_Sym *sym, const char *symname,
+	       const char *vername, bool firstline);
 int is_undef_symbol(const GElf_Sym *sym);
 bool is_ftrace_entry(char *func);
 
