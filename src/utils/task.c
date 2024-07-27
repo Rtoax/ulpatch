@@ -737,6 +737,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 	unsigned long addr = 0;
 	struct vm_area_struct *vma_leader = sym->vma;
 	struct task_struct *task = vma_leader->task;
+	unsigned long off = sym->sym.st_value;
 
 	if (vma_leader != vma_leader->leader) {
 		lerror("Symbol vma must be leader.\n");
@@ -744,7 +745,6 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 	}
 
 	if (vma_leader->is_share_lib) {
-		unsigned long off = sym->sym.st_value;
 		struct vm_area_struct *vma, *tmpvma;
 
 		list_for_each_entry_safe(vma, tmpvma, &vma_leader->siblings,
@@ -767,10 +767,10 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 		 * the offset directly.
 		 */
 		addr = task->is_pie ?
-			offset_to_vaddr(sym->vma, sym->sym.st_value) :
-			sym->sym.st_value + vma_leader->vma_elf->load_addr;
+			offset_to_vaddr(sym->vma, off) :
+			vma_leader->vma_elf->load_addr + off;
 	} else
-		addr = sym->sym.st_value;
+		addr = off;
 
 	ldebug("Get symbol %s addr %lx\n", sym->name, addr);
 	return addr;
