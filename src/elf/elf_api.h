@@ -81,7 +81,10 @@ struct symbol {
 	char *name;
 	GElf_Sym sym;
 
-	/* Maybe belongs to a VMA */
+	/**
+	 * Maybe belongs to a VMA, and this vma is ELF format, which is the
+	 * leader of all other PT_LOAD vmas.
+	 */
 	struct vm_area_struct *vma;
 	/**
 	 * ROOT is one of the following:

@@ -789,10 +789,21 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
 }
 
 /* Insert OK, return 0, else return -1 */
-int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma)
+int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 {
 	struct rb_node *node;
-	struct task_struct *task = vma->task;
+	struct task_struct *task;
+	struct vm_area_struct *vma;
+	unsigned long vaddr;
+
+	task = leader->task;
+	vaddr = leader->vma_elf->load_addr + s->sym.st_value;
+
+	vma = leader;
+
+	ldebug("symbol: st_value %s:%lx(%lx) in vma %s:%lx\n",
+	       s->name, s->sym.st_value, vaddr,
+	       vma->name_, vma->vm_start);
 
 	s->vma = vma;
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
@@ -805,7 +816,7 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma)
 	return node ? -1 : 0;
 }
 
-int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
+int task_vma_alloc_link_symbol(struct vm_area_struct *leader, const char *name,
 			       GElf_Sym *sym)
 {
 	int err = 0;
@@ -813,7 +824,7 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
 
 	/* skip undefined symbols */
 	if (is_undef_symbol(sym)) {
-		ldebug("%s undef symbol: %s %lx\n", basename(vma->name_),
+		ldebug("%s undef symbol: %s %lx\n", basename(leader->name_),
 			name, sym->st_value);
 		/* Skip undefined symbol */
 		return 0;
@@ -827,7 +838,7 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
 	}
 
 	ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
-	err = task_vma_link_symbol(new, vma);
+	err = task_vma_link_symbol(new, leader);
 	if (err)
 		free_symbol(new);
 
@@ -839,15 +850,15 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
  *
  * @vma - self vma
  */
-static int load_self_vma_symbols(struct vm_area_struct *vma)
+static int load_self_vma_symbols(struct vm_area_struct *leader)
 {
 	int err = 0;
-	struct task_struct *task = vma->task;
+	struct task_struct *task = leader->task;
 	struct symbol *sym, *tmp;
 	struct rb_root *root = &task->exe_elf->elf_file_symbols;
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp, root, node)
-		err |= task_vma_alloc_link_symbol(vma, sym->name, &sym->sym);
+		err |= task_vma_alloc_link_symbol(leader, sym->name, &sym->sym);
 
 	return err;
 }
