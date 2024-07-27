@@ -11,7 +11,7 @@ nav:
   - Tutorials:
     - Code Style: code-style.md
     - Developer: developers.md
-    - Log: LOG.md
+    - Log: log.md
     - ULPatch: ulpatch.md
     - ULTask: ultask.md
     - Contributing: CONTRIBUTING.md

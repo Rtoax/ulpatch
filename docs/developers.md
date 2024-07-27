@@ -8,14 +8,13 @@ This document features basic guidelines and recommendations on how to do ulpatch
 In my opinion, if you want to develop and participate in the development of this project together, the following knowledge points need to be understood in advance:
 
 - Linux Basics;
-- ELF file format;
+- ELF format;
 - ELF relocation;
-- How the Linux kernel runs an ELF executable;
-- How the GNU linker works;
+- How Linux kernel runs an ELF executable;
+- How GNU linker works;
 
 
 ### Precautions
 
-You can view unfinished development tasks in [TODO-List](./TODO.md), and you neeto obey the [coding style](./code-style.md) rules.
-
+You can view unfinished development tasks in [TODO-List](./TODO.md), and you need to obey the [Coding Style](./code-style.md) and [Contributing](./CONTRIBUTING.md) rules.
 

@@ -1,7 +1,7 @@
-# ULPatch Contributing Guidelines
+## ULPatch Contributing Guidelines
 
-Contributions are welcome, and they are greatly appreciated! Every little bit
-helps, and credit will always be given.
+Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given.
+
 
 ### Report Bugs
 
@@ -14,25 +14,25 @@ If you are reporting a bug, please include:
 * Any details about your local setup that might be helpful in troubleshooting.
 * Detailed steps to reproduce the bug.
 
+
 ### Fix Bugs
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help
-wanted" is open to whoever wants to implement it.
+Look through the GitHub issues for bugs. Anything tagged with "bug" and "help wanted" is open to whoever wants to implement it.
+
 
 ### Implement Features
 
-Look through the GitHub issues for features. Anything tagged with "enhancement"
-and "help wanted" is open to whoever wants to implement it.
+Look through the GitHub issues for features. Anything tagged with "enhancement" and "help wanted" is open to whoever wants to implement it.
+
 
 ### Write Documentation
 
-ULPatch could always use more documentation, whether as part of the
-official ULPatch docs, in docstrings, or even on the web in blog posts,
-articles, and such.
+ULPatch could always use more documentation, whether as part of the official ULPatch docs, in docstrings, or even on the web in blog posts, articles, and such.
+
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues)
+The best way to send feedback is to file an issue at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues).
 
 If you are proposing a feature:
 
