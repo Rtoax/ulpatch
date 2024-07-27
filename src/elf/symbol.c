@@ -76,14 +76,15 @@ int fprint_sym(FILE *fp, const GElf_Sym *sym, const char *symname,
 		fp = stdout;
 
 	if (firstline)
-		fprintf(fp, " %-18s %-7s %-8s %-8s %-8s %-8s\n",
-			"Value", "Size", "Type", "Bind", "Vis", "Name");
-	fprintf(fp, " %#018lx %-7ld %-8s %-8s %-8s %s%s%s\n",
+		fprintf(fp, " %-18s %-7s %-8s %-8s %-12s %-4s %-8s\n",
+			"Value", "Size", "Type", "Bind", "Vis", "Ndx", "Name");
+	fprintf(fp, " %#018lx %-7ld %-8s %-8s %-12s %-4d %s%s%s\n",
 		sym->st_value,
 		sym->st_size,
 		st_type_string(sym),
 		st_bind_string(sym),
 		st_visibility_string(sym),
+		sym->st_shndx,
 		symname, vername ? "@" : "", vername ?: "");
 
 	return 0;
