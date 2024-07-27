@@ -366,11 +366,6 @@ void rb_free_symbol(struct rb_node *node)
 
 int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
 {
-	int ret;
-	if (firstline)
-		fprintf(fp, "%-32s %16s\n", "NAME", "VALUE");
-	ret = fprintf(fp, "%-32s %#016lx\n", s->name, s->sym.st_value);
-	fprint_sym(fp, &s->sym, s->name, NULL, true);
-	return ret;
+	return fprint_sym(fp, &s->sym, s->name, NULL, firstline);
 }
 
