@@ -62,7 +62,7 @@ static const char __unused *__VMA_TYPE_NAME[] = {
 
 struct vm_area_struct;
 
-struct vma_elf {
+struct vma_elf_mem {
 	GElf_Ehdr ehdr;
 	GElf_Phdr *phdrs;
 	unsigned long load_addr;
@@ -118,13 +118,14 @@ struct vm_area_struct {
 	struct {
 		bool is_matched_phdr;
 		/**
-		 * Point to leader ELF VMA's vma::vma_elf->phdrs[i] if matched.
+		 * Point to leader ELF VMA's vma::vma_elf_mem->phdrs[i] if
+		 * matched.
 		 */
 		GElf_Phdr phdr;
 	};
 
 	/* Only elf has it */
-	struct vma_elf *vma_elf;
+	struct vma_elf_mem *vma_elf;
 
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;

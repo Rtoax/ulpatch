@@ -16,6 +16,7 @@ nav:
     - ULTask: ultask.md
     - Contributing: CONTRIBUTING.md
   - Knowledge:
+    - Elf: elf.md
     - Relocations: relocations.md
     - Symbol Value: symbol-value.md
     - Data Structure: data-structure.md
@@ -130,6 +131,7 @@ plugins:
             ULTask: 进程热修改器
             Contributing: 贡献
             Knowledge: 相关知识
+            Elf: ELF文件
             Relocations: 重定向
             Symbol Value: 符号地址
             Data Structure: 数据结构

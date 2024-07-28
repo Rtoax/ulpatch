@@ -550,11 +550,11 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	}
 
 	/* VMA is ELF, handle it */
-	vma->vma_elf = malloc(sizeof(struct vma_elf));
+	vma->vma_elf = malloc(sizeof(struct vma_elf_mem));
 	if (!vma->vma_elf)
 		return -ENOMEM;
 
-	memset(vma->vma_elf, 0x00, sizeof(struct vma_elf));
+	memset(vma->vma_elf, 0x00, sizeof(struct vma_elf_mem));
 
 	/* Copy ehdr from load var */
 	memcpy(&vma->vma_elf->ehdr, &ehdr, sizeof(ehdr));

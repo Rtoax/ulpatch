@@ -85,7 +85,8 @@ struct symbol {
 	 * Maybe belongs to a VMA, and this vma is ELF format, which is the
 	 * leader of all other PT_LOAD vmas.
 	 *
-	 * If symbol from ELF file, vma will equal to NULL.
+	 * FIXME: If symbol from ELF file, we could found the vma by match
+	 * the program header, the point it to right vma.
 	 */
 	struct vm_area_struct *vma;
 
