@@ -793,7 +793,7 @@ static void sig_handler(int signum)
 		break;
 	case SIGSEGV:
 		lemerg("Segv fault.\n");
-		do_backtrace();
+		do_backtrace(stdout);
 		exit(1);
 		break;
 	}

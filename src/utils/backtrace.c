@@ -7,13 +7,16 @@
 
 
 #if defined(HAVE_LIBUNWIND_H)
-void do_backtrace(void)
+void do_backtrace(FILE *fp)
 {
 	unw_cursor_t    cursor;
 	unw_context_t   context;
 
 	unw_getcontext(&context);
 	unw_init_local(&cursor, &context);
+
+	if (!fp)
+		fp = stdout;
 
 	while (unw_step(&cursor) > 0) {
 
@@ -25,7 +28,8 @@ void do_backtrace(void)
 		fname[0] = '\0';
 		(void)unw_get_proc_name(&cursor, fname, sizeof(fname), &offset);
 
-		printf("0x%lx : (%s+0x%lx) [0x%lx]\n", pc, fname, offset, pc);
+		fprintf(fp, "0x%lx : (%s+0x%lx) [0x%lx]\n", pc, fname, offset,
+			pc);
 	}
 
 	return;

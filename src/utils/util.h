@@ -143,9 +143,9 @@
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
-void do_backtrace(void);
+void do_backtrace(FILE *fp);
 #else
-#define do_backtrace() do {} while(0)
+#define do_backtrace(fp) do {} while(0)
 #endif
 
 
