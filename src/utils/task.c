@@ -144,10 +144,12 @@ static inline int __find_vma_cmp(struct rb_node *node, unsigned long vaddr)
 		return 1;
 }
 
-struct vm_area_struct *find_vma(struct task_struct *task, unsigned long vaddr)
+struct vm_area_struct *find_vma(const struct task_struct *task,
+				unsigned long vaddr)
 {
-	struct rb_node *rnode = rb_search_node(&task->vmas_rb, __find_vma_cmp,
-						vaddr);
+	struct rb_node *rnode;
+	rnode = rb_search_node((struct rb_root *)&task->vmas_rb,
+			       __find_vma_cmp, vaddr);
 	if (rnode)
 		return rb_entry(rnode, struct vm_area_struct, node_rb);
 	return NULL;
@@ -782,6 +784,8 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
 	struct symbol tmp = {
 		.name = (char *)name,
 	};
+
+	ldebug("try find symbol %s\n", name);
 
 	node = rb_search_node(&task->vma_symbols, cmp_symbol_name,
 			      (unsigned long)&tmp);
