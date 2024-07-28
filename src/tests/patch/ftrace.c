@@ -242,7 +242,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task_struct *task = open_task(pid, FTO_LIBC);
+		struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
 
 #ifndef LIBC_PUTS_FN
 # error "No macro LIBC_PUTS_FN"
@@ -342,7 +342,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 
 TEST(Ftrace,	init_patch,	TEST_SKIP_RET)
 {
-	return test_task_patch(FTO_PROC, NULL);
+	return test_task_patch(FTO_ULFTRACE, NULL);
 }
 
 

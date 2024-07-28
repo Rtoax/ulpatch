@@ -127,6 +127,12 @@ struct vm_area_struct {
 	/* Only elf has it */
 	struct vma_elf_mem *vma_elf;
 
+	/**
+	 * if we found the vma is ELF format, open it when open task with PID,
+	 * and load all symbol, otherwise, it's NULL.
+	 */
+	struct elf_file *elf_file;
+
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;
 
@@ -182,15 +188,15 @@ struct fd {
  *
  * FTO means Flag of Task when Open.
  *
- * @FTO_LIBC in /proc/PID/maps specify a libc.so ELF file, if you want to
- *            open it when open task, set this flag.
  * @FTO_SELF task.exe or /proc/PID/exe specify a ELF file, open it or not.
  * @FTO_PROC Create '/proc' like directory under ULP_PROC_ROOT_DIR. If you need
  *           to map a file into target process address space, the flag is
  *           necessary.
  * @FTO_PATCH parse patch VMA when open a task.
- * @FTO_VMA_ELF different with @FTO_LIBC, it's open target process address
+ * @FTO_VMA_ELF different with @FTO_VMA_ELF_FILE, it's open target process address
  *               space's ELF VMA in memory.
+ * @FTO_VMA_ELF_FILE in /proc/PID/maps specify ELF file, if you want to open it
+ *               when open task, set this flag.
  * @FTO_VMA_ELF_SYMBOLS load each ELF VMA's PT_DYNAMIC, at same time, for load
  *                all symbols, need to load SELF
  * @FTO_SELF_PLT load elf file's @plt symbol address value by objdump.
@@ -201,10 +207,10 @@ struct fd {
  */
 #define FTO_NONE	0x0
 #define FTO_SELF	BIT(0)
-#define FTO_LIBC	BIT(1)
-#define FTO_PROC	BIT(2)
-#define FTO_PATCH	BIT(3)
-#define FTO_VMA_ELF	BIT(4)
+#define FTO_PROC	BIT(1)
+#define FTO_PATCH	BIT(2)
+#define FTO_VMA_ELF	BIT(3)
+#define FTO_VMA_ELF_FILE	(BIT(4) | FTO_VMA_ELF)
 #define FTO_VMA_ELF_SYMBOLS	(BIT(5) | FTO_VMA_ELF | FTO_SELF)
 #define FTO_SELF_PLT	BIT(6)
 #define FTO_THREADS	BIT(7)
@@ -271,8 +277,10 @@ struct task_struct {
 	struct task_struct_auxv auxv;
 	struct task_status status;
 
-	/* If FTO_SELF set, load SELF ELF file when open. */
+	/* If set FTO_VMA_ELF_FILE, point self::vma->elf_file */
 	struct elf_file *exe_elf;
+	/* If set FTO_VMA_ELF_FILE, point to libc.so::vma->elf_file */
+	struct elf_file *libc_elf;
 
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
@@ -285,15 +293,6 @@ struct task_struct {
 	/* VMA_SELF ELF vma */
 	struct vm_area_struct *vma_self_elf;
 	struct vm_area_struct *libc_vma;
-
-	/**
-	 * if we found libc library, open it when open task with PID, and load
-	 * all symbol. when patch/ftrace command launched, it is useful to
-	 * handle rela symbol.
-	 *
-	 * Check FTO_LIBC
-	 */
-	struct elf_file *libc_elf;
 
 	struct vm_area_struct *stack;
 

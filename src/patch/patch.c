@@ -593,7 +593,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	/**
 	 * Try find symbol in libc.so
 	 */
-	if (!addr && task->fto_flag & FTO_LIBC) {
+	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
 		sym = find_symbol(task->libc_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;

@@ -56,7 +56,7 @@ __opt_O0 int try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 {
 	int ret = 0;
-	int flags = FTO_SELF | FTO_LIBC | FTO_RDWR;
+	int flags = FTO_SELF | FTO_VMA_ELF_FILE | FTO_RDWR;
 	struct task_struct *task = open_task(getpid(), flags);
 
 	struct symbol *rel_s = NULL;
@@ -203,7 +203,7 @@ int ulpatch_try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 {
 	int ret = 0;
-	int flags = FTO_SELF | FTO_LIBC | FTO_RDWR;
+	int flags = FTO_SELF | FTO_VMA_ELF_FILE | FTO_RDWR;
 	struct task_struct *task = open_task(getpid(), flags);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;
@@ -256,7 +256,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
 {
 	int ret = 0;
-	int flags = FTO_SELF | FTO_LIBC | FTO_RDWR;
+	int flags = FTO_SELF | FTO_VMA_ELF_FILE | FTO_RDWR;
 	struct task_struct *task = open_task(getpid(), flags);
 
 	unsigned long ip_pc = (unsigned long)try_to_wake_up;

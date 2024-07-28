@@ -589,6 +589,23 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	}
 
 	vma->is_elf = true;
+	if (task->fto_flag & FTO_VMA_ELF_FILE) {
+		vma->elf_file = elf_file_open(vma->name_);
+		if (!vma->elf_file) {
+			lerror("Open ELF %s failed.\n", vma->name_);
+			return -EINVAL;
+		}
+		switch (vma->type) {
+		case VMA_SELF:
+			task->exe_elf = vma->elf_file;
+			break;
+		case VMA_LIBC:
+			task->libc_elf = vma->elf_file;
+			break;
+		default:
+			break;
+		}
+	}
 
 	/**
 	 * If type of the ELF is not ET_DYN, this is definitely not a shared
@@ -1628,14 +1645,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 		goto free_task;
 	}
 
-	/* Load libc ELF file if needed */
-	if (flag & FTO_LIBC) {
-		task->libc_elf = elf_file_open(task->libc_vma->name_);
-		if (!task->libc_elf) {
-			lerror("Open libc failed.\n");
-			goto free_task;
-		}
-	}
 	if (flag & FTO_SELF) {
 		task->exe_elf = elf_file_open(task->exe);
 		if (!task->exe_elf) {
@@ -1826,6 +1835,8 @@ static void __check_and_free_task_proc(struct task_struct *task)
 
 int close_task(struct task_struct *task)
 {
+	struct vm_area_struct *tmp_vma;
+
 	if (!task) {
 		lerror("Try free NULL task.\n");
 		return -EINVAL;
@@ -1835,7 +1846,6 @@ int close_task(struct task_struct *task)
 		close(task->proc_mem_fd);
 
 	if (task->fto_flag & FTO_VMA_ELF) {
-		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
 			vma_free_elf(tmp_vma);
 	}
@@ -1843,8 +1853,9 @@ int close_task(struct task_struct *task)
 	if (task->fto_flag & FTO_SELF)
 		elf_file_close(task->exe);
 
-	if (task->fto_flag & FTO_LIBC)
-		elf_file_close(task->libc_vma->name_);
+	if (task->fto_flag & FTO_VMA_ELF_FILE)
+		task_for_each_vma(tmp_vma, task)
+			elf_file_close(tmp_vma->name_);
 
 	if (task->fto_flag & FTO_PROC)
 		__check_and_free_task_proc(task);

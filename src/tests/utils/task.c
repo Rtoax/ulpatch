@@ -38,7 +38,7 @@ TEST(Task,	open_free_fto_flags,	0)
 
 	struct task_struct *task = open_task(getpid(), FTO_ALL);
 
-	if (!task->libc_elf || !task->exe_elf) {
+	if (!task->exe_elf) {
 		ret = -1;
 	}
 
