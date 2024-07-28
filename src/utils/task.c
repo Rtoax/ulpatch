@@ -805,6 +805,9 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 	       s->name, s->sym.st_value, vaddr,
 	       vma->name_, vma->vm_start);
 
+	if (get_log_level() >= LOG_DEBUG)
+		fprint_sym(get_log_fp(), &s->sym, s->name, NULL, true);
+
 	s->vma = vma;
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
 			      (unsigned long)s);
