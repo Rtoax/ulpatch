@@ -188,7 +188,6 @@ struct fd {
  *
  * FTO means Flag of Task when Open.
  *
- * @FTO_SELF task.exe or /proc/PID/exe specify a ELF file, open it or not.
  * @FTO_PROC Create '/proc' like directory under ULP_PROC_ROOT_DIR. If you need
  *           to map a file into target process address space, the flag is
  *           necessary.
@@ -206,16 +205,15 @@ struct fd {
  * @FTO_FD open /proc/PID/fd/ directory and for each FD.
  */
 #define FTO_NONE	0x0
-#define FTO_SELF	BIT(0)
-#define FTO_PROC	BIT(1)
-#define FTO_PATCH	BIT(2)
-#define FTO_VMA_ELF	BIT(3)
-#define FTO_VMA_ELF_FILE	(BIT(4) | FTO_VMA_ELF)
-#define FTO_VMA_ELF_SYMBOLS	(BIT(5) | FTO_VMA_ELF | FTO_SELF)
-#define FTO_SELF_PLT	BIT(6)
-#define FTO_THREADS	BIT(7)
-#define FTO_RDWR	BIT(8)
-#define FTO_FD		BIT(9)
+#define FTO_PROC	BIT(0)
+#define FTO_PATCH	BIT(1)
+#define FTO_VMA_ELF	BIT(2)
+#define FTO_VMA_ELF_FILE	(BIT(3) | FTO_VMA_ELF)
+#define FTO_VMA_ELF_SYMBOLS	(BIT(4) | FTO_VMA_ELF | FTO_VMA_ELF_FILE)
+#define FTO_SELF_PLT	BIT(5)
+#define FTO_THREADS	BIT(6)
+#define FTO_RDWR	BIT(7)
+#define FTO_FD		BIT(8)
 
 #define FTO_ALL 0xffffffff
 

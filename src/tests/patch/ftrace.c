@@ -43,7 +43,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task_struct *task = open_task(pid, FTO_SELF);
+		struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
 		unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
 		int pagesize = getpagesize();
 
@@ -118,7 +118,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 		task_wait_wait(&waitqueue);
 
 		struct symbol *sym;
-		struct task_struct *task = open_task(pid, FTO_SELF);
+		struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
 		int pagesize = getpagesize();
 		unsigned long memaddr;
 

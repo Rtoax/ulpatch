@@ -1645,14 +1645,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 		goto free_task;
 	}
 
-	if (flag & FTO_SELF) {
-		task->exe_elf = elf_file_open(task->exe);
-		if (!task->exe_elf) {
-			lerror("Open exe:%s failed.\n", task->exe);
-			goto free_task;
-		}
-	}
-
 	if (flag & FTO_VMA_ELF) {
 		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
@@ -1849,9 +1841,6 @@ int close_task(struct task_struct *task)
 		task_for_each_vma(tmp_vma, task)
 			vma_free_elf(tmp_vma);
 	}
-
-	if (task->fto_flag & FTO_SELF)
-		elf_file_close(task->exe);
 
 	if (task->fto_flag & FTO_VMA_ELF_FILE)
 		task_for_each_vma(tmp_vma, task)

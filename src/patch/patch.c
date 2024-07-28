@@ -560,7 +560,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	/**
 	 * Try find symbol in SELF
 	 */
-	if (task->fto_flag & FTO_SELF) {
+	if (task->fto_flag & FTO_VMA_ELF_FILE) {
 		sym = find_symbol(task->exe_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
@@ -592,6 +592,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 
 	/**
 	 * Try find symbol in libc.so
+	 * FIXME: Not in libc.so only, for all dynamic libraries.
 	 */
 	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
 		sym = find_symbol(task->libc_elf, name);
