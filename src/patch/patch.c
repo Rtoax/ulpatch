@@ -576,7 +576,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	/**
 	 * Try find symbol address from @plt
 	 */
-	if (task->fto_flag & FTO_SELF_PLT) {
+	if (!addr && task->fto_flag & FTO_SELF_PLT) {
 		unsigned long plt =
 			objdump_elf_plt_symbol_address(task->objdump, name);
 		if (plt && task->vma_self_elf) {
@@ -593,7 +593,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	/**
 	 * Try find symbol in libc.so
 	 */
-	if (!sym && task->fto_flag & FTO_LIBC) {
+	if (!addr && task->fto_flag & FTO_LIBC) {
 		sym = find_symbol(task->libc_elf, name);
 		if (sym) {
 			addr = sym->sym.st_value;
@@ -610,7 +610,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * Try find symbol in other libraries mapped in target process address
 	 * space.
 	 */
-	if (!sym && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
+	if (!addr && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
 		sym = task_vma_find_symbol((struct task_struct *)task, name);
 		if (sym) {
 			addr = sym->sym.st_value;
@@ -627,6 +627,8 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 
 	if (!addr)
 		lerror("Not find symbol %s in anywhere\n", name);
+
+	ldebug("%s value %#016lx\n", name, addr);
 
 found:
 	return addr;
