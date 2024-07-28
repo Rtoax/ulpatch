@@ -830,6 +830,8 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *leader, const char *name,
 		ldebug("%s undef symbol: %s %lx\n", basename(leader->name_),
 			name, sym->st_value);
 		/* Skip undefined symbol */
+		if (get_log_level() >= LOG_DEBUG)
+			fprint_sym(get_log_fp(), sym, name, NULL, true);
 		return 0;
 	}
 
