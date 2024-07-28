@@ -49,8 +49,15 @@ static const struct symbol_t symbols[] = {
 static void print_elf_symbol(struct elf_file *elf, struct symbol *sym,
 			     void *arg)
 {
+	int i;
 	static bool firstline = true;
+
 	fprint_sym(stdout, &sym->sym, sym->name, NULL, firstline);
+	if (sym->nphdrs > 0) {
+		for (i = 0; i < sym->nphdrs; i++)
+			print_phdr(stdout, &sym->phdrs[i], i == 0);
+	}
+
 	firstline = false;
 }
 

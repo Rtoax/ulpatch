@@ -82,6 +82,13 @@ struct symbol {
 	GElf_Sym sym;
 
 	/**
+	 * If symbol from ELF file, point to elf file phdrs. If symbol from
+	 * VMA mem, point to vma's elf phdrs, and used to locate VMA.
+	 */
+	int nphdrs;
+	GElf_Phdr *phdrs;
+
+	/**
 	 * Maybe belongs to a VMA, and this vma is ELF format, which is the
 	 * leader of all other PT_LOAD vmas.
 	 *

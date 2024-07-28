@@ -367,14 +367,43 @@ int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 /* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
-	struct rb_node *node = rb_insert_node(&elf->elf_file_symbols, &s->node,
-					      cmp_symbol_name,
-					      (unsigned long)s);
+	int i, nphdrs;
+	struct rb_node *node;
+	GElf_Section sec = s->sym.st_shndx;
+	GElf_Shdr *shdr = &elf->shdrs[sec];
+
+	if (!is_undef_symbol(&s->sym)) {
+		GElf_Phdr *phdr, *phdrs;
+
+		nphdrs = 0;
+		phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);
+
+		for (i = 0; i < elf->phdrnum; i++) {
+			phdr = &elf->phdrs[i];
+			if (shdr->sh_offset >= phdr->p_offset &&
+				shdr->sh_offset + shdr->sh_size <=
+					phdr->p_offset + phdr->p_filesz) {
+				memcpy(&phdrs[nphdrs], phdr, sizeof(GElf_Phdr));
+				nphdrs++;
+			}
+		}
+		if (nphdrs) {
+			s->nphdrs = nphdrs;
+			s->phdrs = malloc(sizeof(GElf_Phdr) * nphdrs);
+			memcpy(s->phdrs, phdrs, sizeof(GElf_Phdr) * nphdrs);
+		}
+		free(phdrs);
+	}
+
+	node = rb_insert_node(&elf->elf_file_symbols, &s->node,
+			      cmp_symbol_name, (unsigned long)s);
 	return node ? -1 : 0;
 }
 
 void free_symbol(struct symbol *s)
 {
+	if (s->phdrs)
+		free(s->phdrs);
 	free(s->name);
 	free(s);
 }

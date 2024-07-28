@@ -830,6 +830,11 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 		fprint_sym(get_log_fp(), &s->sym, s->name, NULL, true);
 
 	s->vma = vma;
+
+	/**
+	 * TODO: Get the symbol belongs to which phdrs.
+	 */
+
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
 			      (unsigned long)s);
 	if (unlikely(node))
