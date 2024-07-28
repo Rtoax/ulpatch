@@ -46,6 +46,28 @@ static const struct symbol_t symbols[] = {
 	{MCOUNT, false},
 };
 
+static void print_elf_symbol(struct elf_file *elf, struct symbol *sym,
+			     void *arg)
+{
+	static bool firstline = true;
+	fprint_sym(stdout, &sym->sym, sym->name, NULL, firstline);
+	firstline = false;
+}
+
+TEST(Elf,	for_each_symbol,	0)
+{
+	struct elf_file *elf;
+	elf = elf_file_open(ulpatch_test_path);
+	if (!elf) {
+		lerror("open %s failed.\n", ulpatch_test_path);
+		return -ENOENT;
+	}
+
+	for_each_symbol(elf, print_elf_symbol, NULL);
+
+	elf_file_close(ulpatch_test_path);
+	return 0;
+}
 
 TEST(Elf,	find_symbol,	0)
 {
@@ -56,9 +78,10 @@ TEST(Elf,	find_symbol,	0)
 		if (!fexist(test_elfs[i]))
 			continue;
 
-		struct elf_file __unused *e = elf_file_open(test_elfs[i]);
+		struct elf_file *elf;
 
-		if (!e) {
+		elf = elf_file_open(test_elfs[i]);
+		if (!elf) {
 			lerror("open %s failed.\n", test_elfs[i]);
 			ret = -1;
 			break;
@@ -67,7 +90,7 @@ TEST(Elf,	find_symbol,	0)
 		/* Try find some symbols */
 		int is;
 		for (is = 0; is < ARRAY_SIZE(symbols); is++) {
-			struct symbol *s = find_symbol(e, symbols[is].s);
+			struct symbol *s = find_symbol(elf, symbols[is].s);
 			if (!s) {
 				lwarning("no symbol %s founded in %s.\n",
 					symbols[is].s, test_elfs[i]);
@@ -90,15 +113,16 @@ TEST(Elf,	find_symbol,	0)
 TEST(Elf,	find_symbol_mcount,	0)
 {
 	int ret = 0;
-	struct elf_file __unused *e = elf_file_open(ulpatch_test_path);
+	struct elf_file *elf;
 
-	if (!e) {
+	elf = elf_file_open(ulpatch_test_path);
+	if (!elf) {
 		lerror("open %s failed.\n", ulpatch_test_path);
 		ret = -1;
 		goto finish;
 	}
 
-	struct symbol *s = find_symbol(e, MCOUNT);
+	struct symbol *s = find_symbol(elf, MCOUNT);
 	if (!s) {
 		lwarning("no symbol %s founded in %s.\n",
 			MCOUNT, ulpatch_test_path);

@@ -9,6 +9,8 @@ cmake_install.cmake
 *.o
 *.elf
 *.stripped
+*.debug
+*.dbg
 *.op
 *.oS
 *.oc

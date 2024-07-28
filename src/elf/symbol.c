@@ -343,6 +343,27 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name)
 	return node ? rb_entry(node, struct symbol, node) : NULL;
 }
 
+int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
+							  struct symbol *,
+							  void *),
+		    void *arg)
+{
+	struct symbol *sym;
+	struct rb_node *first, *rnode;
+
+	if (!handler) {
+		return -EINVAL;
+	}
+
+	first = rb_first(&elf->elf_file_symbols);
+
+	for (rnode = first; rnode; rnode = rb_next(rnode)) {
+		sym = rb_entry(rnode, struct symbol, node);
+		handler(elf, sym, arg);
+	}
+	return 0;
+}
+
 /* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {

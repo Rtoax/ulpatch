@@ -110,7 +110,6 @@ static int print_interval_usec = PRINT_INTERVAL_USEC;
 static int print_nloop_default = PRINT_NLOOP;
 const char *print_content = "Hello";
 
-static char ulpatch_test_path_buf[PATH_MAX];
 const char *ulpatch_test_path = NULL;
 
 const char *listener_request = NULL;
@@ -800,17 +799,20 @@ static void sig_handler(int signum)
 	}
 }
 
-/**
- * __main__
- */
 int main(int argc, char *argv[])
 {
+	static char ulpatch_test_path_buf[PATH_MAX];
+
+	ulpatch_test_path = get_proc_pid_exe(getpid(), ulpatch_test_path_buf,
+					     PATH_MAX);
+	if (!ulpatch_test_path || !fexist(ulpatch_test_path)) {
+		lerror("Not found ulpatch_test path.\n");
+		return -ENOENT;
+	}
+
 	ulpatch_init();
 
 	signal(SIGINT, sig_handler);
-
-	ulpatch_test_path =
-		get_proc_pid_exe(getpid(), ulpatch_test_path_buf, PATH_MAX);
 
 	parse_config(argc, argv);
 
