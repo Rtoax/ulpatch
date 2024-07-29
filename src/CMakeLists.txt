@@ -21,22 +21,22 @@ add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type -p
 # Target: ultask
 if (BUILD_ULTASK)
 add_executable(ultask ultask.c)
-target_compile_definitions(ultask PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS})
 endif()
 
 # Target: ulftrace
 if (BUILD_ULFTRACE)
 add_executable(ulftrace ulftrace.c)
-target_compile_definitions(ulftrace PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS})
 endif()
 
 # Target: ulpatch
 add_executable(ulpatch ulpatch.c)
-target_compile_definitions(ulpatch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch PRIVATE ${UTILS_CFLAGS_MACROS})
 
 # Target: ulpinfo
 add_executable(ulpinfo ulpinfo.c)
-target_compile_definitions(ulpinfo PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS})
 
 if(BUILD_TESTING)
 add_subdirectory(tests)

@@ -32,4 +32,4 @@ add_library(ulpatch_utils STATIC
 	version.c
 )
 
-target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_CFLAGS_MACROS})

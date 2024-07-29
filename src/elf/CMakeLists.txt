@@ -22,5 +22,5 @@ add_library(ulpatch_elf STATIC
 	symbol.c
 )
 
-target_compile_definitions(ulpatch_elf PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_elf PRIVATE ${UTILS_CFLAGS_MACROS})
 

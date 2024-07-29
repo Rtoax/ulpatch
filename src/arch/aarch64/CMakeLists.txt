@@ -11,4 +11,4 @@ aux_source_directory(. LIB_SOURCES)
 
 add_library(ulpatch_arch STATIC ${LIB_SOURCES})
 
-target_compile_definitions(ulpatch_arch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_arch PRIVATE ${UTILS_CFLAGS_MACROS})

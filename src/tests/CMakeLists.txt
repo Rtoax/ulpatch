@@ -33,4 +33,4 @@ add_executable(ulpatch_test
 	${DIR_UTILS_SRCS}
 )
 
-target_compile_definitions(ulpatch_test PRIVATE ${TESTS_FLAGS} ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})

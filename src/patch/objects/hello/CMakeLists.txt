@@ -19,7 +19,7 @@ aux_source_directory(. LIB_SOURCES)
 add_library(${ULPATCH_OBJ_TARGET} STATIC ${LIB_SOURCES})
 
 target_compile_definitions(${ULPATCH_OBJ_TARGET} PRIVATE
-	${UTILS_FLAGS}
+	${UTILS_CFLAGS_MACROS}
 	ULPATCH_TEST
 )
 

@@ -19,5 +19,5 @@ add_library(ulpatch_patch STATIC
 	patch.c
 )
 
-target_compile_definitions(ulpatch_patch PRIVATE ${UTILS_FLAGS})
+target_compile_definitions(ulpatch_patch PRIVATE ${UTILS_CFLAGS_MACROS})
 
