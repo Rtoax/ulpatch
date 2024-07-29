@@ -38,6 +38,8 @@ set(BUILD_TESTING ON CACHE BOOL "Build test suite")
 set(BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(BUILD_ULTASK ON CACHE BOOL "Build ultask")
 set(BUILD_MAN ON CACHE BOOL "Build man pages")
+set(BUILD_PIE_EXE OFF CACHE BOOL "Build all Executions as PIE")
+
 set(CMAKE_INSTALL_PREFIX /usr)
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
@@ -49,6 +51,13 @@ set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
 # see src/patch/objects/hello/CMakeLists.txt
 set(ULPATCH_HELLO_OBJ hello.obj)
+
+if(BUILD_PIE_EXE)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
+else()
+	set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+endif()
 
 # check processor architecture
 # only support x86_64 and aarch64 right now.

@@ -70,6 +70,15 @@ $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 Default is `Debug`.
 
 
+#### BUILD_PIE_EXE
+
+Build all executions as PIE(`Position-Independent-Executable`), such as:
+
+```
+$ cmake -DEXE_IS_PIE=1 ..
+```
+
+
 #### BUILD_TESTING
 
 You can specify `BUILD_TESTING` to determine compile `ulpatch_test` or not, default `ON`.
