@@ -67,6 +67,9 @@ You can specify CMake Build type with `CMAKE_BUILD_TYPE`, such as `-DCMAKE_BUILD
 $ cmake -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
+Default is `Debug`.
+
+
 #### BUILD_TESTING
 
 You can specify `BUILD_TESTING` to determine compile `ulpatch_test` or not, default `ON`.
