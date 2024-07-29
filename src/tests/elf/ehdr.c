@@ -22,3 +22,18 @@ TEST(Elf_Ehdr,	print,	0)
 	print_ehdr(NULL, &ehdr1);
 	return 0;
 }
+
+TEST(Elf_Ehdr,	readelf,	0)
+{
+	struct elf_file *elf;
+	elf = elf_file_open(ulpatch_test_path);
+	if (!elf) {
+		lerror("open %s failed.\n", ulpatch_test_path);
+		return -ENOENT;
+	}
+
+	print_ehdr(stdout, elf->ehdr);
+
+	elf_file_close(ulpatch_test_path);
+	return 0;
+}
