@@ -26,7 +26,7 @@ static const char *level_prefix[] = {
 	"[\033[1;35mDEBUG\033[m]",
 };
 
-static int log_level = LOG_DEBUG;
+static int log_level = LOG_ERR;
 static bool prefix_on = false;
 static FILE *log_fp = NULL;
 
