@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
 #define PRINT_ADDR(a)	printf("%-32s: %#016lx\n", #a, (unsigned long)a);
 	PRINT_ADDR(print_hello);
 	PRINT_ADDR(puts);
+	PRINT_ADDR(pthread_create);
+	PRINT_ADDR(internal_print_hello);
 
 	for (i = 0; i < NR_THREADS; i++)
 		pthread_create(&threads[i], NULL, routine, NULL);
