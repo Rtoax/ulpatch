@@ -178,11 +178,11 @@ static int command_unpatch(void)
 
 int main(int argc, char *argv[])
 {
-	set_log_level(config.log_level);
-
 	parse_config(argc, argv);
 
 	ulpatch_init();
+
+	set_log_level(config.log_level);
 
 	target_task = open_task(target_pid, FTO_ALL);
 

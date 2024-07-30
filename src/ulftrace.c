@@ -155,11 +155,11 @@ int main(int argc, char *argv[])
 	int __unused ret = 0;
 	struct symbol *target_sym;
 
-	set_log_level(config.log_level);
-
 	parse_config(argc, argv);
 
 	ulpatch_init();
+
+	set_log_level(config.log_level);
 
 	target_task = open_task(target_pid, FTO_ULFTRACE);
 	if (!target_task) {
