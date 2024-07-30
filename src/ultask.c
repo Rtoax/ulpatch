@@ -403,11 +403,11 @@ int main(int argc, char *argv[])
 	int ret = 0;
 	int flags = FTO_ALL;
 
+	set_log_level(config.log_level);
+
 	parse_config(argc, argv);
 
 	ulpatch_init();
-
-	set_log_level(config.log_level);
 
 	if (flag_rdonly)
 		flags &= ~FTO_RDWR;
