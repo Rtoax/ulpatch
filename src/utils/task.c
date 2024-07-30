@@ -589,7 +589,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	}
 
 	vma->is_elf = true;
-	if (task->fto_flag & FTO_VMA_ELF_FILE) {
+	if (task->fto_flag & FTO_VMA_ELF_FILE && fexist(vma->name_)) {
 		vma->elf_file = elf_file_open(vma->name_);
 		if (!vma->elf_file) {
 			lerror("Open ELF %s failed.\n", vma->name_);

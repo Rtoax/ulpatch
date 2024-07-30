@@ -25,6 +25,12 @@ struct elf_file *elf_file_open(const char *filepath)
 	size_t size;
 	struct elf_file *elf = NULL;
 
+	if (!filepath || !fexist(filepath)) {
+		lwarning("%s is not exist.\n", filepath);
+		errno = -EINVAL;
+		return NULL;
+	}
+
 	/* Already open */
 	list_for_each_entry(elf, &elf_file_list, node) {
 		if (!strcmp(filepath, elf->filepath)) {
