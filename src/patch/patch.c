@@ -593,23 +593,6 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	ldebug("Not found %s in @plt.\n", name);
 
 	/**
-	 * Try find symbol in libc.so
-	 * FIXME: Not in libc.so only, for all dynamic libraries.
-	 */
-	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
-		sym = find_symbol(task->libc_elf, name, type);
-		if (sym) {
-			addr = sym->sym.st_value;
-			if (addr) {
-				ldebug("Found %s in libc.so, addr = %lx\n",
-					name, addr);
-				goto found;
-			}
-		}
-	}
-	ldebug("Not found %s in libc.\n", name);
-
-	/**
 	 * Try find symbol in other libraries mapped in target process address
 	 * space.
 	 */
@@ -617,7 +600,10 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		sym = task_vma_find_symbol((struct task_struct *)task, name,
 					   type);
 		if (sym) {
-			addr = sym->sym.st_value;
+			/**
+			 * FIXME: right? I'm not sure.
+			 */
+			addr = task_vma_symbol_vaddr(sym);
 			if (addr) {
 				struct vm_area_struct *vma = sym->vma;
 				ldebug("Found %s in %s, addr = %lx\n",
