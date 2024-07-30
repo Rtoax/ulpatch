@@ -124,6 +124,15 @@ int is_undef_symbol(const GElf_Sym *sym)
 	return sym->st_shndx == SHN_UNDEF || sym->st_shndx >= SHN_LORESERVE;
 }
 
+bool is_extern_symbol(const GElf_Sym *sym)
+{
+	int bind = GELF_ST_BIND(sym->st_info);
+	/* externs are symbols w/ type=NOTYPE, bind=GLOBAL|WEAK, section=UND */
+	return sym->st_shndx == SHN_UNDEF &&
+	       (bind == STB_GLOBAL || bind == STB_WEAK) &&
+	       GELF_ST_TYPE(sym->st_info) == STT_NOTYPE;
+}
+
 GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 			  size_t *nsyms, GElf_Sym *sym_mem, char **symname,
 			  char **pversion)
