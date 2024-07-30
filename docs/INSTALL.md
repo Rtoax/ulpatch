@@ -75,7 +75,7 @@ Default is `Debug`.
 Build all executions as PIE(`Position-Independent-Executable`), such as:
 
 ```
-$ cmake -DEXE_IS_PIE=1 ..
+$ cmake -DBUILD_PIE_EXE=1 ..
 ```
 
 This cmake option is helpful if you want to test the PIE elf.
