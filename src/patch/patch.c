@@ -577,6 +577,8 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 
 	/**
 	 * Try find symbol address from @plt
+	 * FIXME: We should not get symbol address from @plt, use actual addr in so
+	 * instead.
 	 */
 	if (!addr && task->fto_flag & FTO_SELF_PLT) {
 		unsigned long plt =
