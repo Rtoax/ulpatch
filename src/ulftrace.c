@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	target_sym = task_vma_find_symbol(target_task, target_func);
+	target_sym = task_vma_find_symbol(target_task, target_func, STT_FUNC);
 	if (!target_sym) {
 		fprintf(stderr, "couldn't found symbol '%s'\n", target_func);
 		errno = -ENOENT;

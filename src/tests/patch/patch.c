@@ -69,7 +69,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 *
 	 * AArch64: bl <_mcount> is 0x94000000 before relocation
 	 */
-	rel_s = find_symbol(task->exe_elf, mcount_str);
+	rel_s = find_symbol(task->exe_elf, mcount_str, STT_FUNC);
 	if (!rel_s) {
 		lerror("Not found mcount symbol in %s\n", task->exe);
 		return -1;
@@ -79,7 +79,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 * useful when you try to patch a running process or ftrace it. so, this
 	 * is a test.
 	 */
-	libc_s = find_symbol(task->libc_elf, mcount_str);
+	libc_s = find_symbol(task->libc_elf, mcount_str, STT_FUNC);
 	if (!libc_s) {
 		lerror("Not found mcount in %s\n", task->libc_elf->filepath);
 		return -1;

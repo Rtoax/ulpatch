@@ -40,7 +40,7 @@ struct symbol_t {
 	bool must_has;
 };
 
-static const struct symbol_t symbols[] = {
+static const struct symbol_t sym_funcs[] = {
 	{"__libc_start_main", true},
 	{"main", false},
 	{MCOUNT, false},
@@ -94,20 +94,21 @@ TEST(Elf,	find_symbol,	0)
 			break;
 		}
 
-		/* Try find some symbols */
+		/* Try find some sym_funcs */
 		int is;
-		for (is = 0; is < ARRAY_SIZE(symbols); is++) {
-			struct symbol *s = find_symbol(elf, symbols[is].s);
+		for (is = 0; is < ARRAY_SIZE(sym_funcs); is++) {
+			struct symbol *s;
+			s = find_symbol(elf, sym_funcs[is].s, STT_FUNC);
 			if (!s) {
 				lwarning("no symbol %s founded in %s.\n",
-					symbols[is].s, test_elfs[i]);
-				if (symbols[is].must_has) {
+					sym_funcs[is].s, test_elfs[i]);
+				if (sym_funcs[is].must_has) {
 					ret = -1;
 					break;
 				}
 			} else {
 				linfo("%s: %s: st_value: %lx\n",
-					test_elfs[i], symbols[is].s, s->sym.st_value);
+					test_elfs[i], sym_funcs[is].s, s->sym.st_value);
 			}
 		}
 
@@ -129,7 +130,7 @@ TEST(Elf,	find_symbol_mcount,	0)
 		goto finish;
 	}
 
-	struct symbol *s = find_symbol(elf, MCOUNT);
+	struct symbol *s = find_symbol(elf, MCOUNT, STT_FUNC);
 	if (!s) {
 		lwarning("no symbol %s founded in %s.\n",
 			MCOUNT, ulpatch_test_path);

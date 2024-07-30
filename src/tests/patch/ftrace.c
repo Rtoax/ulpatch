@@ -47,7 +47,7 @@ TEST(Ftrace,	elf_static_func_addr,	0)
 		unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
 		int pagesize = getpagesize();
 
-		sym = find_symbol(task->exe_elf, __stringify(STATIC_FUNC_FN));
+		sym = find_symbol(task->exe_elf, __stringify(STATIC_FUNC_FN), STT_FUNC);
 		if (!sym) {
 			lerror("Not found %s.\n", __stringify(STATIC_FUNC_FN));
 			ret = -1;
@@ -126,7 +126,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 		/* Test1:
 		 * Try find global function
 		 */
-		sym = find_symbol(task->exe_elf, __stringify(PRINTER_FN));
+		sym = find_symbol(task->exe_elf, __stringify(PRINTER_FN), STT_FUNC);
 		if (!sym) {
 			lerror("Not found %s.\n", __stringify(PRINTER_FN));
 			ret = -1;
@@ -164,7 +164,7 @@ TEST(Ftrace,	elf_global_func_addr,	0)
 		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
 		memaddr = (unsigned long)LIBC_PUTS_FN;
 
-		sym = find_symbol(task->exe_elf, __stringify(LIBC_PUTS_FN));
+		sym = find_symbol(task->exe_elf, __stringify(LIBC_PUTS_FN), STT_FUNC);
 		if (!sym) {
 			lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
 			ret = -1;
@@ -249,7 +249,7 @@ TEST(Ftrace,	elf_libc_func_addr,	0)
 #endif
 		LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
 
-		sym = find_symbol(task->libc_elf, __stringify(LIBC_PUTS_FN));
+		sym = find_symbol(task->libc_elf, __stringify(LIBC_PUTS_FN), STT_FUNC);
 		if (!sym) {
 			lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
 			ret = -1;
@@ -354,7 +354,7 @@ static int find_task_symbol(struct task_struct *task)
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 
-		sym = task_vma_find_symbol(task, test_symbols[i].sym);
+		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
 
 		linfo("%s %-30s: 0x%lx\n",
 			sym?"Exist":"NoExi",
@@ -423,7 +423,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 			plt_addr = objdump_elf_plt_symbol_address(task->objdump,
 				test_symbols[i].sym);
 
-			sym = task_vma_find_symbol(task, test_symbols[i].sym);
+			sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
 			if (!sym) {
 				lerror("Could not find %s in pid %d vma.\n",
 					test_symbols[i].sym, task->pid);
@@ -433,7 +433,7 @@ TEST(Ftrace,	find_task_symbol_value,	0)
 
 			/* Only non static has alias symbol name, such as 'stdout' */
 			if (test_symbols[i].type == TST_NON_STATIC)
-				alias_sym = task_vma_find_symbol(task, test_symbols[i].alias);
+				alias_sym = task_vma_find_symbol(task, test_symbols[i].alias, STT_FUNC);
 
 			listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 

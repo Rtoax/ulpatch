@@ -31,9 +31,9 @@ const char *st_bind_string(const GElf_Sym *sym)
 	return "UNKNOWN";
 }
 
-const char *st_type_string(const GElf_Sym *sym)
+const char *i_st_type_string(const int type)
 {
-	switch (GELF_ST_TYPE(sym->st_info)) {
+	switch (type) {
 	case STT_NOTYPE:  return "NOTYPE";	/* Symbol type is unspecified */
 	case STT_OBJECT:  return "OBJECT";	/* Symbol is a data object */
 	case STT_FUNC:    return "FUNC";	/* Symbol is a code object */
@@ -51,6 +51,11 @@ const char *st_type_string(const GElf_Sym *sym)
 	case STT_HIPROC:  return "HIPROC";	/* End of processor-specific */
 	}
 	return "UNKNOWN";
+}
+
+const char *st_type_string(const GElf_Sym *sym)
+{
+	return i_st_type_string(GELF_ST_TYPE(sym->st_info));
 }
 
 const char *st_visibility_string(const GElf_Sym *sym)
@@ -317,7 +322,17 @@ int cmp_symbol_name(struct rb_node *n1, unsigned long key)
 	struct symbol *s1 = rb_entry(n1, struct symbol, node);
 	struct symbol *s2 = (struct symbol*)key;
 
-	return strcmp(s1->name, s2->name);
+/**
+ * FIXME: pthread_create()'s symbol type in ulp is STT_NOTYPE
+ */
+#if 0
+	if (s1->type < s2->type) {
+		return -1;
+	} else if (s1->type > s2->type) {
+		return 1;
+	} else
+#endif
+		return strcmp(s1->name, s2->name);
 }
 
 struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
@@ -327,15 +342,18 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 	memset(s, 0, sizeof(*s));
 
 	s->name = strdup(name);
+	s->type = GELF_ST_TYPE(sym->st_info);
+
 	memcpy(&s->sym, sym, sizeof(GElf_Sym));
 
 	return s;
 }
 
-struct symbol *find_symbol(struct elf_file *elf, const char *name)
+struct symbol *find_symbol(struct elf_file *elf, const char *name, int type)
 {
 	struct symbol tmp = {
 		.name = (char *)name,
+		.type = type,
 	};
 	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
 					      cmp_symbol_name,

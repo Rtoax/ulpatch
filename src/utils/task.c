@@ -795,11 +795,13 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 	return addr;
 }
 
-struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name)
+struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
+				    int type)
 {
 	struct rb_node *node;
 	struct symbol tmp = {
 		.name = (char *)name,
+		.type = type,
 	};
 
 	ldebug("try find symbol %s\n", name);
@@ -830,6 +832,7 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 		fprint_sym(get_log_fp(), &s->sym, s->name, NULL, true);
 
 	s->vma = vma;
+	s->type = GELF_ST_TYPE(s->sym.st_info);
 
 	/**
 	 * TODO: Get the symbol belongs to which phdrs.

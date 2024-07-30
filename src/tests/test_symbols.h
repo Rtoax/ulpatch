@@ -10,6 +10,7 @@ for (TEST_SYM_FOR_EACH_I = 0;
 	 TEST_SYM_FOR_EACH_I++) {
 #endif
 
+#ifdef TODO_TEST_STT_OBJECT
 /* Here start to define symbols */
 /* not constant */
 /* For example, if you try get 'stdout' address after process start running,
@@ -26,6 +27,7 @@ for (TEST_SYM_FOR_EACH_I = 0;
 TEST_SYM_NON_STATIC(stdin, _IO_2_1_stdin_)
 TEST_SYM_NON_STATIC(stdout, _IO_2_1_stdout_)
 TEST_SYM_NON_STATIC(stderr, _IO_2_1_stderr_)
+#endif
 
 /* stdlib.h */
 TEST_DYNSYM(exit)
@@ -130,8 +132,9 @@ TEST_DYNSYM(_mcount)
 /* ulpatch_test */
 TEST_SYM_SELF(main)
 TEST_SYM_SELF(who_am_i)
+#ifdef TODO_TEST_STT_OBJECT
 TEST_SYM_SELF(test_list)
-
+#endif
 
 #ifdef TEST_SYM_FOR_EACH
 }

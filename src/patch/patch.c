@@ -232,6 +232,8 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 		}
 
 		newsym->vma = vma;
+		newsym->type = GELF_ST_TYPE(sym[i].st_info);
+
 		node = rb_insert_node(&ulp->ulp_symbols, &newsym->node,
 				      cmp_symbol_name,
 				      (unsigned long)newsym);
@@ -547,7 +549,7 @@ unsigned long arch_jmp_table_jmp(void)
  * @return: 0-failed
  */
 static const unsigned long resolve_symbol(const struct task_struct *task,
-					  const char *name)
+					  const char *name, int type)
 {
 	const struct symbol *sym = NULL;
 	unsigned long addr = 0;
@@ -561,7 +563,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * Try find symbol in SELF
 	 */
 	if (task->fto_flag & FTO_VMA_ELF_FILE) {
-		sym = find_symbol(task->exe_elf, name);
+		sym = find_symbol(task->exe_elf, name, type);
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr) {
@@ -595,7 +597,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * FIXME: Not in libc.so only, for all dynamic libraries.
 	 */
 	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
-		sym = find_symbol(task->libc_elf, name);
+		sym = find_symbol(task->libc_elf, name, type);
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr) {
@@ -612,7 +614,8 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * space.
 	 */
 	if (!addr && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
-		sym = task_vma_find_symbol((struct task_struct *)task, name);
+		sym = task_vma_find_symbol((struct task_struct *)task, name,
+					   type);
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr) {
@@ -627,7 +630,8 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	}
 
 	if (!addr)
-		lerror("Not find symbol %s in anywhere\n", name);
+		lerror("Not find symbol %s(%s) in anywhere\n", name,
+			i_st_type_string(type));
 
 	ldebug("%s value %#016lx\n", name, addr);
 
@@ -673,8 +677,9 @@ static int simplify_symbols(const struct load_info *info)
 
 		case SHN_UNDEF:
 			ldebug("Resolve UNDEF sym %s\n", name);
-			const unsigned long addr =
-				resolve_symbol(info->target_task, name);
+			unsigned long addr;
+			addr = resolve_symbol(info->target_task, name,
+					      GELF_ST_TYPE(sym[i].st_info));
 			/* Ok if resolved.  */
 			if (addr) {
 				sym[i].st_value = addr;
@@ -766,7 +771,7 @@ static int solve_patch_symbols(struct load_info *info)
 	dst_func = info->ulp_strtab.dst_func;
 	src_func = info->ulp_strtab.src_func;
 
-	sym = task_vma_find_symbol(task, dst_func);
+	sym = task_vma_find_symbol(task, dst_func, STT_FUNC);
 	if (!sym) {
 		lerror("Couldn't found %s in target process, maybe %s is stripped.\n",
 		       dst_func, task->exe);

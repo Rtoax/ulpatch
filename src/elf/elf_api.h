@@ -79,6 +79,12 @@ struct vm_area_struct;
 struct symbol {
 	/* strdup() */
 	char *name;
+	/**
+	 * Store GELF_ST_TYPE(sym->st_info), such as STT_OBJECT/STT_FUNC
+	 * for rbtree compare and search.
+	 */
+	int type;
+
 	GElf_Sym sym;
 
 	/**
@@ -126,6 +132,7 @@ int handle_sections(struct elf_file *elf);
 /* ELF Symbol api */
 const char *st_bind_string(const GElf_Sym *sym);
 const char *st_type_string(const GElf_Sym *sym);
+const char *i_st_type_string(const int type);
 
 GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 	int isym, size_t *nsyms,
@@ -137,7 +144,7 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
 void free_symbol(struct symbol *s);
 void rb_free_symbol(struct rb_node *node);
 int link_symbol(struct elf_file *elf, struct symbol *s);
-struct symbol *find_symbol(struct elf_file *elf, const char *name);
+struct symbol *find_symbol(struct elf_file *elf, const char *name, int type);
 int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 							  struct symbol *,
 							  void *),
