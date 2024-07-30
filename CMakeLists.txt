@@ -3,6 +3,14 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
+if(${CMAKE_VERSION} VERSION_EQUAL 3.12.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.12.0)
+	cmake_policy(SET CMP0074 NEW)
+endif()
+
+if(${CMAKE_VERSION} VERSION_EQUAL 3.3.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.3.0)
+	cmake_policy(SET CMP0057 NEW)
+endif()
+
 PROJECT(ulpatch)
 
 # Version number components. You _MUST_ modify ulpatch.spec file at the same,
@@ -154,7 +162,7 @@ install(TARGETS ulpatch_test RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/ulp-config
+	${CMAKE_CURRENT_BINARY_DIR}/src/ulp-config
 DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 

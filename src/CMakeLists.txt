@@ -38,6 +38,20 @@ target_compile_definitions(ulpatch PRIVATE ${UTILS_CFLAGS_MACROS})
 add_executable(ulpinfo ulpinfo.c)
 target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS})
 
+message(STATUS "target ulp-config")
+#execute_process(
+#	COMMAND sed "s|@ULPATCH_VERSION@|${ULPATCH_VERSION}|g" ${PROJECT_SOURCE_DIR}/src/ulp-config
+#	OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/ulp-config
+#	OUTPUT_STRIP_TRAILING_WHITESPACE)
+add_custom_target(ulp-config ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulp-config)
+add_custom_command(
+	TARGET ulp-config
+	#OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/ulp-config
+	COMMAND sed 's|@ULP_CONFIG_VERSION@|${ULPATCH_VERSION}|g' ${PROJECT_SOURCE_DIR}/src/ulp-config > ulp-config
+	PRE_BUILD
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
+)
+
 if(BUILD_TESTING)
 add_subdirectory(tests)
 endif()
