@@ -46,7 +46,6 @@
 #endif
 
 
-
 static const void *convert(Elf *core, Elf_Type type, uint_fast16_t count,
 			   void *value, const void *data, size_t size)
 {
@@ -226,7 +225,8 @@ fail:
 	}
 }
 
-const char *strbuildid(uint8_t *bid, size_t descsz, char *buf, size_t buf_len)
+const char *elf_strbuildid(uint8_t *bid, size_t descsz, char *buf,
+			   size_t buf_len)
 {
 	char *p_buf = buf;
 	int i;
@@ -246,7 +246,7 @@ const char *strbuildid(uint8_t *bid, size_t descsz, char *buf, size_t buf_len)
 int print_elf_build_id(FILE *fp, uint8_t *build_id, size_t descsz)
 {
 	char buf[128];
-	const char *bid = strbuildid(build_id, descsz, buf, 128);
+	const char *bid = elf_strbuildid(build_id, descsz, buf, 128);
 	fprintf(fp, "%s\n", bid);
 	return 0;
 }
@@ -315,7 +315,7 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		(offset = gelf_getnote(data, offset, &nhdr, &name_offset,
 				       &desc_offset)) > 0) {
 		const char *name = nhdr.n_namesz == 0 ? "" : data->d_buf + name_offset;
-		const char __unused *desc = data->d_buf + desc_offset;
+		const char *desc = data->d_buf + desc_offset;
 
 		/**
 		 * GNU Build Attributes are weird, they store most of their data

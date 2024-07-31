@@ -166,7 +166,8 @@ bool is_ftrace_entry(char *func);
 /* ELF Note api */
 int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
 int print_elf_build_id(FILE *fp, uint8_t *build_id, size_t descsz);
-const char *strbuildid(uint8_t *bid, size_t descsz, char *buf, size_t buf_len);
+const char *elf_strbuildid(uint8_t *bid, size_t descsz, char *buf,
+			   size_t buf_len);
 
 /* ELF Rela api */
 int handle_relocs(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);

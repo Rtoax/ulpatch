@@ -423,7 +423,8 @@ int setup_load_info(struct load_info *info)
 		bid = (void *)nhdr + sizeof(*nhdr) + nhdr->n_namesz;
 		strlen_bid = nhdr->n_descsz * 2 + 1;
 		info->str_build_id = malloc(strlen_bid);
-		strbuildid(bid, nhdr->n_descsz, info->str_build_id, strlen_bid);
+		elf_strbuildid(bid, nhdr->n_descsz, info->str_build_id,
+			       strlen_bid);
 		break;
 	/* .note.gnu.property */
 	case NT_GNU_PROPERTY_TYPE_0:
