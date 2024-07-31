@@ -16,8 +16,11 @@
  * code.
  */
 
-/* Use to check ulp file is support version or not. */
-#define ULPATCH_FILE_VERSION	2
+/**
+ * Use to check ulp file is support version or not. If any changes occur to the
+ * metadata structure, we should increase this version number.
+ */
+#define ULPATCH_FILE_VERSION	3
 
 #define SEC_ULPATCH_MAGIC	".ULPATCH"
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
