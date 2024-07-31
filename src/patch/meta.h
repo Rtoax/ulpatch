@@ -25,6 +25,9 @@
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
  * @author: who wrote this patch code
+ *
+ * FIXME: We should split author to a single macro like ULPATCH_AUTHOR(), maybe
+ * one ulp file has multi ULPATCH_INFO()
  */
 #define ULPATCH_INFO(src_func, dst_func, author) \
 __asm__ (								\
