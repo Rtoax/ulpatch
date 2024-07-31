@@ -4,10 +4,11 @@
 
 /* ulp-config --cflags will provides this macro. */
 #ifndef __ULP_DEV
-# error "Must define __ULP_DEV, and make sure what do you do."
+# error "Must define __ULP_DEV, and ensure what are you doing."
 #endif
 
-/* This header use to Identifier Patch metadata info in target process. If that,
+/**
+ * This header use to Identifier Patch metadata info in target process. If that,
  * the task user address space will mmap serial of pages into target address
  * space.
  *
@@ -15,9 +16,17 @@
  * code.
  */
 
+/* Use to check ulp file is support version or not. */
+#define ULPATCH_FILE_VERSION	2
+
 #define SEC_ULPATCH_MAGIC	".ULPATCH"
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
 #define SEC_ULPATCH_INFO	".ulpatch.info"
+
+#ifndef __stringify
+#define __stringify_1(x...)	#x
+#define __stringify(x...)	__stringify_1(x)
+#endif
 
 /**
  * Every patch has this information, it's metadata for each patch.
@@ -46,8 +55,8 @@ __asm__ (								\
 	"	.quad 0\n" /* original value2 */			\
 	"	.quad 0\n" /* patched time(2) */			\
 	"	.long 0\n" /* flags */					\
-	"	.long " ULPATCH_FILE_VERSION " \n"			\
-	"	.byte 1, 2, 3, 4 \n"					\
+	"	.long " __stringify(ULPATCH_FILE_VERSION) " \n"		\
+	"	.byte 0x11, 0x22, 0x33, 0x44 \n"			\
 	".popsection \n"						\
 );
 
@@ -112,10 +121,9 @@ struct ulpatch_info {
 
 	unsigned int flags;
 
-/* Use to check support version or not. */
-#define ULPATCH_FILE_VERSION	"2"
+	/* Must be ULPATCH_FILE_VERSION */
 	unsigned int version;
 
 	char pad[4];
-};
+}  __attribute__((packed));
 

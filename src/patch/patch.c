@@ -36,7 +36,8 @@ void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab)
 const char *ulp_info_strftime(struct ulpatch_info *inf)
 {
 	static char t_buf[40];
-	strftime(t_buf, sizeof(t_buf), "%Y/%m/%d %T", localtime((time_t *)&inf->time));
+	time_t t = inf->time;
+	strftime(t_buf, sizeof(t_buf), "%Y/%m/%d %T", localtime(&t));
 	return t_buf;
 }
 
@@ -391,6 +392,13 @@ int setup_load_info(struct load_info *info)
 
 	info->ulp_info = (void *)info->hdr
 		+ info->sechdrs[info->index.info].sh_offset;
+
+	/* Check ULP file version, must match to ulpatch software version */
+	if (info->ulp_info->version != ULPATCH_FILE_VERSION) {
+		lerror("ULPatch version (%d) != %d\n", info->ulp_info->version,
+			ULPATCH_FILE_VERSION);
+		return -EINVAL;
+	}
 
 	/* found ".ulpatch.strtab" */
 	info->index.ulp_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
