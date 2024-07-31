@@ -681,6 +681,15 @@ As we can see in `readelf -l /bin/bash` output, the `.data.rel.ro` in the last `
 TODO
 
 
+## How ULPatch Resolve Symbol
+
+```
+GElf_Sym->st_shndx -> GElf_Shdr
+GElf_Shdr->sh_offset,sh_size -> GElf_Phdr
+GElf_Phdr->p_vaddr and load_bias to calculate virtual address
+```
+
+
 ## Links
 
 - https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
