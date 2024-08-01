@@ -96,6 +96,7 @@ popd
 %{_datadir}/ulpatch/hello.obj
 
 %files devel
+%{_includedir}/ulpatch/asm.h
 %{_includedir}/ulpatch/meta.h
 %{_bindir}/ulp-config
 %{_mandir}/man8/ulp-config.8.gz
