@@ -9,6 +9,12 @@ extern void internal_print_hello(unsigned long ul);
 int not_created = true;
 pthread_t thread = { 1 };
 
+/**
+ * This patch test is not support unpatch(segvfault), because when unpatch, the
+ * pthread callback in ulp vma, after unpatch, the routine() is not exist.
+ *
+ * FIXME: See docs/TODO.
+ */
 void *routine(void *arg)
 {
 	while (1) {

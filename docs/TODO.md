@@ -24,6 +24,7 @@ hide:
 - How to patch to strip ELF process.
 - loongarch64 support.
 - GUI support, like GTK/Qt, etc.
+- Like kernel module has `module_init` and `module_exit`, ULPatch should has too, if create thread and thread callback is in ULP vma, during unpatch, segvfault will be triggered.
 
 
 ### No support (ideal is plump, reality is bony)
