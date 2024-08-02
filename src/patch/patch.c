@@ -49,7 +49,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
-	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix, inf->orig_value[0], inf->orig_value[1]);
+	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix, inf->orig_code[0], inf->orig_code[1]);
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time, ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
 	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->version);
@@ -827,15 +827,15 @@ static int kick_target_process(const struct load_info *info)
 		info->ulp_info->patch_func_addr);
 
 	/**
-	 * The struct ulpatch_info.orig_value MUST store the original code.
+	 * The struct ulpatch_info.orig_code MUST store the original code.
 	 */
-	if (sizeof(info->ulp_info->orig_value) < insn_sz) {
-		lerror("No enough space in ulpatch_info::orig_value field.\n");
+	if (sizeof(info->ulp_info->orig_code) < insn_sz) {
+		lerror("No enough space in ulpatch_info::orig_code field.\n");
 		goto done;
 	}
 
 	ldebug("Backup original instructions from %lx.\n", info->ulp_info->virtual_addr);
-	n = memcpy_from_task(task, info->ulp_info->orig_value,
+	n = memcpy_from_task(task, info->ulp_info->orig_code,
 				info->ulp_info->virtual_addr, insn_sz);
 	ldebug("memcpy return %d, expect %ld\n", n, insn_sz);
 	if (n == -1 || n < insn_sz) {
@@ -1015,12 +1015,12 @@ int delete_patch(struct task_struct *task)
 		return -ENOENT;
 	}
 
-	insn_sz = sizeof(ulp_info->orig_value);
+	insn_sz = sizeof(ulp_info->orig_code);
 	vma = ulp->vma;
 
 	task_attach(task->pid);
 
-	n = memcpy_to_task(task, ulp_info->virtual_addr, (void *)ulp_info->orig_value, insn_sz);
+	n = memcpy_to_task(task, ulp_info->virtual_addr, (void *)ulp_info->orig_code, insn_sz);
 	if (n == -1 || n < insn_sz) {
 		lerror("failed kick target process.\n");
 		err = -ENOEXEC;

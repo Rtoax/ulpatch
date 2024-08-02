@@ -79,34 +79,7 @@ struct ulpatch_strtab {
 };
 
 /**
- * Point to SEC_ULPATCH_INFO section
- *
- * Example:
- *
- * 0000000000405fe0 <hello>:
- *  405fe0:	55                   	push   %rbp
- *  405fe1:	48 89 e5             	mov    %rsp,%rbp
- *  405fe4:	41 57                	push   %r15
- *  ...
- * 0000000000408060 <new_hello>:
- *  408060:	55                   	push   %rbp
- *  408061:	48 89 e5             	mov    %rsp,%rbp
- *  408064:	41 57                	push   %r15
- *
- * After patching:
- * 0000000000405fe0 <hello>:
- *  405fe0:	75 xx xx xx xx          jmp    new_hello
- *  ...
- * 0000000000408060 <new_hello>:
- *  408060:	55                   	push   %rbp
- *  408061:	48 89 e5             	mov    %rsp,%rbp
- *  408064:	41 57                	push   %r15
- *
- * Then:
- * target_func_addr = 0x405fe0
- * patch_func_addr  = 0x408060
- * virtual_addr     = 0x405fe1
- * orig_value       = 0x55 48 89 e5 41 ...
+ * SEC_ULPATCH_INFO section
  */
 struct ulpatch_info {
 #define ULP_ID_NONE	0
@@ -117,7 +90,7 @@ struct ulpatch_info {
 
 	unsigned long virtual_addr;
 	/* store origin data in target process */
-	unsigned long orig_value[2];
+	unsigned long orig_code[2];
 
 	/* Record the live patch was patched time */
 	unsigned long time;
