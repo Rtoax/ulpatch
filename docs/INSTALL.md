@@ -12,6 +12,7 @@ hide:
 ```bash
 $ sudo dnf install -y \
 	binutils-devel \
+	capstone-devel \
 	cmake \
 	elfutils-devel \
 	elfutils-libelf-devel \
@@ -26,11 +27,12 @@ $ sudo dnf install -y \
 
 ```bash
 $ sudo apt install -y \
-	binutils-dev \
 	cmake \
 	gcc \
-	gcc-c++ \
+	binutils-dev \
 	libc6 \
+	libcapstone-dev \
+	libelf-dev \
 	libunwind-dev
 ```
 

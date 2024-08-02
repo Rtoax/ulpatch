@@ -3,11 +3,12 @@ FROM ubuntu:devel
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y \
-	libc6 \
-	libelf-dev \
 	cmake \
 	gcc \
 	binutils-dev \
+	libc6 \
+	libcapstone-dev \
+	libelf-dev \
 	libunwind-dev
 
 COPY . /src
