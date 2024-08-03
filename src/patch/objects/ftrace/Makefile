@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com>
 #
+SHELL = bash
+
 ifdef FTRACE_OBJ
 TARGETS = $(FTRACE_OBJ)
 else

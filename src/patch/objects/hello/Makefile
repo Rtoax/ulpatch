@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022 Rong Tao <rtoax@foxmail.com>
 #
+SHELL = bash
+
 ifdef ULPATCH_HELLO_OBJ
 TARGETS = $(ULPATCH_HELLO_OBJ)
 else
