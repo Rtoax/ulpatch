@@ -9,6 +9,8 @@
 #ifdef WITH_DLOPEN_TEST
 #include <dlfcn.h>
 #endif
+#include <limits.h>
+#include <unistd.h>
 
 static sig_atomic_t keep_running = true;
 static unsigned long count = 0;
@@ -84,9 +86,13 @@ void *routine(void *arg)
 int main(int argc, char *argv[])
 {
 	int i;
+	char buf[PATH_MAX];
 	pthread_t threads[NR_THREADS];
 
 	signal(SIGINT, sig_handler);
+
+	snprintf(buf, PATH_MAX, "cat /proc/%d/maps", getpid());
+	system(buf);
 
 #ifdef WITH_DLOPEN_TEST
 	load_patch_so();
