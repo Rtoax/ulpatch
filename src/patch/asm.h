@@ -2,15 +2,19 @@
 /* Copyright (C) 2024 Rong Tao <rtoax@foxmail.com> */
 #pragma once
 
+/**
+ * You can use the interface provided by this assembly header file directly in
+ * your UPL patch. This does not produce any relocation entries in the ELF
+ * patch file, so this is useful for testing.
+ *
+ * Developers note that any header file included in this header file can only
+ * reference the data structure in it, not any interfaces.
+ */
 #include <time.h>
 
 /**
- * You can use the interface provided by this assembly header file directly in
- * your UPL patch.
- */
-
-/**
- * nanosleep(2) __NR_nanosleep=35
+ * nanosleep(2)
+ * SYNOPSIS: int nanosleep(const struct timespec *req, struct timespec *rem);
  */
 #define ASM_SLEEP_X86_64(sec) ({		\
 	int ____ret;				\
@@ -48,6 +52,9 @@
 #endif
 
 
+/**
+ * SYNOPSIS: void exit(int status);
+ */
 #define ASM_EXIT_X86_64(val) ({		\
 	int ____v = val;		\
 	int ____ret;			\
