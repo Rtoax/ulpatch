@@ -12,7 +12,7 @@
 /**
  * nanosleep(2) __NR_nanosleep=35
  */
-#define ASM_SLEEP_X86_64(sec) ({			\
+#define ASM_SLEEP_X86_64(sec) ({		\
 	int ____ret;				\
 	struct timespec ____ts = {sec, 0};	\
 	__asm__("movq %1, %%rdi \n\t"		\
@@ -46,5 +46,21 @@
 # define ASM_SLEEP(sec) ASM_SLEEP_AARCH64(sec)
 #else
 # error "ASM_SLEEP() is not support"
+#endif
+
+#define ASM_EXIT_AARCH64(val) ({	\
+	int ____v = val;		\
+	__asm__("mov x0, %[v]\n"	\
+		"mov w8, #0x5d\n"	\
+		"svc #0x0\n"		\
+		: /* no ret */		\
+		: [v] "r"(____v));	\
+})
+
+#if defined(__x86_64__)
+#elif defined(__aarch64__)
+# define ASM_EXIT(v) ASM_EXIT_AARCH64(v)
+#else
+# error "ASM_EXIT() is not support"
 #endif
 
