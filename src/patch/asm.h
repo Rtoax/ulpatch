@@ -39,7 +39,6 @@
 	____ret;				\
 })
 
-
 #if defined(__x86_64__)
 # define ASM_SLEEP(sec) ASM_SLEEP_X86_64(sec)
 #elif defined(__aarch64__)
@@ -47,6 +46,18 @@
 #else
 # error "ASM_SLEEP() is not support"
 #endif
+
+
+#define ASM_EXIT_X86_64(val) ({		\
+	int ____v = val;		\
+	int ____ret;			\
+	__asm__("mov %1, %%edi \n\t"	\
+		"movq $60, %%rax \n\t"	\
+		"syscall \n\t"		\
+		: "=r"(____ret)		\
+		: "r"(____v));		\
+	____ret;			\
+})
 
 #define ASM_EXIT_AARCH64(val) ({	\
 	int ____v = val;		\
@@ -58,6 +69,7 @@
 })
 
 #if defined(__x86_64__)
+# define ASM_EXIT(v) ASM_EXIT_X86_64(v)
 #elif defined(__aarch64__)
 # define ASM_EXIT(v) ASM_EXIT_AARCH64(v)
 #else
