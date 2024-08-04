@@ -28,6 +28,7 @@ TARGETS += test
 TARGETS_ULP := patch-print.ulp
 TARGETS_ULP += patch-empty.ulp
 TARGETS_ULP += patch-asm-exit.ulp
+TARGETS_ULP += patch-asm-sleep.ulp
 TARGETS_ULP += patch-asm-puts.ulp
 TARGETS_ULP += patch-asm-write.ulp
 TARGETS_ULP += patch-add-vars.ulp
