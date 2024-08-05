@@ -8,5 +8,6 @@ ULP_SYM(empty)
 ULP_SYM(failed_bss)
 ULP_SYM(print)
 ULP_SYM(pthread)
+ULP_SYM(asm_sleep)
 /* exit() in the end */
 ULP_SYM(asm_exit)
