@@ -1,22 +1,15 @@
 #include <stdio.h>
+#include <ulpatch/asm.h>
 #include <ulpatch/meta.h>
 
 
 void ulp_asm_write(unsigned long ul)
 {
+	char msg[] = {"Hello-\n"};
+	int len = 7;
 #if defined(__x86_64__)
-	/* write("Hello\n") */
-	asm(
-		"mov    $0x1,%al\n"
-		"mov    %al,%dil\n"
-		"push   $0xa20206f\n"
-		"push   $0x6c6c6548\n"
-		"mov    %rsp,%rsi\n"
-		"mov    $0xc,%dl\n"
-		"syscall\n"
-		"pop    %rsi\n"
-		"pop    %rsi\n"
-	);
+	ASM_WRITE(1, msg, len);
+	ASM_WRITE_HELLO();
 #elif defined(__aarch64__)
 	/* write("Hello\n") */
 	asm(

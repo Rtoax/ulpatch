@@ -83,3 +83,44 @@
 # error "ASM_EXIT() is not support"
 #endif
 
+
+/**
+ * SYNOPSIS: ssize_t write(int fd, const void buf[.count], size_t count);
+ */
+#define ASM_WRITE_X86_64(fd, msg, len) ({	\
+	int ____ret;				\
+	int ____fd = fd;			\
+	char *____msg = msg;			\
+	unsigned long ____len = len;		\
+	__asm__("mov %[_fd], %%edi \n\t"	\
+		"movq %[_msg], %%rsi \n\t"	\
+		"movq %[_len], %%rdx \n\t"	\
+		"movq $1, %%rax \n\t"		\
+		"syscall \n\t"			\
+		: "=r"(____ret)			\
+		: [_fd] "r"(____fd),		\
+		  [_msg] "r"(____msg),		\
+		  [_len] "r"(____len));		\
+})
+
+/* write(1, "Hello\n", 6) */
+#define ASM_WRITE_HELLO_X86_64() ({	\
+	__asm__("mov $0x1, %al\n"	\
+		"mov %al, %dil\n"	\
+		"push $0xa20206f\n"	\
+		"push $0x6c6c6548\n"	\
+		"mov %rsp, %rsi\n"	\
+		"mov $0xc, %dl\n"	\
+		"syscall\n"		\
+		"pop %rsi\n"		\
+		"pop %rsi\n");		\
+})
+
+#if defined(__x86_64__)
+# define ASM_WRITE(fd, msg, len) ASM_WRITE_X86_64(fd, msg, len)
+# define ASM_WRITE_HELLO() ASM_WRITE_HELLO_X86_64()
+#elif defined(__aarch64__)
+#else
+# error "ASM_WRITE() is not support"
+#endif
+
