@@ -3,15 +3,15 @@
 
 void ulp_asm_puts(unsigned long ul)
 {
-	/* puts("Hello\n") */
+	/* puts("Hello") */
 #if defined(__x86_64__)
-	asm(
-	"push   $0xa20206f\n"
-	"push   $0x6c6c6548\n"
-	"mov    %rsp, %rdi\n"
-	"call   puts\n"
-	"pop    %rdi\n"
-	"pop    %rdi\n");
+	__asm__("push %rax\n"
+		"mov $0x0000006f6c6c6548, %rax\n"
+		"push %rax\n"
+		"mov %rsp, %rdi\n"
+		"call puts\n"
+		"pop %rax\n"
+		"pop %rax\n");
 #elif defined(__aarch64__)
 	asm(
 	"stp	x29, x30, [sp, #-32]!\n"
