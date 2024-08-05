@@ -101,6 +101,7 @@
 		: [_fd] "r"(____fd),		\
 		  [_msg] "r"(____msg),		\
 		  [_len] "r"(____len));		\
+	____ret;				\
 })
 
 /* write(1, "Hello\n", 6) */
@@ -116,10 +117,58 @@
 		"pop %rsi\n");		\
 })
 
+#define ASM_WRITE_AARCH64(fd, msg, len) ({	\
+	int ____ret;				\
+	int ____fd = fd;			\
+	char *____msg = msg;			\
+	unsigned long ____len = len;		\
+	__asm__("stp x0, x1, [sp, #-32]! \n\t"	\
+		"mov x0, %[_fd] \n\t"		\
+		"mov x1, %[_msg] \n\t"		\
+		"mov x2, %[_len] \n\t"		\
+		"mov x8, #64 \n\t"		\
+		"svc #0 \n\t"			\
+		"ldp x0, x1, [sp], #32 \n\t"	\
+		: "=g"(____ret)			\
+		: [_fd] "r"(____fd),		\
+		  [_msg] "r"(____msg),		\
+		  [_len] "r"(____len));		\
+	____ret;				\
+})
+
+#define ASM_WRITE_HELLO_AARCH64() ({		\
+	__asm__("stp x29, x30, [sp, #-32]!\n"	\
+		"mov x29, sp\n"			\
+		"str xzr, [sp, #16]\n"		\
+		"mov w0, #0x48\n"		\
+		"strb w0, [sp, #16]\n"		\
+		"mov w0, #0x65\n"		\
+		"strb w0, [sp, #17]\n"		\
+		"mov w0, #0x6c\n"		\
+		"strb w0, [sp, #18]\n"		\
+		"mov w0, #0x6c\n"		\
+		"strb w0, [sp, #19]\n"		\
+		"mov w0, #0x6f\n"		\
+		"strb w0, [sp, #20]\n"		\
+		"mov w0, #0xa\n"		\
+		"strb w0, [sp, #21]\n"		\
+		"add x0, sp, #0x10\n"		\
+		"str x0, [sp, #24]\n"		\
+		"\n"				\
+		"mov x0, #1\n"			\
+		"ldr x1, [sp, #24]\n"		\
+		"mov x2, #0x8\n"		\
+		"mov w8, #64\n"			\
+		"svc #0\n"			\
+		"ldp x29, x30, [sp], #32\n");	\
+})
+
 #if defined(__x86_64__)
 # define ASM_WRITE(fd, msg, len) ASM_WRITE_X86_64(fd, msg, len)
 # define ASM_WRITE_HELLO() ASM_WRITE_HELLO_X86_64()
 #elif defined(__aarch64__)
+# define ASM_WRITE(fd, msg, len) ASM_WRITE_AARCH64(fd, msg, len)
+# define ASM_WRITE_HELLO() ASM_WRITE_HELLO_AARCH64()
 #else
 # error "ASM_WRITE() is not support"
 #endif
