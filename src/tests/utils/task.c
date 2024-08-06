@@ -130,21 +130,19 @@ TEST(Task, attach_detach, 0)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
+	}
 
-		task_wait_wait(&waitqueue);
+	/* Parent */
+	task_wait_wait(&waitqueue);
 
-		ret = task_attach(pid);
-		ret = task_detach(pid);
+	ret = task_attach(pid);
+	ret = task_detach(pid);
 
-		task_wait_trigger(&waitqueue);
+	task_wait_trigger(&waitqueue);
 
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
-	} else {
-		lerror("fork(2) error.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -236,6 +234,10 @@ TEST(Task, mmap_malloc, 0)
 	int ret = -1;
 	int status = 0;
 	struct task_wait waitqueue;
+	char data[] = "ABCDEFG";
+	char buf[64] = "XXXXXX";
+	int n;
+	unsigned long addr;
 
 	task_wait_init(&waitqueue, NULL);
 
@@ -251,39 +253,32 @@ TEST(Task, mmap_malloc, 0)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
-		char data[] = "ABCDEFG";
-		char buf[64] = "XXXXXX";
-		int n;
-		unsigned long addr;
+	}
 
-		task_wait_wait(&waitqueue);
+	/* Parent */
+	task_wait_wait(&waitqueue);
 
-		struct task_struct *task = open_task(pid, FTO_RDWR);
+	struct task_struct *task = open_task(pid, FTO_RDWR);
 
-		// dump_task_vmas(task, true);
+	ret = task_attach(pid);
+	addr = task_malloc(task, 64);
+	ldebug("task %p, addr = %lx\n", task, addr);
 
-		ret = task_attach(pid);
-		addr = task_malloc(task, 64);
-		ldebug("task %p, addr = %lx\n", task, addr);
+	dump_task_vmas(task, true);
 
-		dump_task_vmas(task, true);
+	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
+	ldebug("memcpy_from_task: %s\n", buf);
+	n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
+	/* memcpy failed */
+	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
+		ret = -1;
 
-		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
-		ldebug("memcpy_from_task: %s\n", buf);
-		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
-		/* memcpy failed */
-		if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
-			ret = -1;
-
-		ret = task_detach(pid);
-		task_wait_trigger(&waitqueue);
-		waitpid(pid, &status, __WALL);
-		if (status != 0)
-			ret = -EINVAL;
-		close_task(task);
-	} else
-		lerror("fork(2) error.\n");
+	ret = task_detach(pid);
+	task_wait_trigger(&waitqueue);
+	waitpid(pid, &status, __WALL);
+	if (status != 0)
+		ret = -EINVAL;
+	close_task(task);
 
 	task_wait_destroy(&waitqueue);
 
@@ -295,6 +290,9 @@ TEST(Task, fstat, 0)
 	int ret = 0;
 	int status = 0;
 	struct task_wait waitqueue;
+	int remote_fd, local_fd;
+	struct stat stat = {};
+	struct stat statbuf = {};
 
 	task_wait_init(&waitqueue, NULL);
 
@@ -310,51 +308,46 @@ TEST(Task, fstat, 0)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
-
-		task_wait_wait(&waitqueue);
-
-		int remote_fd, local_fd;
-		struct stat stat = {};
-		struct stat statbuf = {};
-		struct task_struct *task = open_task(pid, FTO_RDWR);
-		char *filename = "/usr/bin/ls";
-
-		ret = task_attach(pid);
-		remote_fd = task_open(task, filename, O_RDONLY, 0644);
-		if (remote_fd <= 0) {
-			lwarning("remote open failed.\n");
-			return -1;
-		}
-		local_fd = open(filename, O_RDONLY, 0644);
-		if (local_fd <= 0) {
-			lwarning("open failed.\n");
-			return -1;
-		}
-
-		fstat(local_fd, &stat);
-		ret = task_fstat(task, remote_fd, &statbuf);
-
-		if (stat.st_size != statbuf.st_size) {
-			lerror("st_size not equal: remote(%ld) vs local(%ld)\n",
-				statbuf.st_size, stat.st_size);
-			ret = -1;
-		}
-
-		ldebug("stat.st_size = %ld\n", statbuf.st_size);
-
-		task_close(task, remote_fd);
-		task_detach(pid);
-
-		task_wait_trigger(&waitqueue);
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
-		close_task(task);
-	} else {
-		lerror("fork(2) error.\n");
 	}
+
+	/* Parent */
+	task_wait_wait(&waitqueue);
+
+	struct task_struct *task = open_task(pid, FTO_RDWR);
+	char *filename = "/usr/bin/ls";
+
+	ret = task_attach(pid);
+	remote_fd = task_open(task, filename, O_RDONLY, 0644);
+	if (remote_fd <= 0) {
+		lwarning("remote open failed.\n");
+		return -1;
+	}
+	local_fd = open(filename, O_RDONLY, 0644);
+	if (local_fd <= 0) {
+		lwarning("open failed.\n");
+		return -1;
+	}
+
+	fstat(local_fd, &stat);
+	ret = task_fstat(task, remote_fd, &statbuf);
+
+	if (stat.st_size != statbuf.st_size) {
+		lerror("st_size not equal: remote(%ld) vs local(%ld)\n",
+			statbuf.st_size, stat.st_size);
+		ret = -1;
+	}
+
+	ldebug("stat.st_size = %ld\n", statbuf.st_size);
+
+	task_close(task, remote_fd);
+	task_detach(pid);
+
+	task_wait_trigger(&waitqueue);
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
+	}
+	close_task(task);
 
 	task_wait_destroy(&waitqueue);
 
@@ -422,28 +415,26 @@ static int task_mmap_file(int prot)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
-
-		task_wait_wait(&waitqueue);
-
-		struct task_struct *task = open_task(pid, FTO_RDWR);
-
-		dump_task_vmas(task, true);
-
-		task_attach(pid);
-		ret = test_mmap_file(task, prot);
-
-		task_detach(pid);
-
-		task_wait_trigger(&waitqueue);
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
-		close_task(task);
-	} else {
-		lerror("fork(2) error.\n");
 	}
+
+	/* Parent */
+	task_wait_wait(&waitqueue);
+
+	struct task_struct *task = open_task(pid, FTO_RDWR);
+
+	dump_task_vmas(task, true);
+
+	task_attach(pid);
+	ret = test_mmap_file(task, prot);
+
+	task_detach(pid);
+
+	task_wait_trigger(&waitqueue);
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
+	}
+	close_task(task);
 
 	task_wait_destroy(&waitqueue);
 
@@ -465,6 +456,11 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 	int ret = -1;
 	int status = 0;
 	struct task_wait waitqueue;
+	char data[] = "ABCDEFG";
+	char buf[64] = "XXXXXX";
+	int n;
+	unsigned long addr;
+
 
 	task_wait_init(&waitqueue, NULL);
 
@@ -480,49 +476,42 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
-		char data[] = "ABCDEFG";
-		char buf[64] = "XXXXXX";
-		int n;
-		unsigned long addr;
+	}
 
-		task_wait_wait(&waitqueue);
+	/* Parent */
+	task_wait_wait(&waitqueue);
 
-		struct task_struct *task = open_task(pid, FTO_RDWR);
+	struct task_struct *task = open_task(pid, FTO_RDWR);
 
-		// dump_task_vmas(task, true);
+	ret = task_attach(pid);
+	addr = task_malloc(task, 64);
+	ldebug("task %p, addr = %lx\n", task, addr);
 
-		ret = task_attach(pid);
-		addr = task_malloc(task, 64);
-		ldebug("task %p, addr = %lx\n", task, addr);
+	dump_task_vmas(task, true);
 
-		dump_task_vmas(task, true);
+	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 
-		n = memcpy_to_task(task, addr, data, strlen(data) + 1);
+	// Set thread name
+	// see:
+	// $ ps -ef | grep sleep
+	// $ top -Hp PID  ot top -Hp $(pidof sleep)
+	//     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+	//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
+	ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
 
-		// Set thread name
-		// see:
-		// $ ps -ef | grep sleep
-		// $ top -Hp PID  ot top -Hp $(pidof sleep)
-		//     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-		//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
-		ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
+	ldebug("memcpy_from_task: %s\n", buf);
+	n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
+	/* memcpy failed */
+	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
+		ret = -1;
 
-		ldebug("memcpy_from_task: %s\n", buf);
-		n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
-		/* memcpy failed */
-		if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
-			ret = -1;
+	ret = task_detach(pid);
 
-		ret = task_detach(pid);
-
-		task_wait_trigger(&waitqueue);
-		waitpid(pid, &status, __WALL);
-		if (status != 0)
-			ret = -EINVAL;
-		close_task(task);
-	} else
-		lerror("fork(2) error.\n");
+	task_wait_trigger(&waitqueue);
+	waitpid(pid, &status, __WALL);
+	if (status != 0)
+		ret = -EINVAL;
+	close_task(task);
 
 	task_wait_destroy(&waitqueue);
 

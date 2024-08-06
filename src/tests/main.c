@@ -866,15 +866,13 @@ TEST(ulpatch_test, sleeper, 0)
 		if (ret == -1) {
 			exit(1);
 		}
-	} else if (pid > 0) {
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
-	} else {
-		lerror("fork(2) error.\n");
 	}
 
+	/* Parent */
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
+	}
 	return ret;
 }
 
@@ -903,17 +901,15 @@ TEST(ulpatch_test, wait, 0)
 		if (ret == -1) {
 			exit(1);
 		}
+	}
 
-	} else if (pid > 0) {
-
-		/* do something */
-		ldebug("PARENT: msgsnd to child.\n");
-		task_wait_trigger(&waitqueue);
-		ldebug("PARENT: send done.\n");
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	/* do something */
+	ldebug("PARENT: msgsnd to child.\n");
+	task_wait_trigger(&waitqueue);
+	ldebug("PARENT: send done.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -947,16 +943,15 @@ TEST(ulpatch_test, trigger, 0)
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		/* do something */
-		ldebug("PARENT: waiting.\n");
-		task_wait_wait(&waitqueue);
-		ldebug("PARENT: get msg.\n");
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	/* do something */
+	ldebug("PARENT: waiting.\n");
+	task_wait_wait(&waitqueue);
+	ldebug("PARENT: get msg.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -990,18 +985,17 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		/* do something */
-		ldebug("PARENT: msgsnd to child.\n");
-		task_wait_trigger(&waitqueue);
-		task_wait_trigger(&waitqueue);
-		task_wait_trigger(&waitqueue);
-		ldebug("PARENT: done.\n");
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	/* do something */
+	ldebug("PARENT: msgsnd to child.\n");
+	task_wait_trigger(&waitqueue);
+	task_wait_trigger(&waitqueue);
+	task_wait_trigger(&waitqueue);
+	ldebug("PARENT: done.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -1035,18 +1029,17 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		/* do something */
-		ldebug("PARENT: wait child.\n");
-		task_wait_wait(&waitqueue);
-		task_wait_wait(&waitqueue);
-		task_wait_wait(&waitqueue);
-		ldebug("PARENT: get msgs from child.\n");
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	/* do something */
+	ldebug("PARENT: wait child.\n");
+	task_wait_wait(&waitqueue);
+	task_wait_wait(&waitqueue);
+	task_wait_wait(&waitqueue);
+	ldebug("PARENT: get msgs from child.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -1080,19 +1073,18 @@ TEST(ulpatch_test, wait_trigger, 0)
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		/* do something */
-		ldebug("PARENT: do some thing.\n");
-		task_wait_trigger(&waitqueue);
-		task_wait_wait(&waitqueue);
-		task_wait_trigger(&waitqueue);
-		task_wait_wait(&waitqueue);
-		ldebug("PARENT: done.\n");
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	/* do something */
+	ldebug("PARENT: do some thing.\n");
+	task_wait_trigger(&waitqueue);
+	task_wait_wait(&waitqueue);
+	task_wait_trigger(&waitqueue);
+	task_wait_wait(&waitqueue);
+	ldebug("PARENT: done.\n");
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -1129,25 +1121,24 @@ static int test_listener_symbol(char request, char *sym,
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		char buffer[BUFFER_SIZE];
-		struct msgbuf *rx_buf = (void *)buffer;
+	char buffer[BUFFER_SIZE];
+	struct msgbuf *rx_buf = (void *)buffer;
 
-		task_wait_request(&waitqueue, REQUEST_SYM_ADDR, rx_buf, BUFFER_SIZE);
+	task_wait_request(&waitqueue, REQUEST_SYM_ADDR, rx_buf, BUFFER_SIZE);
 
-		unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
+	unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
 
-		/* The address must be equal */
-		if (addr != expect_addr) {
-			lerror("%s: addr 0x%lx != 0x%lx\n", sym, addr, expect_addr);
-			ret = -1;
-		}
+	/* The address must be equal */
+	if (addr != expect_addr) {
+		lerror("%s: addr 0x%lx != 0x%lx\n", sym, addr, expect_addr);
+		ret = -1;
+	}
 
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
@@ -1179,6 +1170,7 @@ TEST(ulpatch_test, listener_epoll, 0)
 	int ret = 0;
 	int status = 0;
 	pid_t pid;
+	int fd = -1, i, rslt;
 
 	struct task_wait waitqueue;
 
@@ -1199,35 +1191,32 @@ TEST(ulpatch_test, listener_epoll, 0)
 			exit(1);
 		}
 
-	} else if (pid > 0) {
+	}
 
-		int fd = -1, i, rslt;
+	/**
+	 * Wait for server init done. this method is not perfect.
+	 */
+	usleep(10000);
 
-		/**
-		 * Wait for server init done. this method is not perfect.
-		 */
-		usleep(10000);
+	fd = listener_helper_create_test_client();
 
-		fd = listener_helper_create_test_client();
+	if (fd <= 0)
+		ret = -1;
 
-		if (fd <= 0)
-			ret = -1;
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+		unsigned long addr;
 
-		for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-			unsigned long addr;
+		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 
-			listener_helper_symbol(fd, test_symbols[i].sym, &addr);
+		linfo("%-10s: %lx\n", test_symbols[i].sym, addr);
+	}
 
-			linfo("%-10s: %lx\n", test_symbols[i].sym, addr);
-		}
+	listener_helper_close(fd, &rslt);
+	listener_helper_close_test_client(fd);
 
-		listener_helper_close(fd, &rslt);
-		listener_helper_close_test_client(fd);
-
-		waitpid(pid, &status, __WALL);
-		if (status != 0) {
-			ret = -EINVAL;
-		}
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		ret = -EINVAL;
 	}
 
 	task_wait_destroy(&waitqueue);
