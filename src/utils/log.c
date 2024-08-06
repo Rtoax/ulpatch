@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <assert.h>
 
 #include <utils/log.h>
 
@@ -69,7 +68,9 @@ FILE *get_log_fp(void)
 
 int str2loglevel(const char *str)
 {
-	assert(str && "NULL string pointer");
+	if (!str)
+		return LOG_EMERG;
+
 	if (!strcasecmp(str, "debug") || !strcasecmp(str, "dbg"))
 		return LOG_DEBUG;
 	else if (!strcasecmp(str, "info") || !strcasecmp(str, "inf"))
@@ -88,7 +89,7 @@ int str2loglevel(const char *str)
 		return LOG_EMERG;
 	else {
 		fprintf(stderr, "Unknown log level string %s\n", str);
-		exit(1);
+		return LOG_EMERG;
 	}
 }
 

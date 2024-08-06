@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <errno.h>
 #include <malloc.h>
-#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/ptrace.h>
@@ -81,8 +80,13 @@ int open_pid_mem_rw(pid_t pid)
 
 static struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
-	struct vm_area_struct *vma = malloc(sizeof(struct vm_area_struct));
-	assert(vma && "alloc vma failed.");
+	struct vm_area_struct *vma;
+
+	vma = malloc(sizeof(struct vm_area_struct));
+	if (!vma) {
+		lerror("Malloc vma failed.\n");
+		return NULL;
+	}
 	memset(vma, 0x00, sizeof(struct vm_area_struct));
 
 	vma->task = task;
@@ -112,7 +116,8 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 	else if (vma->vm_end <= new->vm_start)
 		return 1;
 
-	assert(0 && "Try insert illegal vma.");
+	print_vma(stdout, true, vma, true);
+	lerror("Try to insert illegal vma, see above dump vma.\n");
 	return 0;
 }
 
@@ -1010,7 +1015,10 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	}
 
 	buffer = malloc(symtab_sz + strtab_sz);
-	assert(buffer && "Malloc fatal.");
+	if (!buffer) {
+		lerror("Malloc %ld bytes failed\n", symtab_sz + strtab_sz);
+		goto out_free;
+	}
 	memset(buffer, 0x0, symtab_sz + strtab_sz);
 
 	ldebug("%s: symtab_addr %lx, load_addr: %lx, vma start %lx\n",

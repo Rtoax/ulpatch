@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #include <stdarg.h>
-#include <assert.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -11,6 +10,7 @@
 #include <ctype.h>
 
 #include <utils/list.h>
+#include <utils/log.h>
 
 /**
  * @fp - if NULL, return directly
@@ -76,7 +76,10 @@ int ulpatch_startswith(const char *str, const char *prefix)
 static void __add_to_str_list(const char *name, struct list_head *list)
 {
 	struct str_node *str = malloc(sizeof(struct str_node));
-	assert(str && "malloc failed");
+	if (!str) {
+		lerror("Malloc str_node failed.\n");
+		return;
+	}
 
 	str->str = strdup(name);
 	list_add(&str->node, list);
@@ -97,9 +100,6 @@ static void __free_str(struct str_node *str)
 int parse_strstr(char *src, struct list_head *list)
 {
 	int n = 0;
-
-	assert(src && "NULL pointer");
-
 	char *newstr = strdup(src);
 	char *p = newstr;
 

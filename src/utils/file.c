@@ -9,7 +9,6 @@
 #include <string.h>
 #include <malloc.h>
 #include <errno.h>
-#include <assert.h>
 #include <libgen.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -288,7 +287,10 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 	}
 
 	mem = malloc(sizeof(struct mmap_struct));
-	assert(mem && "malloc fatal.");
+	if (!mem) {
+		lerror("Malloc mmap_struct failed.\n");
+		exit(1);
+	}
 
 	mem->filepath = strdup(filepath);
 	mem->open_flags = o_flags;
