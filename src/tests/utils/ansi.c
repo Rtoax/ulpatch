@@ -8,7 +8,7 @@
 #include <tests/test_api.h>
 
 
-TEST(UtilsAnsi,	base,	0)
+TEST(UtilsAnsi, base, 0)
 {
 	int i;
 

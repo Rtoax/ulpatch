@@ -161,7 +161,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	return ret;
 }
 
-TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
+TEST(Patch, ftrace_direct, TTWU_FTRACE_RETURN)
 {
 	struct patch_test_arg arg = {
 		.custom_mcount = my_direct_func,
@@ -171,7 +171,7 @@ TEST(Patch,	ftrace_direct,	TTWU_FTRACE_RETURN)
 	return direct_patch_ftrace_test(&arg, TTWU_FTRACE_RETURN);
 }
 
-TEST(Patch,	ftrace_object,	0)
+TEST(Patch, ftrace_object, 0)
 {
 	struct patch_test_arg arg = {
 		.custom_mcount = _ftrace_mcount,
@@ -182,7 +182,7 @@ TEST(Patch,	ftrace_object,	0)
 }
 
 #if defined(__x86_64__)
-TEST(Patch,	ftrace_nop,	0)
+TEST(Patch, ftrace_nop, 0)
 {
 	struct patch_test_arg arg = {
 		.custom_mcount = NULL,
@@ -200,7 +200,7 @@ int ulpatch_try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 	return ULPATCH_TTWU_RET;
 }
 
-TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
+TEST(Patch, direct_patch_ulpatch_direct_jmp, 0)
 {
 	int ret = 0;
 	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
@@ -253,7 +253,7 @@ TEST(Patch,	direct_patch_ulpatch_direct_jmp,	0)
 	return ret;
 }
 
-TEST(Patch,	direct_patch_ulpatch_jmp_table, 0)
+TEST(Patch, direct_patch_ulpatch_jmp_table, 0)
 {
 	int ret = 0;
 	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;

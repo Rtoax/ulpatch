@@ -20,7 +20,7 @@ static char docs[] = {
 	"\n"
 };
 
-TEST(Utils,	memshow,	0)
+TEST(Utils, memshow, 0)
 {
 
 #define TEST_DATA	"Hello World"

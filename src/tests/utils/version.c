@@ -8,7 +8,7 @@
 #include <tests/test_api.h>
 
 
-TEST(Utils,	ulpatch_version,	0)
+TEST(Utils, ulpatch_version, 0)
 {
 	int ret = 0;
 

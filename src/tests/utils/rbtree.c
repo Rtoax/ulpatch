@@ -12,7 +12,8 @@ struct test_data {
 };
 
 
-static int cmp_data(struct rb_node *n1, unsigned long key) {
+static int cmp_data(struct rb_node *n1, unsigned long key)
+{
 	struct test_data *s1 = rb_entry(n1, struct test_data, node);
 	int v = (int)key;
 	return s1->v - v;
@@ -36,10 +37,10 @@ static __unused int link_data(struct rb_root *tree, struct test_data *data)
 static void free_data(struct rb_node *node)
 {
 	struct test_data __unused *s = rb_entry(node, struct test_data, node);
-	// maybe more
+	/* maybe more */
 }
 
-TEST(Rbtree,	rbtree,	0)
+TEST(Rbtree, rbtree, 0)
 {
 	int ret = -1;
 	int i;

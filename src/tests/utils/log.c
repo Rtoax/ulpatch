@@ -7,7 +7,7 @@
 #include <tests/test_api.h>
 
 
-TEST(Log,	log,	0)
+TEST(Log, log, 0)
 {
 	ldebug("DEBUG\n");
 	linfo("INFO\n");
@@ -23,7 +23,7 @@ TEST(Log,	log,	0)
 	return 0;
 }
 
-TEST(Log,	log_no_prefix,	0)
+TEST(Log, log_no_prefix, 0)
 {
 	set_log_prefix(true);
 
@@ -39,7 +39,7 @@ TEST(Log,	log_no_prefix,	0)
 	return 0;
 }
 
-TEST(Log,	set_log_level,	0)
+TEST(Log, set_log_level, 0)
 {
 	set_log_level(LOG_CRIT);
 
@@ -57,7 +57,7 @@ TEST(Log,	set_log_level,	0)
 	return 0;
 }
 
-TEST(Log,	set_log_prefix,	0)
+TEST(Log, set_log_prefix, 0)
 {
 	set_log_prefix(false);
 
@@ -84,7 +84,7 @@ TEST(Log,	set_log_prefix,	0)
 	return 0;
 }
 
-TEST(Log,	str2loglevel,	0)
+TEST(Log, str2loglevel, 0)
 {
 	if (LOG_INFO != str2loglevel("info") || LOG_INFO != str2loglevel("INFO"))
 		return -1;

@@ -21,7 +21,7 @@ void hello_world(void)
 }
 
 
-TEST(ULPatch,	object_hello,	0)
+TEST(ULPatch, object_hello, 0)
 {
 	/* original */
 	hello_world();

@@ -19,7 +19,7 @@ static __unused void STATIC_FUNC_FN(void)
 {
 }
 
-TEST(Ftrace,	elf_static_func_addr,	0)
+TEST(Ftrace, elf_static_func_addr, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -93,7 +93,7 @@ out:
 	return ret;
 }
 
-TEST(Ftrace,	elf_global_func_addr,	0)
+TEST(Ftrace, elf_global_func_addr, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -217,7 +217,7 @@ out:
 	return ret;
 }
 
-TEST(Ftrace,	elf_libc_func_addr,	0)
+TEST(Ftrace, elf_libc_func_addr, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -340,7 +340,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	return ret;
 }
 
-TEST(Ftrace,	init_patch,	TEST_SKIP_RET)
+TEST(Ftrace, init_patch, TEST_SKIP_RET)
 {
 	return test_task_patch(FTO_ULFTRACE, NULL);
 }
@@ -368,12 +368,12 @@ static int find_task_symbol(struct task_struct *task)
 	return err;
 }
 
-TEST(Ftrace,	find_task_symbol_list,	0)
+TEST(Ftrace, find_task_symbol_list, 0)
 {
 	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }
 
-TEST(Ftrace,	find_task_symbol_value,	0)
+TEST(Ftrace, find_task_symbol_value, 0)
 {
 	int ret = 0;
 	int status = 0;

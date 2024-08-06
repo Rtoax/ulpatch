@@ -23,7 +23,7 @@ int i_am_a_patch(void)
 
 ULPATCH_INFO(patch_me, i_am_a_patch, "Rong Tao <rtoax@foxmail.com>");
 
-TEST(Patch_meta,	macro__ULPATCH_INFO,	0)
+TEST(Patch_meta, macro__ULPATCH_INFO, 0)
 {
 	return 0;
 }

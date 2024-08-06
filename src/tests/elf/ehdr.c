@@ -8,7 +8,7 @@
 
 #include <tests/test_api.h>
 
-TEST(Elf_Ehdr,	print,	0)
+TEST(Elf_Ehdr, print, 0)
 {
 	Elf64_Ehdr ehdr1 = {
 		.e_ident[EI_MAG0] = ELFMAG0,
@@ -23,7 +23,7 @@ TEST(Elf_Ehdr,	print,	0)
 	return 0;
 }
 
-TEST(Elf_Ehdr,	readelf,	0)
+TEST(Elf_Ehdr, readelf, 0)
 {
 	struct elf_file *elf;
 	elf = elf_file_open(ulpatch_test_path);

@@ -15,7 +15,7 @@ static const char *test_files[] = {
 };
 
 
-TEST(File,	fexist,	0)
+TEST(File, fexist, 0)
 {
 	int ret = 0, i;
 
@@ -28,7 +28,7 @@ TEST(File,	fexist,	0)
 	return ret;
 }
 
-TEST(File,	fsize,	0)
+TEST(File, fsize, 0)
 {
 	int ret = 0, i;
 
@@ -46,7 +46,7 @@ TEST(File,	fsize,	0)
 	return ret;
 }
 
-TEST(File,	ftouch_remove,	0)
+TEST(File, ftouch_remove, 0)
 {
 	int ret = 0, i;
 	char *files[] = {
@@ -68,7 +68,7 @@ TEST(File,	ftouch_remove,	0)
 	return ret;
 }
 
-TEST(File,	fmmap_rdonly,	0)
+TEST(File, fmmap_rdonly, 0)
 {
 	int ret = 0, i;
 
@@ -88,7 +88,7 @@ TEST(File,	fmmap_rdonly,	0)
 	return ret;
 }
 
-TEST(File,	ftype_ELF,	0)
+TEST(File, ftype_ELF, 0)
 {
 	if (!fexist(USR_BIN_LS)) {
 		lerror("%s not exist.\n", USR_BIN_LS);
@@ -104,7 +104,7 @@ TEST(File,	ftype_ELF,	0)
 	return 0;
 }
 
-TEST(File,	fmktempfile,	0)
+TEST(File, fmktempfile, 0)
 {
 	int err = 0;
 	char buffer[PATH_MAX];
@@ -135,7 +135,7 @@ TEST(File,	fmktempfile,	0)
 	return err;
 }
 
-TEST(File,	fmktempname,	0)
+TEST(File, fmktempname, 0)
 {
 	int err = 0;
 	char buffer[PATH_MAX];
@@ -155,18 +155,18 @@ TEST(File,	fmktempname,	0)
 	return err;
 }
 
-TEST(File,	fcopy_NULL,	-EINVAL)
+TEST(File, fcopy_NULL, -EINVAL)
 {
 	return fcopy(NULL, NULL);
 }
 
-TEST(File,	fcopy_EXIST,	-EEXIST)
+TEST(File, fcopy_EXIST, -EEXIST)
 {
 	/* Make sure NOT exist */
 	return fcopy("/a/b/c/d/e/f/g/h/i", "/j/k/l/m/n/o/p");
 }
 
-TEST(File,	fcopy,	0)
+TEST(File, fcopy, 0)
 {
 #define TMP_FILE	"./a.out"
 

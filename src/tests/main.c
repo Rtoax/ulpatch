@@ -849,7 +849,7 @@ int main(int argc, char *argv[])
 
 /* There are some selftests */
 
-TEST(ulpatch_test,	sleeper,	0)
+TEST(ulpatch_test, sleeper, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -878,7 +878,7 @@ TEST(ulpatch_test,	sleeper,	0)
 	return ret;
 }
 
-TEST(ulpatch_test,	wait,	0)
+TEST(ulpatch_test, wait, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -921,7 +921,7 @@ TEST(ulpatch_test,	wait,	0)
 	return ret;
 }
 
-TEST(ulpatch_test,	trigger,	0)
+TEST(ulpatch_test, trigger, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -964,7 +964,7 @@ TEST(ulpatch_test,	trigger,	0)
 	return ret;
 }
 
-TEST(ulpatch_test,	wait_wait_wait,	0)
+TEST(ulpatch_test, wait_wait_wait, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1009,7 +1009,7 @@ TEST(ulpatch_test,	wait_wait_wait,	0)
 	return ret;
 }
 
-TEST(ulpatch_test,	trigger_trigger_trigger,	0)
+TEST(ulpatch_test, trigger_trigger_trigger, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1054,7 +1054,7 @@ TEST(ulpatch_test,	trigger_trigger_trigger,	0)
 	return ret;
 }
 
-TEST(ulpatch_test,	wait_trigger,	0)
+TEST(ulpatch_test, wait_trigger, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -1155,7 +1155,7 @@ static int test_listener_symbol(char request, char *sym,
 	return ret;
 }
 
-TEST(ulpatch_test,	listener,	0)
+TEST(ulpatch_test, listener, 0)
 {
 	int err = 0, i;
 
@@ -1174,7 +1174,7 @@ TEST(ulpatch_test,	listener,	0)
 	return err;
 }
 
-TEST(ulpatch_test,	listener_epoll,	0)
+TEST(ulpatch_test, listener_epoll, 0)
 {
 	int ret = 0;
 	int status = 0;

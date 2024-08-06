@@ -14,7 +14,7 @@
 #include <tests/test_api.h>
 
 
-TEST(Task_utils,	get_proc_pid_exe,	0)
+TEST(Task, get_proc_pid_exe, 0)
 {
 	char buf[256] = {}, *exe;
 
@@ -25,13 +25,13 @@ TEST(Task_utils,	get_proc_pid_exe,	0)
 	return -1;
 }
 
-TEST(Task,	open_free,	0)
+TEST(Task, open_free, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	return close_task(task);
 }
 
-TEST(Task,	open_free_fto_flags,	0)
+TEST(Task, open_free_fto_flags, 0)
 {
 	int ret = 0;
 	char buffer[PATH_MAX];
@@ -69,24 +69,27 @@ TEST(Task,	open_free_fto_flags,	0)
 	return ret;
 }
 
-TEST(Task,	open_failed,	-1)
+TEST(Task, open_failed, -1)
 {
-	// Try to open pid 1 (systemd)
-	// with 'sudo' it's will success
+	/**
+	 * Try to open pid 0 (idle)
+	 */
 	struct task_struct *task = open_task(0, FTO_NONE);
 
-	return task?0:-1;
+	return task ? 0 : -1;
 }
 
-TEST(Task,	open_non_exist,	-1)
+TEST(Task, open_non_exist, -1)
 {
-	// Try to open pid -1 (non exist)
+	/**
+	 * Try to open pid -1 (non exist)
+	 */
 	struct task_struct *task = open_task(-1, FTO_NONE);
 
-	return task?0:-1;
+	return task ? 0 : -1;
 }
 
-TEST(Task,	dump_task,	0)
+TEST(Task, dump_task, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
@@ -98,7 +101,7 @@ TEST(Task,	dump_task,	0)
 	return close_task(task);
 }
 
-TEST(Task,	attach_detach,	0)
+TEST(Task, attach_detach, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -140,7 +143,7 @@ TEST(Task,	attach_detach,	0)
 	return ret;
 }
 
-TEST(Task,	for_each_vma,	0)
+TEST(Task, for_each_vma, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	struct vm_area_struct *vma;
@@ -154,7 +157,7 @@ TEST(Task,	for_each_vma,	0)
 	return close_task(task);
 }
 
-TEST(Task,	find_vma,	0)
+TEST(Task, find_vma, 0)
 {
 	int ret = 0;
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
@@ -177,7 +180,7 @@ failed:
 	return ret;
 }
 
-TEST(Task,	copy_from_task,	0)
+TEST(Task, copy_from_task, 0)
 {
 	char data[] = "ABCDEFGH";
 	char buf[64] = "XXXXXXXX";
@@ -197,7 +200,7 @@ TEST(Task,	copy_from_task,	0)
 	return ret;
 }
 
-TEST(Task,	copy_to_task,	0)
+TEST(Task, copy_to_task, 0)
 {
 	char data[] = "ABCDEFG";
 	char buf[64] = "XXXXXX";
@@ -219,7 +222,7 @@ TEST(Task,	copy_to_task,	0)
 	return ret;
 }
 
-TEST(Task,	mmap_malloc,	0)
+TEST(Task, mmap_malloc, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -278,7 +281,7 @@ TEST(Task,	mmap_malloc,	0)
 	return ret;
 }
 
-TEST(Task,	fstat,	0)
+TEST(Task, fstat, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -437,16 +440,18 @@ static int task_mmap_file(int prot)
 
 	return ret;
 }
-TEST(Task,	mmap_file_rw,	0)
+
+TEST(Task, mmap_file_rw, 0)
 {
 	return task_mmap_file(PROT_READ | PROT_WRITE);
 }
-TEST(Task,	mmap_file_rwx,	0)
+
+TEST(Task, mmap_file_rwx, 0)
 {
 	return task_mmap_file(PROT_READ | PROT_WRITE | PROT_EXEC);
 }
 
-TEST(Task,	prctl_PR_SET_NAME,	0)
+TEST(Task, prctl_PR_SET_NAME, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -515,7 +520,7 @@ TEST(Task,	prctl_PR_SET_NAME,	0)
 	return ret;
 }
 
-TEST(Task,	dump_task_vma_to_file,	0)
+TEST(Task, dump_task_vma_to_file, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	unsigned long addr;

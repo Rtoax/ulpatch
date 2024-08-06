@@ -11,7 +11,7 @@
 
 
 #if defined(__x86_64__)
-TEST(Arch_ftrace,	ftrace_call_replace,	0)
+TEST(Arch_ftrace, ftrace_call_replace, 0)
 {
 	char expect[] = {0xe8, 0xff, 0xff, 0xff, 0xff};
 	union text_poke_insn insn;

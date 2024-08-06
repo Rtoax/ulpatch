@@ -9,7 +9,7 @@
 #include <tests/test_api.h>
 
 
-TEST(Arch,	mcount,	0)
+TEST(Arch, mcount, 0)
 {
 	return 0;
 }

@@ -10,7 +10,7 @@
 
 
 #if defined(__x86_64__)
-TEST(Insn,	text_opcode_size,	0)
+TEST(Insn, text_opcode_size, 0)
 {
 	if (text_opcode_size(INST_INT3) != INT3_INSN_SIZE)
 		return -1;
