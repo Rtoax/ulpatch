@@ -83,8 +83,15 @@ struct symbol {
 	/**
 	 * Store GELF_ST_TYPE(sym->st_info), such as STT_OBJECT/STT_FUNC
 	 * for rbtree compare and search.
+	 *
+	 * FIXME: This field is not useful right now.
 	 */
 	int type;
+
+	/**
+	 * Mark the symbol is extern or not, it's use to resolve symbol.
+	 */
+	bool is_extern;
 
 	GElf_Sym sym;
 

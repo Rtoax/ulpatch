@@ -826,6 +826,7 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
 	struct symbol tmp = {
 		.name = (char *)name,
 		.type = type,
+		.is_extern = false,
 	};
 
 	ldebug("try find symbol %s\n", name);

@@ -342,19 +342,20 @@ const char *elf_mcount_name(struct elf_file *elf)
 int cmp_symbol_name(struct rb_node *n1, unsigned long key)
 {
 	struct symbol *s1 = rb_entry(n1, struct symbol, node);
-	struct symbol *s2 = (struct symbol*)key;
+	struct symbol *s2 = (struct symbol *)key;
 
-/**
- * FIXME: pthread_create()'s symbol type in ulp is STT_NOTYPE
- */
-#if 0
-	if (s1->type < s2->type) {
-		return -1;
-	} else if (s1->type > s2->type) {
-		return 1;
-	} else
-#endif
+	/**
+	 * FIXME: pthread_create()'s symbol type in ulp is STT_NOTYPE, and
+	 * kernel does not distinguish symbol type.
+	 */
+
+	if (s1->is_extern == s2->is_extern)
 		return strcmp(s1->name, s2->name);
+	else if (s1->is_extern > s2->is_extern)
+		return -1;
+	else if (s1->is_extern < s2->is_extern)
+		return 1;
+	return 0;
 }
 
 struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
@@ -365,6 +366,7 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 
 	s->name = strdup(name);
 	s->type = GELF_ST_TYPE(sym->st_info);
+	s->is_extern = is_extern_symbol(sym);
 
 	memcpy(&s->sym, sym, sizeof(GElf_Sym));
 
@@ -376,6 +378,7 @@ struct symbol *find_symbol(struct elf_file *elf, const char *name, int type)
 	struct symbol tmp = {
 		.name = (char *)name,
 		.type = type,
+		.is_extern = false,
 	};
 	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
 					      cmp_symbol_name,
@@ -459,6 +462,16 @@ void rb_free_symbol(struct rb_node *node)
 
 int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
 {
+	int i;
+
+	fprintf(fp, "sym:%s extern:%d nphdrs:%d\n", s->name, s->is_extern,
+		s->nphdrs);
+
+	if (s->nphdrs > 0) {
+		for (i = 0; i < s->nphdrs; i++)
+			print_phdr(stdout, &s->phdrs[i], i == 0);
+	}
+
 	return fprint_sym(fp, &s->sym, s->name, NULL, firstline);
 }
 
