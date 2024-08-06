@@ -50,7 +50,7 @@ int fprint_pid_maps(FILE *fp, int mapsfd)
 	if (fp == NULL)
 		fp = stdout;
 
-	while (read(mapsfd, &ch, 1) != 1) {
+	while (read(mapsfd, &ch, 1) == 1) {
 		fputc(ch, fp);
 		cnt++;
 	}
