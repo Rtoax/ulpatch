@@ -315,6 +315,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		case STT_FUNC:
 			if (is_ftrace_entry(symname)) {
 				elf->support_ftrace = true;
+				elf->mcount_name = strdup(symname);
 				lwarning("Found fentry %s\n", symname);
 			}
 			break;
@@ -323,6 +324,18 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		}
 	}
 	return 0;
+}
+
+bool elf_support_ftrace(struct elf_file *elf)
+{
+	return elf->support_ftrace;
+}
+
+const char *elf_mcount_name(struct elf_file *elf)
+{
+	if (!elf_support_ftrace(elf))
+		return NULL;
+	return elf->mcount_name;
 }
 
 /* the @key is (unsigned long)symbol */
@@ -396,32 +409,35 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 {
 	int i, nphdrs;
 	struct rb_node *node;
+	GElf_Phdr *phdr, *phdrs;
 	GElf_Section sec = s->sym.st_shndx;
 	GElf_Shdr *shdr = &elf->shdrs[sec];
 
-	if (!is_undef_symbol(&s->sym)) {
-		GElf_Phdr *phdr, *phdrs;
-
-		nphdrs = 0;
-		phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);
-
-		for (i = 0; i < elf->phdrnum; i++) {
-			phdr = &elf->phdrs[i];
-			if (shdr->sh_offset >= phdr->p_offset &&
-				shdr->sh_offset + shdr->sh_size <=
-					phdr->p_offset + phdr->p_filesz) {
-				memcpy(&phdrs[nphdrs], phdr, sizeof(GElf_Phdr));
-				nphdrs++;
-			}
-		}
-		if (nphdrs) {
-			s->nphdrs = nphdrs;
-			s->phdrs = malloc(sizeof(GElf_Phdr) * nphdrs);
-			memcpy(s->phdrs, phdrs, sizeof(GElf_Phdr) * nphdrs);
-		}
-		free(phdrs);
+	if (is_undef_symbol(&s->sym)) {
+		lwarning("Symbol %s is undef.\n", s->name);
+		goto insert;
 	}
 
+	nphdrs = 0;
+	phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);
+
+	for (i = 0; i < elf->phdrnum; i++) {
+		phdr = &elf->phdrs[i];
+		if (shdr->sh_offset >= phdr->p_offset &&
+			shdr->sh_offset + shdr->sh_size <=
+				phdr->p_offset + phdr->p_filesz) {
+			memcpy(&phdrs[nphdrs], phdr, sizeof(GElf_Phdr));
+			nphdrs++;
+		}
+	}
+	if (nphdrs) {
+		s->nphdrs = nphdrs;
+		s->phdrs = malloc(sizeof(GElf_Phdr) * nphdrs);
+		memcpy(s->phdrs, phdrs, sizeof(GElf_Phdr) * nphdrs);
+	}
+	free(phdrs);
+
+insert:
 	node = rb_insert_node(&elf->elf_file_symbols, &s->node,
 			      cmp_symbol_name, (unsigned long)s);
 	return node ? -1 : 0;

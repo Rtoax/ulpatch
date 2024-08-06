@@ -204,6 +204,9 @@ int elf_file_close(const char *filepath)
 	free(elf->phdrs);
 	free(elf->ehdr);
 
+	if (elf->support_ftrace)
+		free(elf->mcount_name);
+
 	/* Destroy symbols rb tree */
 	rb_destroy(&elf->elf_file_symbols, rb_free_symbol);
 
