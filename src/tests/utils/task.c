@@ -25,6 +25,15 @@ TEST(Task, get_proc_pid_exe, 0)
 	return -1;
 }
 
+TEST(Task, open_pid_maps, 0)
+{
+	int fd;
+	fd = open_pid_maps(getpid());
+	fprint_pid_maps(stderr, fd);
+	close(fd);
+	return 0;
+}
+
 TEST(Task, open_free, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
