@@ -3,7 +3,7 @@
 #
 include_directories(../..)
 
-message(STATUS "=== Compile for x86_64")
+message(STATUS "Compile for x86_64")
 
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 

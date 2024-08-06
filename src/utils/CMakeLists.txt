@@ -5,7 +5,7 @@ include_directories(..)
 
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
-message(STATUS "=== UTILS Architecture: ${ARCHITECTURE}")
+message(STATUS "UTILS Architecture: ${ARCHITECTURE}")
 if(LIBUNWIND_LIBRARIES)
 	find_library(LIBUNWIND unwind /usr/lib64)
 	find_library(LIBUNWIND_ARCH unwind-${ARCHITECTURE} /usr/lib64)
