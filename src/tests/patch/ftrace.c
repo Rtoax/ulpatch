@@ -141,7 +141,7 @@ TEST(Ftrace, elf_global_func_addr, 0)
 		ret = 0;
 	} else {
 		linfo(" %s's st_value %lx != %lx\n",
-			__stringify(STATIC_FUNC_FN), sym->sym.st_value,
+			__stringify(PRINTER_FN), sym->sym.st_value,
 			memaddr);
 		/**
 		 * Because the load address and the address of the
@@ -179,7 +179,7 @@ TEST(Ftrace, elf_global_func_addr, 0)
 		ret = 0;
 	} else {
 		linfo(" %s's st_value %lx != %lx\n",
-			__stringify(STATIC_FUNC_FN), sym->sym.st_value,
+			__stringify(LIBC_PUTS_FN), sym->sym.st_value,
 			memaddr);
 		/**
 		 * Because the load address and the address of the
