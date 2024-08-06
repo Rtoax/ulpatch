@@ -108,7 +108,7 @@
 #define ASM_WRITE_HELLO_X86_64() ({	\
 	__asm__("mov $0x1, %al\n"	\
 		"mov %al, %dil\n"	\
-		"push $0xa20206f\n"	\
+		"push $0x00000a6f\n"	\
 		"push $0x6c6c6548\n"	\
 		"mov %rsp, %rsi\n"	\
 		"mov $0xc, %dl\n"	\
