@@ -1813,6 +1813,11 @@ failed:
 	return NULL;
 }
 
+bool task_is_pie(struct task_struct *task)
+{
+	return task->is_pie;
+}
+
 static void __clean_task_proc(struct task_struct *task)
 {
 	char buffer[PATH_MAX];
