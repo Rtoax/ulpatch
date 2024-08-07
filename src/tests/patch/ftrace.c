@@ -21,7 +21,7 @@ static __unused void STATIC_FUNC_FN(void)
 
 TEST(Ftrace, elf_static_func_addr, 0)
 {
-	int ret = -1;
+	int ret = 0;
 	int status = 0;
 	struct task_wait waitqueue;
 
@@ -46,38 +46,21 @@ TEST(Ftrace, elf_static_func_addr, 0)
 	struct symbol *sym;
 	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
 	unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
-	int pagesize = getpagesize();
+	unsigned long addr;
 
-	sym = find_symbol(task->exe_elf, __stringify(STATIC_FUNC_FN), STT_FUNC);
+	sym = task_vma_find_symbol(task, __stringify(STATIC_FUNC_FN), STT_FUNC);
 	if (!sym) {
 		lerror("Not found %s.\n", __stringify(STATIC_FUNC_FN));
 		ret = -1;
 		goto out;
 	}
+	addr = task_vma_symbol_vaddr(sym);
 
-	linfo("%s: st_value %lx, %lx\n",
-		__stringify(STATIC_FUNC_FN), sym->sym.st_value, memaddr);
+	linfo("%s: find %lx, real %lx\n", __stringify(STATIC_FUNC_FN), addr,
+		memaddr);
 
-	/* st_value MUST equal to ELF address */
-	if (sym->sym.st_value == memaddr) {
-		ret = 0;
-	} else {
-		linfo(" %s's st_value %lx != %lx\n",
-			__stringify(STATIC_FUNC_FN), sym->sym.st_value,
-			memaddr);
-		/**
-		 * Because the load address and the address of the
-		 * symbol in the ELF file are not absolutely equal,
-		 * there is an offset relationship.
-		 *
-		 * This offset must be page aligned.
-		 */
-		unsigned long off = memaddr - sym->sym.st_value;
-		if (off % pagesize)
-			ret = -1;
-		else
-			ret = 0;
-	}
+	if (addr != memaddr)
+		ret = -1;
 
 out:
 	task_wait_trigger(&waitqueue);
@@ -94,7 +77,7 @@ out:
 
 TEST(Ftrace, elf_global_func_addr, 0)
 {
-	int ret = -1;
+	int ret = 0;
 	int status = 0;
 	struct task_wait waitqueue;
 
@@ -119,43 +102,25 @@ TEST(Ftrace, elf_global_func_addr, 0)
 
 	struct symbol *sym;
 	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
-	int pagesize = getpagesize();
-	unsigned long memaddr;
+	unsigned long memaddr, addr;
 
 	memaddr = (unsigned long)PRINTER_FN;
 	/* Test1:
 	 * Try find global function
 	 */
-	sym = find_symbol(task->exe_elf, __stringify(PRINTER_FN), STT_FUNC);
+	sym = task_vma_find_symbol(task, __stringify(PRINTER_FN), STT_FUNC);
 	if (!sym) {
 		lerror("Not found %s.\n", __stringify(PRINTER_FN));
 		ret = -1;
 		goto out;
 	}
+	addr = task_vma_symbol_vaddr(sym);
 
-	linfo("%s: st_value %lx, %lx\n",
-		__stringify(PRINTER_FN), sym->sym.st_value, memaddr);
+	linfo("%s: find %lx, real %lx\n", __stringify(PRINTER_FN), addr,
+		memaddr);
 
-	/* st_value MUST equal to ELF address */
-	if (sym->sym.st_value == memaddr) {
-		ret = 0;
-	} else {
-		linfo(" %s's st_value %lx != %lx\n",
-			__stringify(PRINTER_FN), sym->sym.st_value,
-			memaddr);
-		/**
-		 * Because the load address and the address of the
-		 * symbol in the ELF file are not absolutely equal,
-		 * there is an offset relationship.
-		 *
-		 * This offset must be page aligned.
-		 */
-		unsigned long off = memaddr - sym->sym.st_value;
-		if (off % pagesize)
-			ret = -1;
-		else
-			ret = 0;
-	}
+	if (addr != memaddr)
+		ret = -1;
 
 	/* Test2:
 	 * Try find libc function
@@ -164,44 +129,20 @@ TEST(Ftrace, elf_global_func_addr, 0)
 	LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
 	memaddr = (unsigned long)LIBC_PUTS_FN;
 
-	sym = find_symbol(task->exe_elf, __stringify(LIBC_PUTS_FN), STT_FUNC);
+	sym = task_vma_find_symbol(task, __stringify(LIBC_PUTS_FN), STT_FUNC);
 	if (!sym) {
 		lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
 		ret = -1;
 		goto out;
 	}
 
-	linfo("%s: st_value %lx, %lx\n",
-		__stringify(LIBC_PUTS_FN), sym->sym.st_value, memaddr);
+	addr = task_vma_symbol_vaddr(sym);
 
-	/* st_value MUST equal to ELF address */
-	if (sym->sym.st_value == memaddr) {
-		ret = 0;
-	} else {
-		linfo(" %s's st_value %lx != %lx\n",
-			__stringify(LIBC_PUTS_FN), sym->sym.st_value,
-			memaddr);
-		/**
-		 * Because the load address and the address of the
-		 * symbol in the ELF file are not absolutely equal,
-		 * there is an offset relationship.
-		 *
-		 * This offset must be page aligned.
-		 */
-		unsigned long off = memaddr - sym->sym.st_value;
-		if (off % pagesize) {
-#if defined(__aarch64__)
-			/**
-			 * TODO: st_value == 0 in aarch64?
-			 */
-			if (sym->sym.st_value == 0)
-				ret = 0;
-#else
-			ret = -1;
-#endif
-		} else
-			ret = 0;
-	}
+	linfo("%s: find %lx, real %lx\n", __stringify(LIBC_PUTS_FN), addr,
+		memaddr);
+
+	if (addr != memaddr)
+		ret = -1;
 
 out:
 	task_wait_trigger(&waitqueue);
