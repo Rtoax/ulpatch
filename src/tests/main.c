@@ -395,24 +395,26 @@ static int show_test(struct test *test)
 	return 0;
 }
 
-static bool filter_out_test(struct test *test)
+static bool should_filter_out(struct test *test)
 {
-	if (filter_format) {
-		char category_name[256];
-		snprintf(category_name, 256, "%s.%s",
-			test->category, test->name);
-
-		if (strstr(category_name, filter_format)) {
-			return false;
-		} else if (test->prio < TEST_PRIO_HIGHER) {
-			if (just_list_tests) return true;
-			else return false;
-		} else {
-			return true;
-		}
-	}
-
 	/* Default: test all */
+	if (!filter_format)
+		return false;
+
+	char category_name[256];
+	snprintf(category_name, 256, "%s.%s",
+		test->category, test->name);
+
+	if (strstr(category_name, filter_format))
+		return false;
+	else if (test->prio < TEST_PRIO_HIGHER) {
+		if (just_list_tests)
+			return true;
+		else
+			return false;
+	} else
+		return true;
+
 	return false;
 }
 
@@ -501,10 +503,12 @@ static void launch_tester(void)
 			int ret;
 
 			if (just_list_tests) {
-				if (filter_out_test(test)) continue;
+				if (should_filter_out(test))
+					continue;
 				ret = show_test(test);
 			} else {
-				if (filter_out_test(test)) continue;
+				if (should_filter_out(test))
+					continue;
 				ret = operate_test(test);
 				/* if error */
 				if (ret != 0) {
