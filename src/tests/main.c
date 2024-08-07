@@ -58,7 +58,8 @@ static void __ctor(TEST_PRIO_START) __init_test_list(void)
 	fprintf(stderr, "\033[m");
 
 
-/* 0-success, 1-failed */
+#define STAT_IDX_SUCCESS	0
+#define STAT_IDX_FAILED		1
 static unsigned long stat_count[2] = {0};
 
 static unsigned long total_spent_us = 0;
@@ -431,12 +432,10 @@ static int operate_test(struct test *test)
 	/* Exe test entry */
 	ret = test->test_cb();
 	if (ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
-		stat_count[0]++;
+		stat_count[STAT_IDX_SUCCESS]++;
 	} else {
-		stat_count[1]++;
-
+		stat_count[STAT_IDX_FAILED]++;
 		failed = true;
-
 		list_add(&test->failed, &failed_list);
 	}
 
@@ -449,12 +448,13 @@ static int operate_test(struct test *test)
 
 	test_log("\033[2m%ldus\033[m %s%-8s%s\n",
 		test->spend_us,
-		failed?"\033[31m":"\033[32m",
-		failed?"Not OK":"OK",
+		failed ? "\033[31m" : "\033[32m",
+		failed ? "Not OK" : "OK",
 		"\033[m");
 
 	if (failed) {
-		/* 1. high priority failed
+		/**
+		 * 1. high priority failed
 		 * 2. ordinary test failed, and set --error-exit argument
 		 */
 		if (test->prio < TEST_PRIO_MIDDLE || error_exit) {
@@ -476,6 +476,7 @@ static void launch_tester(void)
 	test_log("===\n");
 	test_log("===  version: %s\n", ulpatch_version());
 	test_log("=== ---------------------------\n");
+
 	if (just_list_tests) {
 		fprintf(stderr,
 			"\n"
@@ -517,35 +518,36 @@ print_stat:
 
 	if (just_list_tests) {
 		fprintf(stderr, "\n");
-	} else {
-		fprintf(stderr,
-			"=========================================\n"
-			"=== Total %ld tested\n"
-			"===  Success %ld\n"
-			"===  Failed %ld\n"
-			"===  Spend %ldms %.2lfms/per\n",
-			stat_count[0] + stat_count[1],
-			stat_count[0],
-			stat_count[1],
-			total_spent_us / 1000,
-			total_spent_us * 1.0f / (stat_count[0] + stat_count[1]) / 1000.0f
-		);
-
-		if (stat_count[1] > 0) {
-			fprintf(stderr,
-				"\n"
-				"Show failed test list\n"
-				"\n"
-				" %-10s  %-4s %s.%s\n",
-				"Idx/NUM", "Prio", "Category", "name"
-			);
-			list_for_each_entry(test, &failed_list, failed) {
-				show_test(test);
-			}
-		}
-		test_log("=========================================\n");
+		return;
 	}
 
+	unsigned long total = stat_count[STAT_IDX_SUCCESS]
+				+ stat_count[STAT_IDX_FAILED];
+	fprintf(stderr,
+		"=========================================\n"
+		"=== Total %ld tested\n"
+		"===  Success %ld\n"
+		"===  Failed %ld\n"
+		"===  Spend %ldms %.2lfms/per\n",
+		total,
+		stat_count[STAT_IDX_SUCCESS],
+		stat_count[STAT_IDX_FAILED],
+		total_spent_us / 1000,
+		total_spent_us * 1.0f / total / 1000.0f
+	);
+
+	if (stat_count[STAT_IDX_FAILED] > 0) {
+		fprintf(stderr,
+			"\n"
+			"Show failed test list\n"
+			"\n"
+			" %-10s  %-4s %s.%s\n",
+			"Idx/NUM", "Prio", "Category", "name"
+		);
+		list_for_each_entry(test, &failed_list, failed)
+			show_test(test);
+	}
+	test_log("=========================================\n");
 }
 
 static void launch_printer(void);
