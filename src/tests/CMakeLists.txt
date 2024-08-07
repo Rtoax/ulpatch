@@ -3,8 +3,10 @@
 #
 include_directories(..)
 
-find_library(ELF elf /usr/lib64)
-find_library(PTHREAD pthread /usr/lib64)
+set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
+
+find_library(ELF elf HINTS ${SEARCH_PATH})
+find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
 link_libraries(${ELF} ${PTHREAD}
 	ulpatch_arch

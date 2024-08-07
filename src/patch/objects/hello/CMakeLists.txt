@@ -4,8 +4,9 @@
 include_directories(../../../)
 
 set(ULPATCH_OBJ_TARGET ulpatch_patch_obj_hello)
+set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
-find_library(ELF elf /usr/lib64)
+find_library(ELF elf HINTS ${SEARCH_PATH})
 
 link_libraries(${ELF}
 	ulpatch_utils
