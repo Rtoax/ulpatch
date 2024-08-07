@@ -20,7 +20,7 @@ find_library(BINUTILS_BFD_LIBRARIES
 
 include(FindPackageHandleStandardArgs)
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils-devel development package"
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils development package"
 	BINUTILS_BFD_LIBRARIES
 	BINUTILS_INCLUDE_DIRS)
 

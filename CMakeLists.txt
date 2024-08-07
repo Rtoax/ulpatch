@@ -93,59 +93,54 @@ message(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
 
-if(ELFUTILS_INCLUDE_DIRS)
-	message(STATUS "FOUND elfutils-devel")
-else()
-	message(FATAL_ERROR "FOUND elfutils-devel")
-endif()
-
-if(BINUTILS_INCLUDE_DIRS)
-	message(STATUS "FOUND binutils-devel")
-else()
-	message(FATAL_ERROR "Not FOUND binutils-devel")
-endif()
-
-if(CAPSTONE_INCLUDE_DIRS)
-	message(STATUS "FOUND capstone-devel")
-endif()
-
-if(LIBUNWIND_INCLUDE_DIRS)
-	message(STATUS "FOUND libunwind-devel")
-endif()
-
-if(KERNEL_HEADERS_INCLUDE_DIRS)
-	message(STATUS "FOUND kernel-headers")
-endif()
-
-if(LIBELF_FOUND)
-	message(STATUS "FOUND libelf")
-endif()
-
 # This variable store utils CFLAGS's macros(-D of compiler)
 set(UTILS_CFLAGS_MACROS)
 set(TESTS_CFLAGS_MACROS)
 
+if(LIBELF_INCLUDE_DIRS)
+	message(STATUS "Found libelf headers")
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_LIBELF_DEVEL)
+endif()
+
 if(ELFUTILS_INCLUDE_DIRS)
+	message(STATUS "Found elfutils headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_ELFUTILS_DEVEL)
+else()
+	message(FATAL_ERROR "Not found elfutils header")
 endif()
+
 if(BINUTILS_INCLUDE_DIRS)
+	message(STATUS "Found binutils headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_BINUTILS_DEVEL)
+else()
+	message(FATAL_ERROR "Not found binutils headers")
 endif()
+
 if(BINUTILS_BFD_H)
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_BINUTILS_BFD_H)
 endif()
+
 if(LIBUNWIND_LIBUNWIND_H)
+	message(STATUS "Found libunwind headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_LIBUNWIND_H)
 endif()
+
 if(CAPSTONE_INCLUDE_DIRS)
+	message(STATUS "Found capstone headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_DEVEL)
 endif()
+
 if(CAPSTONE_CAPSTONE_H)
-	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CAPSTONE_CAPSTONE_H)
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_CAPSTONE_H)
+endif()
+
+if(KERNEL_HEADERS_INCLUDE_DIRS)
+	message(STATUS "Found kernel headers")
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_KERNEL_HEADERS_DEVEL)
 endif()
 
 if(KERNEL_HEADERS_CONST_H)
-	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" KERNEL_HEADERS_CONST_H)
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_KERNEL_HEADERS_CONST_H)
 endif()
 
 # macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example

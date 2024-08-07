@@ -64,7 +64,7 @@
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #endif
 
-#if defined(KERNEL_HEADERS_CONST_H)
+#if defined(HAVE_KERNEL_HEADERS_CONST_H)
 #include <linux/const.h>
 #endif
 

@@ -5,6 +5,7 @@
 # Once done this will define
 #
 #  CAPSTONE_FOUND - system has capstone
+#  CAPSTONE_LIBRARIES
 #  CAPSTONE_INCLUDE_DIRS - the capstone include directory
 #  CAPSTONE_CAPSTONE_H - the capstone has capstone.h header
 
@@ -13,9 +14,15 @@ find_path(CAPSTONE_INCLUDE_DIRS
 	PATH_SUFFIXES capstone
 	PATHS ENV CPATH)
 
+find_library(CAPSTONE_LIBRARIES
+	NAMES capstone
+	PATHS
+		ENV LIBRARY_PATH
+		ENV LD_LIBRARY_PATH)
+
 include(FindPackageHandleStandardArgs)
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(capstone-devel "Please install the capstone-devel development package"
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(capstone-devel "Please install the capstone development package"
 	CAPSTONE_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES capstone)
@@ -27,5 +34,9 @@ int main(void) {
 }" CAPSTONE_CAPSTONE_H)
 SET(CMAKE_REQUIRED_LIBRARIES)
 
-mark_as_advanced(CAPSTONE_INCLUDE_DIRS CAPSTONE_CAPSTONE_H)
+mark_as_advanced(
+	CAPSTONE_INCLUDE_DIRS
+	CAPSTONE_LIBRARIES
+	CAPSTONE_CAPSTONE_H
+)
 
