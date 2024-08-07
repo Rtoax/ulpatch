@@ -836,7 +836,6 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
 	return node ? rb_entry(node, struct symbol, node) : NULL;
 }
 
-/* Insert OK, return 0, else return -1 */
 int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 {
 	struct rb_node *node;
@@ -870,7 +869,7 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 	else
 		ldebug("%s: add symbol %s addr %lx success.\n", task->comm,
 			s->name, s->sym.st_value);
-	return node ? -1 : 0;
+	return node ? -EINVAL : 0;
 }
 
 int task_vma_alloc_link_symbol(struct vm_area_struct *leader, const char *name,

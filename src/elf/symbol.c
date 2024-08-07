@@ -290,6 +290,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 {
+	int ret;
 	size_t nsym = 0, isym = 0;
 	GElf_Sym *sym, sym_mem;
 	char *symname, *pversion;
@@ -306,9 +307,12 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		ldebug("%s%s%s\n", symname, pversion ? "@" : "",
 			pversion ?: "");
 
-		/* save symbol to rbtree */
 		struct symbol *s = alloc_symbol(symname, sym);
-		link_symbol(elf, s);
+		ret = link_symbol(elf, s);
+		if (ret) {
+			free_symbol(s);
+			continue;
+		}
 
 		/* make some special handle */
 		switch (GELF_ST_TYPE(sym->st_info)) {
@@ -419,7 +423,6 @@ int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 	return 0;
 }
 
-/* Insert OK, return 0, else return -1 */
 int link_symbol(struct elf_file *elf, struct symbol *s)
 {
 	int i, nphdrs;
@@ -455,7 +458,7 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 insert:
 	node = rb_insert_node(&elf->elf_file_symbols, &s->node,
 			      cmp_symbol_name, (unsigned long)s);
-	return node ? -1 : 0;
+	return node ? -EINVAL : 0;
 }
 
 void free_symbol(struct symbol *s)
