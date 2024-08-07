@@ -19,7 +19,7 @@ static __unused void STATIC_FUNC_FN(void)
 {
 }
 
-TEST(Ftrace, elf_static_func_addr, 0)
+static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 {
 	int ret = 0;
 	int status = 0;
@@ -45,18 +45,18 @@ TEST(Ftrace, elf_static_func_addr, 0)
 
 	struct symbol *sym;
 	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
-	unsigned long memaddr = (unsigned long)STATIC_FUNC_FN;
+	unsigned long memaddr = real_addr;
 	unsigned long addr;
 
-	sym = task_vma_find_symbol(task, __stringify(STATIC_FUNC_FN), STT_FUNC);
+	sym = task_vma_find_symbol(task, name, STT_FUNC);
 	if (!sym) {
-		lerror("Not found %s.\n", __stringify(STATIC_FUNC_FN));
+		lerror("Not found %s.\n", name);
 		ret = -1;
 		goto out;
 	}
 	addr = task_vma_symbol_vaddr(sym);
 
-	linfo("%s: find %lx, real %lx\n", __stringify(STATIC_FUNC_FN), addr,
+	linfo("%s: find %lx, real %lx\n", name, addr,
 		memaddr);
 
 	if (addr != memaddr)
@@ -75,150 +75,18 @@ out:
 	return ret;
 }
 
-TEST(Ftrace, elf_global_func_addr, 0)
+TEST(Ftrace, task_func_addr, 0)
 {
 	int ret = 0;
-	int status = 0;
-	struct task_wait waitqueue;
-
-	task_wait_init(&waitqueue, NULL);
-
-	pid_t pid = fork();
-	if (pid == 0) {
-		char *argv[] = {
-			(char*)ulpatch_test_path,
-			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
-			NULL
-		};
-		ret = execvp(argv[0], argv);
-		if (ret == -1) {
-			exit(1);
-		}
-	}
-
-	/* Parent */
-	task_wait_wait(&waitqueue);
-
-	struct symbol *sym;
-	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
-	unsigned long memaddr, addr;
-
-	memaddr = (unsigned long)PRINTER_FN;
-	/* Test1:
-	 * Try find global function
-	 */
-	sym = task_vma_find_symbol(task, __stringify(PRINTER_FN), STT_FUNC);
-	if (!sym) {
-		lerror("Not found %s.\n", __stringify(PRINTER_FN));
-		ret = -1;
-		goto out;
-	}
-	addr = task_vma_symbol_vaddr(sym);
-
-	linfo("%s: find %lx, real %lx\n", __stringify(PRINTER_FN), addr,
-		memaddr);
-
-	if (addr != memaddr)
-		ret = -1;
-
-	/* Test2:
-	 * Try find libc function
-	 */
-	/* call it, make PLT/GOT done */
-	LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
-	memaddr = (unsigned long)LIBC_PUTS_FN;
-
-	sym = task_vma_find_symbol(task, __stringify(LIBC_PUTS_FN), STT_FUNC);
-	if (!sym) {
-		lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
-		ret = -1;
-		goto out;
-	}
-
-	addr = task_vma_symbol_vaddr(sym);
-
-	linfo("%s: find %lx, real %lx\n", __stringify(LIBC_PUTS_FN), addr,
-		memaddr);
-
-	if (addr != memaddr)
-		ret = -1;
-
-out:
-	task_wait_trigger(&waitqueue);
-
-	waitpid(pid, &status, __WALL);
-	if (status != 0)
-		ret = -EINVAL;
-	close_task(task);
-
-	task_wait_destroy(&waitqueue);
-	return ret;
-}
-
-TEST(Ftrace, elf_libc_func_addr, 0)
-{
-	int ret = -1;
-	int status = 0;
-	struct task_wait waitqueue;
-
-	task_wait_init(&waitqueue, NULL);
-
-	pid_t pid = fork();
-	if (pid == 0) {
-		char *argv[] = {
-			(char*)ulpatch_test_path,
-			"--role", "sleeper,trigger,printer,wait",
-			"--msgq", waitqueue.tmpfile,
-			NULL
-		};
-		ret = execvp(argv[0], argv);
-		if (ret == -1) {
-			exit(1);
-		}
-	}
-
-	/* Parent */
-	task_wait_wait(&waitqueue);
-
-	struct symbol *sym;
-	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
-
-#ifndef LIBC_PUTS_FN
-# error "No macro LIBC_PUTS_FN"
-#endif
-	LIBC_PUTS_FN(__stringify(LIBC_PUTS_FN));
-
-	sym = find_symbol(task->libc_elf, __stringify(LIBC_PUTS_FN), STT_FUNC);
-	if (!sym) {
-		lerror("Not found %s.\n", __stringify(LIBC_PUTS_FN));
-		ret = -1;
-		goto out;
-	}
-
-	linfo("%s: st_value %lx, %p\n",
-		__stringify(LIBC_PUTS_FN), sym->sym.st_value, LIBC_PUTS_FN);
-
-	/* st_value not equal to ELF address in libc */
-	if (sym->sym.st_value == (unsigned long)LIBC_PUTS_FN) {
-		lerror(" %s's st_value %lx != %p\n", __stringify(LIBC_PUTS_FN),
-			sym->sym.st_value, LIBC_PUTS_FN);
-		ret = -1;
-	} else {
-		ret = 0;
-	}
-
-out:
-	task_wait_trigger(&waitqueue);
-
-	waitpid(pid, &status, __WALL);
-	if (status != 0) {
-		ret = -EINVAL;
-	}
-	close_task(task);
-
-	task_wait_destroy(&waitqueue);
-
+	/* static */
+	ret += open_task_and_resolve_sym((unsigned long)STATIC_FUNC_FN,
+					 __stringify(STATIC_FUNC_FN));
+	/* global */
+	ret += open_task_and_resolve_sym((unsigned long)PRINTER_FN,
+					 __stringify(PRINTER_FN));
+	/* FIXME: puts in SELF and libc.so??? */
+	ret += open_task_and_resolve_sym((unsigned long)LIBC_PUTS_FN,
+					 __stringify(LIBC_PUTS_FN));
 	return ret;
 }
 
