@@ -373,17 +373,29 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 	return s;
 }
 
-struct symbol *find_symbol(struct elf_file *elf, const char *name, int type)
+struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
+			     bool ext)
 {
 	struct symbol tmp = {
 		.name = (char *)name,
 		.type = type,
-		.is_extern = false,
+		.is_extern = ext,
 	};
 	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
 					      cmp_symbol_name,
 					      (unsigned long)&tmp);
 	return node ? rb_entry(node, struct symbol, node) : NULL;
+}
+
+struct symbol *find_symbol(struct elf_file *elf, const char *name, int type)
+{
+	return __find_symbol(elf, name, type, false);
+}
+
+struct symbol *find_extern_symbol(struct elf_file *elf, const char *name,
+				  int type)
+{
+	return __find_symbol(elf, name, type, true);
 }
 
 int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,

@@ -153,6 +153,8 @@ void free_symbol(struct symbol *s);
 void rb_free_symbol(struct rb_node *node);
 int link_symbol(struct elf_file *elf, struct symbol *s);
 struct symbol *find_symbol(struct elf_file *elf, const char *name, int type);
+struct symbol *find_extern_symbol(struct elf_file *elf, const char *name,
+				  int type);
 int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 							  struct symbol *,
 							  void *),
