@@ -27,6 +27,7 @@ add_library(ulpatch_utils STATIC
 	ansi.c
 	backtrace.c
 	callback.c
+	disasm.c
 	file.c
 	id.c
 	init.c
