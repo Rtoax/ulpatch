@@ -19,6 +19,7 @@ BuildRequires:	elfutils-devel
 BuildRequires:	elfutils-libelf-devel
 BuildRequires:	glibc-devel
 BuildRequires:  libunwind-devel
+BuildRequires:  capstone-devel
 
 Requires:	libunwind
 Requires:	elfutils-libelf
