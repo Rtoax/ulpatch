@@ -119,6 +119,16 @@ If you want to turn it off, such as:
 $ cmake -DBUILD_MAN=0 ..
 ```
 
+#### BUILD_WITH_CAPSTONE
+
+CMake `BUILD_WITH_CAPSTONE` determine compile with capstone or not, default `ON`.
+If you want to turn it off, such as:
+
+```
+$ cmake -DBUILD_WITH_CAPSTONE=OFF ..
+```
+
+
 ### Install
 
 ```bash

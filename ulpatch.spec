@@ -2,6 +2,7 @@
 
 # Default disable ulftrace, beacuse it's is unimplemented.
 %global with_ulftrace	0
+%global with_capstone	1
 
 Name:		ulpatch
 Version:	0.5.7
@@ -19,7 +20,9 @@ BuildRequires:	elfutils-devel
 BuildRequires:	elfutils-libelf-devel
 BuildRequires:	glibc-devel
 BuildRequires:  libunwind-devel
+%if %{with_capstone}
 BuildRequires:  capstone-devel
+%endif
 
 Requires:	libunwind
 Requires:	elfutils-libelf
@@ -66,6 +69,9 @@ pushd build
 cmake -DCMAKE_BUILD_TYPE=Release \
 %if !%{with_ulftrace}
 	-DBUILD_ULFTRACE=OFF \
+%endif
+%if !%{with_capstone}
+	-DBUILD_WITH_CAPSTONE=OFF \
 %endif
 	..
 make %{?_smp_mflags}

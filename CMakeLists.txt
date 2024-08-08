@@ -47,6 +47,7 @@ set(BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(BUILD_ULTASK ON CACHE BOOL "Build ultask")
 set(BUILD_MAN ON CACHE BOOL "Build man pages")
 set(BUILD_PIE_EXE OFF CACHE BOOL "Build all Executions as PIE")
+set(BUILD_WITH_CAPSTONE ON CACHE BOOL "Build with capstone for disasm")
 
 set(CMAKE_INSTALL_PREFIX /usr)
 if(NOT CMAKE_BUILD_TYPE)
@@ -120,18 +121,32 @@ if(BINUTILS_BFD_H)
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_BINUTILS_BFD_H)
 endif()
 
+# Libunwind provides a C ABI to determine the call-chain of a program.
 if(LIBUNWIND_LIBUNWIND_H)
 	message(STATUS "Found libunwind headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_LIBUNWIND_H)
 endif()
 
-if(CAPSTONE_INCLUDE_DIRS)
-	message(STATUS "Found capstone headers")
-	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_DEVEL)
-endif()
+# Capstone Disassembler Engine
+# Capstone is a disassembly framework with the target of becoming the ultimate
+# disasm engine for binary analysis and reversing in the security community.
+if(BUILD_WITH_CAPSTONE)
+	message(STATUS "Build with capstone support")
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_CAPSTONE=1)
+	if(CAPSTONE_INCLUDE_DIRS)
+		message(STATUS "Found capstone headers")
+		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_DEVEL)
+	else()
+		message(FATAL_ERROR "Not found capstone headers")
+	endif()
 
-if(CAPSTONE_CAPSTONE_H)
-	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_CAPSTONE_H)
+	if(CAPSTONE_CAPSTONE_H)
+		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_CAPSTONE_H)
+	else()
+		message(FATAL_ERROR "Not found capstone/capstone.h")
+	endif()
+else()
+	message(STATUS "Build without capstone support")
 endif()
 
 if(KERNEL_HEADERS_INCLUDE_DIRS)

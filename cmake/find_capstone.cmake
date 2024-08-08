@@ -28,6 +28,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(capstone-devel "Please install the capstone de
 SET(CMAKE_REQUIRED_LIBRARIES capstone)
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
+#include <capstone/platform.h>
 #include <capstone/capstone.h>
 int main(void) {
 	return 0;

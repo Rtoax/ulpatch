@@ -23,11 +23,16 @@ endif()
 
 link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
 
+set(disasm)
+if(BUILD_WITH_CAPSTONE)
+	set(disasm disasm.c)
+endif()
+
 add_library(ulpatch_utils STATIC
 	ansi.c
 	backtrace.c
 	callback.c
-	disasm.c
+	${disasm}
 	file.c
 	id.c
 	init.c
