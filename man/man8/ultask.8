@@ -24,19 +24,19 @@ Specify a target process's PID.
 Dump process's VMA, see also /proc/PID/maps.
 .TP
 \fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
-Dump process's VMA to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix.
+Dump process's VMA to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-dump-addr\fR[=\fI\,ADDR\/\fR]
-Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Need specify \fB--dump-size\fR too.
+Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Need specify \fB--dump-size\fR too. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-dump-size\fR[=\fI\,SIZE\/\fR]
-Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix.
+Dump process's address memory to file or stdout, see also /proc/PID/maps. Followed by the \fBSIZE\fR format string.
 .TP
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry SRC address, must use with --jmp-to. the string may include a "0x" prefix.
+Specify a jump entry SRC address, must use with --jmp-to. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-jmp-to\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry DST address, must use with --jmp-from. the string may include a "0x" prefix.
+Specify a jump entry DST address, must use with --jmp-from. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-threads\fR
 Dump process's Thread, see also /proc/PID/task/.
@@ -54,16 +54,16 @@ Print process's status, see also /proc/PID/status.
 Map a file into target process.
 .TP
 \fB\-\-unmap-file\fR[=\fI\,ADDR\/\fR]
-Unmap a vma from target process.
+Unmap a vma from target process. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-symbols\fR
 List all symbols of target process.
 .TP
 \fB\-\-disasm-addr\fR[=\fI\,ADDR\/\fR]
-Disassemble a piece of code in a running process.
+Disassemble a piece of code in a running process. Need specify \fB--disasm-size\fR too. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-disasm-size\fR[=\fI\,SIZE\/\fR]
-Specify disassemble size.
+Specify disassemble size. Followed by the \fBSIZE\fR format string.
 .TP
 \fB\-o\fR, \fB\-\-output\fR
 Specify output.
@@ -86,6 +86,13 @@ Show help information.
 .TP
 \fB\-v\fR, \fB\-\-version\fR
 Show version information.
+.SH FORMAT
+.TP
+\fBADDR\fR
+Address string may include a "0x" prefix or not.
+.TP
+\fBSIZE\fR
+Size string may include a "0x" prefix or not, and size string may include a "KB", "MB", "GB" suffix or not.
 .SH OS
 Linux
 .SH STABILITY

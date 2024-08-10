@@ -52,6 +52,31 @@ TEST(Utils_str, str2size, 0)
 
 	for (i = 0; i < ARRAY_SIZE(values); i++) {
 		unsigned long v = str2size(values[i].str);
+		ldebug("v = %lx\n", v);
+		if (v != values[i].expect)
+			ret++;
+	}
+
+	return ret;
+}
+
+TEST(Utils_str, str2addr, 0)
+{
+	int i, ret = 0;
+
+	struct {
+		char *str;
+		unsigned long expect;
+	} values[] = {
+		{"0x1234", 0x1234},
+		{"1234", 1234},
+		{"0x1234KB", 0x1234},
+		{"1234KB", 1234},
+	};
+
+	for (i = 0; i < ARRAY_SIZE(values); i++) {
+		unsigned long v = str2addr(values[i].str);
+		ldebug("v = %lx\n", v);
 		if (v != values[i].expect)
 			ret++;
 	}

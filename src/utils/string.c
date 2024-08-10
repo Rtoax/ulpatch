@@ -173,3 +173,18 @@ unsigned long str2size(const char *str)
 	return size;
 }
 
+unsigned long str2addr(const char *str)
+{
+	unsigned long addr = 0;
+
+	if (!str)
+		return 0;
+
+	if (str[0] == '0' && str[1] == 'x')
+		addr = strtoull(str, NULL, 16);
+	else
+		addr = strtoull(str, NULL, 10);
+
+	return addr;
+}
+

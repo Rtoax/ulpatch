@@ -219,6 +219,7 @@ int parse_strstr(char *src, struct list_head *list);
 void free_strstr_list(struct list_head *list);
 
 unsigned long str2size(const char *str);
+unsigned long str2addr(const char *str);
 
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\

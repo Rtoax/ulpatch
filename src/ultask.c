@@ -122,6 +122,7 @@ static void print_help(void)
 	"\n");
 	printf(
 	" FORMAT\n"
+	"  ADDR: 0x123, 123\n"
 	"  SIZE: 123, 0x123, 123GB, 123KB, 123MB, 0x123MB\n"
 	"\n"
 	);
@@ -170,7 +171,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_DUMP_VMA:
 			flag_dump_vma = true;
-			vma_addr = strtoull(optarg, NULL, 16);
+			vma_addr = str2addr(optarg);
 			if (vma_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-vma.\n");
 				exit(1);
@@ -178,7 +179,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_DUMP_ADDR:
 			flag_dump_addr = true;
-			dump_addr = strtoull(optarg, NULL, 16);
+			dump_addr = str2addr(optarg);
 			if (dump_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-addr.\n");
 				exit(1);
@@ -193,7 +194,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_JMP_FROM_ADDR:
 			flag_rdonly = false;
-			jmp_addr_from = strtoull(optarg, NULL, 16);
+			jmp_addr_from = str2addr(optarg);
 			if (jmp_addr_from == 0) {
 				fprintf(stderr, "Wrong address for --jmp-from.\n");
 				exit(1);
@@ -201,7 +202,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_JMP_TO_ADDR:
 			flag_rdonly = false;
-			jmp_addr_to = strtoull(optarg, NULL, 16);
+			jmp_addr_to = str2addr(optarg);
 			if (jmp_addr_to == 0) {
 				fprintf(stderr, "Wrong address for --jmp-to.\n");
 				exit(1);
@@ -214,7 +215,7 @@ static int parse_config(int argc, char *argv[])
 		case ARG_FILE_UNMAP_FROM_VMA:
 			flag_unmap_vma = true;
 			flag_rdonly = false;
-			vma_addr = strtoull(optarg, NULL, 16);
+			vma_addr = str2addr(optarg);
 			break;
 		case ARG_LIST_SYMBOLS:
 			flag_list_symbols = true;
@@ -233,7 +234,7 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_DISASM_ADDR:
 			flag_disasm = true;
-			disasm_addr = strtoull(optarg, NULL, 16);
+			disasm_addr = str2addr(optarg);
 			if (disasm_addr == 0) {
 				fprintf(stderr, "Invalid --disasm-addr argument.\n");
 				exit(1);
