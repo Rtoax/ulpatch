@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
 #include <errno.h>
+#if defined(HAVE_CAPSTONE_CAPSTONE_H)
+# include <capstone/platform.h>
+# include <capstone/capstone.h>
+#endif
 
+#include <utils/log.h>
 #include <utils/util.h>
 #include <utils/disasm.h>
 
 
-int fdisasm(FILE *fp, cs_arch arch, cs_mode mode, unsigned char *code,
-	    size_t size)
+int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 {
 	uint64_t address = 0x1000;
 	cs_insn *insn;
@@ -15,10 +19,26 @@ int fdisasm(FILE *fp, cs_arch arch, cs_mode mode, unsigned char *code,
 	csh handle;
 	int ret = 0;
 
+	cs_arch arch;
+	cs_mode mode;
+
+	switch (disasm_arch) {
+	case DISASM_ARCH_X86_64:
+		arch = CS_ARCH_X86;
+		mode = CS_MODE_64;
+		break;
+	case DISASM_ARCH_AARCH64:
+		arch = CS_ARCH_ARM64;
+		mode = CS_MODE_ARM;
+		break;
+	default:
+		lerror("Disasm not support architecture.\n");
+		return -EINVAL;
+	}
 
 	cs_err err = cs_open(arch, mode, &handle);
 	if (err) {
-		fprintf(stderr, "cs_open() fatal returned: %u\n", err);
+		lerror("cs_open() fatal returned: %u\n", err);
 		return -EINVAL;
 	}
 
@@ -26,7 +46,7 @@ int fdisasm(FILE *fp, cs_arch arch, cs_mode mode, unsigned char *code,
 
 	count = cs_disasm(handle, code, size, address, 0, &insn);
 	if (!count) {
-		fprintf(stderr, "ERROR: Failed to disasm given code!\n");
+		lerror("ERROR: Failed to disasm given code!\n");
 		ret = -EINVAL;
 		goto close;
 	}

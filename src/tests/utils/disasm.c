@@ -8,7 +8,6 @@
 #include <tests/test_api.h>
 
 
-#if defined(CONFIG_CAPSTONE)
 TEST(Disasm, base, 0)
 {
 #define X86_64_CODE \
@@ -35,25 +34,18 @@ TEST(Disasm, base, 0)
 	"\xfd\x7b\xba\xa9" \
 	"\xfd\xc7\x43\xf8"
 
-	cs_arch arch;
-	cs_mode mode;
 	unsigned char *code;
 	size_t size;
 
-	arch = CS_ARCH_X86;
-	mode = CS_MODE_64;
 	code = (unsigned char *)X86_64_CODE;
 	size = sizeof(X86_64_CODE) - 1;
 	print_string_hex(stdout, "Code:", code, size);
-	fdisasm(stdout, arch, mode, code, size);
+	fdisasm(stdout, DISASM_ARCH_X86_64, code, size);
 
-	arch = CS_ARCH_ARM64;
-	mode = CS_MODE_ARM;
 	code = (unsigned char *)AArch64_CODE;
 	size = sizeof(AArch64_CODE) - 1;
 	print_string_hex(stdout, "Code:", code, size);
-	fdisasm(stdout, arch, mode, code, size);
+	fdisasm(stdout, DISASM_ARCH_AARCH64, code, size);
 
 	return 0;
 }
-#endif
