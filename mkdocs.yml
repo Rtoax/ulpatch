@@ -14,6 +14,7 @@ nav:
     - Log: log.md
     - ULPatch: ulpatch.md
     - ULTask: ultask.md
+    - ULPatchTest: ulpatch_test.md
     - Contributing: CONTRIBUTING.md
   - Knowledge:
     - Elf: elf.md
@@ -129,6 +130,7 @@ plugins:
             Log: 日志
             ULPatch: 用户态热补丁
             ULTask: 进程热修改器
+            ULPatchTest: ULPatch测试
             Contributing: 贡献
             Knowledge: 相关知识
             Elf: ELF文件

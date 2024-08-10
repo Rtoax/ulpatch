@@ -19,9 +19,9 @@ In my opinion, if you want to develop and participate in the development of this
 You can view unfinished development tasks in [TODO-List](./TODO.md), and you need to obey the [Coding Style](./code-style.md) and [Contributing](./CONTRIBUTING.md) rules.
 
 
-## C Compile Macros
+### C Compile Macros
 
-### CONFIG_CAPSTONE
+#### CONFIG_CAPSTONE
 
 Macro `CONFIG_CAPSTONE` defined and set to `1` by default if found capstone, you can turn it off, see [INSTALL](./INSTALL.md).
 

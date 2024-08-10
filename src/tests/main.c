@@ -448,10 +448,11 @@ static int operate_test(struct test *test)
 
 	total_spent_us += test->spend_us;
 
-	test_log("\033[2m%ldus\033[m %s%-8s%s\n",
+	test_log("\033[2m%ldus\033[m %s%-8s%s %s\n",
 		test->spend_us,
 		failed ? "\033[31m" : "\033[32m",
-		failed ? "Not OK" : "OK",
+		failed ? "Failed: " : "OK",
+		failed ? strerror(errno) : "",
 		"\033[m");
 
 	if (failed) {

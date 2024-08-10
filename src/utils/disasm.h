@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2024 Rong Tao <rtoax@foxmail.com> */
 #pragma once
+#include <errno.h>
 
 #include <utils/compiler.h>
 
@@ -13,6 +14,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size);
 static int __unused fdisasm(FILE *fp, int disasm_arch, unsigned char *code,
 			    size_t size)
 {
+	errno = ENOSYS;
 	return -ENOSYS;
 }
 #endif
