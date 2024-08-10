@@ -7,9 +7,6 @@
 #include <utils/disasm.h>
 #include <tests/test_api.h>
 
-
-TEST(Disasm, base, 0)
-{
 #define X86_64_CODE \
 	"\x55\x48\x8b\x05\xb8\x13\x00\x00\xe9\xea\xbe\xad\xde\xff\x25\x23\x01\x00\x00\xe8\xdf\xbe\xad\xde\x74\xff"
 
@@ -34,18 +31,25 @@ TEST(Disasm, base, 0)
 	"\xfd\x7b\xba\xa9" \
 	"\xfd\xc7\x43\xf8"
 
+static int test_disasm(int arch, unsigned char *code, size_t size)
+{
+	print_string_hex(stdout, "Code:", code, size);
+	return fdisasm(stdout, arch, code, size);
+}
+
+TEST(Disasm, base, 0)
+{
+	int ret = 0;
 	unsigned char *code;
 	size_t size;
 
 	code = (unsigned char *)X86_64_CODE;
 	size = sizeof(X86_64_CODE) - 1;
-	print_string_hex(stdout, "Code:", code, size);
-	fdisasm(stdout, DISASM_ARCH_X86_64, code, size);
+	ret += test_disasm(DISASM_ARCH_X86_64, code, size);
 
 	code = (unsigned char *)AArch64_CODE;
 	size = sizeof(AArch64_CODE) - 1;
-	print_string_hex(stdout, "Code:", code, size);
-	fdisasm(stdout, DISASM_ARCH_AARCH64, code, size);
+	ret += test_disasm(DISASM_ARCH_AARCH64, code, size);
 
-	return 0;
+	return ret;
 }
