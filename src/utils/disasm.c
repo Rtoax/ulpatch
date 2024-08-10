@@ -11,6 +11,22 @@
 #include <utils/disasm.h>
 
 
+int current_disasm_arch(void)
+{
+#if defined(__x86_64__)
+	return DISASM_ARCH_X86_64;
+#elif defined(__aarch64__)
+	return DISASM_ARCH_AARCH64;
+#else
+# error "Not support architecture"
+#endif
+}
+
+int fdisasm_arch(FILE *fp, unsigned char *code, size_t size)
+{
+	return fdisasm(fp, current_disasm_arch(), code, size);
+}
+
 int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 {
 	uint64_t address = 0x1000;

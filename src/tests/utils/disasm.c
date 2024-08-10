@@ -31,6 +31,18 @@
 	"\xfd\x7b\xba\xa9" \
 	"\xfd\xc7\x43\xf8"
 
+static int test_disasm_stub1(void)
+{
+	char buf[] = {"Hello, Rong Tao!"};
+	printf("%s\n", buf);
+	return 0;
+}
+
+static int test_disasm_stub2(void)
+{
+	return 0;
+}
+
 static int test_disasm(int arch, unsigned char *code, size_t size)
 {
 	print_string_hex(stdout, "Code:", code, size);
@@ -52,4 +64,13 @@ TEST(Disasm, base, 0)
 	ret += test_disasm(DISASM_ARCH_AARCH64, code, size);
 
 	return ret;
+}
+
+TEST(Disasm, base_arch, 0)
+{
+	unsigned char *code = (unsigned char *)test_disasm_stub1;
+	size_t size = (test_disasm_stub2 - test_disasm_stub1);
+
+	fprintf(stdout, "Disasm test_disasm_stub2:\n");
+	return fdisasm_arch(stdout, code, size);
 }
