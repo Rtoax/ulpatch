@@ -42,6 +42,10 @@ int fsize(const char *filepath)
 
 bool fexist(const char *filepath)
 {
+	if (!filepath) {
+		errno = EINVAL;
+		return false;
+	}
 	return access(filepath, F_OK) == 0 ? true : false;
 }
 

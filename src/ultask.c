@@ -15,6 +15,7 @@
 #include <utils/list.h>
 #include <utils/util.h>
 #include <utils/task.h>
+#include <utils/disasm.h>
 #include <utils/compiler.h>
 
 #include <patch/patch.h>
@@ -37,6 +38,8 @@ enum {
 	ARG_AUXV,
 	ARG_STATUS,
 	ARG_LIST_SYMBOLS,
+	ARG_DISASM_ADDR,
+	ARG_DISASM_SIZE,
 };
 
 static pid_t target_pid = -1;
@@ -57,6 +60,9 @@ static bool flag_print_threads = false;
 static bool flag_print_fds = false;
 static bool flag_print_auxv = false;
 static bool flag_print_status = false;
+static bool flag_disasm = false;
+static unsigned long disasm_addr = 0;
+static unsigned long disasm_size = 0;
 static const char *output_file = NULL;
 /* Default: read only */
 static bool flag_rdonly = true;
@@ -107,6 +113,11 @@ static void print_help(void)
 	"\n"
 	"  --symbols           list all symbols\n"
 	"\n"
+	"  --disasm-addr [ADDR]\n"
+	"                      disassemble a piece of code in a running process.\n"
+	"  --disasm-size [SIZE]\n"
+	"                      specify disassemble size.\n"
+	"\n"
 	"  -o, --output        specify output filename.\n"
 	"\n"
 	"\n");
@@ -131,6 +142,8 @@ static int parse_config(int argc, char *argv[])
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
+		{ "disasm-addr",    required_argument, 0, ARG_DISASM_ADDR },
+		{ "disasm-size",    required_argument, 0, ARG_DISASM_SIZE },
 		{ "output",         required_argument, 0, 'o' },
 		COMMON_OPTIONS
 		{ NULL }
@@ -214,6 +227,21 @@ static int parse_config(int argc, char *argv[])
 		case ARG_STATUS:
 			flag_print_status = true;
 			break;
+		case ARG_DISASM_ADDR:
+			flag_disasm = true;
+			disasm_addr = strtoull(optarg, NULL, 16);
+			if (disasm_addr == 0) {
+				fprintf(stderr, "Invalid --disasm-addr argument.\n");
+				exit(1);
+			}
+			break;
+		case ARG_DISASM_SIZE:
+			disasm_size = strtoull(optarg, NULL, 16);
+			if (disasm_size == 0) {
+				fprintf(stderr, "Wrong value for --disasm-size.\n");
+				exit(1);
+			}
+			break;
 		case 'o':
 			output_file = optarg;
 			break;
@@ -251,6 +279,7 @@ static int parse_config(int argc, char *argv[])
 		!flag_print_auxv &&
 		!flag_print_status &&
 		!flag_print_threads &&
+		!flag_disasm &&
 		!flag_print_fds) {
 		if ((!jmp_addr_from && jmp_addr_to) || \
 			(jmp_addr_from && !jmp_addr_to)) {
@@ -282,6 +311,10 @@ static int parse_config(int argc, char *argv[])
 		exit(1);
 	}
 
+	if (flag_disasm && disasm_addr && !disasm_size) {
+		fprintf(stderr, "need --disasm-size if disassemble\n");
+		exit(1);
+	}
 
 	if (map_file && !fexist(map_file)) {
 		fprintf(stderr, "%s is not exist.\n", map_file);
@@ -482,6 +515,13 @@ int main(int argc, char *argv[])
 			ret = -1;
 			goto done;
 		}
+	}
+
+	if (disasm_addr && disasm_size) {
+		void *mem = malloc(disasm_size);
+		memcpy_from_task(target_task, mem, disasm_addr, disasm_size);
+		fdisasm_arch(stdout, mem, disasm_size);
+		free(mem);
 	}
 
 done:

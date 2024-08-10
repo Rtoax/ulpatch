@@ -29,7 +29,7 @@ int fdisasm_arch(FILE *fp, unsigned char *code, size_t size)
 
 int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 {
-	uint64_t address = 0x1000;
+	uint64_t address = 0x0;
 	cs_insn *insn;
 	size_t j, count;
 	csh handle;
