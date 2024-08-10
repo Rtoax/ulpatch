@@ -151,3 +151,25 @@ void free_strstr_list(struct list_head *list)
 	}
 }
 
+unsigned long str2size(const char *str)
+{
+	unsigned long size = 0;
+
+	if (!str)
+		return 0;
+
+	if (str[0] == '0' && str[1] == 'x')
+		size = strtoull(str, NULL, 16);
+	else
+		size = strtoull(str, NULL, 10);
+
+	if (strstr(str, "GB"))
+		size *= GB;
+	else if (strstr(str, "MB"))
+		size *= MB;
+	else if (strstr(str, "KB"))
+		size *= KB;
+
+	return size;
+}
+

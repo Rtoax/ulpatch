@@ -121,6 +121,10 @@
 #define SZ_1G				0x40000000
 #define SZ_2G				0x80000000
 
+#define KB (sizeof(uint8_t) * 1024UL)
+#define MB (KB * 1024UL)
+#define GB (MB * 1024UL)
+
 
 /* all output need file store here, mkdir(2) it before running. */
 #define ULP_PROC_ROOT_DIR	"/tmp/ulpatch"
@@ -213,6 +217,9 @@ int ulpatch_startswith(const char *str, const char *prefix);
  */
 int parse_strstr(char *src, struct list_head *list);
 void free_strstr_list(struct list_head *list);
+
+unsigned long str2size(const char *str);
+
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)

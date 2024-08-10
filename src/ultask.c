@@ -119,8 +119,12 @@ static void print_help(void)
 	"                      specify disassemble size.\n"
 	"\n"
 	"  -o, --output        specify output filename.\n"
-	"\n"
 	"\n");
+	printf(
+	" FORMAT\n"
+	"  SIZE: 123, 0x123, 123GB, 123KB, 123MB, 0x123MB\n"
+	"\n"
+	);
 	print_usage_common(prog_name);
 	exit(0);
 }
@@ -181,7 +185,7 @@ static int parse_config(int argc, char *argv[])
 			}
 			break;
 		case ARG_DUMP_SIZE:
-			dump_size = strtoull(optarg, NULL, 16);
+			dump_size = str2size(optarg);
 			if (dump_size == 0) {
 				fprintf(stderr, "Wrong value for --dump-size.\n");
 				exit(1);
@@ -236,7 +240,7 @@ static int parse_config(int argc, char *argv[])
 			}
 			break;
 		case ARG_DISASM_SIZE:
-			disasm_size = strtoull(optarg, NULL, 16);
+			disasm_size = str2size(optarg);
 			if (disasm_size == 0) {
 				fprintf(stderr, "Wrong value for --disasm-size.\n");
 				exit(1);
