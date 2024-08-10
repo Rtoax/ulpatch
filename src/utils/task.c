@@ -252,7 +252,7 @@ static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 
 	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
-	} else if (!strncmp(basename((char*)name), "libc", 4)
+	} else if (!strncmp(basename((char*)name), "libc.so", 7)
 		|| !strncmp(basename((char*)name), "libssp", 6)) {
 		type = VMA_LIBC;
 	} else if (!strncmp(basename((char*)name), "libelf", 6)) {
