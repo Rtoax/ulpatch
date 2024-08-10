@@ -200,6 +200,8 @@ void daemonize(void);
 
 int memshow(FILE *fp, const void *data, int data_len);
 int memshowinlog(int level, const void *data, int data_len);
+void print_string_hex(FILE *fp, const char *comment, unsigned char *str,
+		      size_t len);
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int ulpatch_startswith(const char *str, const char *prefix);
 

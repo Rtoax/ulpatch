@@ -67,6 +67,17 @@ int memshow(FILE *fp, const void *data, int data_len)
 	return len;
 }
 
+void print_string_hex(FILE *fp, const char *comment, unsigned char *str,
+		      size_t len)
+{
+	unsigned char *c;
+	fprintf(fp, "%s", comment);
+	for (c = str; c < str + len; c++)
+		fprintf(fp, "0x%02x ", *c & 0xff);
+	fprintf(fp, "\n");
+}
+
+
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int ulpatch_startswith(const char *str, const char *prefix)
 {

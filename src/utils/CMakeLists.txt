@@ -17,16 +17,17 @@ if(BINUTILS_BFD_LIBRARIES)
 	find_library(BFD bfd HINTS ${SEARCH_PATH})
 endif()
 
-if(CAPSTONE_LIBRARIES)
-	find_library(CAPSTONE capstone HINTS ${SEARCH_PATH})
-endif()
-
-link_libraries(${ELF} ${BFD} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
-
 set(disasm)
+set(CAPSTONE)
+
 if(BUILD_WITH_CAPSTONE)
+	if(CAPSTONE_LIBRARIES)
+		find_library(CAPSTONE capstone HINTS ${SEARCH_PATH})
+	endif()
 	set(disasm disasm.c)
 endif()
+
+link_libraries(${ELF} ${BFD} ${CAPSTONE} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
 
 add_library(ulpatch_utils STATIC
 	ansi.c
