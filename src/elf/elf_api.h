@@ -77,6 +77,24 @@ struct elf_file {
 
 struct vm_area_struct;
 
+enum sym_type {
+	SYM_TYPE_MIN,
+	/**
+	 * This symbol is extern, check with is_extern_symbol(), of course it's
+	 * undef, but undef symbol maybe not extern, like @plt
+	 */
+	SYM_TYPE_EXTERN,
+	/**
+	 * If symbol is undef and not extern.
+	 */
+	SYM_TYPE_UNDEF,
+	/**
+	 * Defined symbol.
+	 */
+	SYM_TYPE_DEFINED,
+	SYM_TYPE_MAX,
+};
+
 struct symbol {
 	/* strdup() */
 	char *name;
@@ -89,9 +107,9 @@ struct symbol {
 	int type;
 
 	/**
-	 * Mark the symbol is extern or not, it's use to resolve symbol.
+	 * Mark the symbol type.
 	 */
-	bool is_extern;
+	enum sym_type sym_type;
 
 	GElf_Sym sym;
 
@@ -155,6 +173,8 @@ int link_symbol(struct elf_file *elf, struct symbol *s);
 struct symbol *find_symbol(struct elf_file *elf, const char *name, int type);
 struct symbol *find_extern_symbol(struct elf_file *elf, const char *name,
 				  int type);
+struct symbol *find_undef_symbol(struct elf_file *elf, const char *name,
+				 int type);
 int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 							  struct symbol *,
 							  void *),

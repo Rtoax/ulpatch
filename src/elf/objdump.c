@@ -20,7 +20,7 @@
 #include <utils/list.h>
 
 
-enum sym_type {
+enum obj_sym_type {
 	S_T_PLT, /* @plt */
 	S_T_NUM,
 };
@@ -51,7 +51,7 @@ struct objdump_elf_file {
 struct objdump_symbol {
 	char *name;
 	unsigned long addr;
-	enum sym_type type;
+	enum obj_sym_type type;
 
 	/* root is objdump_elf_file.rb_tree_syms[type] */
 	struct rb_node node;
@@ -84,7 +84,7 @@ static inline int cmp_sym(struct rb_node *n1, unsigned long key)
 }
 
 static struct objdump_symbol *alloc_sym(const char *name, unsigned long addr,
-					enum sym_type type)
+					enum obj_sym_type type)
 {
 	struct objdump_symbol *s = malloc(sizeof(struct objdump_symbol));
 

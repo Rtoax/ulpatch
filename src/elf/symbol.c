@@ -353,11 +353,11 @@ int cmp_symbol_name(struct rb_node *n1, unsigned long key)
 	 * kernel does not distinguish symbol type.
 	 */
 
-	if (s1->is_extern == s2->is_extern)
+	if (s1->sym_type == s2->sym_type)
 		return strcmp(s1->name, s2->name);
-	else if (s1->is_extern > s2->is_extern)
+	else if (s1->sym_type > s2->sym_type)
 		return -1;
-	else if (s1->is_extern < s2->is_extern)
+	else if (s1->sym_type < s2->sym_type)
 		return 1;
 	return 0;
 }
@@ -370,7 +370,12 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 
 	s->name = strdup(name);
 	s->type = GELF_ST_TYPE(sym->st_info);
-	s->is_extern = is_extern_symbol(sym);
+	if (is_extern_symbol(sym))
+		s->sym_type = SYM_TYPE_EXTERN;
+	else if (is_undef_symbol(sym))
+		s->sym_type = SYM_TYPE_UNDEF;
+	else
+		s->sym_type = SYM_TYPE_DEFINED;
 
 	memcpy(&s->sym, sym, sizeof(GElf_Sym));
 
@@ -378,12 +383,12 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 }
 
 struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
-			     bool ext)
+			     enum sym_type sym_type)
 {
 	struct symbol tmp = {
 		.name = (char *)name,
 		.type = type,
-		.is_extern = ext,
+		.sym_type = sym_type,
 	};
 	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
 					      cmp_symbol_name,
@@ -393,13 +398,19 @@ struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
 
 struct symbol *find_symbol(struct elf_file *elf, const char *name, int type)
 {
-	return __find_symbol(elf, name, type, false);
+	return __find_symbol(elf, name, type, SYM_TYPE_DEFINED);
 }
 
 struct symbol *find_extern_symbol(struct elf_file *elf, const char *name,
 				  int type)
 {
-	return __find_symbol(elf, name, type, true);
+	return __find_symbol(elf, name, type, SYM_TYPE_EXTERN);
+}
+
+struct symbol *find_undef_symbol(struct elf_file *elf, const char *name,
+				 int type)
+{
+	return __find_symbol(elf, name, type, SYM_TYPE_UNDEF);
 }
 
 int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
@@ -479,7 +490,7 @@ int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
 {
 	int i;
 
-	fprintf(fp, "sym:%s extern:%d nphdrs:%d\n", s->name, s->is_extern,
+	fprintf(fp, "sym:%s symtype:%d nphdrs:%d\n", s->name, s->sym_type,
 		s->nphdrs);
 
 	if (s->nphdrs > 0) {
