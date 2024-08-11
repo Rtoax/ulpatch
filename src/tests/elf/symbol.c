@@ -88,6 +88,7 @@ TEST(Elf, find_symbol_mcount, 0)
 	int ret = 0;
 	struct elf_file *elf;
 	const char *mcount_name;
+	struct symbol *s;
 
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
@@ -103,12 +104,15 @@ TEST(Elf, find_symbol_mcount, 0)
 	if (!mcount_name)
 		return -ENOENT;
 
-	struct symbol *s = find_symbol(elf, mcount_name, STT_FUNC);
+	s = find_symbol(elf, mcount_name, STT_FUNC);
 	if (!s) {
 		lwarning("no symbol %s founded in %s.\n", mcount_name,
 			 ulpatch_test_path);
-		ret = -1;
-		goto finish_close_elf;
+		s = find_undef_symbol(elf, mcount_name, STT_FUNC);
+		if (!s) {
+			ret = -1;
+			goto finish_close_elf;
+		}
 	}
 
 	linfo("%s: %s: st_value: %lx\n", ulpatch_test_path, mcount_name,

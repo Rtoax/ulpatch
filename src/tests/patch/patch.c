@@ -71,8 +71,15 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 */
 	rel_s = find_symbol(task->exe_elf, mcount_str, STT_FUNC);
 	if (!rel_s) {
-		lerror("Not found mcount symbol in %s\n", task->exe);
-		return -1;
+		lwarning("Not found %s symbol in %s\n", mcount_str, task->exe);
+		/**
+		 * Symbol mcount() in SELF elf is undef
+		 */
+		rel_s = find_undef_symbol(task->exe_elf, mcount_str, STT_FUNC);
+		if (!rel_s) {
+			lerror("Not found %s symbol in %s\n", mcount_str, task->exe);
+			return -1;
+		}
 	}
 
 	/* Try to find mcount in libc.so, some time, libc.so's symbols is very
