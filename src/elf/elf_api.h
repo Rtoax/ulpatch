@@ -65,7 +65,7 @@ struct elf_file {
 	 * Save all symbol for fast search
 	 * struct symbol.node
 	 */
-	struct rb_root elf_file_symbols;
+	struct rb_root symbols;
 
 	/* has fentry, mcount(), etc. */
 	bool support_ftrace;
@@ -131,7 +131,7 @@ struct symbol {
 
 	/**
 	 * ROOT is one of the following:
-	 * struct elf_file.elf_file_symbols
+	 * struct elf_file.symbols
 	 * struct task_struct.vma_symbols
 	 * struct vma_ulp.ulp_symbols
 	 */

@@ -913,7 +913,7 @@ static int load_self_vma_symbols(struct vm_area_struct *leader)
 	int err = 0;
 	struct task_struct *task = leader->task;
 	struct symbol *sym, *tmp;
-	struct rb_root *root = &task->exe_elf->elf_file_symbols;
+	struct rb_root *root = &task->exe_elf->symbols;
 
 	rbtree_postorder_for_each_entry_safe(sym, tmp, root, node)
 		err |= task_vma_alloc_link_symbol(leader, sym->name, &sym->sym);

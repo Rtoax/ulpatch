@@ -390,7 +390,7 @@ struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
 		.type = type,
 		.sym_type = sym_type,
 	};
-	struct rb_node *node = rb_search_node(&elf->elf_file_symbols,
+	struct rb_node *node = rb_search_node(&elf->symbols,
 					      cmp_symbol_name,
 					      (unsigned long)&tmp);
 	return node ? rb_entry(node, struct symbol, node) : NULL;
@@ -425,7 +425,7 @@ int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 		return -EINVAL;
 	}
 
-	first = rb_first(&elf->elf_file_symbols);
+	first = rb_first(&elf->symbols);
 
 	for (rnode = first; rnode; rnode = rb_next(rnode)) {
 		sym = rb_entry(rnode, struct symbol, node);
@@ -467,7 +467,7 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 	free(phdrs);
 
 insert:
-	node = rb_insert_node(&elf->elf_file_symbols, &s->node,
+	node = rb_insert_node(&elf->symbols, &s->node,
 			      cmp_symbol_name, (unsigned long)s);
 	return node ? -EINVAL : 0;
 }

@@ -71,7 +71,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	strncpy(elf->filepath, filepath, sizeof(elf->filepath) - 1);
 
 	/* Init symbols red black tree */
-	rb_init(&elf->elf_file_symbols);
+	rb_init(&elf->symbols);
 
 	/* ELF file header */
 
@@ -208,7 +208,7 @@ int elf_file_close(const char *filepath)
 		free(elf->mcount_name);
 
 	/* Destroy symbols rb tree */
-	rb_destroy(&elf->elf_file_symbols, rb_free_symbol);
+	rb_destroy(&elf->symbols, rb_free_symbol);
 
 	close(elf->fd);
 	list_del(&elf->node);
