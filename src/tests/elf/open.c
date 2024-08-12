@@ -28,7 +28,7 @@ static const char *test_elfs[] = {
 };
 
 
-TEST(Elf, open_close, 0)
+TEST(Elf_Open, open_close, 0)
 {
 	int i;
 	int ret = 0;

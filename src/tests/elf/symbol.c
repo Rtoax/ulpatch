@@ -29,7 +29,7 @@ static void print_elf_symbol(struct elf_file *elf, struct symbol *sym,
 	firstline = false;
 }
 
-TEST(Elf, for_each_symbol, 0)
+TEST(Elf_Sym, for_each_symbol, 0)
 {
 	struct elf_file *elf;
 	elf = elf_file_open(ulpatch_test_path);
@@ -44,7 +44,7 @@ TEST(Elf, for_each_symbol, 0)
 	return 0;
 }
 
-TEST(Elf, find_symbol, 0)
+TEST(Elf_Sym, find_symbol, 0)
 {
 	int ret = 0;
 
@@ -83,7 +83,7 @@ TEST(Elf, find_symbol, 0)
 	return ret;
 }
 
-TEST(Elf, find_symbol_mcount, 0)
+TEST(Elf_Sym, find_symbol_mcount, 0)
 {
 	int ret = 0;
 	struct elf_file *elf;

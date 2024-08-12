@@ -56,11 +56,12 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	}
 	addr = task_vma_symbol_vaddr(sym);
 
-	linfo("%s: find %lx, real %lx\n", name, addr,
-		memaddr);
+	linfo("%s: find %lx, real %lx\n", name, addr, memaddr);
 
-	if (addr != memaddr)
+	if (addr != memaddr) {
+		lerror("%s: find %lx, real %lx\n", name, addr, memaddr);
 		ret = -1;
+	}
 
 out:
 	task_wait_trigger(&waitqueue);
@@ -75,7 +76,7 @@ out:
 	return ret;
 }
 
-TEST(Ftrace, task_func_addr, 0)
+TEST(Symbol, task_func_addr, 0)
 {
 	int ret = 0;
 	/* static */
@@ -143,7 +144,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	return ret;
 }
 
-TEST(Ftrace, init_patch, TEST_SKIP_RET)
+TEST(Symbol, init_patch, TEST_SKIP_RET)
 {
 	return test_task_patch(FTO_ULFTRACE, NULL);
 }
@@ -171,12 +172,12 @@ static int find_task_symbol(struct task_struct *task)
 	return err;
 }
 
-TEST(Ftrace, find_task_symbol_list, 0)
+TEST(Symbol, find_task_symbol_list, 0)
 {
 	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }
 
-TEST(Ftrace, find_task_plt_symbol_value, 0)
+TEST(Symbol, find_task_plt_symbol_value, 0)
 {
 	int ret = 0;
 	int status = 0;
