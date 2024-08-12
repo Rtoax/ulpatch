@@ -129,9 +129,8 @@ static enum who who_am_i(const char *s)
 
 	for (i = ROLE_TESTER; i < ARRAY_SIZE(role_string); i++) {
 		if (!strcmp(s, role_string[i])) {
-			/* Not allow set ROLE_MIX directly
-			 */
-			return i!=ROLE_MIX?i:ROLE_NONE;
+			/* Not allow set ROLE_MIX directly */
+			return i != ROLE_MIX ? i : ROLE_NONE;
 		}
 	}
 
@@ -704,16 +703,14 @@ static void init_test_symbols(void)
 #undef TEST_SYM_FOR_EACH
 }
 
-struct test_symbol * find_test_symbol(const char *sym)
+struct test_symbol *find_test_symbol(const char *sym)
 {
 	int i;
 	struct test_symbol *s = NULL;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-		if (!strcmp(test_symbols[i].sym, sym)) {
+	for (i = 0; i < ARRAY_SIZE(test_symbols); i++)
+		if (!strcmp(test_symbols[i].sym, sym))
 			s = &test_symbols[i];
-		}
-	}
 
 	return s;
 }
@@ -877,9 +874,8 @@ TEST(ulpatch_test, sleeper, 0)
 
 	/* Parent */
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 	return ret;
 }
 
@@ -915,9 +911,8 @@ TEST(ulpatch_test, wait, 0)
 	task_wait_trigger(&waitqueue);
 	ldebug("PARENT: send done.\n");
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -957,9 +952,8 @@ TEST(ulpatch_test, trigger, 0)
 	task_wait_wait(&waitqueue);
 	ldebug("PARENT: get msg.\n");
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -1001,9 +995,8 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 	task_wait_trigger(&waitqueue);
 	ldebug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -1043,11 +1036,11 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 	task_wait_wait(&waitqueue);
 	task_wait_wait(&waitqueue);
 	task_wait_wait(&waitqueue);
+
 	ldebug("PARENT: get msgs from child.\n");
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -1088,11 +1081,11 @@ TEST(ulpatch_test, wait_trigger, 0)
 	task_wait_wait(&waitqueue);
 	task_wait_trigger(&waitqueue);
 	task_wait_wait(&waitqueue);
+
 	ldebug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -1144,9 +1137,8 @@ static int test_listener_symbol(char request, char *sym,
 	}
 
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
@@ -1163,11 +1155,13 @@ TEST(ulpatch_test, listener, 0)
 		if (test_symbols[i].type == TST_NON_STATIC)
 			continue;
 
-		err = err ? :
-			test_listener_symbol(REQUEST_SYM_ADDR,
-					test_symbols[i].sym,
-					test_symbols[i].addr);
+		err += test_listener_symbol(REQUEST_SYM_ADDR,
+					    test_symbols[i].sym,
+					    test_symbols[i].addr);
 	}
+
+	if (err)
+		errno = EINVAL;
 
 	return err;
 }
@@ -1222,9 +1216,8 @@ TEST(ulpatch_test, listener_epoll, 0)
 	listener_helper_close_test_client(fd);
 
 	waitpid(pid, &status, __WALL);
-	if (status != 0) {
+	if (status != 0)
 		ret = -EINVAL;
-	}
 
 	task_wait_destroy(&waitqueue);
 
