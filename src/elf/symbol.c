@@ -304,7 +304,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		if (!sym)
 			continue;
 
-		ldebug("%s%s%s\n", symname, pversion ? "@" : "",
+		ldebug("Symtab: %s%s%s\n", symname, pversion ? "@" : "",
 			pversion ?: "");
 
 		struct symbol *s = alloc_symbol(symname, sym);
@@ -401,9 +401,12 @@ struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
 		.type = type,
 		.sym_type = sym_type,
 	};
-	struct rb_node *node = rb_search_node(&elf->symbols,
-					      cmp_symbol_name,
-					      (unsigned long)&tmp);
+	struct rb_node *node;
+
+	ldebug("Find: %s : %s\n", elf->filepath, name);
+
+	node = rb_search_node(&elf->symbols, cmp_symbol_name,
+			      (unsigned long)&tmp);
 	return node ? rb_entry(node, struct symbol, node) : NULL;
 }
 
@@ -457,6 +460,8 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 		lwarning("Symbol %s is undef.\n", s->name);
 		goto insert;
 	}
+
+	ldebug("Link: %s : %s\n", elf->filepath, s->name);
 
 	nphdrs = 0;
 	phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);
