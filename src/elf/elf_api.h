@@ -167,6 +167,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn,
 int handle_symtab(struct elf_file *elf, Elf_Scn *scn);
 
 struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym);
+struct symbol *dup_symbol(struct symbol *sym);
 void free_symbol(struct symbol *s);
 void rb_free_symbol(struct rb_node *node);
 int link_symbol(struct elf_file *elf, struct symbol *s);

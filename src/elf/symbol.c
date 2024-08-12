@@ -382,6 +382,17 @@ struct symbol *alloc_symbol(const char *name, const GElf_Sym *sym)
 	return s;
 }
 
+struct symbol *dup_symbol(struct symbol *sym)
+{
+	struct symbol *new;
+
+	new = malloc(sizeof(struct symbol));
+	memcpy(new, sym, sizeof(struct symbol));
+	new->name = strdup(sym->name);
+
+	return new;
+}
+
 struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
 			     enum sym_type sym_type)
 {
