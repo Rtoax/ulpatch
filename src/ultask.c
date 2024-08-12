@@ -524,8 +524,16 @@ int main(int argc, char *argv[])
 
 	if (disasm_addr && disasm_size) {
 		void *mem = malloc(disasm_size);
-		memcpy_from_task(target_task, mem, disasm_addr, disasm_size);
-		fdisasm_arch(stdout, mem, disasm_size);
+		ret = memcpy_from_task(target_task, mem, disasm_addr, disasm_size);
+		if (ret <= 0) {
+			fprintf(stderr, "Bad address 0x%lx\n", disasm_addr);
+		} else {
+			print_string_hex(stdout, "Hex: ", mem, disasm_size);
+			ret = fdisasm_arch(stdout, mem, disasm_size);
+			if (ret) {
+				fprintf(stderr, "Disasm failed\n");
+			}
+		}
 		free(mem);
 	}
 

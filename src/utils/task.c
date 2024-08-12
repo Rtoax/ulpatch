@@ -2022,9 +2022,9 @@ int memcpy_from_task(struct task_struct *task, void *dst, unsigned long task_src
 {
 	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
-	if (ret <= 0) {
-		lerror("pread(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
-			task->proc_mem_fd, dst, size, task_src, ret, strerror(errno));
+	if (ret == -1) {
+		lerror("pread(%d, %p, %ld, 0x%lx) = %d failed, %m\n",
+			task->proc_mem_fd, dst, size, task_src, ret);
 		do_backtrace(stdout);
 	}
 	/* pread(2) will return -1 if failed, keep it that way. */
@@ -2036,7 +2036,7 @@ int memcpy_to_task(struct task_struct *task, unsigned long task_dst, void *src,
 {
 	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
-	if (ret <= 0) {
+	if (ret == -1) {
 		lerror("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
 		do_backtrace(stdout);
