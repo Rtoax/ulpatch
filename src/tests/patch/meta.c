@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com> */
+/* Copyright (C) 2022-2024 Rong Tao */
 #include <errno.h>
 
 #include <utils/log.h>
@@ -21,7 +21,7 @@ int i_am_a_patch(void)
 	return 1;
 }
 
-ULPATCH_INFO(patch_me, i_am_a_patch, "Rong Tao <rtoax@foxmail.com>");
+ULPATCH_INFO(patch_me, i_am_a_patch, "Rong Tao");
 
 TEST(Patch_meta, macro__ULPATCH_INFO, 0)
 {

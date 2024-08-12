@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2022-2024 Rong Tao <rtoax@foxmail.com>
+# Copyright (C) 2022-2024 Rong Tao
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
