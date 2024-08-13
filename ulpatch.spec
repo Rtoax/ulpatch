@@ -101,6 +101,7 @@ popd
 %{_mandir}/man8/ultask.8.gz
 %{_datadir}/ulpatch/ftrace-mcount.obj
 %{_datadir}/ulpatch/hello.obj
+%license LICENSE
 
 %files devel
 %{_includedir}/ulpatch/asm.h
