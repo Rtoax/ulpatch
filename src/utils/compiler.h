@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao */
-#ifndef __ULPATCH_UTILS_COMPILER_H
-#define __ULPATCH_UTILS_COMPILER_H 1
+#pragma once
 
 #define compiler_barrier()	asm volatile("" :::"memory")
 
@@ -37,30 +36,31 @@
 # define restrict
 #endif
 
-#define __weak  __attribute__((weak))
-#define __visible_default  __attribute__((visibility("default")))
-#define __alias(func)  __attribute__((alias(#func)))
-#define __maybe_unused  __attribute__((unused))
-# define __used  __attribute__((used))
-# define __unused  __attribute__((unused))
-# define __noreturn  __attribute__((noreturn))
-#define __align(n)  __attribute__((aligned(n)))
-#define __packed  __attribute__((packed))
+#define __weak __attribute__((weak))
+#define __visible_default __attribute__((visibility("default")))
+#define __hidden __attribute__((visibility("hidden")))
+#define __alias(func) __attribute__((alias(#func)))
+#define __maybe_unused __attribute__((unused))
+#define __used __attribute__((used))
+#define __unused __attribute__((unused))
+#define __noreturn __attribute__((noreturn))
+#define __align(n) __attribute__((aligned(n)))
+#define __packed __attribute__((packed))
 
 #ifndef likely
-#define likely(x)    __builtin_expect(!!(x), 1)
+#define likely(x) __builtin_expect(!!(x), 1)
 #endif
 
 #ifndef unlikely
-#define unlikely(x)  __builtin_expect(!!(x), 0)
+#define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
 /* Forced inlining */
 #ifndef force_inline
-#define force_inline __attribute__ ((__always_inline__))
+#define force_inline __attribute__((__always_inline__))
 #endif
 
-#define __deprecated  __attribute__((deprecated))
+#define __deprecated __attribute__((deprecated))
 
 #define CTOR_PRIO_1	101
 #define CTOR_PRIO_USER	105
@@ -78,10 +78,9 @@
 
 #ifndef FALLTHROUGH
 # ifdef HAVE_FALLTHROUGH
-#  define FALLTHROUGH __attribute__ ((fallthrough))
+#  define FALLTHROUGH __attribute__((fallthrough))
 # else
-#  define FALLTHROUGH ((void) 0)
+#  define FALLTHROUGH ((void)0)
 # endif
 #endif
 
-#endif /* __ULPATCH_UTILS_COMPILER_H */
