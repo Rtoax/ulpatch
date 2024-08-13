@@ -33,6 +33,7 @@ cmake_install.cmake
 
 # Coredump, we don't have source file named with core. prefix.
 core.*
+!core*.c
 
 # mkdocs
 site

@@ -139,6 +139,10 @@ struct symbol {
 	struct rb_node node;
 };
 
+
+int elf_core_init(void);
+const char *libc_object(void);
+
 struct elf_file *elf_file_open(const char *filepath);
 struct elf_file *elf_file_find(const char *filepath);
 int elf_file_close(const char *filepath);

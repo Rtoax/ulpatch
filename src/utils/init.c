@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <elf/elf_api.h>
 #include <utils/util.h>
 #include <utils/log.h>
 #include <utils/compiler.h>
@@ -78,5 +79,7 @@ void ulpatch_init(void)
 {
 	__check_and_exit();
 	__env_init();
+
+	elf_core_init();
 }
 

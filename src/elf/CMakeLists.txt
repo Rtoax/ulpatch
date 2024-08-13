@@ -14,6 +14,7 @@ link_libraries(${ELF}
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 add_library(ulpatch_elf STATIC
+	core.c
 	ehdr.c
 	note.c
 	objdump.c
