@@ -23,6 +23,7 @@ struct elf_file {
 	size_t rawsize;
 	size_t size;
 	char filepath[PATH_MAX];
+#define NO_BUILD_ID	"No Build ID"
 	char *build_id;
 
 	/* ELF file header */

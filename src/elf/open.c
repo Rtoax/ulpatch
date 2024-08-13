@@ -145,7 +145,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	/* Elf MUST has Build ID */
 	if (!elf->build_id) {
 		if (elf->ehdr->e_type == ET_REL) {
-			elf->build_id = "REL no Build ID";
+			elf->build_id = NO_BUILD_ID;
 		} else {
 			lerror("No Build ID found in %s,%d, check with 'readelf -n'\n",
 				elf->filepath, elf->ehdr->e_type);
