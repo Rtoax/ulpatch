@@ -44,6 +44,12 @@ TEST(Elf_Open, open_close, 0)
 			ret = -1;
 			break;
 		}
+		e = elf_file_find(test_elfs[i]);
+		if (!e) {
+			lerror("find %s failed.\n", test_elfs[i]);
+			ret = -1;
+			break;
+		}
 
 		elf_file_close(test_elfs[i]);
 	}

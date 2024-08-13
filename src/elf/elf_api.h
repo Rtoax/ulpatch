@@ -140,6 +140,7 @@ struct symbol {
 };
 
 struct elf_file *elf_file_open(const char *filepath);
+struct elf_file *elf_file_find(const char *filepath);
 int elf_file_close(const char *filepath);
 
 /* ELF Ehdr api */

@@ -15,19 +15,18 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
+/* Store all already opened ELF file handlers */
 static uint16_t elf_files_number = 0;
 static LIST_HEAD(elf_file_list);
 
 
-struct elf_file *elf_file_open(const char *filepath)
+struct elf_file *elf_file_find(const char *filepath)
 {
-	int i, fd;
-	size_t size;
 	struct elf_file *elf = NULL;
 
 	if (!filepath || !fexist(filepath)) {
 		lwarning("%s is not exist.\n", filepath);
-		errno = -EINVAL;
+		errno = EINVAL;
 		return NULL;
 	}
 
@@ -38,7 +37,18 @@ struct elf_file *elf_file_open(const char *filepath)
 			return elf;
 		}
 	}
-	elf = NULL;
+	return NULL;
+}
+
+struct elf_file *elf_file_open(const char *filepath)
+{
+	int i, fd;
+	size_t size;
+	struct elf_file *elf = NULL;
+
+	elf = elf_file_find(filepath);
+	if (elf)
+		return elf;
 
 	fd = open(filepath, O_RDONLY);
 	if (fd < 0) {
