@@ -54,7 +54,7 @@ struct test *create_test(char *category, char *name, test_prio prio,
 invalid:
 	fprintf(stderr, "ERROR: fatal add test: %s.%s %s\n", category, name,
 		err);
-	errno = EINVAL;
+	abort();
 	return NULL;
 }
 
