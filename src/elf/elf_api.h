@@ -210,6 +210,8 @@ const char *elf_strbuildid(uint8_t *bid, size_t descsz, char *buf,
 
 /* ELF Rela api */
 int handle_relocs(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn);
+const char *r_x86_64_name(int r);
+const char *r_aarch64_name(int r);
 const char *rela_type_string(int r);
 void print_rela(GElf_Rela *rela);
 
