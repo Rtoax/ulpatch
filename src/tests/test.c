@@ -15,7 +15,30 @@ int nr_tests = 0;
 struct test *create_test(char *category, char *name, test_prio prio,
 			 int (*cb)(void), int expect_ret)
 {
-	struct test *test = malloc(sizeof(struct test));
+	struct test *test;
+	const char *err = "Success";
+
+	if (!category || strlen(category) == 0) {
+		err = "Wrong category";
+		goto invalid;
+	}
+
+	if (!name || strlen(name) == 0) {
+		err = "Wrong name";
+		goto invalid;
+	}
+
+	if (prio < TEST_PRIO_HIGHEST || prio > TEST_PRIO_LOWER) {
+		err = "Wrong prio";
+		goto invalid;
+	}
+
+	if (!cb) {
+		err = "Wrong callback";
+		goto invalid;
+	}
+
+	test = malloc(sizeof(struct test));
 
 	test->idx = ++nr_tests;
 	test->category = strdup(category);
@@ -27,6 +50,12 @@ struct test *create_test(char *category, char *name, test_prio prio,
 	list_add(&test->node, &test_list[prio - TEST_PRIO_START]);
 
 	return test;
+
+invalid:
+	fprintf(stderr, "ERROR: fatal add test: %s.%s %s\n", category, name,
+		err);
+	errno = EINVAL;
+	return NULL;
 }
 
 void release_tests(void)

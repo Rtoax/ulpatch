@@ -24,6 +24,7 @@
  *
  */
 typedef enum {
+	TEST_PRIO_MIN,
 /* constructor priorities from 0 to 100 are reserved for the implementation */
 #define TEST_PRIO_START	CTOR_PRIO_USER
 	TEST_HIGHEST = 1,
@@ -104,9 +105,8 @@ int PRINTER_FN(int nloop, const char *content);
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
 
-struct test*
-create_test(char *category, char *name, test_prio prio, int (*cb)(void),
-	int expect_ret);
+struct test *create_test(char *category, char *name, test_prio prio,
+			 int (*cb)(void), int expect_ret);
 void release_tests(void);
 
 /* Add wait api */
@@ -196,7 +196,8 @@ int task_wait_destroy(struct task_wait *task_wait);
 int task_wait_wait(struct task_wait *task_wait);
 int task_wait_trigger(struct task_wait *task_wait);
 int task_wait_request(struct task_wait *task_wait, char request,
-	struct msgbuf *rx_buf, size_t rx_buf_size);
+		      struct msgbuf *rx_buf, size_t rx_buf_size);
 int task_wait_response(struct task_wait *task_wait,
-	int (*makemsg)(char request, struct msgbuf *buf, size_t buf_len));
+		       int (*makemsg)(char request, struct msgbuf *buf,
+				      size_t buf_len));
 

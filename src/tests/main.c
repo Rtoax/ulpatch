@@ -422,7 +422,10 @@ static int operate_test(struct test *test)
 	int ret;
 	bool failed = false;
 
-	if (!test->test_cb) return -1;
+	errno = 0;
+
+	if (!test->test_cb)
+		return -EINVAL;
 
 	test_log("=== %4d/%-4d %s.%s %c",
 		test->idx, nr_tests,
