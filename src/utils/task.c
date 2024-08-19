@@ -275,8 +275,8 @@ static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 		type = VMA_ANON;
 	/**
 	 * Example:
-	 * /tmp/ulpatch/17099/map_files/patch-ZUkaOS
-	 *              ^^^^^           ^^^^^^
+	 * /tmp/ulpatch/20298/map_files/ulp-GLpgJM
+	 *              ^^^^^           ^^^^
 	 */
 	} else if (strstr(name, PATCH_VMA_TEMP_PREFIX) && strstr(name, s_pid)) {
 		type = VMA_ULPATCH;

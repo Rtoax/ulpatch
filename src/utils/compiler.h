@@ -46,6 +46,10 @@
 #define __noreturn __attribute__((noreturn))
 #define __align(n) __attribute__((aligned(n)))
 #define __packed __attribute__((packed))
+#ifdef __nonnull
+# undef __nonnull
+#endif
+#define __nonnull(i...) __attribute__((nonnull(i)))
 
 #ifndef likely
 #define likely(x) __builtin_expect(!!(x), 1)

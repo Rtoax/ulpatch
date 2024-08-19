@@ -25,6 +25,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
+
 enum vma_type {
 	VMA_NONE,   /* None */
 	VMA_SELF,   /* /usr/bin/ls, ... */

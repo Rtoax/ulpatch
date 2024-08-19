@@ -12,29 +12,25 @@
 int nr_tests = 0;
 
 
+__nonnull(1,2,4)
 struct test *create_test(char *category, char *name, test_prio prio,
 			 int (*cb)(void), int expect_ret)
 {
 	struct test *test;
 	const char *err = "Success";
 
-	if (!category || strlen(category) == 0) {
+	if (strlen(category) == 0) {
 		err = "Wrong category";
 		goto invalid;
 	}
 
-	if (!name || strlen(name) == 0) {
+	if (strlen(name) == 0) {
 		err = "Wrong name";
 		goto invalid;
 	}
 
 	if (prio < TEST_PRIO_HIGHEST || prio > TEST_PRIO_LOWER) {
 		err = "Wrong prio";
-		goto invalid;
-	}
-
-	if (!cb) {
-		err = "Wrong callback";
 		goto invalid;
 	}
 

@@ -7,6 +7,7 @@
 #include <utils/compiler.h>
 #include <utils/util.h>
 
+
 static const char *ANSI_COLORS_GRAY[] = {
 	"\033[48;5;255m",
 	"\033[48;5;254m",
