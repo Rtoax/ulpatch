@@ -9,6 +9,8 @@ hide:
 
 #### Fedora/RHEL/ALmaLinux
 
+On **RHEL** like linux distrobution, manage packages with [rpm](https://github.com/rpm-software-management) and [dnf/yum](https://github.com/rpm-software-management/dnf).
+
 ```bash
 $ sudo dnf install -y \
 	binutils-devel \
@@ -24,6 +26,8 @@ $ sudo dnf install -y \
 
 
 #### Debian/Ubuntu
+
+On **Debian** like linux distrobutions, manage packages with [apt](https://salsa.debian.org/apt-team/apt).
 
 ```bash
 $ sudo apt install -y \
