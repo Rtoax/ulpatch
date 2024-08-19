@@ -8,9 +8,18 @@ add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 message(STATUS "UTILS Architecture: ${ARCHITECTURE}")
-if(LIBUNWIND_LIBRARIES)
-	find_library(LIBUNWIND unwind HINTS ${SEARCH_PATH})
-	find_library(LIBUNWIND_ARCH unwind-${ARCHITECTURE} HINTS ${SEARCH_PATH})
+
+set(unwind)
+set(LIBUNWIND)
+set(LIBUNWIND_ARCH)
+
+if(LIBUNWIND_LIBUNWIND_H)
+	message(STATUS "UTILS Support unwind")
+	if(LIBUNWIND_LIBRARIES)
+		find_library(LIBUNWIND unwind HINTS ${SEARCH_PATH})
+		find_library(LIBUNWIND_ARCH unwind-${ARCHITECTURE} HINTS ${SEARCH_PATH})
+	endif()
+	set(unwind backtrace.c)
 endif()
 
 if(BINUTILS_BFD_LIBRARIES)
@@ -21,6 +30,7 @@ set(disasm)
 set(CAPSTONE)
 
 if(BUILD_WITH_CAPSTONE)
+	message(STATUS "UTILS Support capstone")
 	if(CAPSTONE_LIBRARIES)
 		find_library(CAPSTONE capstone HINTS ${SEARCH_PATH})
 	endif()
@@ -31,7 +41,6 @@ link_libraries(${ELF} ${BFD} ${CAPSTONE} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_
 
 add_library(ulpatch_utils STATIC
 	ansi.c
-	backtrace.c
 	callback.c
 	${disasm}
 	file.c
@@ -43,6 +52,7 @@ add_library(ulpatch_utils STATIC
 	string.c
 	task.c
 	time.c
+	${unwind}
 	version.c
 )
 

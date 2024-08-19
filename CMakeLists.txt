@@ -125,6 +125,7 @@ endif()
 if(LIBUNWIND_LIBUNWIND_H)
 	message(STATUS "Found libunwind headers")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_LIBUNWIND_H)
+	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_LIBUNWIND=1)
 endif()
 
 # Capstone Disassembler Engine
