@@ -4,6 +4,13 @@
 - PIE: Position-Independent-Executable
 
 
+## Introductions
+
+**How to resolve symbol addresses?** For examples, the implementation of [uprobe in the linux kernel](https://docs.kernel.org/trace/uprobetracer.html). At the same time, the implementation of application-level software, such as the implementation of [BCC](https://github.com/iovisor/bcc) and [bpftrace](https://github.com/iovisor/bpftrace).
+
+GDB's implementation of symbol parsing, [binutils-gdb](https://sourceware.org/git/binutils-gdb) is helpful.
+
+
 ## Kernel ELF File Map
 
 See kernel `load_elf_binary()` function, it will load all `PT_LOAD` section to memory, the location is what we care about.
