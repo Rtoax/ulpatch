@@ -3,6 +3,11 @@
 #
 SHELL = bash
 
+ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
+ifeq ($(wildcard ${ULP_CONFIG}),)
+  $(error Not found ulp-config, Please install ulpatch first)
+endif
+
 ifdef ULPATCH_HELLO_OBJ
 TARGETS = $(ULPATCH_HELLO_OBJ)
 else
@@ -11,8 +16,13 @@ endif
 
 CC = gcc
 
+LDFLAGS :=
+
 CFLAGS := -Werror -Wall
 CFLAGS += -O0
+CFLAGS += $(shell ${ULP_CONFIG} --cflags)
+
+LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
 
 ifdef INCS1
 CFLAGS += $(INCS1)
@@ -24,11 +34,11 @@ ALL: $(TARGETS)
 
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
+	@$(CC) $(CFLAGS) -o $(@) -c $(<)
 
 $(TARGETS): hello.o
 	@echo -e "Target   \033[1;32m$(@)\033[m"
-	@ld -relocatable -o $(@) --build-id=sha1 $(<)
+	@ld ${LDFLAGS} -o $(@) $(<)
 
 clean:
 	@echo -e "Clean   \033[1;32m$(@)\033[m"
