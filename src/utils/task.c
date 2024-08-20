@@ -91,12 +91,10 @@ static struct vm_area_struct *alloc_vma(struct task_struct *task)
 
 	vma->task = task;
 	vma->type = VMA_NONE;
-
-	list_init(&vma->node_list);
-
 	vma->leader = NULL;
 	vma->ulp = NULL;
 
+	list_init(&vma->node_list);
 	list_init(&vma->siblings);
 
 	return vma;
@@ -131,8 +129,8 @@ static void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
 	}
 
 	list_add(&vma->node_list, &task->vma_list);
-	rb_insert_node(&task->vmas_rb, &vma->node_rb,
-		__vma_rb_cmp, (unsigned long)vma);
+	rb_insert_node(&task->vmas_rb, &vma->node_rb, __vma_rb_cmp,
+			(unsigned long)vma);
 }
 
 static void unlink_vma(struct task_struct *task, struct vm_area_struct *vma)
@@ -185,8 +183,8 @@ struct vm_area_struct *next_vma(struct task_struct *task,
 
 unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 {
-	struct vm_area_struct *ivma, *first_vma;
-	struct rb_node *first, *rnode;
+	struct vm_area_struct *ivma, *first_vma, *next_vma;
+	struct rb_node *first, *next, *rnode;
 
 	first = rb_first(&task->vmas_rb);
 	first_vma = rb_entry(first, struct vm_area_struct, node_rb);
@@ -200,15 +198,14 @@ unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 
 	for (rnode = first; rnode; rnode = rb_next(rnode)) {
 		ivma = rb_entry(rnode, struct vm_area_struct, node_rb);
-		struct rb_node *next_node = rb_next(rnode);
-		struct vm_area_struct *next_vma;
-		if (!next_node)
+		next = rb_next(rnode);
+		if (!next)
 			return 0;
 
 		ldebug("vma: %lx-%lx %s\n", ivma->vm_start, ivma->vm_end,
 			ivma->name_);
 
-		next_vma = rb_entry(next_node, struct vm_area_struct, node_rb);
+		next_vma = rb_entry(next, struct vm_area_struct, node_rb);
 		if (next_vma->vm_start - ivma->vm_end >= size)
 			return ivma->vm_end;
 	}
