@@ -3,9 +3,13 @@
 #
 SHELL = bash
 
-ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
-ifeq ($(wildcard ${ULP_CONFIG}),)
-  $(error Not found ulp-config, Please install ulpatch first)
+ULP_CONFIG :=
+
+ifndef ULP_CONFIG
+  ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
+  ifeq ($(wildcard ${ULP_CONFIG}),)
+    $(error Not found ulp-config, Please install ulpatch first)
+  endif
 endif
 
 ifdef ULPATCH_HELLO_OBJ
@@ -29,6 +33,8 @@ CFLAGS += $(INCS1)
 else
 CFLAGS += -I../../../
 endif
+
+$(info ulp-config: ${ULP_CONFIG})
 
 ALL: $(TARGETS)
 
