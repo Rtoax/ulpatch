@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 #include <utils/util.h>
 #include <utils/log.h>
 

@@ -11,7 +11,7 @@
 #include <errno.h>
 #include <time.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/task.h>

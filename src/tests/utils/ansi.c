@@ -4,8 +4,8 @@
 #include <utils/list.h>
 #include <utils/util.h>
 #include <utils/ansi.h>
-#include <elf/elf_api.h>
-#include <tests/test_api.h>
+#include <elf/elf-api.h>
+#include <tests/test-api.h>
 
 
 TEST(UtilsAnsi, base, 0)

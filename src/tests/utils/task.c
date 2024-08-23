@@ -11,7 +11,7 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/task.h>
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 
 TEST(Task, get_proc_pid_exe, 0)

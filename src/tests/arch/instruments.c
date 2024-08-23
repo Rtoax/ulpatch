@@ -6,7 +6,7 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/task.h>
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 
 #if defined(__x86_64__)

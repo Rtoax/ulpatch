@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
 #include <utils/log.h>
 #include <utils/list.h>

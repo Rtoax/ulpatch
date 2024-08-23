@@ -6,7 +6,7 @@
 #include <utils/util.h>
 #include <patch/asm.h>
 
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 TEST(Asm, sleep, 0)
 {

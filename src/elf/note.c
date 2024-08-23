@@ -20,7 +20,7 @@
 #define NT_GNU_BUILD_ATTRIBUTE_FUNC 0x101
 #endif
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 #include <utils/util.h>
 #include <utils/log.h>
 

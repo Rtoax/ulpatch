@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
 #ifdef HAVE_BINUTILS_BFD_H
 #include <bfd.h>

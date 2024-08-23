@@ -13,7 +13,7 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
 #include <utils/log.h>
 #include <utils/task.h>

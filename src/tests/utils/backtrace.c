@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <utils/log.h>
 #include <utils/util.h>
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 
 static void bar(void)

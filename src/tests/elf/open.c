@@ -7,9 +7,9 @@
 #include <utils/util.h>
 #include <utils/compiler.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 
 static const char *test_elfs[] = {

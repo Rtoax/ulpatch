@@ -16,8 +16,8 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <utils/task.h>
-#include <elf/elf_api.h>
-#include <tests/test_api.h>
+#include <elf/elf-api.h>
+#include <tests/test-api.h>
 
 #include "../common.c"
 
@@ -699,7 +699,7 @@ static void init_test_symbols(void)
 	}
 #define TEST_SYM_NON_STATIC(s, a)	TEST_DYNSYM(s)
 #define TEST_SYM_SELF(s) TEST_DYNSYM(s)
-#include <tests/test_symbols.h>
+#include <tests/test-symbols.h>
 #undef TEST_DYNSYM
 #undef TEST_SYM_SELF
 #undef TEST_SYM_NON_STATIC

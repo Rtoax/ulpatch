@@ -11,7 +11,7 @@
 #include <utils/compiler.h>
 #include <patch/patch.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
 
 const char *ulpatch_jmpq_replace(union text_poke_insn *insn, unsigned long ip,

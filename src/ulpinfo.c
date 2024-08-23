@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <errno.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 
 #include <patch/patch.h>
 

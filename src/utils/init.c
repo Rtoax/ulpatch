@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <elf/elf_api.h>
+#include <elf/elf-api.h>
 #include <utils/util.h>
 #include <utils/log.h>
 #include <utils/compiler.h>

@@ -2,8 +2,8 @@
 /* Copyright (C) 2022-2024 Rong Tao */
 #include <utils/log.h>
 #include <utils/rbtree.h>
-#include <elf/elf_api.h>
-#include <tests/test_api.h>
+#include <elf/elf-api.h>
+#include <tests/test-api.h>
 
 
 struct test_data {

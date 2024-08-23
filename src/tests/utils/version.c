@@ -5,7 +5,7 @@
 
 #include <utils/log.h>
 #include <utils/list.h>
-#include <tests/test_api.h>
+#include <tests/test-api.h>
 
 
 TEST(Utils, ulpatch_version, 0)
