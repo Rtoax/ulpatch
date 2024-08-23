@@ -22,14 +22,14 @@ add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type -p
 
 # Target: ultask
 if (BUILD_ULTASK)
-add_executable(ultask ultask.c)
-target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS})
+	add_executable(ultask ultask.c)
+	target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS})
 endif()
 
 # Target: ulftrace
 if (BUILD_ULFTRACE)
-add_executable(ulftrace ulftrace.c)
-target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS})
+	add_executable(ulftrace ulftrace.c)
+	target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS})
 endif()
 
 # Target: ulpatch

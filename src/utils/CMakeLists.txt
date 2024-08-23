@@ -37,8 +37,6 @@ if(BUILD_WITH_CAPSTONE)
 	set(disasm disasm.c)
 endif()
 
-link_libraries(${ELF} ${BFD} ${CAPSTONE} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf)
-
 add_library(ulpatch_utils STATIC
 	ansi.c
 	callback.c
@@ -57,3 +55,6 @@ add_library(ulpatch_utils STATIC
 )
 
 target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_CFLAGS_MACROS})
+target_link_libraries(ulpatch_utils PRIVATE
+	${ELF} ${BFD} ${CAPSTONE} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf
+)

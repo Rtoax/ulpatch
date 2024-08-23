@@ -8,15 +8,6 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
-link_libraries(${ELF} ${PTHREAD}
-	ulpatch_arch
-	ulpatch_elf
-	ulpatch_patch
-	ulpatch_patch_obj_ftrace
-	ulpatch_patch_obj_hello
-	ulpatch_utils
-)
-
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 aux_source_directory(arch DIR_ARCH_SRCS)
@@ -37,3 +28,13 @@ add_executable(ulpatch_test
 )
 
 target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})
+
+target_link_libraries(ulpatch_test
+	${ELF} ${PTHREAD}
+	ulpatch_arch
+	ulpatch_elf
+	ulpatch_patch
+	ulpatch_patch_obj_ftrace
+	ulpatch_patch_obj_hello
+	ulpatch_utils
+)

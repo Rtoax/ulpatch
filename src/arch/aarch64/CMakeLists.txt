@@ -7,8 +7,10 @@ message(STATUS "Compile for aarch64")
 
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
-aux_source_directory(. LIB_SOURCES)
-
-add_library(ulpatch_arch STATIC ${LIB_SOURCES})
+add_library(ulpatch_arch STATIC
+	ftrace.c
+	insn.c
+	patch.c
+)
 
 target_compile_definitions(ulpatch_arch PRIVATE ${UTILS_CFLAGS_MACROS})

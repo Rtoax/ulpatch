@@ -9,12 +9,6 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
-link_libraries(${ELF}
-	ulpatch_arch
-	ulpatch_elf
-	ulpatch_utils
-)
-
 add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
 
 add_library(ulpatch_patch STATIC
@@ -22,4 +16,9 @@ add_library(ulpatch_patch STATIC
 )
 
 target_compile_definitions(ulpatch_patch PRIVATE ${UTILS_CFLAGS_MACROS})
-
+target_link_libraries(ulpatch_patch PRIVATE
+	${ELF}
+	ulpatch_arch
+	ulpatch_elf
+	ulpatch_utils
+)
