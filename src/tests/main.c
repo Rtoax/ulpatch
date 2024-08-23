@@ -396,13 +396,13 @@ static int show_test(struct test *test)
 
 static bool should_filter_out(struct test *test)
 {
+	char category_name[256];
+
 	/* Default: test all */
 	if (!filter_format)
 		return false;
 
-	char category_name[256];
-	snprintf(category_name, 256, "%s.%s",
-		test->category, test->name);
+	snprintf(category_name, 256, "%s.%s", test->category, test->name);
 
 	if (strstr(category_name, filter_format))
 		return false;
