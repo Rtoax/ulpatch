@@ -39,6 +39,14 @@ add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
 add_definitions("-DULPATCH_VERSION_PATCH=${ULPATCH_VERSION_PATCH}")
 add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
 
+add_compile_options(-MD)
+add_compile_options(-Wall)
+add_compile_options(-Werror)
+add_compile_options(-D_GNU_SOURCE)
+add_compile_options(-Wuninitialized)
+add_compile_options(-Wreturn-type -pg)
+add_compile_options(-pg)
+
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 set(WARNINGS_AS_ERRORS OFF CACHE BOOL "Build with -Werror")
 # If you modify, update docs/INSTALL.md

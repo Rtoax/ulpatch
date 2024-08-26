@@ -5,8 +5,6 @@ include_directories(../..)
 
 message(STATUS "Compile for aarch64")
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 add_library(ulpatch_arch STATIC
 	ftrace.c
 	insn.c

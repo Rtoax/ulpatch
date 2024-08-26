@@ -13,8 +13,6 @@ link_libraries(${ELF}
 	ulpatch_elf
 )
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 aux_source_directory(. LIB_SOURCES)
 
 add_library(${ULPATCH_OBJ_TARGET} STATIC ${LIB_SOURCES})

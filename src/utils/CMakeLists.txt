@@ -3,8 +3,6 @@
 #
 include_directories(..)
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 message(STATUS "UTILS Architecture: ${ARCHITECTURE}")

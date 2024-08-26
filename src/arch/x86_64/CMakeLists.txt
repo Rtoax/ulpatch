@@ -5,8 +5,6 @@ include_directories(../..)
 
 message(STATUS "Compile for x86_64")
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 add_library(ulpatch_arch STATIC
 	alternative.c
 	ftrace.c

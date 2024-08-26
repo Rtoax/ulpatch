@@ -8,8 +8,6 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 aux_source_directory(arch DIR_ARCH_SRCS)
 aux_source_directory(elf DIR_ELF_SRCS)
 aux_source_directory(patch DIR_PATCH_SRCS)

@@ -15,8 +15,6 @@ link_libraries(${ELF}
 	ulpatch_elf
 )
 
-add_definitions(-MD -Wall -Werror -D_GNU_SOURCE -Wuninitialized -Wreturn-type)
-
 aux_source_directory(. LIB_SOURCES)
 
 # Need to explicitly add assembly files
