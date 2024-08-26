@@ -33,6 +33,7 @@ int main(void) {
 	return 0;
 }" BINUTILS_BFD_H)
 CHECK_C_SOURCE_COMPILES("
+#include <stddef.h>
 #include <bfd.h>
 int main(void) {
 	struct bfd *bfd, *templ;
