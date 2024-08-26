@@ -47,6 +47,7 @@ add_library(ulpatch_utils STATIC
 	rbtree.c
 	string.c
 	task.c
+	task-syscall.c
 	time.c
 	${unwind}
 	version.c
