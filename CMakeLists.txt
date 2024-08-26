@@ -128,7 +128,15 @@ else()
 endif()
 
 if(BINUTILS_BFD_H)
+	message(STATUS "Found binutils bfd.h")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_BINUTILS_BFD_H)
+	if(BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY)
+		message(STATUS "bfd support bfd_elf_bfd_from_remote_memory()")
+	else()
+		message(FATAL_ERROR "not support bfd_elf_bfd_from_remote_memory()")
+	endif()
+else()
+	message(FATAL_ERROR "Not found bfd.h")
 endif()
 
 # Libunwind provides a C ABI to determine the call-chain of a program.
