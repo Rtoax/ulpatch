@@ -1,9 +1,14 @@
+
 name: docs
 on:
   push:
+    paths:
+      - docs
     branches:
       - master
   pull_request:
+    paths:
+      - docs
 
 permissions:
   contents: write
