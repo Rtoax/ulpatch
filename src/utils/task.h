@@ -242,6 +242,10 @@ struct elf_file;
 struct task_struct_auxv {
 	/* AT_PHDR */
 	unsigned long auxv_phdr;
+	/* AT_PHENT */
+	unsigned long auxv_phent;
+	/* AT_PHNUM */
+	unsigned long auxv_phnum;
 	/* AT_BASE */
 	unsigned long auxv_interp;
 	/* AT_ENTRY */

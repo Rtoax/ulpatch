@@ -1479,6 +1479,12 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 		case AT_PHDR:
 			pauxv->auxv_phdr = auxv.a_un.a_val;
 			break;
+		case AT_PHENT:
+			pauxv->auxv_phent = auxv.a_un.a_val;
+			break;
+		case AT_PHNUM:
+			pauxv->auxv_phnum = auxv.a_un.a_val;
+			break;
 		case AT_BASE:
 			pauxv->auxv_interp = auxv.a_un.a_val;
 			break;
@@ -1490,6 +1496,18 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 
 	if (pauxv->auxv_phdr == 0) {
 		lerror("Not found AT_PHDR in %s\n", buf);
+		errno = ENOENT;
+		ret = -errno;
+		goto close_exit;
+	}
+	if (pauxv->auxv_phent == 0) {
+		lerror("Not found AT_PHENT in %s\n", buf);
+		errno = ENOENT;
+		ret = -errno;
+		goto close_exit;
+	}
+	if (pauxv->auxv_phnum == 0) {
+		lerror("Not found AT_PHNUM in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
@@ -1521,6 +1539,10 @@ int print_task_auxv(FILE *fp, const struct task_struct *task)
 
 	fprintf(fp, "%-8s %-16s\n", "TYPE", "VALUE");
 	fprintf(fp, "%-8s %-#16lx\n", "AT_PHDR", pauxv->auxv_phdr);
+	fprintf(fp, "%-8s %ld (%-#lx)\n", "AT_PHENT", pauxv->auxv_phent,
+							pauxv->auxv_phent);
+	fprintf(fp, "%-8s %ld (%-#lx)\n", "AT_PHNUM", pauxv->auxv_phnum,
+							pauxv->auxv_phnum);
 	fprintf(fp, "%-8s %-#16lx\n", "AT_BASE", pauxv->auxv_interp);
 	fprintf(fp, "%-8s %-#16lx\n", "AT_ENTRY", pauxv->auxv_entry);
 
