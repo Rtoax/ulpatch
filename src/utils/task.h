@@ -366,6 +366,11 @@ int print_task_auxv(FILE *fp, const struct task_struct *task);
 int load_task_status(pid_t pid, struct task_status *status);
 int print_task_status(FILE *fp, const struct task_struct *task);
 
+#define current get_current_task()
+int set_current_task(struct task_struct *task);
+void reset_current_task(void);
+struct task_struct *get_current_task(void);
+
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);
 void print_task(FILE *fp, const struct task_struct *task, bool detail);

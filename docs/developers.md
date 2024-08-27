@@ -25,3 +25,9 @@ You can view unfinished development tasks in [TODO-List](./TODO.md), and you nee
 
 Macro `CONFIG_CAPSTONE` defined and set to `1` by default if found capstone, you can turn it off, see [INSTALL](./INSTALL.md).
 
+
+### C Macros
+
+#### current
+
+Like kernel macro `current`, this `current` indicates the currently opened remote process.

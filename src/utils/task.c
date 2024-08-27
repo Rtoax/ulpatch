@@ -27,6 +27,42 @@
 #endif
 
 
+/**
+ * We should implement the current macro because sometimes we cannot directly
+ * pass the task_struct structure as a function parameter. At the same time,
+ * this can also be unified with the kernel.
+ */
+static struct task_struct *current_task = NULL;
+static struct task_struct fallback_task = {
+	.pid = 0,
+};
+
+int set_current_task(struct task_struct *task)
+{
+	if (!task)
+		return -EINVAL;
+	current_task = task;
+	return 0;
+}
+
+void reset_current_task(void)
+{
+	current_task = NULL;
+}
+
+struct task_struct *get_current_task(void)
+{
+	if (!current_task) {
+		lerror("Not set current task.\n");
+		errno = ENOENT;
+		/**
+		 * To prevent segmentation errors, NULL cannot be returned.
+		 */
+		return &fallback_task;
+	}
+	return current_task;
+}
+
 int open_pid_maps(pid_t pid)
 {
 	int mapsfd;
@@ -1824,6 +1860,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 		closedir(dir);
 	}
 
+	set_current_task(task);
+
 	return task;
 
 free_task:
@@ -1928,6 +1966,9 @@ int close_task(struct task_struct *task)
 	free_task_vmas(task);
 	free(task->exe);
 	free(task);
+
+	reset_current_task();
+
 	return 0;
 }
 

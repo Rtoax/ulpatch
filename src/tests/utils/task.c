@@ -37,6 +37,10 @@ TEST(Task, open_pid_maps, 0)
 TEST(Task, open_free, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
+
+	/* Test current */
+	linfo("Comm %s\n", current->comm);
+
 	return close_task(task);
 }
 
