@@ -333,7 +333,7 @@ struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct 
 #define first_vma(task) next_vma(task, NULL)
 /* For each vma of task */
 #define task_for_each_vma(vma, task) \
-		for (vma = first_vma(task); vma; vma = next_vma(task, vma))
+	for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
 struct vm_area_struct *find_vma(const struct task_struct *task,
 				unsigned long vaddr);
@@ -369,7 +369,7 @@ int print_task_status(FILE *fp, const struct task_struct *task);
 #define current get_current_task()
 int set_current_task(struct task_struct *task);
 void reset_current_task(void);
-struct task_struct *get_current_task(void);
+struct task_struct *const get_current_task(void);
 
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);

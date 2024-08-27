@@ -41,6 +41,9 @@ TEST(Task, open_free, 0)
 	/* Test current */
 	linfo("Comm %s\n", current->comm);
 
+	/* Make sure we could write 'current' task */
+	current->objdump = (void *)1;
+
 	return close_task(task);
 }
 
