@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 #if defined(HAVE_ELFUTILS_DEVEL)
 #include <elfutils/elf-knowledge.h>

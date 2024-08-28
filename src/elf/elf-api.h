@@ -6,8 +6,6 @@
 #include <libelf.h>
 #include <stdbool.h>
 #include <signal.h>
-#include <sys/socket.h>
-#include <sys/un.h>
 #include <gelf.h>
 #include <sys/types.h>
 

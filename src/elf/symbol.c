@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <malloc.h>
+#include <string.h>
 
 #include <elf/elf-api.h>
 #include <utils/util.h>
