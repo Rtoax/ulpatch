@@ -390,8 +390,9 @@ static int parse_config(int argc, char *argv[])
 
 static int show_test(struct test *test)
 {
-	fprintf(stderr, " %4d/%-4d  %-4d %s.%s\n",
-		test->idx, nr_tests, test->prio, test->category, test->name);
+	fprintf(stderr, " %4d/%-4d  %-4d %s.%s \texpect_ret:%d\n",
+		test->idx, nr_tests, test->prio, test->category, test->name,
+		test->expect_ret);
 	return 0;
 }
 
@@ -420,7 +421,6 @@ static bool should_filter_out(struct test *test)
 
 static int operate_test(struct test *test)
 {
-	int ret;
 	bool failed = false;
 
 	errno = 0;
@@ -430,13 +430,14 @@ static int operate_test(struct test *test)
 
 	test_log("=== %4d/%-4d %s.%s %c",
 		test->idx, nr_tests,
-		test->category, test->name, config.verbose?'\n':'\0');
+		test->category, test->name,
+		config.verbose ? '\n' : '\0');
 
 	gettimeofday(&test->start, NULL);
 
 	/* Exe test entry */
-	ret = test->test_cb();
-	if (ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
+	test->real_ret = test->test_cb();
+	if (test->real_ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
 		stat_count[STAT_IDX_SUCCESS]++;
 	} else {
 		stat_count[STAT_IDX_FAILED]++;
@@ -451,12 +452,13 @@ static int operate_test(struct test *test)
 
 	total_spent_us += test->spend_us;
 
-	test_log("\033[2m%ldus\033[m %s%-8s%s %s\n",
+	test_log("\033[2m%ldus\033[m %s%-8s%s %s ret:%d:%d\n",
 		test->spend_us,
 		failed ? "\033[31m" : "\033[32m",
 		failed ? "Failed: " : "OK",
 		failed ? strerror(errno) : "",
-		"\033[m");
+		"\033[m",
+		test->expect_ret, test->real_ret);
 
 	if (failed) {
 		/**

@@ -42,6 +42,7 @@ struct test *create_test(char *category, char *name, test_prio prio,
 	test->prio = prio;
 	test->test_cb = cb;
 	test->expect_ret = expect_ret;
+	test->real_ret = expect_ret;
 
 	list_add(&test->node, &test_list[prio - TEST_PRIO_START]);
 

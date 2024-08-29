@@ -49,6 +49,8 @@ struct test {
 	test_prio prio;
 	int (*test_cb)(void);
 	int expect_ret;
+	/* after running return value */
+	int real_ret;
 
 	/* record testing time spend */
 	struct timeval start, end;
