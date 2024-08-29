@@ -17,15 +17,15 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size);
 static int __unused fdisasm_arch(FILE *fp, unsigned char *code, size_t size)
 {
 	memshow(fp, code, size);
-	errno = ENOSYS;
-	return -ENOSYS;
+	errno = ENOTSUPP;
+	return -ENOTSUPP;
 }
 static int __unused fdisasm(FILE *fp, int disasm_arch, unsigned char *code,
 			    size_t size)
 {
 	memshow(fp, code, size);
-	errno = ENOSYS;
-	return -ENOSYS;
+	errno = ENOTSUPP;
+	return -ENOTSUPP;
 }
 #endif
 
