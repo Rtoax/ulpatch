@@ -8,7 +8,7 @@
 
 #include <arch/x86_64/instruments.h>
 
-// see linux/scripts/recordmcount.c
+/* see linux/scripts/recordmcount.c */
 static unsigned char __unused ideal_nop5_x86_64[5] =
 	{ 0x0f, 0x1f, 0x44, 0x00, 0x00 };
 static unsigned char __unused ideal_nop5_x86_32[5] =
@@ -71,4 +71,3 @@ uint32_t x86_64_func_callq_offset(void *func)
 
 	return offset;
 }
-

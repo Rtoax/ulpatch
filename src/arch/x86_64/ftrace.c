@@ -18,7 +18,7 @@ const char *ftrace_nop_replace(void)
 }
 
 const char *ftrace_call_replace(union text_poke_insn *insn, unsigned long ip,
-			unsigned long addr)
+				unsigned long addr)
 {
 	return text_gen_insn(insn, INST_CALL, (void *)ip, (void *)addr);
 }

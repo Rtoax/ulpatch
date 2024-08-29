@@ -206,6 +206,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		lerror("failed to memcpy, ret = %d.\n", ret);
 	}
 
+	fdisasm_arch(stdout, (void *)restore_addr, restore_size);
+
 	close_task(task);
 
 	return test_ret;
