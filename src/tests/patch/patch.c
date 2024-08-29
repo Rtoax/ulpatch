@@ -45,7 +45,6 @@ static void my_direct_func(void)
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
-/* see macro ULPATCH_TEST code branch */
 __opt_O0 int try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 {
 	linfo("TTWU emulate.\n");
@@ -54,19 +53,34 @@ __opt_O0 int try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 	return ret;
 }
 
+__opt_O0 int ulpatch_try_to_wake_up(struct task_struct *task, int mode,
+				    int wake_flags)
+{
+#define ULPATCH_TTWU_RET	0xdead1234
+	linfo("TTWU emulate, patched.\n");
+	return ULPATCH_TTWU_RET;
+}
+
 static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 {
-	int ret = 0;
-	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
-	struct task_struct *task = open_task(getpid(), flags);
-
+	int ret = 0, test_ret;
+	int flags;
+	struct task_struct *task;
 	struct symbol *rel_s = NULL;
 	struct symbol *libc_s = NULL;
+	unsigned long restore_addr;
+	size_t restore_size;
 
 
-	/* Try to find mcount symbol in target task address space, you need to
-	 * access mcount before find_symbol("mcount"), otherwise, st_value will be
-	 * zero.
+	test_ret = expect_ret;
+
+	flags = FTO_VMA_ELF_FILE | FTO_RDWR;
+	task = open_task(getpid(), flags);
+
+	/**
+	 * Try to find mcount symbol in target task address space, you need to
+	 * access mcount before find_symbol("mcount"), otherwise, st_value will
+	 * be zero.
 	 *
 	 * AArch64: bl <_mcount> is 0x94000000 before relocation
 	 */
@@ -83,9 +97,10 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		}
 	}
 
-	/* Try to find mcount in libc.so, some time, libc.so's symbols is very
-	 * useful when you try to patch a running process or ftrace it. so, this
-	 * is a test.
+	/**
+	 * Try to find mcount in libc.so, some time, libc.so's symbols is very
+	 * useful when you try to patch a running process or ftrace it. thus,
+	 * this is a test.
 	 */
 	libc_s = find_symbol(task->libc_elf, mcount_str, STT_FUNC);
 	if (!libc_s) {
@@ -101,6 +116,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 	try_to_wake_up(task, 0, 0);
 
+	char orig_code[MCOUNT_INSN_SIZE];
 	unsigned long addr = (unsigned long)arg->custom_mcount;
 	/**
 	 * Skip symbols whose symbol address length is longer than 4 bytes.
@@ -131,6 +147,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
 
+	/* Store original code */
+	ret = memcpy_from_task(task, orig_code, ip, MCOUNT_INSN_SIZE);
+	if (ret == -1 || ret < MCOUNT_INSN_SIZE) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
+	}
+
 	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
@@ -139,6 +161,9 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	}
 
 	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
+
+	restore_addr = ip;
+	restore_size = MCOUNT_INSN_SIZE;
 
 #elif defined(__aarch64__)
 
@@ -152,6 +177,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
 		aarch64_func_bl_offset(try_to_wake_up));
 
+	/* Store original code */
+	ret = memcpy_from_task(task, orig_code, pc, MCOUNT_INSN_SIZE);
+	if (ret == -1 || ret < MCOUNT_INSN_SIZE) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
+	}
+
 	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
 
 	/* application the patch */
@@ -159,17 +190,25 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
 
+	restore_addr = pc;
+	restore_size = MCOUNT_INSN_SIZE;
 #endif
 
 	/**
 	 * call again, custom_mcount() will be called. see macro ULPATCH_TEST
 	 * code branch
 	 */
-	ret = try_to_wake_up(task, 1, 2);
+	test_ret = try_to_wake_up(task, 1, 2);
+
+	/* Restore original code */
+	ret = memcpy_to_task(task, restore_addr, orig_code, restore_size);
+	if (ret == -1 || ret < restore_size) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
+	}
 
 	close_task(task);
 
-	return ret;
+	return test_ret;
 }
 
 TEST(Patch, ftrace_direct, TTWU_FTRACE_RETURN)
@@ -204,14 +243,7 @@ TEST(Patch, ftrace_nop, 0)
 }
 #endif
 
-int ulpatch_try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
-{
-#define ULPATCH_TTWU_RET	0xdead1234
-	linfo("TTWU emulate, patched.\n");
-	return ULPATCH_TTWU_RET;
-}
-
-TEST(Patch, direct_patch_ulpatch_direct_jmp, 0)
+TEST(Patch, direct_jmp, 0)
 {
 	int ret = 0;
 	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
@@ -264,9 +296,9 @@ TEST(Patch, direct_patch_ulpatch_direct_jmp, 0)
 	return ret;
 }
 
-TEST(Patch, direct_patch_ulpatch_jmp_table, 0)
+TEST(Patch, direct_jmp_table, 0)
 {
-	int ret = 0;
+	int ret = 0, test_ret = 0;
 	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
 	struct task_struct *task = open_task(getpid(), flags);
 
@@ -274,7 +306,9 @@ TEST(Patch, direct_patch_ulpatch_jmp_table, 0)
 	unsigned long addr = (unsigned long)ulpatch_try_to_wake_up;
 
 	const char *new = NULL;
+	char orig_code[sizeof(struct jmp_table_entry)];
 	struct jmp_table_entry jmp_entry;
+
 	jmp_entry.jmp = arch_jmp_table_jmp();
 	jmp_entry.addr = addr;
 	new = (void *)&jmp_entry;
@@ -282,18 +316,36 @@ TEST(Patch, direct_patch_ulpatch_jmp_table, 0)
 	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
+	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
 
-	ret = memcpy_to_task(task, ip_pc, (void*)new, sizeof(jmp_entry));
-	if (ret == -1 || ret <= sizeof(jmp_entry)) {
-		lerror("failed to memcpy.\n");
+	/* Store original code */
+	ret = memcpy_from_task(task, orig_code, ip_pc, sizeof(jmp_entry));
+	if (ret == -1 || ret < sizeof(jmp_entry)) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
 	}
+
+	ret = memcpy_to_task(task, ip_pc, (void *)new, sizeof(jmp_entry));
+	if (ret == -1 || ret < sizeof(jmp_entry)) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
+	}
+
+	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
+
 	/* This will called patched function ulpatch_try_to_wake_up() */
 	ret = try_to_wake_up(task, 1, 1);
 	if (ret != ULPATCH_TTWU_RET)
-		ret = -1;
+		test_ret = -1;
 	else
-		ret = 0;
+		test_ret = 0;
+
+	/* Restore original code */
+	ret = memcpy_to_task(task, ip_pc, orig_code, sizeof(jmp_entry));
+	if (ret == -1 || ret < sizeof(jmp_entry)) {
+		lerror("failed to memcpy, ret = %d.\n", ret);
+	}
+
+	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
 
 	close_task(task);
-	return ret;
+	return test_ret;
 }
