@@ -12,6 +12,7 @@ hide:
 On **RHEL** like linux distrobution, manage packages with [rpm](https://github.com/rpm-software-management) and [dnf/yum](https://github.com/rpm-software-management/dnf).
 
 ```bash
+$ sudo dnf groupinstall -y "Development Tools" "Development Libraries"
 $ sudo dnf install -y \
 	binutils-devel \
 	capstone-devel \
@@ -30,6 +31,7 @@ $ sudo dnf install -y \
 On **Debian** like linux distrobutions, manage packages with [apt](https://salsa.debian.org/apt-team/apt).
 
 ```bash
+$ sudo apt install -y build-essential
 $ sudo apt install -y \
 	cmake \
 	gcc \
