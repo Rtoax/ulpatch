@@ -93,10 +93,10 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	}
 
 	dump_task(task, true);
-	linfo("SELF: _mcount: st_value: %lx %lx\n",
-		rel_s->sym.st_value, mcount_addr);
-	linfo("LIBC: _mcount: st_value: %lx %lx\n",
-		libc_s->sym.st_value, mcount_addr);
+	linfo("SELF: _mcount: st_value: %lx %lx\n", rel_s->sym.st_value,
+		mcount_addr);
+	linfo("LIBC: _mcount: st_value: %lx %lx\n", libc_s->sym.st_value,
+		mcount_addr);
 
 	try_to_wake_up(task, 0, 0);
 
@@ -129,7 +129,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	}
 
 	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
-	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
+	memshowinlog(LOG_INFO, (void *)ip, MCOUNT_INSN_SIZE);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
@@ -147,8 +147,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
-	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n",
-		pc, new, aarch64_func_bl_offset(try_to_wake_up));
+	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
+		aarch64_func_bl_offset(try_to_wake_up));
 
 	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
 
@@ -159,8 +159,10 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 #endif
 
-	/* call again, custom_mcount() will be called. see macro ULPATCH_TEST
-	 * code branch */
+	/**
+	 * call again, custom_mcount() will be called. see macro ULPATCH_TEST
+	 * code branch
+	 */
 	ret = try_to_wake_up(task, 1, 2);
 
 	close_task(task);
