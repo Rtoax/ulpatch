@@ -29,14 +29,17 @@ int fdisasm_arch(FILE *fp, unsigned char *code, size_t size)
 
 int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 {
-	uint64_t address = 0x0;
+	uint64_t address;
 	cs_insn *insn;
 	size_t j, count;
 	csh handle;
 	int ret = 0;
-
 	cs_arch arch;
 	cs_mode mode;
+
+
+	/* FIXME: Prefix */
+	address = 0x0;
 
 	switch (disasm_arch) {
 	case DISASM_ARCH_X86_64:
@@ -73,7 +76,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 			insn[j].address,
 			insn[j].mnemonic,
 			insn[j].op_str);
-	fprintf(fp, "0x%" PRIx64 ":\n", insn[j-1].address + insn[j-1].size);
+	fprintf(fp, "0x%" PRIx64 ":\n", insn[j - 1].address + insn[j - 1].size);
 
 	cs_free(insn, count);
 close:
