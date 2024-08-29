@@ -7,6 +7,8 @@ hide:
 
 This page only introduce theroy of ULPatch, but not the implementation details.
 
+All programs are single-threaded models, so you will not see synchronization locks in the code. Of course, we need to consider the multi-threaded situation of the target process.
+
 
 ## ULPatch
 
