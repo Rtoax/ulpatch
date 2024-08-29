@@ -388,11 +388,17 @@ static int parse_config(int argc, char *argv[])
 	return 0;
 }
 
-static int show_test(struct test *test)
+static int show_test(struct test *test, bool after_test)
 {
-	fprintf(stderr, " %4d/%-4d  %-4d %s.%s \texpect_ret:%d\n",
-		test->idx, nr_tests, test->prio, test->category, test->name,
-		test->expect_ret);
+	fprintf(stderr, " %4d/%-4d  %-4d %s.%s",
+		test->idx, nr_tests, test->prio, test->category, test->name);
+
+	if (after_test)
+		fprintf(stderr, "\tret:%d:%d", test->expect_ret, test->real_ret);
+	else
+		fprintf(stderr, "\texpect_ret:%d", test->expect_ret);
+
+	fprintf(stderr, "\n");
 	return 0;
 }
 
@@ -511,7 +517,7 @@ static void launch_tester(void)
 			if (just_list_tests) {
 				if (should_filter_out(test))
 					continue;
-				ret = show_test(test);
+				ret = show_test(test, false);
 			} else {
 				if (should_filter_out(test))
 					continue;
@@ -555,7 +561,7 @@ print_stat:
 			"Idx/NUM", "Prio", "Category", "name"
 		);
 		list_for_each_entry(test, &failed_list, failed)
-			show_test(test);
+			show_test(test, true);
 	}
 	test_log("=========================================\n");
 }
