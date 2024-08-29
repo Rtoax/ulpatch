@@ -84,6 +84,10 @@
 #define ALIGN(x, a)		__ALIGN_KERNEL((x), (a))
 #define ALIGN_DOWN(x, a)	__ALIGN_KERNEL((x) - ((a) - 1), (a))
 
+#ifndef ENOTSUPP
+# define ENOTSUPP	524
+#endif
+
 /* see linux:include/linux/sizes.h */
 #define SZ_1				0x00000001
 #define SZ_2				0x00000002
