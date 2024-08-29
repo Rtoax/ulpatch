@@ -6,6 +6,7 @@
 #include <utils/list.h>
 #include <utils/util.h>
 #include <utils/task.h>
+#include <utils/disasm.h>
 #include <elf/elf-api.h>
 #include <patch/patch.h>
 
@@ -129,14 +130,15 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	}
 
 	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
-	memshowinlog(LOG_INFO, (void *)ip, MCOUNT_INSN_SIZE);
+
+	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 
-	memshowinlog(LOG_INFO, (void*)ip, MCOUNT_INSN_SIZE);
+	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
 
 #elif defined(__aarch64__)
 
@@ -150,12 +152,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
 		aarch64_func_bl_offset(try_to_wake_up));
 
-	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
+	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
 
 	/* application the patch */
 	ftrace_modify_code(task, pc, 0, new, false);
 
-	memshowinlog(LOG_INFO, (void*)pc, MCOUNT_INSN_SIZE);
+	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
 
 #endif
 
