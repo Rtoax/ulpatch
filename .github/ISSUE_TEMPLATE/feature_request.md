@@ -2,7 +2,7 @@
 name: Feature request
 about: Feature request
 title: ''
-labels: priority/primary, STATUS/TODO
+labels: enhancement, priority/primary, STATUS/TODO
 assignees: ''
 
 ---

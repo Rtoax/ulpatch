@@ -2,7 +2,7 @@
 name: Knowledge note
 about: Knowledge note
 title: ''
-labels: note, priority/primary, STATUS/TODO
+labels: documentation, priority/primary, STATUS/TODO
 assignees: ''
 
 ---
