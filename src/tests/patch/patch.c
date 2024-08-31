@@ -68,8 +68,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	struct task_struct *task;
 	struct symbol *rel_s = NULL;
 	struct symbol *libc_s = NULL;
-	unsigned long restore_addr;
-	size_t restore_size;
+	unsigned long restore_addr, disasm_addr;
+	size_t restore_size, disasm_size;
 
 
 	test_ret = expect_ret;
@@ -128,6 +128,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		return expect_ret;
 	}
 
+	disasm_addr = (unsigned long)try_to_wake_up;
+
 #if defined(__x86_64__)
 
 	unsigned long ip = (unsigned long)try_to_wake_up +
@@ -135,6 +137,10 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 	union text_poke_insn insn;
 	const char *new = NULL;
+
+	restore_addr = ip;
+	restore_size = MCOUNT_INSN_SIZE;
+	disasm_size = ip - disasm_addr + MCOUNT_INSN_SIZE;
 
 	switch (arg->replace) {
 	case REPLACE_MCOUNT:
@@ -153,17 +159,14 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		lerror("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
+	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
 		lerror("failed to memcpy.\n");
 	}
 
-	fdisasm_arch(stdout, (void *)ip, MCOUNT_INSN_SIZE);
-
-	restore_addr = ip;
-	restore_size = MCOUNT_INSN_SIZE;
+	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 
 #elif defined(__aarch64__)
 
@@ -174,6 +177,10 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);
 
+	restore_addr = pc;
+	restore_size = MCOUNT_INSN_SIZE;
+	disasm_size = pc - disasm_addr + MCOUNT_INSN_SIZE;
+
 	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
 		aarch64_func_bl_offset(try_to_wake_up));
 
@@ -183,15 +190,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		lerror("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
+	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 
 	/* application the patch */
 	ftrace_modify_code(task, pc, 0, new, false);
 
-	fdisasm_arch(stdout, (void *)pc, MCOUNT_INSN_SIZE);
-
-	restore_addr = pc;
-	restore_size = MCOUNT_INSN_SIZE;
+	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 #endif
 
 	/**
@@ -206,7 +210,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		lerror("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)restore_addr, restore_size);
+	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 
 	close_task(task);
 
