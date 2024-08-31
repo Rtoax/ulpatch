@@ -12,7 +12,6 @@
 #include <tests/test-api.h>
 
 
-
 TEST(Elf_Core, libc_object, 0)
 {
 	return libc_object() ? 0 : 1;

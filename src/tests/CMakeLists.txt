@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao
 #
-include_directories(..)
-
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})
@@ -40,6 +38,8 @@ add_executable(ulpatch_test
 	./utils/utils.c
 	./utils/version.c
 )
+
+target_include_directories(ulpatch_test PRIVATE ..)
 
 target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})
 

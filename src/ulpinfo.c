@@ -17,7 +17,7 @@
 #include <utils/compiler.h>
 #include <utils/task.h>
 
-#include "common.c"
+#include <args-common.c>
 
 
 static const char *prog_name = "ulpinfo";

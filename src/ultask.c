@@ -20,7 +20,7 @@
 
 #include <patch/patch.h>
 
-#include "common.c"
+#include <args-common.c>
 
 
 enum {

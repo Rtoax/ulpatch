@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao */
 
+/**
+ * This source code file is included (#include) into other source code, which
+ * is compiled into an executable file that parses the command line arguments
+ * by requiring the execution of getopt/getopt_long.
+ */
+
 struct config config = {
 	.log_level = LOG_ERR,
 	.verbose = 0,

@@ -20,12 +20,8 @@
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
-#include "../common.c"
+#include <args-common.c>
 
-
-#ifdef HAVE_CUNIT
-#else
-#endif
 
 struct list_head test_list[TEST_PRIO_NUM];
 static LIST_HEAD(failed_list);
