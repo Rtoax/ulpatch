@@ -8,21 +8,37 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
-aux_source_directory(arch DIR_ARCH_SRCS)
-aux_source_directory(elf DIR_ELF_SRCS)
-aux_source_directory(patch DIR_PATCH_SRCS)
-aux_source_directory(patch/object/hello/ DIR_PATCH_OBJ_HELLO_SRCS)
-aux_source_directory(utils DIR_UTILS_SRCS)
-
 add_executable(ulpatch_test
 	listener.c
 	main.c
 	test.c
-	${DIR_ARCH_SRCS}
-	${DIR_ELF_SRCS}
-	${DIR_PATCH_SRCS}
-	${DIR_PATCH_OBJ_HELLO_SRCS}
-	${DIR_UTILS_SRCS}
+	./arch/ftrace.c
+	./arch/instruments.c
+	./arch/mcount.c
+	./elf/core.c
+	./elf/ehdr.c
+	./elf/objdump.c
+	./elf/open.c
+	./elf/relocs.c
+	./elf/symbol.c
+	./patch/asm.c
+	./patch/meta.c
+	./patch/object.c
+	./patch/object/hello/hello.c
+	./patch/patch.c
+	./patch/symbol.c
+	./utils/ansi.c
+	./utils/backtrace.c
+	./utils/disasm.c
+	./utils/file.c
+	./utils/id.c
+	./utils/list.c
+	./utils/log.c
+	./utils/rbtree.c
+	./utils/string.c
+	./utils/task.c
+	./utils/utils.c
+	./utils/version.c
 )
 
 target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})
