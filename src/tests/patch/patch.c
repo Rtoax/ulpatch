@@ -132,8 +132,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 
 #if defined(__x86_64__)
 
-	unsigned long ip = (unsigned long)try_to_wake_up +
-		x86_64_func_callq_offset(try_to_wake_up);
+	/**
+	 * FIXME: on Debian/Ubuntu, There is no callq(0xe8) for mcount, thus,
+	 * this will trigger 'Illegal instruction' fatal.
+	 */
+	unsigned long callq_off = x86_64_func_callq_offset(try_to_wake_up);
+	unsigned long ip = (unsigned long)try_to_wake_up + callq_off;
 
 	union text_poke_insn insn;
 	const char *new = NULL;
@@ -151,7 +155,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		break;
 	}
 
-	linfo("addr:%#0lx call:%#0lx\n", addr, ip);
+	linfo("addr:%#0lx call:%#0lx(off %#0lx)\n", addr, ip, callq_off);
 
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, ip, MCOUNT_INSN_SIZE);
@@ -171,8 +175,8 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 #elif defined(__aarch64__)
 
 	/* TODO: how to get bl <_mcount> address (24) */
-	unsigned long pc =
-		(unsigned long)try_to_wake_up + aarch64_func_bl_offset(try_to_wake_up);
+	unsigned long bl_off = aarch64_func_bl_offset(try_to_wake_up);
+	unsigned long pc = (unsigned long)try_to_wake_up + bl_off;
 	uint32_t new = aarch64_insn_gen_branch_imm(pc,
 						(unsigned long)arg->custom_mcount,
 						AARCH64_INSN_BRANCH_LINK);

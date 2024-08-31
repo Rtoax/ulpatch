@@ -59,6 +59,8 @@ void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
 /**
  * find first callq instrument in the front of function body, it's mcount()
  * address.
+ *
+ * FIXME: on Debian/Ubuntu, There is no callq(0xe8) for mcount
  */
 uint32_t x86_64_func_callq_offset(void *func)
 {
