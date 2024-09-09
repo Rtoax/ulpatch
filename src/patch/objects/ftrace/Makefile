@@ -3,6 +3,16 @@
 #
 SHELL = bash
 
+ULP_CONFIG :=
+
+ifndef ULP_CONFIG
+  ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
+  ifeq ($(wildcard ${ULP_CONFIG}),)
+    $(error Not found ulp-config, Please install ulpatch first)
+  endif
+endif
+
+
 ifdef FTRACE_OBJ
 TARGETS = $(FTRACE_OBJ)
 else
@@ -20,10 +30,9 @@ else
 CFLAGS += -I ../../../
 endif
 
-LDLIBS :=
-LDLIBS += -relocatable
-LDLIBS += --build-id=sha1
-LDLIBS += -z noexecstack
+CFLAGS += $(shell ${ULP_CONFIG} --cflags)
+
+LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
 
 ALL: $(TARGETS)
 
@@ -37,7 +46,7 @@ ALL: $(TARGETS)
 
 $(TARGETS): mcount.oc mcount.oS
 	@echo -e "Target   \033[1;32m$(@)\033[m"
-	@$(LD) -o $(@) $(^) $(LDLIBS)
+	@$(LD) -o $(@) $(^) $(LDFLAGS)
 
 clean:
 	@echo -e "Clean   \033[1;32m$(@)\033[m"

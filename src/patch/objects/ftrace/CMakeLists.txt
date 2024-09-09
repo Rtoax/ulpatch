@@ -38,7 +38,7 @@ set(make_include ${PROJECT_SOURCE_DIR}/src/)
 message(STATUS "Compile ftrace object ${make_include}")
 add_custom_command(
 	TARGET ${FTRACE_OBJ_TARGET}
-	COMMAND make INCS1="-I${make_include}" FTRACE_OBJ=${FTRACE_MCOUNT_OBJ}
+	COMMAND make INCS1="-I${make_include}" FTRACE_OBJ=${FTRACE_MCOUNT_OBJ} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace
 )
 
