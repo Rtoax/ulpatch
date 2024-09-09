@@ -10,33 +10,33 @@ add_executable(ulpatch_test
 	listener.c
 	main.c
 	test.c
-	./arch/ftrace.c
-	./arch/instruments.c
-	./arch/mcount.c
-	./elf/core.c
-	./elf/ehdr.c
-	./elf/objdump.c
-	./elf/open.c
-	./elf/relocs.c
-	./elf/symbol.c
-	./patch/asm.c
-	./patch/meta.c
-	./patch/object.c
-	./patch/object/hello/hello.c
-	./patch/patch.c
-	./patch/symbol.c
-	./utils/ansi.c
-	./utils/backtrace.c
-	./utils/disasm.c
-	./utils/file.c
-	./utils/id.c
-	./utils/list.c
-	./utils/log.c
-	./utils/rbtree.c
-	./utils/string.c
-	./utils/task.c
-	./utils/utils.c
-	./utils/version.c
+	arch/ftrace.c
+	arch/instruments.c
+	arch/mcount.c
+	elf/core.c
+	elf/ehdr.c
+	elf/objdump.c
+	elf/open.c
+	elf/relocs.c
+	elf/symbol.c
+	patch/asm.c
+	patch/meta.c
+	patch/object.c
+	patch/object/hello/hello.c
+	patch/patch.c
+	patch/symbol.c
+	utils/ansi.c
+	utils/backtrace.c
+	utils/disasm.c
+	utils/file.c
+	utils/id.c
+	utils/list.c
+	utils/log.c
+	utils/rbtree.c
+	utils/string.c
+	utils/task.c
+	utils/utils.c
+	utils/version.c
 )
 
 target_include_directories(ulpatch_test PRIVATE ..)
