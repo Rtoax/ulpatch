@@ -17,7 +17,7 @@ hide:
 
 ## Description
 
-ULPatch is open source user space live patch tool, under GPL-2.0 or later license.
+[ULPatch](https://github.com/Rtoax/ulpatch) is open source user space live patch tool, under [GPL-2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) or [later](https://www.gnu.org/licenses/gpl-3.0.html) license.
 
 
 ### Logo
