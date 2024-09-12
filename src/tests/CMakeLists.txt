@@ -30,6 +30,7 @@ add_executable(ulpatch_test
 	utils/disasm.c
 	utils/file.c
 	utils/id.c
+	utils/init.c
 	utils/list.c
 	utils/log.c
 	utils/rbtree.c

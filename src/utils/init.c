@@ -16,6 +16,8 @@
 #include <utils/compiler.h>
 
 
+static int __dry_run = false;
+
 static int __page_size = 0;
 static int __page_shift = 0;
 
@@ -83,3 +85,12 @@ void ulpatch_init(void)
 	elf_core_init();
 }
 
+bool is_dry_run(void)
+{
+	return __dry_run;
+}
+
+void enable_dry_run(void)
+{
+	__dry_run = true;
+}

@@ -168,7 +168,6 @@ typedef enum {
 /* ulpatch arguments configuration */
 struct config {
 	int verbose;
-	bool dry_run;
 };
 
 struct nr_idx_bool {
@@ -191,6 +190,9 @@ void ulpatch_init(void);
 
 int ulp_page_size(void);
 int ulp_page_shift(void);
+
+bool is_dry_run(void);
+void enable_dry_run(void);
 
 /* Check some thing */
 bool is_root(const char *prog);

@@ -11,7 +11,6 @@ static int log_level = LOG_ERR;
 
 struct config config = {
 	.verbose = 0,
-	.dry_run = false,
 };
 
 enum {
@@ -72,7 +71,7 @@ void print_usage_common(const char *progname)
 		set_log_prefix(true);	\
 		break;	\
 	case 'u':	\
-		config.dry_run = true;	\
+		enable_dry_run();	\
 		break;	\
 	case ARG_LOG_LEVEL:	\
 		log_level = atoi(optarg);	\

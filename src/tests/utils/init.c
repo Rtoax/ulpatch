@@ -8,15 +8,13 @@
 #include <tests/test-api.h>
 
 
-TEST(Utils, page, 0)
+TEST(Utils, dry_run, 0)
 {
 	int ret = 0;
 
-	printf("PAGE_SIZE = %x, %lx\n", ulp_page_size(), PAGE_SIZE);
-	printf("PAGE_SHIFT = %d, %d\n", ulp_page_shift(), PAGE_SHIFT);
+	if (is_dry_run())
+		ret = EINVAL;
 
-	ret += ulp_page_size() != PAGE_SIZE;
-	ret += ulp_page_shift() != PAGE_SHIFT;
-
-	return 0;
+	return ret;
 }
+
