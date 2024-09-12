@@ -63,7 +63,7 @@ static unsigned long total_spent_us = 0;
 
 /* For -l, --list-tests */
 static bool just_list_tests = false;
-/* For -f, --filter-tests */
+/* For -f, --filter */
 static char *filter_format = NULL;
 
 /* exit if Error */
@@ -173,12 +173,12 @@ static void print_help(void)
 	"Tests:\n"
 	"\n"
 	" -l, --list-tests    list all tests\n"
-	" -f, --filter-tests  filter out some tests\n"
+	" -f, --filter [STR]  filter out some tests\n"
 	"\n");
 	printf(
 	"Role:\n"
 	"\n"
-	" -r, --role          who am i, what should i do\n"
+	" -r, --role [ROLE]   who am i, what should i do\n"
 	"                     '%s' test all Tests, see with -l, default.\n"
 	"                     '%s' i will sleep %dus by default, set with -s.\n"
 	"                     '%s' i will wait on msgrcv(2), specify by -m.\n"
@@ -202,8 +202,8 @@ static void print_help(void)
 	);
 	printf(
 	"   %s and %s arguments:\n"
-	"     --print-nloop    loop of print, default %d\n"
-	"     --print-usec     interval of print, default %d usec\n"
+	"     --print-nloop [NUM]   loop of print, default %d\n"
+	"     --print-usec [N]      interval of print, default %d usec\n"
 	"\n",
 	role_string[ROLE_PRINTER],
 	role_string[ROLE_MULTI_THREADS],
@@ -226,10 +226,10 @@ static void print_help(void)
 	);
 	printf(
 	"\n"
-	" -s, --usecond       usecond of time, sleep, etc.\n"
+	" -s, --usecond [N]   usecond of time, sleep, etc.\n"
 	"                     -r %s, the main thread will sleep -s useconds.\n"
 	"\n"
-	" -m, --msgq          key to ftok(3).\n"
+	" -m, --msgq [STRING] key to ftok(3).\n"
 	"                     -r %s, the main thread will wait on msgrcv(2).\n"
 	"                     -r %s, the main thread will msgsnd(2) to msgq.\n"
 	"                     -r %s, the main thread will msgrcv(2) a request on msgq.\n"
@@ -262,7 +262,7 @@ static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
 	{ "list-tests",         no_argument,        0,  'l' },
-	{ "filter-tests",       required_argument,  0,  'f' },
+	{ "filter",             required_argument,  0,  'f' },
 	{ "role",               required_argument,  0,  'r' },
 	{ "usecond",            required_argument,  0,  's' },
 	{ "msgq",               required_argument,  0,  'm' },
