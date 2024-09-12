@@ -431,7 +431,7 @@ static int operate_test(struct test *test)
 	test_log("=== %4d/%-4d %s.%s %c",
 		test->idx, nr_tests,
 		test->category, test->name,
-		config.verbose ? '\n' : '\0');
+		is_verbose() ? '\n' : '\0');
 
 	gettimeofday(&test->start, NULL);
 
@@ -495,7 +495,7 @@ static void launch_tester(void)
 		);
 	}
 
-	if (!config.verbose && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
+	if (!is_verbose() && (fd = open("/dev/null", O_RDWR, 0)) != -1) {
 		dup2(fd, STDIN_FILENO);
 		dup2(fd, STDOUT_FILENO);
 		if (fd > STDERR_FILENO)

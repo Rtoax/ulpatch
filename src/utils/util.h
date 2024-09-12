@@ -165,11 +165,6 @@ typedef enum {
 	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
 } file_type;
 
-/* ulpatch arguments configuration */
-struct config {
-	int verbose;
-};
-
 struct nr_idx_bool {
 	uint32_t nr;
 	uint32_t idx;
@@ -182,15 +177,14 @@ struct str_node {
 	char *str; /* malloc, strdup */
 };
 
-/* Global configuration */
-extern struct config config;
-
 
 void ulpatch_init(void);
 
 int ulp_page_size(void);
 int ulp_page_shift(void);
 
+bool is_verbose(void);
+void enable_verbose(void);
 bool is_dry_run(void);
 void enable_dry_run(void);
 

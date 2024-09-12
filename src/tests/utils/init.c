@@ -18,3 +18,13 @@ TEST(Utils, dry_run, 0)
 	return ret;
 }
 
+TEST(Utils, verbose, 0)
+{
+	int ret = 0;
+
+	if (is_verbose())
+		ret = EINVAL;
+
+	return ret;
+}
+

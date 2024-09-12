@@ -17,6 +17,7 @@
 
 
 static int __dry_run = false;
+static int __verbose = 0;
 
 static int __page_size = 0;
 static int __page_shift = 0;
@@ -93,4 +94,14 @@ bool is_dry_run(void)
 void enable_dry_run(void)
 {
 	__dry_run = true;
+}
+
+bool is_verbose(void)
+{
+	return __verbose;
+}
+
+void enable_verbose(void)
+{
+	__verbose = true;
 }

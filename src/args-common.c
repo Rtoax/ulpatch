@@ -9,10 +9,6 @@
 
 static int log_level = LOG_ERR;
 
-struct config config = {
-	.verbose = 0,
-};
-
 enum {
 	ARG_LOG_LEVEL = 139,
 	ARG_LOG_DEBUG,
@@ -67,7 +63,7 @@ void print_usage_common(const char *progname)
 		exit(0);	\
 		break;	\
 	case 'v':	\
-		config.verbose = true;	\
+		enable_verbose();	\
 		set_log_prefix(true);	\
 		break;	\
 	case 'u':	\

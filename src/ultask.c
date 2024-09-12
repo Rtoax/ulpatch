@@ -457,7 +457,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (flag_print_task)
-		print_task(stdout, target_task, config.verbose);
+		print_task(stdout, target_task, is_verbose());
 
 	if (map_file)
 		mmap_a_file();
@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)
-		dump_task_vmas(target_task, config.verbose);
+		dump_task_vmas(target_task, is_verbose());
 
 	/* dump an VMA */
 	if (flag_dump_vma)
@@ -487,10 +487,10 @@ int main(int argc, char *argv[])
 		list_all_symbol();
 
 	if (flag_print_threads)
-		dump_task_threads(target_task, config.verbose);
+		dump_task_threads(target_task, is_verbose());
 
 	if (flag_print_fds)
-		dump_task_fds(target_task, config.verbose);
+		dump_task_fds(target_task, is_verbose());
 
 	if (jmp_addr_from && jmp_addr_to) {
 		struct vm_area_struct *vma_from, *vma_to;
