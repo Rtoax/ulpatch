@@ -51,9 +51,9 @@ ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
                       argument before --ldflags and --libs.
 
    -h, --help         show this help information
-   -v, --version      show version
+   -V, --version      show version
 
-   -V, --verbose      show verbose of running, just for debug.
+   -v, --verbose      show verbose of running, just for debug.
 
 ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
    ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
@@ -206,11 +206,11 @@ while true; do
 		shift
 		__usage__
 		;;
-	-V|--verbose)
+	-v|--verbose)
 		shift
 		set -x
 		;;
-	-v|--version)
+	-V|--version)
 		shift
 		echo "ulp-config ${VERSION}"
 		exit 0
