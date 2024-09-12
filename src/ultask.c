@@ -443,9 +443,9 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	ulpatch_init();
+	COMMON_IN_MAIN();
 
-	set_log_level(config.log_level);
+	ulpatch_init();
 
 	if (flag_rdonly)
 		flags &= ~FTO_RDWR;

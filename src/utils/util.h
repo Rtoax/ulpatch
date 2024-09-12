@@ -167,7 +167,6 @@ typedef enum {
 
 /* ulpatch arguments configuration */
 struct config {
-	int log_level;
 	int verbose;
 	bool dry_run;
 };

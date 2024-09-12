@@ -7,8 +7,9 @@
  * by requiring the execution of getopt/getopt_long.
  */
 
+static int log_level = LOG_ERR;
+
 struct config config = {
-	.log_level = LOG_ERR,
 	.verbose = 0,
 	.dry_run = false,
 };
@@ -33,7 +34,7 @@ void print_usage_common(const char *progname)
 	"  --log-debug         set log level to DEBUG(%d)\n"
 	"  --log-error         set log level to ERR(%d)\n"
 	"\n",
-	config.log_level,
+	get_log_level(),
 	LOG_EMERG, LOG_ALERT, LOG_CRIT, LOG_ERR, LOG_WARNING, LOG_NOTICE, LOG_INFO,
 	LOG_DEBUG, log_level_list(),
 	LOG_DEBUG,
@@ -74,17 +75,21 @@ void print_usage_common(const char *progname)
 		config.dry_run = true;	\
 		break;	\
 	case ARG_LOG_LEVEL:	\
-		config.log_level = atoi(optarg);	\
-		if (!config.log_level)	\
-			config.log_level = str2loglevel(optarg);	\
+		log_level = atoi(optarg);	\
+		if (!log_level)	\
+			log_level = str2loglevel(optarg);	\
 		break;	\
 	case ARG_LOG_DEBUG:	\
-		config.log_level = LOG_DEBUG;	\
+		log_level = LOG_DEBUG;	\
 		break;	\
 	case ARG_LOG_ERR:	\
-		config.log_level = LOG_ERR;	\
+		log_level = LOG_ERR;	\
 		break;	\
 	case '?':	\
 		fprintf(stderr, "Unknown option or option missing argument.\n");	\
 		exit(1);
+
+#define COMMON_IN_MAIN() do {	\
+	set_log_level(log_level);	\
+	} while (0)
 

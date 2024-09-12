@@ -158,9 +158,9 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	ulpatch_init();
+	COMMON_IN_MAIN();
 
-	set_log_level(config.log_level);
+	ulpatch_init();
 
 	target_task = open_task(target_pid, FTO_ULFTRACE);
 	if (!target_task) {

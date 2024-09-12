@@ -333,8 +333,6 @@ static int parse_config(int argc, char *argv[])
 		}
 	}
 
-	set_log_level(config.log_level);
-
 	if (role == ROLE_NONE) {
 		fprintf(stderr, "wrong -r, --role argument.\n");
 		exit(1);
@@ -821,6 +819,8 @@ int main(int argc, char *argv[])
 		lerror("Not found ulpatch_test path.\n");
 		return -ENOENT;
 	}
+
+	COMMON_IN_MAIN();
 
 	ulpatch_init();
 
