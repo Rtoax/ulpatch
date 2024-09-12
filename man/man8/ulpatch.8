@@ -23,8 +23,12 @@ Specify a ulpatch.elf file to patch to target process.
 Unpatch a latest ulpatch from target process.
 .TP
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
-Specify a log level. The LEVEL could be number(see /usr/include/sys/syslog.h) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
-For example, if you want to set log level to LOG_ERR, just: --lv=error.
+Specify a log level. The LEVEL could be number(see
+.BR syslog (3)
+) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
+For example, if you want to set log level to LOG_ERR, just:
+.BR --lv=error .
+
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
@@ -46,8 +50,15 @@ Show version information.
 
 .SH MACROS
 .TP
-__ULP_DEV
-If you develope an ulpatch file, you need to define __ULP_DEV and include <ulpatch/meta.h> header in your ulpatch source code.
+.B __ULP_DEV
+If you develope an ulpatch ulp file, you need to define
+.B __ULP_DEV
+and include
+.B <ulpatch/meta.h>
+header in your ulpatch source code. The
+.BR ulp-config (8)
+.B --cflags
+provides this macro.
 
 .SH ULP DEMO
 More to see the documentations in ulpatch source code tree.
@@ -65,10 +76,41 @@ More to see the documentations in ulpatch source code tree.
 void ulpatch_print_hello_exit(void)
 {
 	printf("Patched.\\n");
+	ASM_EXIT(0xff);
 }
 ULPATCH_INFO(ulpatch_print_hello_exit, print_hello, "Rong Tao");
 .EE
 .\" SRC END
+
+.SH ARCHITECTURES
+List the CPU architectures that ULPatch supports and will support.
+.TS
+allbox;
+lbx lb lb
+l l l.
+Architecture	Supported	Value
+T{
+.na
+.nh
+.BR x86_64
+T}	YES	TODO
+T{
+.na
+.nh
+.BR aarch64
+T}	YES	TODO
+T{
+.na
+.nh
+.BR loongarch64
+T}	NO	-
+T{
+.na
+.nh
+.BR riscv64
+T}	NO	-
+.TE
+
 .SH LINKS
 .IP " 1." 4
 aarch64 relocations
@@ -82,4 +124,15 @@ Unstable - in development.
 .SH AUTHOR
 Written by Rong Tao
 .SH SEE ALSO
-ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
+.BR ulpinfo (8),
+.BR ulftrace (8),
+.BR ultask (8),
+.BR ulp-config (8)
+
+.P
+The descriptions of the following files in
+.BR proc (5):
+.IR /proc/ pid /maps ,
+.IR /proc/ pid /map_files ,
+and
+.IR /proc/ pid /smaps .

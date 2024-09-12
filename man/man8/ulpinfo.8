@@ -20,8 +20,11 @@ Specify a target process's PID.
 Show ulpatch.elf file information.
 .TP
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
-Specify a log level. The LEVEL could be number(see /usr/include/sys/syslog.h) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
-For example, if you want to set log level to LOG_ERR, just: --lv=error.
+Specify a log level. The LEVEL could be number(see
+.BR syslog (3)
+) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
+For example, if you want to set log level to LOG_ERR, just:
+.BR --lv=error .
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
@@ -48,4 +51,7 @@ Unstable - in development.
 .SH AUTHOR
 Written by Rong Tao
 .SH SEE ALSO
-ulftrace(8), ultask(8), ulpatch(8), ulp-config(8)
+.BR ulftrace (8),
+.BR ultask (8),
+.BR ulpatch (8),
+.BR ulp-config (8)
