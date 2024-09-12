@@ -169,6 +169,7 @@ typedef enum {
 struct config {
 	int log_level;
 	int verbose;
+	bool dry_run;
 };
 
 struct nr_idx_bool {

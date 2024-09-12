@@ -10,6 +10,7 @@
 struct config config = {
 	.log_level = LOG_ERR,
 	.verbose = 0,
+	.dry_run = false,
 };
 
 enum {
@@ -38,6 +39,7 @@ void print_usage_common(const char *progname)
 	LOG_DEBUG,
 	LOG_ERR);
 	printf(
+	"  -u, --dry-run       don’t actually run\n"
 	"  -v, --verbose       set verbose\n"
 	"  -h, --help          display this help and exit\n"
 	"  -V, --version       output version information and exit\n"
@@ -52,6 +54,7 @@ void print_usage_common(const char *progname)
 	{ "lv",             required_argument, 0, ARG_LOG_LEVEL },	\
 	{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },	\
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
+	{ "dry-run",        no_argument,       0, 'u' },	\
 	{ "verbose",        no_argument,       0, 'v' },
 #define COMMON_GETOPT_OPTSTRING "Vvh"
 
@@ -66,6 +69,9 @@ void print_usage_common(const char *progname)
 	case 'v':	\
 		config.verbose = true;	\
 		set_log_prefix(true);	\
+		break;	\
+	case 'u':	\
+		config.dry_run = true;	\
 		break;	\
 	case ARG_LOG_LEVEL:	\
 		config.log_level = atoi(optarg);	\
