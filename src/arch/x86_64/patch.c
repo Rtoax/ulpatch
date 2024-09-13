@@ -36,9 +36,9 @@ static inline void *debug_memcpy(void *dst, const void *src, size_t n)
 	return memcpy(dst, src, n);
 }
 
-int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-		       const char *strtab, unsigned int symindex,
-		       unsigned int relsec)
+int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
+			    const char *strtab, unsigned int symindex,
+			    unsigned int relsec)
 {
 	unsigned int i;
 

@@ -737,9 +737,9 @@ static int apply_relocations(const struct load_info *info)
 			err = -ENOEXEC;
 			break;
 		} else if (info->sechdrs[i].sh_type == SHT_RELA)
-			err = apply_relocate_add(info, info->sechdrs,
-						info->strtab,
-						info->index.sym, i);
+			err = arch_apply_relocate_add(info, info->sechdrs,
+						      info->strtab,
+						      info->index.sym, i);
 
 		if (err < 0) {
 			lerror("apply relocations failed.\n");

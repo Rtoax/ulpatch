@@ -189,9 +189,9 @@ static int reloc_insn_adrp(Elf64_Shdr *sechdrs, uint32_t *place, uint64_t val)
 			      AARCH64_INSN_IMM_ADR);
 }
 
-int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-		       const char *strtab, unsigned int symindex,
-		       unsigned int relsec)
+int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
+			    const char *strtab, unsigned int symindex,
+			    unsigned int relsec)
 {
 	unsigned int i;
 	int ovf;

@@ -104,9 +104,9 @@ void release_load_info(struct load_info *info);
 int init_patch(struct task_struct *task, const char *obj_file);
 int delete_patch(struct task_struct *task);
 
-int apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
-			const char *strtab, unsigned int symindex,
-			unsigned int relsec);
+int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
+			    const char *strtab, unsigned int symindex,
+			    unsigned int relsec);
 
 unsigned long arch_jmp_table_jmp(void);
 
