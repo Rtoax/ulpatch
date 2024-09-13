@@ -1,3 +1,5 @@
+SHELL = bash
+
 CC = gcc
 LD = ld
 
@@ -22,17 +24,18 @@ CFLAGS_hello-pie := ${CFLAGS_hello} -fpie
 LDFLAGS_hello-pie := -pie
 
 %.o: %.c
-	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
+	@echo -e "CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*))
 
 %.so: %.c
-	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(<) -shared -fpic
+	@echo -e "CC SO  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@$(CC) -o $(@) $(<) -shared -fpic $(CFLAGS) $(CFLAGS_$(*))
 
 $(TARGETS): %:
-	@echo -e "Target   \033[1;32m$(@)\033[m"
-	$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*))
-	strip $(@) -o $(@).stripped
+	@echo -e "LD   \033[1;32m$(@)\033[m"
+	@$(CC) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
+	@strip $(@) -o $(@).stripped
 
 clean:
-	rm -f $(TARGETS) $(TARGETS_PATCH_SO) *.o *.stripped
+	@echo -e "CLEAN   \033[1;32m$(TARGETS) ${TARGETS_PATCH_SO}\033[m"
+	@rm -f $(TARGETS) $(TARGETS_PATCH_SO) *.o *.stripped

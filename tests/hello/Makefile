@@ -1,4 +1,6 @@
 # This is ULPatch test Makefile wrote by Rong Tao.
+SHELL = bash
+
 CC = gcc
 LD = ld
 
@@ -61,6 +63,7 @@ endif
 
 LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ldflags)
 
+$(info CFLAGS = ${CFLAGS})
 $(info CFLAGS_ULP = ${CFLAGS_ULP})
 $(info LDFLAGS_ULP = ${LDFLAGS_ULP})
 
@@ -95,5 +98,5 @@ $(TARGETS): %:
 	@strip $(@) -o $(@).stripped
 
 clean:
-	@echo -e "Target   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
+	@echo -e " CLEAN   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
 	@rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.ulp.no-build-id *.stripped
