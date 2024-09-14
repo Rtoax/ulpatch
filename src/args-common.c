@@ -52,7 +52,7 @@ void print_usage_common(const char *progname)
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
 	{ "dry-run",        no_argument,       0, 'u' },	\
 	{ "verbose",        no_argument,       0, 'v' },
-#define COMMON_GETOPT_OPTSTRING "Vvh"
+#define COMMON_GETOPT_OPTSTRING "uVvh"
 
 #define COMMON_GETOPT_CASES(progname, usage)	\
 	case 'V':	\
