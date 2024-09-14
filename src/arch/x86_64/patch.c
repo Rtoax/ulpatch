@@ -24,12 +24,12 @@ static long target_off = 0L;
 static inline void *debug_memcpy(void *dst, const void *src, size_t n)
 {
 	int i;
-	ldebug("RELA: Copy %ld bytes from %p to %p\n", n, src, dst);
-	ldebug("RELA: Copy %x to %p\n", *(int *)src, dst - target_off);
+	ulp_debug("RELA: Copy %ld bytes from %p to %p\n", n, src, dst);
+	ulp_debug("RELA: Copy %x to %p\n", *(int *)src, dst - target_off);
 	if (get_log_level() >= LOG_NOTICE) {
 		for (i = 0; i < n; i += sizeof(unsigned int)) {
 			unsigned int ui = *(unsigned int *)(src + i);
-			ldebug("    : %x\n", ui);
+			ulp_debug("    : %x\n", ui);
 		}
 	}
 
@@ -71,7 +71,7 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	uint64_t val;
 	int r_type = 0;
 
-	ldebug("Applying relocate section %u to %u\n", relsec, sechdrs[relsec].sh_info);
+	ulp_debug("Applying relocate section %u to %u\n", relsec, sechdrs[relsec].sh_info);
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 
@@ -94,7 +94,7 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		r_type = (int)ELF64_R_TYPE(rel[i].r_info);
 		val = sym->st_value + rel[i].r_addend;
 
-		ldebug("RELA: %s, st_name %d, type %d, st_value %lx, "
+		ulp_debug("RELA: %s, st_name %d, type %d, st_value %lx, "
 		       "r_addend %lx, loc %lx, val %lx\n",
 			symname, sym->st_name, r_type,
 			sym->st_value, rel[i].r_addend, (uint64_t)loc, val);
@@ -102,30 +102,30 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		switch (r_type) {
 
 		case R_X86_64_NONE:
-			lwarning("Handle R_X86_64_NONE\n");
+			ulp_warning("Handle R_X86_64_NONE\n");
 			break;
 
 		case R_X86_64_64:
-			lwarning("Handle R_X86_64_64\n");
+			ulp_warning("Handle R_X86_64_64\n");
 			if (*(uint64_t*)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 8);
 			break;
 
 		case R_X86_64_32:
-			lwarning("Handle R_X86_64_32\n");
+			ulp_warning("Handle R_X86_64_32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
 			if (val != *(uint32_t *)loc) {
-				lerror("R_X86_64_32 overflow val(%lx) != loc(%x)\n",
+				ulp_error("R_X86_64_32 overflow val(%lx) != loc(%x)\n",
 					val, *(uint32_t *)loc);
 				goto overflow;
 			}
 			break;
 
 		case R_X86_64_32S:
-			lwarning("Handle R_X86_64_32S\n");
+			ulp_warning("Handle R_X86_64_32S\n");
 			if (*(int32_t *)loc != 0)
 				goto invalid_relocation;
 			write_func(loc, &val, 4);
@@ -154,9 +154,9 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			FALLTHROUGH;
 
 		case R_X86_64_PC32:
-			lwarning("Handle R_X86_64_PC32\n");
+			ulp_warning("Handle R_X86_64_PC32\n");
 		case R_X86_64_PLT32:
-			lwarning("Handle R_X86_64_PLT32\n");
+			ulp_warning("Handle R_X86_64_PLT32\n");
 			if (*(uint32_t *)loc != 0)
 				goto invalid_relocation;
 			/**
@@ -167,7 +167,7 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		case R_X86_64_PC64:
-			lwarning("Handle R_X86_64_PC64\n");
+			ulp_warning("Handle R_X86_64_PC64\n");
 			if (*(uint64_t *)loc != 0)
 				goto invalid_relocation;
 			/**
@@ -180,11 +180,11 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		/* FIXME: Newest kernel already remove {TPOFF64, TPOFF32} cases */
 		case R_X86_64_TPOFF64:
 		case R_X86_64_TPOFF32:
-			lerror("TPOFF32/TPOFF64 should not be present\n");
+			ulp_error("TPOFF32/TPOFF64 should not be present\n");
 			break;
 
 		default:
-			lerror("Unknown rela relocation: %s\n",
+			ulp_error("Unknown rela relocation: %s\n",
 				rela_type_string(r_type));
 			return -ENOEXEC;
 		}
@@ -193,15 +193,15 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	return 0;
 
 invalid_relocation:
-	lerror("x86: Skipping invalid relocation target, "
+	ulp_error("x86: Skipping invalid relocation target, "
 		"existing value is nonzero for type %s(%d), loc %p, val %lx\n",
 		rela_type_string(r_type), r_type, loc, val);
 	return -ENOEXEC;
 
 overflow:
-	lerror("overflow in relocation type %s(%d) val %lx\n",
+	ulp_error("overflow in relocation type %s(%d) val %lx\n",
 		rela_type_string(r_type), r_type, val);
-	lerror("likely not compiled with -fpic and -fno-PIE.\n");
+	ulp_error("likely not compiled with -fpic and -fno-PIE.\n");
 	return -ENOEXEC;
 }
 

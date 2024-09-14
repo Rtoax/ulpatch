@@ -9,16 +9,16 @@
 
 TEST(Log, log, 0)
 {
-	ldebug("DEBUG\n");
-	linfo("INFO\n");
-	lnotice("NOTICE\n");
-	lwarning("WARN\n");
-	lerror("ERROR\n");
-	lcrit("CRIT\n");
-	lalert("ALERT\n");
-	lemerg("EMERG\n");
+	ulp_debug("DEBUG\n");
+	ulp_info("INFO\n");
+	ulp_notice("NOTICE\n");
+	ulp_warning("WARN\n");
+	ulp_error("ERROR\n");
+	ulp_crit("CRIT\n");
+	ulp_alert("ALERT\n");
+	ulp_emerg("EMERG\n");
 
-	lwarning("LIST: %s\n", log_level_list());
+	ulp_warning("LIST: %s\n", log_level_list());
 
 	return 0;
 }
@@ -27,14 +27,14 @@ TEST(Log, set_log_level, 0)
 {
 	set_log_level(LOG_CRIT);
 
-	ldebug("DEBUG\n");
-	linfo("INFO\n");
-	lnotice("NOTICE\n");
-	lwarning("WARN\n");
-	lerror("ERROR\n");
-	lcrit("CRIT\n");
-	lalert("ALERT\n");
-	lemerg("EMERG\n");
+	ulp_debug("DEBUG\n");
+	ulp_info("INFO\n");
+	ulp_notice("NOTICE\n");
+	ulp_warning("WARN\n");
+	ulp_error("ERROR\n");
+	ulp_crit("CRIT\n");
+	ulp_alert("ALERT\n");
+	ulp_emerg("EMERG\n");
 
 	set_log_level(LOG_DEBUG);
 
@@ -45,25 +45,25 @@ TEST(Log, set_log_prefix, 0)
 {
 	set_log_prefix(false);
 
-	ldebug("DEBUG\n");
-	linfo("INFO\n");
-	lnotice("NOTICE\n");
-	lwarning("WARN\n");
-	lerror("ERROR\n");
-	lcrit("CRIT\n");
-	lalert("ALERT\n");
-	lemerg("EMERG\n");
+	ulp_debug("DEBUG\n");
+	ulp_info("INFO\n");
+	ulp_notice("NOTICE\n");
+	ulp_warning("WARN\n");
+	ulp_error("ERROR\n");
+	ulp_crit("CRIT\n");
+	ulp_alert("ALERT\n");
+	ulp_emerg("EMERG\n");
 
 	set_log_prefix(true);
 
-	ldebug("DEBUG\n");
-	linfo("INFO\n");
-	lnotice("NOTICE\n");
-	lwarning("WARN\n");
-	lerror("ERROR\n");
-	lcrit("CRIT\n");
-	lalert("ALERT\n");
-	lemerg("EMERG\n");
+	ulp_debug("DEBUG\n");
+	ulp_info("INFO\n");
+	ulp_notice("NOTICE\n");
+	ulp_warning("WARN\n");
+	ulp_error("ERROR\n");
+	ulp_crit("CRIT\n");
+	ulp_alert("ALERT\n");
+	ulp_emerg("EMERG\n");
 
 	return 0;
 }

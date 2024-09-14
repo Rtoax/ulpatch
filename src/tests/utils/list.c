@@ -32,7 +32,7 @@ TEST(List, list, 0)
 	}
 
 	list_for_each_entry(tmp, &list1, node) {
-		ldebug("%d\n", tmp->v);
+		ulp_debug("%d\n", tmp->v);
 
 		/* make sure all test data in list */
 		sum += tmp->v;

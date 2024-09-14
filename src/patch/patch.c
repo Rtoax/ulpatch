@@ -115,7 +115,7 @@ static int __chk_load_info_len(struct load_info *info)
 	if (info->hdr->e_shoff >= info->len
 		|| (info->hdr->e_shnum * sizeof(GElf_Shdr) >
 			info->len - info->hdr->e_shoff)) {
-		lerror("Bad section header.\n");
+		ulp_error("Bad section header.\n");
 		return -EFAULT;
 	}
 	return 0;
@@ -129,7 +129,7 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 
 	/* source object file must exist. */
 	if (!fexist(obj_from)) {
-		lerror("%s not exist, command 'make install' is needed.\n", obj_from);
+		ulp_error("%s not exist, command 'make install' is needed.\n", obj_from);
 		return -EEXIST;
 	}
 
@@ -138,7 +138,7 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 
 	info->len = fsize(obj_from);
 	if (info->len < sizeof(*(info->hdr))) {
-		lerror("%s truncated.\n", obj_from);
+		ulp_error("%s truncated.\n", obj_from);
 		err = -ENOEXEC;
 		goto out;
 	}
@@ -146,14 +146,14 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 	/* allocate memory for object file */
 	info->patch.mmap = fmmap_shmem_create(info->patch.path, info->len);
 	if (!info->patch.mmap) {
-		lerror("%s: fmmap failed.\n", info->patch.path);
+		ulp_error("%s: fmmap failed.\n", info->patch.path);
 		err = -1;
 		goto out;
 	}
 
 	/* copy from file */
 	if (fmemcpy(info->patch.mmap->mem, info->len, obj_from) != info->len) {
-		lerror("copy chunk failed.\n");
+		ulp_error("copy chunk failed.\n");
 		err = -EFAULT;
 		goto out;
 	}
@@ -162,7 +162,7 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 	info->hdr = info->patch.mmap->mem;
 
 	if (!ehdr_magic_ok(info->hdr)) {
-		lerror("Invalid ELF format: %s\n", obj_from);
+		ulp_error("Invalid ELF format: %s\n", obj_from);
 		err = -1;
 		goto free_out;
 	}
@@ -188,7 +188,7 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 	struct task_struct *task = vma->task;
 
 	if (vma->type != VMA_ULPATCH || !vma->ulp) {
-		lerror("Forbid parse non-ulpatch VMA to load_info.\n");
+		ulp_error("Forbid parse non-ulpatch VMA to load_info.\n");
 		return -ENOENT;
 	}
 
@@ -211,11 +211,11 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 		struct rb_node *node;
 		const char *name = info->strtab + sym[i].st_name;
 
-		ldebug("ULP Sym: %s, %lx\n", name, sym[i].st_value);
+		ulp_debug("ULP Sym: %s, %lx\n", name, sym[i].st_value);
 
 		/* skip undefined symbols */
 		if (is_undef_symbol(&sym[i])) {
-			ldebug("%s undef symbol: %s %lx\n", basename(vma->name_),
+			ulp_debug("%s undef symbol: %s %lx\n", basename(vma->name_),
 				name, sym[i].st_value);
 			/* Skip undefined symbol */
 			continue;
@@ -228,7 +228,7 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 		/* allocate a symbol, and add it to task struct */
 		newsym = alloc_symbol(name, &sym[i]);
 		if (!newsym) {
-			lerror("Alloc symbol failed, %s\n", name);
+			ulp_error("Alloc symbol failed, %s\n", name);
 			return -ENOMEM;
 		}
 
@@ -239,11 +239,11 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 				      cmp_symbol_name,
 				      (unsigned long)newsym);
 		if (unlikely(node)) {
-			lwarning("%s: symbol %s already exist\n", task->comm,
+			ulp_warning("%s: symbol %s already exist\n", task->comm,
 				 newsym->name);
 			free_symbol(newsym);
 		} else
-			ldebug("%s: add symbol %s addr %lx success.\n", task->comm,
+			ulp_debug("%s: add symbol %s addr %lx success.\n", task->comm,
 				newsym->name, newsym->sym.st_value);
 	}
 
@@ -251,7 +251,7 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
 	ulp->str_build_id = strdup(info->str_build_id);
 
-	ldebug("%s build id %s\n", vma->name_, ulp->str_build_id);
+	ulp_debug("%s build id %s\n", vma->name_, ulp->str_build_id);
 
 	return 0;
 }
@@ -269,13 +269,13 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 
 	map_fd = task_open(task, (char *)info->patch.path, O_RDWR, 0644);
 	if (map_fd <= 0) {
-		lerror("remote open failed.\n");
+		ulp_error("remote open failed.\n");
 		return -1;
 	}
 
 	ret = task_ftruncate(task, map_fd, map_len);
 	if (ret != 0) {
-		lerror("remote ftruncate failed.\n");
+		ulp_error("remote ftruncate failed.\n");
 		ret = -EFAULT;
 		goto close_ret;
 	}
@@ -292,14 +292,14 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 	 */
 	addr = find_vma_span_area(task, map_len);
 	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
-		lwarning("Not found 4 bytes length address span area in memory space.\n"\
+		ulp_warning("Not found 4 bytes length address span area in memory space.\n"\
 			"please: cat /proc/%d/maps\n", task->pid);
 	}
 
 	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
 	map_v = task_mmap(task, addr, map_len, prot, MAP_SHARED, map_fd, 0);
 	if (!map_v) {
-		lerror("remote mmap failed.\n");
+		ulp_error("remote mmap failed.\n");
 		ret = -EFAULT;
 		goto close_ret;
 	}
@@ -308,7 +308,7 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 	info->target_hdr = map_v;
 
 	update_task_vmas_ulp(task);
-	ldebug("Done to create patch vma, addr 0x%lx\n", map_v);
+	ulp_debug("Done to create patch vma, addr 0x%lx\n", map_v);
 
 close_ret:
 	task_close(task, map_fd);
@@ -318,7 +318,7 @@ close_ret:
 
 static void delete_mmap_vma_file(struct task_struct *task, struct load_info *info)
 {
-	lwarning("munmap ulpatch.\n");
+	ulp_warning("munmap ulpatch.\n");
 	task_attach(task->pid);
 	task_munmap(task, info->target_hdr, info->len);
 	update_task_vmas_ulp(task);
@@ -346,7 +346,7 @@ static int parse_ulpatch_strtab(struct ulpatch_strtab *s, const char *strtab)
 	s->magic = p;
 
 	if (strcmp(s->magic, SEC_ULPATCH_MAGIC)) {
-		lerror("No magic %s found.\n", SEC_ULPATCH_MAGIC);
+		ulp_error("No magic %s found.\n", SEC_ULPATCH_MAGIC);
 		return -ENOENT;
 	}
 
@@ -386,7 +386,7 @@ int setup_load_info(struct load_info *info)
 	/* found ".ulpatch.info" */
 	info->index.info = find_sec(info, SEC_ULPATCH_INFO);
 	if (info->index.info == 0) {
-		lerror("Not found %s section.\n", SEC_ULPATCH_INFO);
+		ulp_error("Not found %s section.\n", SEC_ULPATCH_INFO);
 		return -EEXIST;
 	}
 
@@ -395,7 +395,7 @@ int setup_load_info(struct load_info *info)
 
 	/* Check ULP file version, must match to ulpatch software version */
 	if (info->ulp_info->version != ULPATCH_FILE_VERSION) {
-		lerror("ULPatch version (%d) != %d\n", info->ulp_info->version,
+		ulp_error("ULPatch version (%d) != %d\n", info->ulp_info->version,
 			ULPATCH_FILE_VERSION);
 		return -EINVAL;
 	}
@@ -403,7 +403,7 @@ int setup_load_info(struct load_info *info)
 	/* found ".ulpatch.strtab" */
 	info->index.ulp_strtab = find_sec(info, SEC_ULPATCH_STRTAB);
 	if (info->index.ulp_strtab == 0) {
-		lerror("Not found %s section.\n", SEC_ULPATCH_STRTAB);
+		ulp_error("Not found %s section.\n", SEC_ULPATCH_STRTAB);
 		return -EEXIST;
 	}
 	const char *ulp_strtab = (void *)info->hdr
@@ -415,7 +415,7 @@ int setup_load_info(struct load_info *info)
 	 */
 	secbuildid = find_sec(info, ".note.gnu.build-id");
 	if (secbuildid == 0 || info->sechdrs[secbuildid].sh_type != SHT_NOTE) {
-		lerror("Not found Build ID or .note.gnu.build-id section.\n"
+		ulp_error("Not found Build ID or .note.gnu.build-id section.\n"
 			"Add gcc argument '-Wl,--build-id=sha1'\n"
 			"or Add linker(ld) argument '--build-id=sha1'\n");
 		return -EEXIST;
@@ -437,13 +437,13 @@ int setup_load_info(struct load_info *info)
 	/* .note.gnu.property */
 	case NT_GNU_PROPERTY_TYPE_0:
 	default:
-		lerror("No need Note section %s.", secname);
+		ulp_error("No need Note section %s.", secname);
 		break;
 	}
 
 	err = parse_ulpatch_strtab(&info->ulp_strtab, ulp_strtab);
 	if (err) {
-		lerror("Failed parse ulpatch_strtab.\n");
+		ulp_error("Failed parse ulpatch_strtab.\n");
 		return -ENOENT;
 	}
 
@@ -462,7 +462,7 @@ int setup_load_info(struct load_info *info)
 
 	/* Object/Patch has no symbols (stripped?) */
 	if (info->index.sym == 0) {
-		lwarning("patch has no symbols (stripped).\n");
+		ulp_warning("patch has no symbols (stripped).\n");
 		return -ENOEXEC;
 	}
 
@@ -486,13 +486,13 @@ static int rewrite_section_headers(struct load_info *info)
 
 		if (shdr->sh_type != SHT_NOBITS
 			&& info->len < shdr->sh_offset + shdr->sh_size) {
-			lerror("Patch len %lu truncated\n", info->len);
+			ulp_error("Patch len %lu truncated\n", info->len);
 			return -ENOEXEC;
 		}
 
 		if ((shdr->sh_type == SHT_NOBITS || !strcmp(name, ".bss"))
 		     && shdr->sh_size > 0) {
-			lerror("Not support uninitialized variable yet.\n"
+			ulp_error("Not support uninitialized variable yet.\n"
 			       "Or you can just initial global variables "
 			       "with non-zero value.\n");
 			return -EFAULT;
@@ -503,7 +503,7 @@ static int rewrite_section_headers(struct load_info *info)
 		 */
 		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
 
-		ldebug("Rewrite section hdr %s sh_addr %lx\n", name, shdr->sh_addr);
+		ulp_debug("Rewrite section hdr %s sh_addr %lx\n", name, shdr->sh_addr);
 	}
 
 	/* Track but don't keep info or other sections. */
@@ -576,13 +576,13 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		if (sym) {
 			addr = sym->sym.st_value;
 			if (addr) {
-				ldebug("Found %s in self, addr = %lx\n",
+				ulp_debug("Found %s in self, addr = %lx\n",
 					name, addr);
 				goto found;
 			}
 		}
 	}
-	ldebug("Not found %s in self ELF.\n", name);
+	ulp_debug("Not found %s in self ELF.\n", name);
 
 	/**
 	 * Try find symbol address from @plt
@@ -596,12 +596,12 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 			addr = plt + task->vma_self_elf->vma_elf->load_addr;
 		}
 		if (addr) {
-			ldebug("Found %s in self @plt, addr = %lx\n",
+			ulp_debug("Found %s in self @plt, addr = %lx\n",
 				name, addr);
 			goto found;
 		}
 	}
-	ldebug("Not found %s in @plt.\n", name);
+	ulp_debug("Not found %s in @plt.\n", name);
 
 	/**
 	 * Try find symbol in other libraries mapped in target process address
@@ -617,7 +617,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 			addr = task_vma_symbol_vaddr(sym);
 			if (addr) {
 				struct vm_area_struct *vma = sym->vma;
-				ldebug("Found %s in %s, addr = %lx\n",
+				ulp_debug("Found %s in %s, addr = %lx\n",
 					name,
 					vma ? vma->name_ : "Unknown lib",
 					addr);
@@ -627,10 +627,10 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	}
 
 	if (!addr)
-		lerror("Not find symbol %s(%s) in anywhere\n", name,
+		ulp_error("Not find symbol %s(%s) in anywhere\n", name,
 			i_st_type_string(type));
 
-	ldebug("%s value %#016lx\n", name, addr);
+	ulp_debug("%s value %#016lx\n", name, addr);
 
 found:
 	return addr;
@@ -649,31 +649,31 @@ static int simplify_symbols(const struct load_info *info)
 	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
 
 
-	ldebug("sym = %p + %lx - %lx, sh_offset %lx\n",
+	ulp_debug("sym = %p + %lx - %lx, sh_offset %lx\n",
 		info->hdr, symsec->sh_addr, info->target_hdr, symsec->sh_offset);
 
 	for (i = 1; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		const char *name = info->strtab + sym[i].st_name;
 
-		ldebug("symbol: %s, st_name: %d\n", name, sym[i].st_name);
+		ulp_debug("symbol: %s, st_name: %d\n", name, sym[i].st_name);
 
 		switch (sym[i].st_shndx) {
 		case SHN_COMMON:
 			/* Ignore common symbols */
 			if (!strncmp(name, "__gnu_lto", 9))
 				break;
-			ldebug("Common symbol: %s\n", name);
-			lwarning("please compile with -fno-common.\n");
+			ulp_debug("Common symbol: %s\n", name);
+			ulp_warning("please compile with -fno-common.\n");
 			ret = -ENOEXEC;
 			break;
 
 		case SHN_ABS:
 			/* Don't need to do anything */
-			ldebug("Absolute symbol: 0x%08lx\n", (long)sym[i].st_value);
+			ulp_debug("Absolute symbol: 0x%08lx\n", (long)sym[i].st_value);
 			break;
 
 		case SHN_UNDEF:
-			ldebug("Resolve UNDEF sym %s\n", name);
+			ulp_debug("Resolve UNDEF sym %s\n", name);
 			unsigned long addr;
 			addr = resolve_symbol(info->target_task, name,
 					      GELF_ST_TYPE(sym[i].st_info));
@@ -690,7 +690,7 @@ static int simplify_symbols(const struct load_info *info)
 			/* Not found symbol in any where */
 			ret = addr ? 0 : -ENOENT;
 			if (ret) {
-				lerror("Unknown symbol %s's addr %lx (err %d)\n",
+				ulp_error("Unknown symbol %s's addr %lx (err %d)\n",
 					 name, addr, ret);
 			}
 			break;
@@ -699,7 +699,7 @@ static int simplify_symbols(const struct load_info *info)
 			/* The address in the target process */
 			secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
 			sym[i].st_value += secbase;
-			ldebug("In patch sym %s: secbase:0x%lx, st_value:0x%lx\n",
+			ulp_debug("In patch sym %s: secbase:0x%lx, st_value:0x%lx\n",
 				name, secbase, sym[i].st_value);
 			break;
 		}
@@ -742,7 +742,7 @@ static int apply_relocations(const struct load_info *info)
 						      info->index.sym, i);
 
 		if (err < 0) {
-			lerror("apply relocations failed.\n");
+			ulp_error("apply relocations failed.\n");
 			break;
 		}
 	}
@@ -770,7 +770,7 @@ static int solve_patch_symbols(struct load_info *info)
 
 	sym = task_vma_find_symbol(task, dst_func, STT_FUNC);
 	if (!sym) {
-		lerror("Couldn't found %s in target process, maybe %s is stripped.\n",
+		ulp_error("Couldn't found %s in target process, maybe %s is stripped.\n",
 		       dst_func, task->exe);
 		return -ENOENT;
 	}
@@ -781,14 +781,14 @@ static int solve_patch_symbols(struct load_info *info)
 	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
 		GElf_Sym *sym = &syms[i];
 		char *name = info->strtab + sym->st_name;
-		ldebug("patch: %s, %d\n", name, sym->st_name);
+		ulp_debug("patch: %s, %d\n", name, sym->st_name);
 
 		if (!strcmp(src_func, name))
 			sym_src_func = sym;
 	}
 
 	if (!sym_src_func) {
-		lerror("Couldn't found %s in %s.\n", src_func, info->ulp_name);
+		ulp_error("Couldn't found %s in %s.\n", src_func, info->ulp_name);
 		return -ENOENT;
 	}
 
@@ -800,8 +800,8 @@ static int solve_patch_symbols(struct load_info *info)
 
 	info->ulp_info->time = secs();
 
-	ldebug("Found %s symbol address %#016lx.\n", dst_func, info->ulp_info->target_func_addr);
-	ldebug("Found %s symbol address %#016lx.\n", src_func, info->ulp_info->patch_func_addr);
+	ulp_debug("Found %s symbol address %#016lx.\n", dst_func, info->ulp_info->target_func_addr);
+	ulp_debug("Found %s symbol address %#016lx.\n", src_func, info->ulp_info->patch_func_addr);
 	return 0;
 }
 
@@ -820,7 +820,7 @@ static int kick_target_process(const struct load_info *info)
 	new_insn = (void *)&jmp_entry;
 	insn_sz = sizeof(struct jmp_table_entry);
 
-	ldebug("Jmp table: from %s(%lx) jump to %s(%lx)\n",
+	ulp_debug("Jmp table: from %s(%lx) jump to %s(%lx)\n",
 		info->ulp_strtab.dst_func,
 		info->ulp_info->target_func_addr,
 		info->ulp_strtab.src_func,
@@ -830,25 +830,25 @@ static int kick_target_process(const struct load_info *info)
 	 * The struct ulpatch_info.orig_code MUST store the original code.
 	 */
 	if (sizeof(info->ulp_info->orig_code) < insn_sz) {
-		lerror("No enough space in ulpatch_info::orig_code field.\n");
+		ulp_error("No enough space in ulpatch_info::orig_code field.\n");
 		goto done;
 	}
 
-	ldebug("Backup original instructions from %lx.\n", info->ulp_info->virtual_addr);
+	ulp_debug("Backup original instructions from %lx.\n", info->ulp_info->virtual_addr);
 	n = memcpy_from_task(task, info->ulp_info->orig_code,
 				info->ulp_info->virtual_addr, insn_sz);
-	ldebug("memcpy return %d, expect %ld\n", n, insn_sz);
+	ulp_debug("memcpy return %d, expect %ld\n", n, insn_sz);
 	if (n == -1 || n < insn_sz) {
-		lerror("Backup original instructions failed.\n");
+		ulp_error("Backup original instructions failed.\n");
 		err = -ENOEXEC;
 		goto done;
 	}
 
-	ldebug("Copy ulpatch to target process.\n");
+	ulp_debug("Copy ulpatch to target process.\n");
 	/* copy patch to target address space */
 	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
 	if (n == -1 || n < info->len) {
-		lerror("failed kick target process.\n");
+		ulp_error("failed kick target process.\n");
 		err = -ENOEXEC;
 		goto done;
 	}
@@ -857,7 +857,7 @@ static int kick_target_process(const struct load_info *info)
 
 	n = memcpy_to_task(task, info->ulp_info->virtual_addr, (void *)new_insn, insn_sz);
 	if (n == -1 || n < insn_sz) {
-		lerror("failed kick target process.\n");
+		ulp_error("failed kick target process.\n");
 		err = -ENOEXEC;
 	}
 
@@ -865,7 +865,7 @@ static int kick_target_process(const struct load_info *info)
 
 done:
 	if (err)
-		lerror("Kick target process failed.\n");
+		ulp_error("Kick target process failed.\n");
 	return err;
 }
 
@@ -883,9 +883,9 @@ static int load_patch(struct load_info *info)
 	 * Check the Build ID exist or not.
 	 */
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
-		ldebug("ULPatch \n");
+		ulp_debug("ULPatch \n");
 		if (!strcmp(ulp->str_build_id, info->str_build_id)) {
-			lerror("Build ID %s already exist\n" \
+			ulp_error("Build ID %s already exist\n" \
 				"Check ULPatch in target process first.\n",
 				ulp->str_build_id);
 			err = -EALREADY;
@@ -938,7 +938,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	};
 
 	if (!(task->fto_flag & FTO_PROC)) {
-		lerror("Need FTO_PROC task flag.\n");
+		ulp_error("Need FTO_PROC task flag.\n");
 		return -1;
 	}
 
@@ -946,7 +946,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 
 	err = alloc_patch_file(obj_file, ulp_file, &info);
 	if (err) {
-		lerror("Parse %s failed.\n", obj_file);
+		ulp_error("Parse %s failed.\n", obj_file);
 		goto err;
 	}
 
@@ -956,7 +956,7 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	 */
 	err = chown(ulp_file, task->status.uid, task->status.gid);
 	if (err) {
-		lerror("chown %s failed.\n", ulp_file);
+		ulp_error("chown %s failed.\n", ulp_file);
 		goto err;
 	}
 
@@ -1004,14 +1004,14 @@ int delete_patch(struct task_struct *task)
 
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		if (task->max_ulp_id == ulp->info.ulp_id) {
-			linfo("Found last ulpatch vma.\n");
+			ulp_info("Found last ulpatch vma.\n");
 			ulp_info = &ulp->info;
 			break;
 		}
 	}
 
 	if (!ulp_info) {
-		lerror("Not found any ulp.\n");
+		ulp_error("Not found any ulp.\n");
 		return -ENOENT;
 	}
 
@@ -1022,7 +1022,7 @@ int delete_patch(struct task_struct *task)
 
 	n = memcpy_to_task(task, ulp_info->virtual_addr, (void *)ulp_info->orig_code, insn_sz);
 	if (n == -1 || n < insn_sz) {
-		lerror("failed kick target process.\n");
+		ulp_error("failed kick target process.\n");
 		err = -ENOEXEC;
 		goto exit;
 	}
@@ -1030,7 +1030,7 @@ int delete_patch(struct task_struct *task)
 	err = task_munmap(task, vma->vm_start, vma->vm_end - vma->vm_start);
 	if (err) {
 		print_vma(stdout, true, vma, false);
-		lerror("failed to munmap vma.\n");
+		ulp_error("failed to munmap vma.\n");
 		err = -ENOEXEC;
 		goto exit;
 	}

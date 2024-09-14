@@ -53,14 +53,14 @@ static inline long branch_imm_common(unsigned long pc, unsigned long addr,
 	long offset;
 
 	if ((pc & 0x3) || (addr & 0x3)) {
-		lerror("A64 instructions must be word aligned.\n");
+		ulp_error("A64 instructions must be word aligned.\n");
 		return range;
 	}
 
 	offset = ((long)addr - (long)pc);
 
 	if (offset < -range || offset >= range) {
-		lerror("offset out of range.\n");
+		ulp_error("offset out of range.\n");
 		return range;
 	}
 
@@ -148,7 +148,7 @@ uint64_t aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type,
 		break;
 	default:
 		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
-			lerror("aarch64_insn_decode_immediate: unknown immediate encoding %d\n",
+			ulp_error("aarch64_insn_decode_immediate: unknown immediate encoding %d\n",
 			       type);
 			return 0;
 		}
@@ -178,7 +178,7 @@ uint32_t aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
 		break;
 	default:
 		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
-			lerror("aarch64_insn_encode_immediate: unknown immediate encoding %d\n",
+			ulp_error("aarch64_insn_encode_immediate: unknown immediate encoding %d\n",
 			       type);
 			return AARCH64_BREAK_FAULT;
 		}
@@ -213,7 +213,7 @@ uint32_t aarch64_insn_gen_branch_imm(unsigned pc, unsigned long addr,
 		insn = aarch64_insn_get_b_value();
 		break;
 	default:
-		lerror("unknown branch encoding %d\n", type);
+		ulp_error("unknown branch encoding %d\n", type);
 		return AARCH64_BREAK_FAULT;
 	}
 

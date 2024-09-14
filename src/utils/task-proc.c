@@ -27,7 +27,7 @@ int open_pid_maps(pid_t pid)
 	snprintf(maps, sizeof(maps), "/proc/%d/maps", pid);
 	mapsfd = open(maps, O_RDONLY);
 	if (mapsfd <= 0) {
-		lerror("open %s failed. %s\n", maps, strerror(errno));
+		ulp_error("open %s failed. %s\n", maps, strerror(errno));
 		mapsfd = -1;
 	}
 	return mapsfd;
@@ -54,7 +54,7 @@ int __open_pid_mem(pid_t pid, int flags)
 	snprintf(mem, sizeof(mem), "/proc/%d/mem", pid);
 	int memfd = open(mem, flags);
 	if (memfd <= 0) {
-		lerror("open %s failed. %s\n", mem, strerror(errno));
+		ulp_error("open %s failed. %s\n", mem, strerror(errno));
 		memfd = -errno;
 	}
 	return memfd;

@@ -51,13 +51,13 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 		mode = CS_MODE_ARM;
 		break;
 	default:
-		lerror("Disasm not support architecture.\n");
+		ulp_error("Disasm not support architecture.\n");
 		return -EINVAL;
 	}
 
 	cs_err err = cs_open(arch, mode, &handle);
 	if (err) {
-		lerror("cs_open() fatal returned: %u\n", err);
+		ulp_error("cs_open() fatal returned: %u\n", err);
 		return -EINVAL;
 	}
 
@@ -65,7 +65,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 
 	count = cs_disasm(handle, code, size, address, 0, &insn);
 	if (!count) {
-		lerror("ERROR: Failed to disasm given code!\n");
+		ulp_error("ERROR: Failed to disasm given code!\n");
 		ret = -EINVAL;
 		goto close;
 	}

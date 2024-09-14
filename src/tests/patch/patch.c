@@ -41,13 +41,13 @@ const unsigned long mcount_addr = (unsigned long)_mcount;
 
 static void my_direct_func(void)
 {
-	linfo(">>>>> REPLACE mcount() <<<<<\n");
+	ulp_info(">>>>> REPLACE mcount() <<<<<\n");
 	ret_TTWU = TTWU_FTRACE_RETURN;
 }
 
 __opt_O0 int try_to_wake_up(struct task_struct *task, int mode, int wake_flags)
 {
-	linfo("TTWU emulate.\n");
+	ulp_info("TTWU emulate.\n");
 	int ret = ret_TTWU;
 	ret_TTWU = 0;
 	return ret;
@@ -57,7 +57,7 @@ __opt_O0 int ulpatch_try_to_wake_up(struct task_struct *task, int mode,
 				    int wake_flags)
 {
 #define ULPATCH_TTWU_RET	0xdead1234
-	linfo("TTWU emulate, patched.\n");
+	ulp_info("TTWU emulate, patched.\n");
 	return ULPATCH_TTWU_RET;
 }
 
@@ -86,13 +86,13 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 */
 	rel_s = find_symbol(task->exe_elf, mcount_str, STT_FUNC);
 	if (!rel_s) {
-		lwarning("Not found %s symbol in %s\n", mcount_str, task->exe);
+		ulp_warning("Not found %s symbol in %s\n", mcount_str, task->exe);
 		/**
 		 * Symbol mcount() in SELF elf is undef
 		 */
 		rel_s = find_undef_symbol(task->exe_elf, mcount_str, STT_FUNC);
 		if (!rel_s) {
-			lerror("Not found %s symbol in %s\n", mcount_str, task->exe);
+			ulp_error("Not found %s symbol in %s\n", mcount_str, task->exe);
 			return -1;
 		}
 	}
@@ -104,14 +104,14 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 */
 	libc_s = find_symbol(task->libc_elf, mcount_str, STT_FUNC);
 	if (!libc_s) {
-		lerror("Not found mcount in %s\n", task->libc_elf->filepath);
+		ulp_error("Not found mcount in %s\n", task->libc_elf->filepath);
 		return -1;
 	}
 
 	dump_task(task, true);
-	linfo("SELF: _mcount: st_value: %lx %lx\n", rel_s->sym.st_value,
+	ulp_info("SELF: _mcount: st_value: %lx %lx\n", rel_s->sym.st_value,
 		mcount_addr);
-	linfo("LIBC: _mcount: st_value: %lx %lx\n", libc_s->sym.st_value,
+	ulp_info("LIBC: _mcount: st_value: %lx %lx\n", libc_s->sym.st_value,
 		mcount_addr);
 
 	try_to_wake_up(task, 0, 0);
@@ -123,7 +123,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 * After all, this method is designed to test 4-byte addresses.
 	 */
 	if ((addr & 0xFFFFFFFFUL) != addr) {
-		lwarning("Not support address overflow 4 bytes length.\n");
+		ulp_warning("Not support address overflow 4 bytes length.\n");
 		/* Skip, return expected value */
 		return expect_ret;
 	}
@@ -155,19 +155,19 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		break;
 	}
 
-	linfo("addr:%#0lx call:%#0lx(off %#0lx)\n", addr, ip, callq_off);
+	ulp_info("addr:%#0lx call:%#0lx(off %#0lx)\n", addr, ip, callq_off);
 
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, ip, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret < MCOUNT_INSN_SIZE) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
-		lerror("failed to memcpy.\n");
+		ulp_error("failed to memcpy.\n");
 	}
 
 	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
@@ -185,13 +185,13 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	restore_size = MCOUNT_INSN_SIZE;
 	disasm_size = pc - disasm_addr + MCOUNT_INSN_SIZE;
 
-	linfo("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
+	ulp_info("pc:%#0lx new addr:%x, mcount_offset %x\n", pc, new,
 		aarch64_func_bl_offset(try_to_wake_up));
 
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, pc, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret < MCOUNT_INSN_SIZE) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
@@ -211,7 +211,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	/* Restore original code */
 	ret = memcpy_to_task(task, restore_addr, orig_code, restore_size);
 	if (ret == -1 || ret < restore_size) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
@@ -267,7 +267,7 @@ TEST(Patch, direct_jmp, 0)
 	 * After all, this method is designed to test 4-byte addresses.
 	 */
 	if ((addr & 0xFFFFFFFFUL) != addr) {
-		lwarning("Not support address overflow 4 bytes length.\n");
+		ulp_warning("Not support address overflow 4 bytes length.\n");
 		return 0;
 	}
 
@@ -277,18 +277,18 @@ TEST(Patch, direct_jmp, 0)
 
 	new = ulpatch_jmpq_replace(&insn, ip_pc, addr);
 
-	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
+	ulp_info("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
 
 	ret = memcpy_to_task(task, ip_pc, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
-		lerror("failed to memcpy.\n");
+		ulp_error("failed to memcpy.\n");
 	}
 #elif defined(__aarch64__)
 	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr, AARCH64_INSN_BRANCH_NOLINK);
 
-	linfo("pc:%#0lx new addr:%#0x\n", ip_pc, new);
+	ulp_info("pc:%#0lx new addr:%#0x\n", ip_pc, new);
 
 	try_to_wake_up(task, 1, 1);
 	/* application the patch */
@@ -323,7 +323,7 @@ TEST(Patch, direct_jmp_table, 0)
 	jmp_entry.addr = addr;
 	new = (void *)&jmp_entry;
 
-	linfo("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
+	ulp_info("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
 	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
@@ -331,12 +331,12 @@ TEST(Patch, direct_jmp_table, 0)
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, ip_pc, sizeof(jmp_entry));
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	ret = memcpy_to_task(task, ip_pc, (void *)new, sizeof(jmp_entry));
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
@@ -351,7 +351,7 @@ TEST(Patch, direct_jmp_table, 0)
 	/* Restore original code */
 	ret = memcpy_to_task(task, ip_pc, orig_code, sizeof(jmp_entry));
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
-		lerror("failed to memcpy, ret = %d.\n", ret);
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
 	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));

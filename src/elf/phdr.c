@@ -89,11 +89,11 @@ int handle_phdrs(struct elf_file *elf)
 		switch (phdr->p_type) {
 		case PT_INTERP:
 			elf->elf_interpreter = elf->rawfile + phdr->p_offset;
-			ldebug("[Requesting program interpreter: %s]\n",
+			ulp_debug("[Requesting program interpreter: %s]\n",
 				elf->elf_interpreter);
 			break;
 		case PT_LOAD:
-			ldebug("get a PT_LOAD program header.\n");
+			ulp_debug("get a PT_LOAD program header.\n");
 			break;
 		default:
 			break;

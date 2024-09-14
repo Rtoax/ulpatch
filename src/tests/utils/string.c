@@ -52,7 +52,7 @@ TEST(Utils_str, str2size, 0)
 
 	for (i = 0; i < ARRAY_SIZE(values); i++) {
 		unsigned long v = str2size(values[i].str);
-		ldebug("v = %lx\n", v);
+		ulp_debug("v = %lx\n", v);
 		if (v != values[i].expect)
 			ret++;
 	}
@@ -76,7 +76,7 @@ TEST(Utils_str, str2addr, 0)
 
 	for (i = 0; i < ARRAY_SIZE(values); i++) {
 		unsigned long v = str2addr(values[i].str);
-		ldebug("v = %lx\n", v);
+		ulp_debug("v = %lx\n", v);
 		if (v != values[i].expect)
 			ret++;
 	}

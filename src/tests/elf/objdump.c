@@ -92,7 +92,7 @@ TEST(Objdump, for_each_plt_symbol_and_search, 0)
 								objdump_symbol_name(symbol));
 				unsigned long addr2 = objdump_symbol_address(symbol);
 
-				ldebug("%08lx %s (%08lx)\n",
+				ulp_debug("%08lx %s (%08lx)\n",
 					addr2,
 					objdump_symbol_name(symbol),
 					addr);
@@ -150,7 +150,7 @@ static int __unused objdump_for_each_plt_sym(struct objdump_elf_file *efile,
 
 		ret = sscanf(line, "%lx %s", &addr, sym);
 		if (ret <= 0) {
-			lerror("sscanf failed.\n");
+			ulp_error("sscanf failed.\n");
 			continue;
 		}
 
@@ -164,23 +164,23 @@ static int __unused objdump_for_each_plt_sym(struct objdump_elf_file *efile,
 		int slen = strlen(s);
 
 		if (!strstr(s, "@plt>:")) {
-			lerror("Wrong format: %s\n", sym);
+			ulp_error("Wrong format: %s\n", sym);
 			continue;
 		}
 
 		s[slen - strlen("@plt>:")] = '\0';
 
-		linfo("%s: %#08lx %s\n", basename(file), addr, s);
+		ulp_info("%s: %#08lx %s\n", basename(file), addr, s);
 
 		unsigned long addr2 = objdump_elf_plt_symbol_address(efile, s);
 
 		if (addr2 == 0) {
-			lwarning("Not found symbol %s\n", s);
+			ulp_warning("Not found symbol %s\n", s);
 			ret = -1;
 			goto close_return;
 		}
 		if (addr2 != 0 && addr != addr2) {
-			lerror("Wrong %s@plt check: %#08lx != %#08lx\n",
+			ulp_error("Wrong %s@plt check: %#08lx != %#08lx\n",
 				s, addr, addr2);
 			ret = -1;
 			goto close_return;

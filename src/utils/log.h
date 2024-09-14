@@ -7,14 +7,14 @@
 #include <stdbool.h>
 
 /* Has prefix if set_log_prefix on */
-#define ldebug(fmt...) ulp_log(LOG_DEBUG, true, __FILE__, __func__, __LINE__, fmt)
-#define linfo(fmt...) ulp_log(LOG_INFO, true, __FILE__, __func__, __LINE__, fmt)
-#define lnotice(fmt...) ulp_log(LOG_NOTICE, true, __FILE__, __func__, __LINE__, fmt)
-#define lwarning(fmt...) ulp_log(LOG_WARNING, true, __FILE__, __func__, __LINE__, fmt)
-#define lerror(fmt...) ulp_log(LOG_ERR, true, __FILE__, __func__, __LINE__, fmt)
-#define lcrit(fmt...) ulp_log(LOG_CRIT, true, __FILE__, __func__, __LINE__, fmt)
-#define lalert(fmt...) ulp_log(LOG_ALERT, true, __FILE__, __func__, __LINE__, fmt)
-#define lemerg(fmt...) ulp_log(LOG_EMERG, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_debug(fmt...) ulp_log(LOG_DEBUG, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_info(fmt...) ulp_log(LOG_INFO, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_notice(fmt...) ulp_log(LOG_NOTICE, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_warning(fmt...) ulp_log(LOG_WARNING, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_error(fmt...) ulp_log(LOG_ERR, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_crit(fmt...) ulp_log(LOG_CRIT, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_alert(fmt...) ulp_log(LOG_ALERT, true, __FILE__, __func__, __LINE__, fmt)
+#define ulp_emerg(fmt...) ulp_log(LOG_EMERG, true, __FILE__, __func__, __LINE__, fmt)
 
 
 int __attribute__((format(printf, 6, 7)))

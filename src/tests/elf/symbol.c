@@ -34,7 +34,7 @@ TEST(Elf_Sym, for_each_symbol, 0)
 	struct elf_file *elf;
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
-		lerror("open %s failed.\n", ulpatch_test_path);
+		ulp_error("open %s failed.\n", ulpatch_test_path);
 		return -ENOENT;
 	}
 
@@ -55,7 +55,7 @@ TEST(Elf_Sym, find_symbol, 0)
 
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
-		lerror("open %s failed.\n", ulpatch_test_path);
+		ulp_error("open %s failed.\n", ulpatch_test_path);
 		ret = -1;
 		return -EINVAL;
 	}
@@ -66,14 +66,14 @@ TEST(Elf_Sym, find_symbol, 0)
 		struct symbol *s;
 		s = find_symbol(elf, sym_funcs[is].s, STT_FUNC);
 		if (!s) {
-			lwarning("no symbol %s founded in %s.\n",
+			ulp_warning("no symbol %s founded in %s.\n",
 				sym_funcs[is].s, ulpatch_test_path);
 			if (sym_funcs[is].must_has) {
 				ret = -1;
 				break;
 			}
 		} else {
-			linfo("%s: %s: st_value: %lx\n",
+			ulp_info("%s: %s: st_value: %lx\n",
 				ulpatch_test_path, sym_funcs[is].s, s->sym.st_value);
 		}
 	}
@@ -92,7 +92,7 @@ TEST(Elf_Sym, find_symbol_mcount, 0)
 
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
-		lerror("open %s failed.\n", ulpatch_test_path);
+		ulp_error("open %s failed.\n", ulpatch_test_path);
 		ret = -1;
 		goto finish;
 	}
@@ -106,7 +106,7 @@ TEST(Elf_Sym, find_symbol_mcount, 0)
 
 	s = find_symbol(elf, mcount_name, STT_FUNC);
 	if (!s) {
-		lwarning("no symbol %s founded in %s.\n", mcount_name,
+		ulp_warning("no symbol %s founded in %s.\n", mcount_name,
 			 ulpatch_test_path);
 		s = find_undef_symbol(elf, mcount_name, STT_FUNC);
 		if (!s) {
@@ -115,7 +115,7 @@ TEST(Elf_Sym, find_symbol_mcount, 0)
 		}
 	}
 
-	linfo("%s: %s: st_value: %lx\n", ulpatch_test_path, mcount_name,
+	ulp_info("%s: %s: st_value: %lx\n", ulpatch_test_path, mcount_name,
 	      s->sym.st_value);
 
 finish_close_elf:

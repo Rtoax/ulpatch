@@ -50,16 +50,16 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 
 	sym = task_vma_find_symbol(task, name, STT_FUNC);
 	if (!sym) {
-		lerror("Not found %s.\n", name);
+		ulp_error("Not found %s.\n", name);
 		ret = -1;
 		goto out;
 	}
 	addr = task_vma_symbol_vaddr(sym);
 
-	linfo("%s: find %lx, real %lx\n", name, addr, memaddr);
+	ulp_info("%s: find %lx, real %lx\n", name, addr, memaddr);
 
 	if (addr != memaddr) {
-		lerror("%s: find %lx, real %lx\n", name, addr, memaddr);
+		ulp_error("%s: find %lx, real %lx\n", name, addr, memaddr);
 		ret = -1;
 	}
 
@@ -160,7 +160,7 @@ static int find_task_symbol(struct task_struct *task)
 
 		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
 
-		linfo("%s %-30s: 0x%lx\n",
+		ulp_info("%s %-30s: 0x%lx\n",
 			sym?"Exist":"NoExi",
 			test_symbols[i].sym,
 			sym?sym->sym.st_value:0);
@@ -232,7 +232,7 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 
 		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
 		if (!sym) {
-			lerror("Could not find %s in pid %d vma.\n",
+			ulp_error("Could not find %s in pid %d vma.\n",
 				test_symbols[i].sym, task->pid);
 			ret = -EEXIST;
 			continue;
@@ -246,7 +246,7 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 
 		/* TODO: i'm not sure this is a correct method to get symbol
 		 * address value. */
-		linfo("%-10s %s%s\n"
+		ulp_info("%-10s %s%s\n"
 			"%016lx(proc) %016lx(vma) %016lx(alias) %016lx(plt)\n",
 			test_symbols[i].sym,
 			test_symbols[i].alias ?: "",
@@ -272,7 +272,7 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 				ret = -1;
 		}
 		if (ret) {
-			lerror("Sym %s wrong addr %lx(plt), %lx(mem)\n",
+			ulp_error("Sym %s wrong addr %lx(plt), %lx(mem)\n",
 				test_symbols[i].sym, plt_addr, addr);
 		}
 	}

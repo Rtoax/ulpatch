@@ -45,7 +45,7 @@ void reset_current_task(void)
 struct task_struct *const get_current_task(void)
 {
 	if (!current_task) {
-		lerror("Not set current task.\n");
+		ulp_error("Not set current task.\n");
 		errno = ENOENT;
 		/**
 		 * To prevent segmentation errors, NULL cannot be returned.

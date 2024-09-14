@@ -96,7 +96,7 @@ int show_patch_info(void)
 
 	err = alloc_patch_file(patch_file, "temp.up", &info);
 	if (err) {
-		lerror("Parse %s failed.\n", patch_file);
+		ulp_error("Parse %s failed.\n", patch_file);
 		return err;
 	}
 
@@ -119,7 +119,7 @@ int show_task_patch_info(pid_t pid)
 
 	task = open_task(pid, FTO_ALL & ~FTO_RDWR);
 	if (!task) {
-		lerror("Open pid=%d task failed.\n", pid);
+		ulp_error("Open pid=%d task failed.\n", pid);
 		return -ENOENT;
 	}
 

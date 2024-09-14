@@ -91,13 +91,13 @@ TEST(File, fmmap_rdonly, 0)
 TEST(File, ftype_ELF, 0)
 {
 	if (!fexist(USR_BIN_LS)) {
-		lerror("%s not exist.\n", USR_BIN_LS);
+		ulp_error("%s not exist.\n", USR_BIN_LS);
 		return -1;
 	}
 
 	file_type type = ftype(USR_BIN_LS);
 	if ((type & FILE_ELF) != FILE_ELF) {
-		lerror("%s is not ELF(%d), but %d\n", USR_BIN_LS, FILE_ELF, type);
+		ulp_error("%s is not ELF(%d), but %d\n", USR_BIN_LS, FILE_ELF, type);
 		return -1;
 	}
 
@@ -115,7 +115,7 @@ TEST(File, fmktempfile, 0)
 	name = fmktempfile(buffer, PATH_MAX, NULL);
 	if (!name)
 		err = -1;
-	linfo("fmktempfile: %s\n", name);
+	ulp_info("fmktempfile: %s\n", name);
 
 	if (!fexist(name))
 		err = -EEXIST;
@@ -126,7 +126,7 @@ TEST(File, fmktempfile, 0)
 	name = fmktempfile(buffer, PATH_MAX, "patch-XXXXXX");
 	if (!name)
 		err = -1;
-	linfo("fmktempfile: %s\n", name);
+	ulp_info("fmktempfile: %s\n", name);
 	if (!fexist(name))
 		err = -EEXIST;
 
@@ -145,12 +145,12 @@ TEST(File, fmktempname, 0)
 	name = fmktempname(buffer, PATH_MAX, NULL);
 	if (!name)
 		err = -1;
-	linfo("fmktempname: %s\n", name);
+	ulp_info("fmktempname: %s\n", name);
 
 	name = fmktempname(buffer, PATH_MAX, "patch-XXXXXX");
 	if (!name)
 		err = -1;
-	linfo("fmktempname: %s\n", name);
+	ulp_info("fmktempname: %s\n", name);
 
 	return err;
 }
@@ -175,12 +175,12 @@ TEST(File, fcopy, 0)
 	ret = fcopy(USR_BIN_LS, TMP_FILE);
 
 	if (!fexist(TMP_FILE)) {
-		lerror("%s not exist after copy.\n", TMP_FILE);
+		ulp_error("%s not exist after copy.\n", TMP_FILE);
 		ret = -1;
 	}
 
 	if (fsize(USR_BIN_LS) != fsize(TMP_FILE)) {
-		lerror("file size not equal %d != %d.\n",
+		ulp_error("file size not equal %d != %d.\n",
 			fsize(USR_BIN_LS), fsize(TMP_FILE));
 		ret = -1;
 	}

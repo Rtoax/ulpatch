@@ -17,7 +17,7 @@ bool ehdr_magic_ok(const GElf_Ehdr *ehdr)
 	    ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
 	    ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
 	    ehdr->e_ident[EI_MAG3] != ELFMAG3) {
-		ldebug("Wrong ELF magic\n");
+		ulp_debug("Wrong ELF magic\n");
 		return false;
 	}
 	return true;
@@ -26,24 +26,24 @@ bool ehdr_magic_ok(const GElf_Ehdr *ehdr)
 bool ehdr_ok(const GElf_Ehdr *ehdr)
 {
 	if (ehdr->e_type == ET_NONE) {
-		ldebug("unknown elf type %d\n", ehdr->e_type);
+		ulp_debug("unknown elf type %d\n", ehdr->e_type);
 		goto not_ok;
 	}
 	if (ehdr->e_machine == EM_NONE) {
-		ldebug("unknown elf machine %d\n", ehdr->e_machine);
+		ulp_debug("unknown elf machine %d\n", ehdr->e_machine);
 		goto not_ok;
 	}
 	if (ehdr->e_version != EV_CURRENT) {
-		ldebug("unknown elf version %d\n", ehdr->e_version);
+		ulp_debug("unknown elf version %d\n", ehdr->e_version);
 		goto not_ok;
 	}
 	/* Only support 64bit system */
 	if (ehdr->e_ident[EI_CLASS] != ELFCLASS64) {
-		ldebug("unsupport %d\n", ehdr->e_ident[EI_CLASS]);
+		ulp_debug("unsupport %d\n", ehdr->e_ident[EI_CLASS]);
 		goto not_ok;
 	}
 	if (ehdr->e_ident[EI_DATA] != ELFDATA2LSB) {
-		ldebug("unsupport %d\n", ehdr->e_ident[EI_DATA]);
+		ulp_debug("unsupport %d\n", ehdr->e_ident[EI_DATA]);
 		goto not_ok;
 	}
 	if (!ehdr_magic_ok(ehdr)) {
@@ -131,7 +131,7 @@ int print_ehdr(FILE *fp, const GElf_Ehdr *ehdr)
 	int i;
 
 	if (!ehdr || !ehdr_magic_ok(ehdr)) {
-		lerror("Print unknown pointer as elf header.\n");
+		ulp_error("Print unknown pointer as elf header.\n");
 		return -EINVAL;
 	}
 

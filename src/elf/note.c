@@ -69,7 +69,7 @@ static const void *convert(Elf *core, Elf_Type type, uint_fast16_t count,
 		? elf32_xlatetom : elf64_xlatetom)
 			(&valuedata, &indata, elf_getident(core, NULL)[EI_DATA]);
 	if (d == NULL) {
-		lerror("cannot convert core note data: %s", elf_errmsg(-1));
+		ulp_error("cannot convert core note data: %s", elf_errmsg(-1));
 		return 0;
 	}
 
@@ -121,7 +121,7 @@ static void __unused handle_siginfo_note(struct elf_file *elf, GElf_Word descsz,
 	Elf *core = elf->elf;
 	Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
 	if (data == NULL) {
-		lerror("cannot convert core note data: %s", elf_errmsg (-1));
+		ulp_error("cannot convert core note data: %s", elf_errmsg (-1));
 		return;
 	}
 
@@ -180,7 +180,7 @@ static void __unused handle_file_note(struct elf_file *elf, GElf_Word descsz,
 	Elf *core = elf->elf;
 	Elf_Data *data = elf_getdata_rawchunk(core, desc_pos, descsz, ELF_T_BYTE);
 	if (data == NULL) {
-		lerror("cannot convert core note data: %s", elf_errmsg(-1));
+		ulp_error("cannot convert core note data: %s", elf_errmsg(-1));
 	}
 
 	unsigned char const *ptr = data->d_buf;
@@ -233,7 +233,7 @@ const char *elf_strbuildid(uint8_t *bid, size_t descsz, char *buf,
 	int i;
 
 	if (buf_len < (descsz * 2 + 1)) {
-		lerror("No enough space to copy Build ID.\n");
+		ulp_error("No enough space to copy Build ID.\n");
 		return NULL;
 	}
 	for (i = 0; i < descsz; ++i) {
@@ -288,7 +288,7 @@ static void elf_object_note(struct elf_file *elf, uint32_t namesz,
 			build_id[i * 2 + 1] = v[1];
 			build_id[i * 2 + 2] = '\0';
 
-			ldebug("Build ID: %s\n", build_id);
+			ulp_debug("Build ID: %s\n", build_id);
 
 			elf->build_id = build_id;
 		}
@@ -351,7 +351,7 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		return 0;
 
 bad_note:
-	lerror("cannot get content of note: %s",
+	ulp_error("cannot get content of note: %s",
 		data != NULL ? "garbage data" : elf_errmsg(-1));
 	return -ENODATA;
 }

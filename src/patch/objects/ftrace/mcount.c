@@ -34,7 +34,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 {
 #if defined(ULPATCH_TEST)
 
-	lwarning("parent: %p, child: %lx, args: %ld %ld %ld %ld %ld %ld.\n",
+	ulp_warning("parent: %p, child: %lx, args: %ld %ld %ld %ld %ld %ld.\n",
 		parent_loc,
 		child,
 		ARG1(regs),
@@ -51,7 +51,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 	if (child - (unsigned long)try_to_wake_up > 0x0 &&
 		child - (unsigned long)try_to_wake_up < 0x26) {
 		struct task_struct *task = (void *)ARG1(regs);
-		lwarning("COMM: %s, PID %d\n", task->comm, task->pid);
+		ulp_warning("COMM: %s, PID %d\n", task->comm, task->pid);
 	}
 
 #endif /* ULPATCH_TEST */

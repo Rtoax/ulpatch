@@ -64,14 +64,14 @@ static void __env_init(void)
 	if (!fexist(ULP_PROC_ROOT_DIR)) {
 		ret = mkdirat(0, ULP_PROC_ROOT_DIR, MODE_0777);
 		if (ret != 0) {
-			lerror("Create %s failed, %m\n", ULP_PROC_ROOT_DIR);
+			ulp_error("Create %s failed, %m\n", ULP_PROC_ROOT_DIR);
 			exit(1);
 		}
 	} else {
 		ret = chmod(ULP_PROC_ROOT_DIR, MODE_0777);
 		if (ret != 0) {
-			lerror("Chmod %s failed, %m\n", ULP_PROC_ROOT_DIR);
-			lerror("You could remove %s and run again.\n",
+			ulp_error("Chmod %s failed, %m\n", ULP_PROC_ROOT_DIR);
+			ulp_error("You could remove %s and run again.\n",
 				ULP_PROC_ROOT_DIR);
 			exit(1);
 		}

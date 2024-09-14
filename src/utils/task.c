@@ -33,7 +33,7 @@ static struct vm_area_struct *alloc_vma(struct task_struct *task)
 
 	vma = malloc(sizeof(struct vm_area_struct));
 	if (!vma) {
-		lerror("Malloc vma failed.\n");
+		ulp_error("Malloc vma failed.\n");
 		return NULL;
 	}
 	memset(vma, 0x00, sizeof(struct vm_area_struct));
@@ -64,7 +64,7 @@ static inline int __vma_rb_cmp(struct rb_node *node, unsigned long key)
 		return 1;
 
 	print_vma(stdout, true, vma, true);
-	lerror("Try to insert illegal vma, see above dump vma.\n");
+	ulp_error("Try to insert illegal vma, see above dump vma.\n");
 	return 0;
 }
 
@@ -151,14 +151,14 @@ unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 		if (!next)
 			return 0;
 
-		ldebug("vma: %lx-%lx %s\n", ivma->vm_start, ivma->vm_end,
+		ulp_debug("vma: %lx-%lx %s\n", ivma->vm_start, ivma->vm_end,
 			ivma->name_);
 
 		next_vma = rb_entry(next, struct vm_area_struct, node_rb);
 		if (next_vma->vm_start - ivma->vm_end >= size)
 			return ivma->vm_end;
 	}
-	lerror("No space fatal in target process, pid %d\n", task->pid);
+	ulp_error("No space fatal in target process, pid %d\n", task->pid);
 	return 0;
 }
 
@@ -325,7 +325,7 @@ static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
 		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
 
-	ldebug("MatchPhdr: %lx-%lx vs %lx-%lx "PROT_FMT" ret=%d\n",
+	ulp_debug("MatchPhdr: %lx-%lx vs %lx-%lx "PROT_FMT" ret=%d\n",
 		addr, addr + size, vma->vm_start, vma->vm_end,
 		PROT_ARGS(vma->prot), ret);
 
@@ -355,12 +355,12 @@ int alloc_ulp(struct vm_area_struct *vma)
 
 	ulp = malloc(sizeof(struct vma_ulp));
 	if (!ulp) {
-		lerror("malloc failed.\n");
+		ulp_error("malloc failed.\n");
 		return -ENOMEM;
 	}
 	mem = malloc(elf_mem_len);
 	if (!mem) {
-		lerror("malloc failed.\n");
+		ulp_error("malloc failed.\n");
 		return -ENOMEM;
 	}
 
@@ -373,12 +373,12 @@ int alloc_ulp(struct vm_area_struct *vma)
 	/* Copy VMA from target task memory space */
 	ret = memcpy_from_task(task, ulp->elf_mem, vma->vm_start, elf_mem_len);
 	if (ret == -1 || ret < elf_mem_len) {
-		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		free_ulp(vma);
 		return -EAGAIN;
 	}
 
-	ldebug("Add %s to ulpatch list.\n", vma->name_);
+	ulp_debug("Add %s to ulpatch list.\n", vma->name_);
 	list_add(&ulp->node, &task->ulp_list);
 	return 0;
 }
@@ -390,7 +390,7 @@ void free_ulp(struct vm_area_struct *vma)
 	if (!ulp)
 		return;
 
-	ldebug("Remove %s from ulpatch list.\n", vma->name_);
+	ulp_debug("Remove %s from ulpatch list.\n", vma->name_);
 
 	list_del(&ulp->node);
 	if (ulp->str_build_id)
@@ -413,16 +413,16 @@ int vma_load_ulp(struct vm_area_struct *vma)
 		.target_task = task,
 	};
 
-	ldebug("Load ulpatch vma %s.\n", vma->name_);
+	ulp_debug("Load ulpatch vma %s.\n", vma->name_);
 
 	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret == -1 || ret < sizeof(ehdr)) {
-		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
 
 	if (!ehdr_magic_ok(&ehdr)) {
-		lerror("VMA %s(%lx) is considered as ULPATCH, but it isn't ELF.",
+		ulp_error("VMA %s(%lx) is considered as ULPATCH, but it isn't ELF.",
 			vma->name_, vma->vm_start);
 		return -ENOENT;
 	}
@@ -455,7 +455,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	case VMA_VVAR:
 	case VMA_STACK:
 	case VMA_VSYSCALL:
-		lwarning("skip %s\n", VMA_TYPE_NAME(vma->type));
+		ulp_warning("skip %s\n", VMA_TYPE_NAME(vma->type));
 		return 0;
 	case VMA_ULPATCH:
 		return vma_load_ulp(vma);
@@ -473,18 +473,18 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 */
 	if (!strncmp(vma->name_, "/etc", 4) ||
 	    !strncmp(vma->name_, "/sys", 4)) {
-		ldebug("Skip peek vma %s\n", vma->name_);
+		ulp_debug("Skip peek vma %s\n", vma->name_);
 		return 0;
 	}
 
-	ldebug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
+	ulp_debug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
 
 	/**
 	 * Read the ELF header from target task memory.
 	 */
 	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret < sizeof(ehdr)) {
-		lerror("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
 		return -EAGAIN;
 	}
 
@@ -492,7 +492,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	if (!ehdr_ok(&ehdr))
 		return 0;
 
-	ldebug("%lx %s is ELF\n", vma->vm_start, vma->name_);
+	ulp_debug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
 	if (vma->type == VMA_SELF) {
 		task->vma_self_elf = vma;
@@ -507,10 +507,10 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		 * [0] https://sourceware.org/git/binutils-gdb.git
 		 */
 		if (ehdr.e_type == ET_DYN) {
-			ldebug("%s is PIE.\n", vma->name_);
+			ulp_debug("%s is PIE.\n", vma->name_);
 			task->is_pie = true;
 		}  else {
-			ldebug("%s is not PIE.\n", vma->name_);
+			ulp_debug("%s is not PIE.\n", vma->name_);
 			task->is_pie = false;
 		}
 	}
@@ -533,7 +533,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 * /usr/lib64/ld-linux-x86-64.so.2 has '.ELF' magic, but it's no phdr.
 	 */
 	if (phsz == 0) {
-		lwarning("%s: no phdr, e_phoff %lx, skip it.\n",
+		ulp_warning("%s: no phdr, e_phoff %lx, skip it.\n",
 			 vma->name_, vma->vma_elf->ehdr.e_phoff);
 		free(vma->vma_elf);
 		return 0;
@@ -546,11 +546,11 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	}
 
 	/* Read all program headers from target task memory space */
-	ldebug("peek phdr from target addr %lx, len %d\n", phaddr, phsz);
+	ulp_debug("peek phdr from target addr %lx, len %d\n", phaddr, phsz);
 	if (memcpy_from_task(task, vma->vma_elf->phdrs, phaddr, phsz) < phsz) {
 		free(vma->vma_elf->phdrs);
 		free(vma->vma_elf);
-		lerror("Failed to read %s program header.\n", vma->name_);
+		ulp_error("Failed to read %s program header.\n", vma->name_);
 		return -EAGAIN;
 	}
 
@@ -562,7 +562,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	if (task->fto_flag & FTO_VMA_ELF_FILE && fexist(vma->name_)) {
 		vma->elf_file = elf_file_open(vma->name_);
 		if (!vma->elf_file) {
-			lerror("Open ELF %s failed.\n", vma->name_);
+			ulp_error("Open ELF %s failed.\n", vma->name_);
 			return -EINVAL;
 		}
 		switch (vma->type) {
@@ -628,7 +628,7 @@ share_lib:
 			lowest_vaddr = lowest_vaddr <= phdr->p_vaddr
 					? lowest_vaddr : phdr->p_vaddr;
 
-			ldebug("PT_LOAD: %s, lowest_vaddr %lx\n", vma->name_,
+			ulp_debug("PT_LOAD: %s, lowest_vaddr %lx\n", vma->name_,
 				lowest_vaddr);
 
 			/* Virtual address offset */
@@ -646,7 +646,7 @@ share_lib:
 				 * maybe i can use /proc/PID/auxv to get it.
 				 */
 				if ((sibling->vm_pgoff << PAGE_SHIFT) == vaddr) {
-					ldebug("Get %s voffset %lx\n",
+					ulp_debug("Get %s voffset %lx\n",
 						vma->name_, phdr->p_vaddr);
 					sibling->voffset = phdr->p_vaddr;
 				}
@@ -660,7 +660,7 @@ share_lib:
 	}
 
 	if (lowest_vaddr == ULONG_MAX) {
-		lerror("%s: unable to find lowest load address(%lx).\n",
+		ulp_error("%s: unable to find lowest load address(%lx).\n",
 			vma->name_, lowest_vaddr);
 		print_vma(stdout, true, vma, true);
 		free(vma->vma_elf->phdrs);
@@ -697,7 +697,7 @@ share_lib:
 		}
 	}
 
-	linfo("%s vma start %lx, load_addr %lx\n",
+	ulp_info("%s vma start %lx, load_addr %lx\n",
 		vma->name_, vma->vm_start, vma->vma_elf->load_addr);
 
 	return 0;
@@ -729,7 +729,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 	unsigned long off = sym->sym.st_value;
 
 	if (vma_leader != vma_leader->leader) {
-		lerror("Symbol vma must be leader.\n");
+		ulp_error("Symbol vma must be leader.\n");
 		return 0;
 	}
 
@@ -761,7 +761,7 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym)
 	} else
 		addr = off;
 
-	ldebug("Get symbol %s addr %lx\n", sym->name, addr);
+	ulp_debug("Get symbol %s addr %lx\n", sym->name, addr);
 	return addr;
 }
 
@@ -775,7 +775,7 @@ struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
 		.sym_type = SYM_TYPE_DEFINED,
 	};
 
-	ldebug("try find symbol %s\n", name);
+	ulp_debug("try find symbol %s\n", name);
 
 	node = rb_search_node(&task->vma_symbols, cmp_symbol_name,
 			      (unsigned long)&tmp);
@@ -794,7 +794,7 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 
 	vma = leader;
 
-	ldebug("symbol: st_value %s:%lx(%lx) in vma %s:%lx\n",
+	ulp_debug("symbol: st_value %s:%lx(%lx) in vma %s:%lx\n",
 	       s->name, s->sym.st_value, vaddr,
 	       vma->name_, vma->vm_start);
 
@@ -811,9 +811,9 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *leader)
 	node = rb_insert_node(&task->vma_symbols, &s->node, cmp_symbol_name,
 			      (unsigned long)s);
 	if (unlikely(node))
-		lwarning("%s: symbol %s already exist\n", task->comm, s->name);
+		ulp_warning("%s: symbol %s already exist\n", task->comm, s->name);
 	else
-		ldebug("%s: add symbol %s addr %lx success.\n", task->comm,
+		ulp_debug("%s: add symbol %s addr %lx success.\n", task->comm,
 			s->name, s->sym.st_value);
 	return node ? -EINVAL : 0;
 }
@@ -826,7 +826,7 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *leader, const char *name,
 
 	/* skip undefined symbols */
 	if (is_undef_symbol(sym)) {
-		ldebug("%s undef symbol: %s %lx\n", basename(leader->name_),
+		ulp_debug("%s undef symbol: %s %lx\n", basename(leader->name_),
 			name, sym->st_value);
 		/* Skip undefined symbol */
 		if (get_log_level() >= LOG_DEBUG)
@@ -837,11 +837,11 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *leader, const char *name,
 	/* allocate a symbol, and add it to task struct */
 	new = alloc_symbol(name, sym);
 	if (!new) {
-		lerror("Alloc symbol failed, %s\n", name);
+		ulp_error("Alloc symbol failed, %s\n", name);
 		return -ENOMEM;
 	}
 
-	ldebug("SELF %s %lx\n", new->name, new->sym.st_value);
+	ulp_debug("SELF %s %lx\n", new->name, new->sym.st_value);
 	err = task_vma_link_symbol(new, leader);
 	if (err)
 		free_symbol(new);
@@ -905,13 +905,13 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 	}
 
 	if (!dynamic_phdr) {
-		lerror("No PT_DYNAMIC in %s\n", vma->name_);
+		ulp_error("No PT_DYNAMIC in %s\n", vma->name_);
 		return -ENOENT;
 	}
 
 	dynamics = malloc(dynamic_phdr->p_memsz);
 	if (!dynamics) {
-		lerror("Malloc dynamics failed %s\n", vma->name_);
+		ulp_error("Malloc dynamics failed %s\n", vma->name_);
 		return -ENOMEM;
 	}
 
@@ -919,7 +919,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 			       vma->vma_elf->load_addr + dynamic_phdr->p_vaddr,
 			       dynamic_phdr->p_memsz);
 	if (err == -1 || err < dynamic_phdr->p_memsz) {
-		lerror("Task read mem failed, %lx.\n",
+		ulp_error("Task read mem failed, %lx.\n",
 			vma->vm_start + dynamic_phdr->p_vaddr);
 		goto out_free;
 	}
@@ -940,7 +940,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 			break;
 		case DT_SYMENT:
 			if (curdyn->d_un.d_val != sizeof(GElf_Sym)) {
-				lerror("Dynsym entry size is %ld expected %ld\n",
+				ulp_error("Dynsym entry size is %ld expected %ld\n",
 					curdyn->d_un.d_val, sizeof(GElf_Sym));
 				goto out_free;
 			}
@@ -954,7 +954,7 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 
 	if (strtab_sz == 0 || symtab_sz == 0) {
 		memshowinlog(LOG_INFO, dynamics, dynamic_phdr->p_memsz);
-		lwarning("No strtab, p_memsz %ld, p_vaddr %lx. "
+		ulp_warning("No strtab, p_memsz %ld, p_vaddr %lx. "
 			 "strtab(%lx) symtab(%lx) %s %lx\n",
 			 dynamic_phdr->p_memsz, dynamic_phdr->p_vaddr,
 			 strtab_addr, symtab_addr, vma->name_, vma->vm_start);
@@ -962,12 +962,12 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 
 	buffer = malloc(symtab_sz + strtab_sz);
 	if (!buffer) {
-		lerror("Malloc %ld bytes failed\n", symtab_sz + strtab_sz);
+		ulp_error("Malloc %ld bytes failed\n", symtab_sz + strtab_sz);
 		goto out_free;
 	}
 	memset(buffer, 0x0, symtab_sz + strtab_sz);
 
-	ldebug("%s: symtab_addr %lx, load_addr: %lx, vma start %lx\n",
+	ulp_debug("%s: symtab_addr %lx, load_addr: %lx, vma start %lx\n",
 		vma->name_,
 		symtab_addr,
 		vma->vma_elf->load_addr,
@@ -989,11 +989,11 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 
 	err = memcpy_from_task(task, buffer, symtab_addr, strtab_sz + symtab_sz);
 	if (err == -1 || err < strtab_sz + symtab_sz) {
-		lerror("load symtab failed.\n");
+		ulp_error("load symtab failed.\n");
 		goto out_free_buffer;
 	}
 
-	ldebug("%s\n", vma->name_);
+	ulp_debug("%s\n", vma->name_);
 	memshowinlog(LOG_INFO, buffer, strtab_sz + symtab_sz);
 
 	/* For each symbol */
@@ -1007,12 +1007,12 @@ int vma_load_all_symbols(struct vm_area_struct *vma)
 		if (is_undef_symbol(sym) || strlen(symname) == 0)
 			continue;
 
-		ldebug("%s: %s\n", vma->name_, symname);
+		ulp_debug("%s: %s\n", vma->name_, symname);
 
 		/* allocate a symbol, and add it to task struct */
 		s = alloc_symbol(symname, sym);
 		if (!s) {
-			lerror("Alloc symbol failed, %s\n", symname);
+			ulp_error("Alloc symbol failed, %s\n", symname);
 			continue;
 		}
 
@@ -1067,7 +1067,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		r = sscanf(line, "%lx-%lx %s %lx %x:%x %ld %255s", &start,
 			   &end, perms, &off, &major, &minor, &inode, name_);
 		if (r <= 0) {
-			lerror("sscanf failed.\n");
+			ulp_error("sscanf failed.\n");
 			return -1;
 		}
 #if 1
@@ -1076,10 +1076,10 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 			/* Skip if alread exist. */
 			if (old && old->vm_start == start &&
 			    old->vm_end == end) {
-				lwarning("vma %s alread exist.\n", name_);
+				ulp_warning("vma %s alread exist.\n", name_);
 				continue;
 			} else
-				lwarning("insert vma %s.\n", name_);
+				ulp_warning("insert vma %s.\n", name_);
 		}
 #endif
 
@@ -1099,7 +1099,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		/* Find libc.so */
 		if (!task->libc_vma && vma->type == VMA_LIBC &&
 		    vma->prot & PROT_EXEC) {
-			ldebug("Get x libc: 0x%lx\n", vma->vm_start);
+			ulp_debug("Get x libc: 0x%lx\n", vma->vm_start);
 			task->libc_vma = vma;
 		}
 
@@ -1148,7 +1148,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 	int i;
 
 	if (!vma) {
-		lerror("Invalide pointer.\n");
+		ulp_error("Invalide pointer.\n");
 		return;
 	}
 
@@ -1245,13 +1245,13 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 	if (ofile) {
 		fd = open(ofile, O_CREAT | O_RDWR, 0664);
 		if (fd <= 0) {
-			lerror("open %s: %s\n", ofile, strerror(errno));
+			ulp_error("open %s: %s\n", ofile, strerror(errno));
 			return -1;
 		}
 	}
 	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
-		lerror("vma not exist.\n");
+		ulp_error("vma not exist.\n");
 		return -1;
 	}
 
@@ -1262,7 +1262,7 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 	/* write to file or stdout */
 	nbytes = write(fd, mem, size);
 	if (nbytes != size) {
-		lerror("write failed, %s.\n", strerror(errno));
+		ulp_error("write failed, %s.\n", strerror(errno));
 		free(mem);
 		return -1;
 	}
@@ -1280,7 +1280,7 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 	size_t vma_size = 0;
 	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
-		lerror("vma not exist.\n");
+		ulp_error("vma not exist.\n");
 		return -1;
 	}
 
@@ -1294,7 +1294,7 @@ void dump_task_threads(struct task_struct *task, bool detail)
 	struct thread *thread;
 
 	if (!(task->fto_flag & FTO_THREADS)) {
-		lerror("Not set FTO_THREADS(%ld) flag\n", FTO_THREADS);
+		ulp_error("Not set FTO_THREADS(%ld) flag\n", FTO_THREADS);
 		return;
 	}
 
@@ -1307,7 +1307,7 @@ void dump_task_fds(struct task_struct *task, bool detail)
 	struct fd *fd;
 
 	if (!(task->fto_flag & FTO_FD)) {
-		lerror("Not set FTO_FD(%ld) flag\n", FTO_FD);
+		ulp_error("Not set FTO_FD(%ld) flag\n", FTO_FD);
 		return;
 	}
 
@@ -1351,7 +1351,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
 	ret = readlink(path, buf, bufsz);
 	if (ret < 0) {
-		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
 		return NULL;
 	}
 	return buf;
@@ -1365,7 +1365,7 @@ static int __get_comm(struct task_struct *task)
 
 	ret = snprintf(path, sizeof(path), "/proc/%d/comm", task->pid);
 	if (ret < 0) {
-		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
 		return -errno;
 	}
 
@@ -1373,7 +1373,7 @@ static int __get_comm(struct task_struct *task)
 
 	ret = fscanf(fp, "%s", task->comm);
 	if (ret == EOF) {
-		lerror("fscanf(%s) %m\n", path);
+		ulp_error("fscanf(%s) %m\n", path);
 		return -errno;
 	}
 
@@ -1390,13 +1390,13 @@ static int __get_exe(struct task_struct *task)
 	snprintf(path, sizeof(path), "/proc/%d/exe", task->pid);
 	ret = readlink(path, realpath, sizeof(realpath));
 	if (ret < 0) {
-		lerror("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
 		return -errno;
 	}
 	realpath[ret] = '\0';
 
 	if (!fexist(realpath)) {
-		lerror("Execute %s is removed!\n", realpath);
+		ulp_error("Execute %s is removed!\n", realpath);
 		return -ENOENT;
 	}
 
@@ -1415,7 +1415,7 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
 	fd = open(buf, O_RDONLY);
 	if (fd == -1) {
-		lerror("Open %s failed, %s\n", buf, strerror(errno));
+		ulp_error("Open %s failed, %s\n", buf, strerror(errno));
 		ret = -errno;
 		goto close_exit;
 	}
@@ -1444,31 +1444,31 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 	}
 
 	if (pauxv->auxv_phdr == 0) {
-		lerror("Not found AT_PHDR in %s\n", buf);
+		ulp_error("Not found AT_PHDR in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
 	}
 	if (pauxv->auxv_phent == 0) {
-		lerror("Not found AT_PHENT in %s\n", buf);
+		ulp_error("Not found AT_PHENT in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
 	}
 	if (pauxv->auxv_phnum == 0) {
-		lerror("Not found AT_PHNUM in %s\n", buf);
+		ulp_error("Not found AT_PHNUM in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
 	}
 	if (pauxv->auxv_interp == 0) {
-		lerror("Not found AT_BASE in %s\n", buf);
+		ulp_error("Not found AT_BASE in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
 	}
 	if (pauxv->auxv_entry == 0) {
-		lerror("Not found AT_ENTRY in %s\n", buf);
+		ulp_error("Not found AT_ENTRY in %s\n", buf);
 		errno = ENOENT;
 		ret = -errno;
 		goto close_exit;
@@ -1511,7 +1511,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 	fd = open(buf, O_RDONLY);
 	fp = fdopen(fd, "r");
 	if (fd == -1 || !fd) {
-		lerror("Open %s failed, %s\n", buf, strerror(errno));
+		ulp_error("Open %s failed, %s\n", buf, strerror(errno));
 		ret = -errno;
 		goto close_exit;
 	}
@@ -1526,7 +1526,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 
 		if (!fgets(line, sizeof(line), fp))
 			break;
-		ldebug("Status: %s\n", line);
+		ulp_debug("Status: %s\n", line);
 
 		if (!strncmp(line, "Uid:", 4)) {
 			r = sscanf(line, "%s %d %d %d %d", label,
@@ -1535,7 +1535,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 					&ts.suid,
 					&ts.fsuid);
 			if (r <= 0) {
-				lerror("sscanf failed.\n");
+				ulp_error("sscanf failed.\n");
 				ret = -errno;
 				goto close_exit;
 			}
@@ -1548,7 +1548,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 					&ts.sgid,
 					&ts.fsgid);
 			if (r <= 0) {
-				lerror("sscanf failed.\n");
+				ulp_error("sscanf failed.\n");
 				ret = -errno;
 				goto close_exit;
 			}
@@ -1560,7 +1560,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 
 	if (ts.uid == -1 || ts.euid == -1 || ts.suid == -1 || ts.fsuid == -1 ||
 	    ts.gid == -1 || ts.egid == -1 || ts.sgid == -1 || ts.fsgid == -1) {
-		lerror("Not found Uid: or Gid: in %s\n", buf);
+		ulp_error("Not found Uid: or Gid: in %s\n", buf);
 		ret = -ENOENT;
 		goto close_exit;
 	}
@@ -1597,14 +1597,14 @@ struct task_struct *open_task(pid_t pid, int flag)
 	int o_flags;
 
 	if (!proc_pid_exist(pid)) {
-		lerror("pid %d is not exist.\n", pid);
+		ulp_error("pid %d is not exist.\n", pid);
 		errno = -ENOENT;
 		return NULL;
 	}
 
 	task = malloc(sizeof(struct task_struct));
 	if (!task) {
-		lerror("malloc task failed, %m.\n");
+		ulp_error("malloc task failed, %m.\n");
 		goto failed;
 	}
 
@@ -1644,7 +1644,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	rb_init(&task->vma_symbols);
 
 	if (!task->libc_vma || !task->stack) {
-		lerror("No libc or stack founded.\n");
+		ulp_error("No libc or stack founded.\n");
 		goto free_task;
 	}
 
@@ -1673,7 +1673,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d",
 			 task->pid);
 		if (mkdirat(0, buffer, MODE_0777) != 0 && errno != EEXIST) {
-			lerror("mkdirat(2) for %d:%s failed.\n", task->pid,
+			ulp_error("mkdirat(2) for %d:%s failed.\n", task->pid,
 			       task->exe);
 			goto free_task;
 		}
@@ -1689,7 +1689,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_MAP_FILES,
 			 task->pid);
 		if (mkdirat(0, buffer, MODE_0777) != 0 && errno != EEXIST) {
-			lerror("mkdirat(2) for %d:%s failed.\n", task->pid,
+			ulp_error("mkdirat(2) for %d:%s failed.\n", task->pid,
 			       task->exe);
 			goto free_task;
 		}
@@ -1705,13 +1705,13 @@ struct task_struct *open_task(pid_t pid, int flag)
 		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
 		dir = opendir(proc_task_dir);
 		if (!dir) {
-			lerror("opendir %s failed.\n", proc_task_dir);
+			ulp_error("opendir %s failed.\n", proc_task_dir);
 			goto free_task;
 		}
 		while ((entry = readdir(dir)) != NULL) {
 			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
 				continue;
-			ldebug("Thread %s\n", entry->d_name);
+			ulp_debug("Thread %s\n", entry->d_name);
 			child = atoi(entry->d_name);
 			/**
 			 * Maybe we should skip the thread tid == pid, however,
@@ -1725,7 +1725,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 * is a longterm work, but not now.
 			 */
 			if (child == task->pid)
-				ldebug("Thread %s (pid)\n", entry->d_name);
+				ulp_debug("Thread %s (pid)\n", entry->d_name);
 			thread = malloc(sizeof(struct thread));
 			thread->tid = child;
 			list_init(&thread->node);
@@ -1745,13 +1745,13 @@ struct task_struct *open_task(pid_t pid, int flag)
 		sprintf(proc_fd, "/proc/%d/fd/", task->pid);
 		dir = opendir(proc_fd);
 		if (!dir) {
-			lerror("opendir %s failed.\n", proc_fd);
+			ulp_error("opendir %s failed.\n", proc_fd);
 			goto free_task;
 		}
 		while ((entry = readdir(dir)) != NULL) {
 			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
 				continue;
-			ldebug("FD %s\n", entry->d_name);
+			ulp_debug("FD %s\n", entry->d_name);
 			ifd = atoi(entry->d_name);
 
 			fd = malloc(sizeof(struct fd));
@@ -1763,7 +1763,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			sprintf(proc_fd, "/proc/%d/fd/%d", task->pid, ifd);
 			ret = readlink(proc_fd, fd->symlink, PATH_MAX);
 			if (ret < 0) {
-				lwarning("readlink %s failed\n", proc_fd);
+				ulp_warning("readlink %s failed\n", proc_fd);
 				strncpy(fd->symlink, "[UNKNOWN]", PATH_MAX);
 			}
 
@@ -1792,13 +1792,13 @@ static void __clean_task_proc(struct task_struct *task)
 {
 	char buffer[PATH_MAX];
 
-	ldebug("Task %s is not patched, clean task's proc.\n", task->comm);
+	ulp_debug("Task %s is not patched, clean task's proc.\n", task->comm);
 
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM,
 		 task->pid);
 	if (unlink(buffer) != 0)
-		lerror("unlink(%s) for %d:%s failed, %s.\n",
+		ulp_error("unlink(%s) for %d:%s failed, %s.\n",
 			buffer, task->pid, task->exe, strerror(errno));
 
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
@@ -1809,13 +1809,13 @@ static void __clean_task_proc(struct task_struct *task)
 	 * and rmdir can't remove the directory has file in it.
 	 */
 	if (rmdir(buffer) != 0)
-		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
+		ulp_error("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
 			task->exe, strerror(errno));
 
 	/* ULP_PROC_ROOT_DIR/PID */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 	if (rmdir(buffer) != 0)
-		lerror("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
+		ulp_error("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
 			task->exe, strerror(errno));
 }
 
@@ -1840,7 +1840,7 @@ int close_task(struct task_struct *task)
 	struct vm_area_struct *tmp_vma;
 
 	if (!task) {
-		lerror("Try free NULL task.\n");
+		ulp_error("Try free NULL task.\n");
 		return -EINVAL;
 	}
 
@@ -1892,13 +1892,13 @@ int task_attach(pid_t pid)
 
 	ret = ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 	if (ret != 0) {
-		lerror("Attach %d failed. %s\n", pid, strerror(errno));
+		ulp_error("Attach %d failed. %s\n", pid, strerror(errno));
 		return -errno;
 	}
 	do {
 		ret = waitpid(pid, &status, __WALL);
 		if (ret < 0) {
-			lerror("can't wait for pid %d\n", pid);
+			ulp_error("can't wait for pid %d\n", pid);
 			return -errno;
 		}
 		ret = 0;
@@ -1918,7 +1918,7 @@ int task_attach(pid_t pid)
 
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
-			lerror("can't cont tracee\n");
+			ulp_error("can't cont tracee\n");
 			return -errno;
 		}
 	} while (1);
@@ -1931,7 +1931,7 @@ int task_detach(pid_t pid)
 	long rv;
 	rv = ptrace(PTRACE_DETACH, pid, NULL, NULL);
 	if (rv != 0) {
-		lerror("Detach %d failed. %s\n", pid, strerror(errno));
+		ulp_error("Detach %d failed. %s\n", pid, strerror(errno));
 		return -errno;
 	}
 
@@ -1996,7 +1996,7 @@ int memcpy_from_task(struct task_struct *task, void *dst, unsigned long task_src
 	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
 	if (ret == -1) {
-		lerror("pread(%d, %p, %ld, 0x%lx) = %d failed, %m\n",
+		ulp_error("pread(%d, %p, %ld, 0x%lx) = %d failed, %m\n",
 			task->proc_mem_fd, dst, size, task_src, ret);
 		do_backtrace(stdout);
 	}
@@ -2010,7 +2010,7 @@ int memcpy_to_task(struct task_struct *task, unsigned long task_dst, void *src,
 	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
 	if (ret == -1) {
-		lerror("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
+		ulp_error("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
 			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
 		do_backtrace(stdout);
 	}

@@ -97,14 +97,14 @@ int wait_for_stop(struct task_struct *task)
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
 			print_vma(stderr, true, task->libc_vma, false);
-			lerror("ptrace(PTRACE_CONT, %d, ...) %s\n",
+			ulp_error("ptrace(PTRACE_CONT, %d, ...) %s\n",
 				pid, strerror(ESRCH));
 			return -1;
 		}
 
 		ret = waitpid(pid, &status, __WALL);
 		if (ret < 0) {
-			lerror("can't wait tracee %d\n", pid);
+			ulp_error("can't wait tracee %d\n", pid);
 			return -1;
 		}
 		if (WIFSTOPPED(status)) {
@@ -113,7 +113,7 @@ int wait_for_stop(struct task_struct *task)
 				break;
 			}
 			if (WSTOPSIG(status) == SIGSEGV) {
-				lerror("Child process %d segment fault.\n", pid);
+				ulp_error("Child process %d segment fault.\n", pid);
 				return -1;
 			}
 			status = WSTOPSIG(status);
@@ -157,7 +157,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
+		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
 		return -errno;
 	}
@@ -181,7 +181,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
+		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
 		ret = -errno;
 		goto poke_back;
@@ -189,7 +189,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 
 	ret = wait_for_stop(task);
 	if (ret < 0) {
-		lerror("failed call to func\n");
+		ulp_error("failed call to func\n");
 		goto poke_back;
 	}
 
@@ -202,7 +202,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		lerror("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
+		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
 		ret = -errno;
 		goto poke_back;
@@ -217,7 +217,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		lerror("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
+		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
 		ret = -errno;
 		goto poke_back;
@@ -226,7 +226,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	syscall_regs = regs;
 	*res = SYSCALL_RET(syscall_regs);
 
-	ldebug("result %lx\n", *res);
+	ulp_debug("result %lx\n", *res);
 
 poke_back:
 	memcpy_to_task(task, libc_base, orig_code, sizeof(__syscall));
@@ -287,7 +287,7 @@ unsigned long task_malloc(struct task_struct *task, size_t length)
 	remote_addr = task_mmap(task, 0UL, length, PROT_READ | PROT_WRITE,
 				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (remote_addr == (unsigned long)MAP_FAILED) {
-		lerror("Remote malloc failed, %ld\n", remote_addr);
+		ulp_error("Remote malloc failed, %ld\n", remote_addr);
 		return 0UL;
 	}
 	return remote_addr;
@@ -331,7 +331,7 @@ static bool __should_skip_remote_fd(int remote_fd)
 	int fd = remote_fd;
 	/* We should never close 0,1,2 fd of target process. */
 	if (fd == STDIN_FILENO || fd == STDOUT_FILENO || fd == STDERR_FILENO) {
-		lwarning("Try to close remote 0,1,2 file descriptor.\n");
+		ulp_warning("Try to close remote 0,1,2 file descriptor.\n");
 		return true;
 	}
 	/**
@@ -378,11 +378,11 @@ int task_fstat(struct task_struct *task, int remote_fd, struct stat *statbuf)
 	ret_fstat = task_syscall(task, __NR_fstat, remote_fd, remote_statbuf,
 				 0, 0, 0, 0, &result);
 	if (ret_fstat < 0)
-		lerror("fstat failed, ret %d, %ld\n", ret_fstat, result);
+		ulp_error("fstat failed, ret %d, %ld\n", ret_fstat, result);
 
 	ret = memcpy_from_task(task, statbuf, remote_statbuf, sizeof(struct stat));
 	if (ret == -1 || ret != sizeof(struct stat))
-		lerror("failed copy struct stat.\n");
+		ulp_error("failed copy struct stat.\n");
 
 	task_free(task, remote_statbuf, sizeof(struct stat));
 

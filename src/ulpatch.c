@@ -140,24 +140,24 @@ int check_patch_file(const char *file)
 		return -EEXIST;
 
 	if (file && !fexist(file)) {
-		ldebug("%s is not exist.\n", file);
+		ulp_debug("%s is not exist.\n", file);
 		return -EEXIST;
 	}
 	err = alloc_patch_file(patch_file, "temp.ulp", &info);
 	if (err) {
-		lerror("Parse %s failed.\n", patch_file);
+		ulp_error("Parse %s failed.\n", patch_file);
 		return err;
 	}
 
 	err = setup_load_info(&info);
 	if (err) {
-		ldebug("Load %s failed\n", file);
+		ulp_debug("Load %s failed\n", file);
 		err = -ENODATA;
 		goto release;
 	}
 
 	if (strcmp(info.ulp_strtab.magic, SEC_ULPATCH_MAGIC)) {
-		ldebug("%s is not ulpatch file.\n", file);
+		ulp_debug("%s is not ulpatch file.\n", file);
 		err = -ENODATA;
 	}
 

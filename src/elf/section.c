@@ -27,7 +27,7 @@ int handle_sections(struct elf_file *elf)
 		elf->shdrnames[i] = elf_strptr(elf->elf, elf->shdrstrndx,
 						shdr->sh_name);
 		if (elf->shdrnames[i] == NULL) {
-			lerror("couldn't get section name: %s\n", elf_errmsg(-1));
+			ulp_error("couldn't get section name: %s\n", elf_errmsg(-1));
 			return -ENOENT;
 		}
 
@@ -36,12 +36,12 @@ int handle_sections(struct elf_file *elf)
 		case SHT_PROGBITS:
 			/* .plt */
 			if (strcmp(elf->shdrnames[i], ".plt") == 0) {
-				ldebug("%s PLT: %d\n", elf->filepath, i);
+				ulp_debug("%s PLT: %d\n", elf->filepath, i);
 				elf->plt_data = elf_getdata(scn, NULL);
 				elf->plt_shdr_idx = i;
 			/* .got */
 			} else if (strcmp(elf->shdrnames[i], ".got") == 0) {
-				ldebug("%s GOT: %d\n", elf->filepath, i);
+				ulp_debug("%s GOT: %d\n", elf->filepath, i);
 				elf->got_data = elf_getdata(scn, NULL);
 				elf->got_shdr_idx = i;
 			}

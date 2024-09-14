@@ -9,7 +9,7 @@
 TEST(Id, is_root, 0)
 {
 	if (is_root("PROG"))
-		ldebug("Run with root.\n");
+		ulp_debug("Run with root.\n");
 	return 0;
 }
 

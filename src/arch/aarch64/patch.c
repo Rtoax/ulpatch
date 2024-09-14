@@ -32,7 +32,7 @@ static uint64_t do_reloc(enum aarch64_reloc_op reloc_op, uint32_t *place,
 		return 0;
 	}
 
-	lerror("do_reloc: unknown relocation operation %d\n", reloc_op);
+	ulp_error("do_reloc: unknown relocation operation %d\n", reloc_op);
 	return 0;
 }
 
@@ -66,7 +66,7 @@ static int reloc_data(enum aarch64_reloc_op op, void *place, uint64_t val,
 				return -ERANGE;
 			break;
 		default:
-			lerror("Invalid 16-bit data relocation (%d)\n", op);
+			ulp_error("Invalid 16-bit data relocation (%d)\n", op);
 			return 0;
 		}
 		break;
@@ -82,7 +82,7 @@ static int reloc_data(enum aarch64_reloc_op op, void *place, uint64_t val,
 				return -ERANGE;
 			break;
 		default:
-			lerror("Invalid 32-bit data relocation (%d)\n", op);
+			ulp_error("Invalid 32-bit data relocation (%d)\n", op);
 			return 0;
 		}
 		break;
@@ -90,7 +90,7 @@ static int reloc_data(enum aarch64_reloc_op op, void *place, uint64_t val,
 		*(int64_t *)place = sval;
 		break;
 	default:
-		lerror("Invalid length (%d) for data relocation\n", len);
+		ulp_error("Invalid length (%d) for data relocation\n", len);
 		return 0;
 	}
 	return 0;
@@ -225,7 +225,7 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off)
 			+ ELF64_R_SYM(rel[i].r_info);
 
-		ldebug("type %d st_value %lx r_addend %lx loc %lx\n",
+		ulp_debug("type %d st_value %lx r_addend %lx loc %lx\n",
 			(int)ELF64_R_TYPE(rel[i].r_info),
 			sym->st_value, rel[i].r_addend, (uint64_t)loc);
 
@@ -395,12 +395,12 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			ovf = reloc_insn_imm(RELOC_OP_PREL, loc, val, 2, 26,
 					     AARCH64_INSN_IMM_26);
 			if (ovf == -ERANGE) {
-				lerror("Out of rang.\n");
+				ulp_error("Out of rang.\n");
 			}
 			break;
 
 		default:
-			lerror("unsupported RELA relocation: %lu\n",
+			ulp_error("unsupported RELA relocation: %lu\n",
 				ELF64_R_TYPE(rel[i].r_info));
 			return -ENOEXEC;
 		}
@@ -412,7 +412,7 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 	return 0;
 
 overflow:
-	lerror("overflow in relocation type %d val %lx\n",
+	ulp_error("overflow in relocation type %d val %lx\n",
 		(int)ELF64_R_TYPE(rel[i].r_info), val);
 	return -ENOEXEC;
 }

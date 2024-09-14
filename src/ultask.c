@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
 		n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
 					insn_sz);
 		if (n == -1 || n < insn_sz) {
-			lerror("failed kick target process.\n");
+			ulp_error("failed kick target process.\n");
 			ret = -1;
 			goto done;
 		}

@@ -605,9 +605,9 @@ static void launch_waiting(void)
 	}
 
 	task_wait_init(&wait_here, msgq_file);
-	ldebug("CHILD: wait msg.\n");
+	ulp_debug("CHILD: wait msg.\n");
 	task_wait_wait(&wait_here);
-	ldebug("CHILD: return.\n");
+	ulp_debug("CHILD: return.\n");
 	// task_wait_destroy(&wait_here);
 }
 
@@ -621,9 +621,9 @@ static void launch_trigger(void)
 	}
 
 	task_wait_init(&wait_here, msgq_file);
-	ldebug("CHILD: send msg.\n");
+	ulp_debug("CHILD: send msg.\n");
 	task_wait_trigger(&wait_here);
-	ldebug("CHILD: return.\n");
+	ulp_debug("CHILD: return.\n");
 	// task_wait_destroy(&wait_here);
 }
 
@@ -679,11 +679,11 @@ static void launch_mix_role(enum who r)
 
 static void launch_mix(void)
 {
-	ldebug("MIX\n");
+	ulp_debug("MIX\n");
 	struct str_node *str = NULL, *tmp;
 
 	strstr_for_each_node_safe(str, tmp, &mix_role_list) {
-		ldebug("MIX: %s\n", str->str);
+		ulp_debug("MIX: %s\n", str->str);
 		launch_mix_role(who_am_i(str->str));
 	}
 }
@@ -698,7 +698,7 @@ static void init_test_symbols(void)
 #define TEST_DYNSYM(s) \
 	if (!strcmp(#s, test_symbols[i].sym)) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
-		ldebug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
+		ulp_debug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
 	}
 #define TEST_SYM_NON_STATIC(s, a)	TEST_DYNSYM(s)
 #define TEST_SYM_SELF(s) TEST_DYNSYM(s)
@@ -768,7 +768,7 @@ static void launch_listener_once(void)
 {
 	struct task_wait waitqueue;
 
-	ldebug("LAUNCH: %s %s\n", role_string[ROLE_LISTENER], listener_request);
+	ulp_debug("LAUNCH: %s %s\n", role_string[ROLE_LISTENER], listener_request);
 
 	task_wait_init(&waitqueue, msgq_file);
 
@@ -802,7 +802,7 @@ static void sig_handler(int signum)
 		exit(1);
 		break;
 	case SIGSEGV:
-		lemerg("Segv fault.\n");
+		ulp_emerg("Segv fault.\n");
 		do_backtrace(stdout);
 		exit(1);
 		break;
@@ -816,7 +816,7 @@ int main(int argc, char *argv[])
 	ulpatch_test_path = get_proc_pid_exe(getpid(), ulpatch_test_path_buf,
 					     PATH_MAX);
 	if (!ulpatch_test_path || !fexist(ulpatch_test_path)) {
-		lerror("Not found ulpatch_test path.\n");
+		ulp_error("Not found ulpatch_test path.\n");
 		return -ENOENT;
 	}
 
@@ -907,7 +907,7 @@ TEST(ulpatch_test, wait, 0)
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
-		ldebug("PARENT: fork one.\n");
+		ulp_debug("PARENT: fork one.\n");
 		ret = execvp(_argv[0], _argv);
 		if (ret == -1) {
 			exit(1);
@@ -915,9 +915,9 @@ TEST(ulpatch_test, wait, 0)
 	}
 
 	/* do something */
-	ldebug("PARENT: msgsnd to child.\n");
+	ulp_debug("PARENT: msgsnd to child.\n");
 	task_wait_trigger(&waitqueue);
-	ldebug("PARENT: send done.\n");
+	ulp_debug("PARENT: send done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
@@ -947,7 +947,7 @@ TEST(ulpatch_test, trigger, 0)
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
-		ldebug("PARENT: fork one.\n");
+		ulp_debug("PARENT: fork one.\n");
 		ret = execvp(_argv[0], _argv);
 		if (ret == -1) {
 			exit(1);
@@ -956,9 +956,9 @@ TEST(ulpatch_test, trigger, 0)
 	}
 
 	/* do something */
-	ldebug("PARENT: waiting.\n");
+	ulp_debug("PARENT: waiting.\n");
 	task_wait_wait(&waitqueue);
-	ldebug("PARENT: get msg.\n");
+	ulp_debug("PARENT: get msg.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
@@ -988,7 +988,7 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
-		ldebug("PARENT: fork one.\n");
+		ulp_debug("PARENT: fork one.\n");
 		ret = execvp(_argv[0], _argv);
 		if (ret == -1) {
 			exit(1);
@@ -997,11 +997,11 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 	}
 
 	/* do something */
-	ldebug("PARENT: msgsnd to child.\n");
+	ulp_debug("PARENT: msgsnd to child.\n");
 	task_wait_trigger(&waitqueue);
 	task_wait_trigger(&waitqueue);
 	task_wait_trigger(&waitqueue);
-	ldebug("PARENT: done.\n");
+	ulp_debug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
@@ -1031,7 +1031,7 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
-		ldebug("PARENT: fork one.\n");
+		ulp_debug("PARENT: fork one.\n");
 		ret = execvp(_argv[0], _argv);
 		if (ret == -1) {
 			exit(1);
@@ -1040,12 +1040,12 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 	}
 
 	/* do something */
-	ldebug("PARENT: wait child.\n");
+	ulp_debug("PARENT: wait child.\n");
 	task_wait_wait(&waitqueue);
 	task_wait_wait(&waitqueue);
 	task_wait_wait(&waitqueue);
 
-	ldebug("PARENT: get msgs from child.\n");
+	ulp_debug("PARENT: get msgs from child.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
@@ -1075,7 +1075,7 @@ TEST(ulpatch_test, wait_trigger, 0)
 			"--msgq", waitqueue.tmpfile,
 			NULL,
 		};
-		ldebug("PARENT: fork one.\n");
+		ulp_debug("PARENT: fork one.\n");
 		ret = execvp(_argv[0], _argv);
 		if (ret == -1) {
 			exit(1);
@@ -1084,13 +1084,13 @@ TEST(ulpatch_test, wait_trigger, 0)
 	}
 
 	/* do something */
-	ldebug("PARENT: do some thing.\n");
+	ulp_debug("PARENT: do some thing.\n");
 	task_wait_trigger(&waitqueue);
 	task_wait_wait(&waitqueue);
 	task_wait_trigger(&waitqueue);
 	task_wait_wait(&waitqueue);
 
-	ldebug("PARENT: done.\n");
+	ulp_debug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
@@ -1140,7 +1140,7 @@ static int test_listener_symbol(char request, char *sym,
 
 	/* The address must be equal */
 	if (addr != expect_addr) {
-		lerror("%s: addr 0x%lx != 0x%lx\n", sym, addr, expect_addr);
+		ulp_error("%s: addr 0x%lx != 0x%lx\n", sym, addr, expect_addr);
 		ret = -1;
 	}
 
@@ -1217,7 +1217,7 @@ TEST(ulpatch_test, listener_epoll, 0)
 
 		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 
-		linfo("%-10s: %lx\n", test_symbols[i].sym, addr);
+		ulp_info("%-10s: %lx\n", test_symbols[i].sym, addr);
 	}
 
 	listener_helper_close(fd, &rslt);

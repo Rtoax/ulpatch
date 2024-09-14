@@ -25,7 +25,7 @@ struct elf_file *elf_file_find(const char *filepath)
 	struct elf_file *elf = NULL;
 
 	if (!filepath || !fexist(filepath)) {
-		lwarning("%s is not exist.\n", filepath);
+		ulp_warning("%s is not exist.\n", filepath);
 		errno = EINVAL;
 		return NULL;
 	}
@@ -33,7 +33,7 @@ struct elf_file *elf_file_find(const char *filepath)
 	/* Already open */
 	list_for_each_entry(elf, &elf_file_list, node) {
 		if (!strcmp(filepath, elf->filepath)) {
-			lwarning("%s already opened.\n", filepath);
+			ulp_warning("%s already opened.\n", filepath);
 			return elf;
 		}
 	}
@@ -52,20 +52,20 @@ struct elf_file *elf_file_open(const char *filepath)
 
 	fd = open(filepath, O_RDONLY);
 	if (fd < 0) {
-		lerror("open failed: %s\n", filepath);
+		ulp_error("open failed: %s\n", filepath);
 		goto error_open;
 	}
 	elf_version(EV_CURRENT);
 
 	Elf *__elf = elf_begin(fd, ELF_C_READ_MMAP, NULL);
 	if (!__elf) {
-		lerror("open %s: %s\n", filepath, elf_errmsg(elf_errno()));
+		ulp_error("open %s: %s\n", filepath, elf_errmsg(elf_errno()));
 		goto error_elf;
 	}
 
 	char *ident = elf_getident(__elf, &size);
 	if (!ident || !strcmp(ident, ELFMAG)) {
-		lerror("%s is not ELF file\n", filepath);
+		ulp_error("%s is not ELF file\n", filepath);
 		goto close_elf;
 	}
 
@@ -89,7 +89,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	assert(elf->ehdr && "Malloc failed.");
 	elf->ehdr = gelf_getehdr(__elf, elf->ehdr);
 	if (!ehdr_ok(elf->ehdr)) {
-		lerror("unsupport %d\n", elf->ehdr->e_ident[EI_DATA]);
+		ulp_error("unsupport %d\n", elf->ehdr->e_ident[EI_DATA]);
 		goto free_elf;
 	}
 
@@ -115,7 +115,7 @@ struct elf_file *elf_file_open(const char *filepath)
 	assert(elf->shdrnames && "Malloc failed.");
 
 	if (elf_getshdrstrndx(__elf, &elf->shdrstrndx) < 0) {
-		lerror("cannot get section header string table index %s\n",
+		ulp_error("cannot get section header string table index %s\n",
 			elf_errmsg(-1));
 		goto free_shdrs;
 	}
@@ -125,14 +125,14 @@ struct elf_file *elf_file_open(const char *filepath)
 		Elf_Scn *scn = elf_getscn(elf->elf, i);
 
 		if (gelf_getshdr(scn, shdr) == NULL) {
-			lerror("gelf_getshdr failed: %s\n", elf_errmsg(-1));
+			ulp_error("gelf_getshdr failed: %s\n", elf_errmsg(-1));
 			goto free_shdrs;
 		}
 
 		if ((shdr->sh_flags & SHF_COMPRESSED) != 0) {
 
 			if (elf_compress(scn, 0, 0) < 0)
-				lwarning("WARNING: %s [%zd]\n",
+				ulp_warning("WARNING: %s [%zd]\n",
 					 "Couldn't uncompress section",
 					 elf_ndxscn(scn));
 
@@ -140,7 +140,7 @@ struct elf_file *elf_file_open(const char *filepath)
 			shdr = gelf_getshdr(scn, &shdr_mem);
 
 			if (unlikely(shdr == NULL)) {
-				lerror("cannot get section [%zd] header: %s",
+				ulp_error("cannot get section [%zd] header: %s",
 					elf_ndxscn(scn), elf_errmsg(-1));
 				continue;
 			}
@@ -157,7 +157,7 @@ struct elf_file *elf_file_open(const char *filepath)
 		if (elf->ehdr->e_type == ET_REL) {
 			elf->build_id = NO_BUILD_ID;
 		} else {
-			lerror("No Build ID found in %s,%d, check with 'readelf -n'\n",
+			ulp_error("No Build ID found in %s,%d, check with 'readelf -n'\n",
 				elf->filepath, elf->ehdr->e_type);
 			goto free_shdrs;
 		}

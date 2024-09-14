@@ -170,7 +170,7 @@ static asymbol **slurp_symtab(struct objdump_elf_file *file)
 
 	long storage = bfd_get_symtab_upper_bound(abfd);
 	if (storage < 0) {
-		lerror("failed to read symbol table from: %s",
+		ulp_error("failed to read symbol table from: %s",
 			bfd_get_filename(abfd));
 	}
 
@@ -180,7 +180,7 @@ static asymbol **slurp_symtab(struct objdump_elf_file *file)
 	asymbol **sy = (asymbol **) malloc(storage);
 	file->symcount = bfd_canonicalize_symtab(abfd, sy);
 	if (file->symcount < 0)
-		lerror("%s: symcount < 0\n", bfd_get_filename(abfd));
+		ulp_error("%s: symcount < 0\n", bfd_get_filename(abfd));
 
 	return sy;
 }
@@ -193,11 +193,11 @@ static asymbol **slurp_dynamic_symtab(struct objdump_elf_file *file)
 	long storage = bfd_get_dynamic_symtab_upper_bound(abfd);
 	if (storage < 0) {
 		if (!(bfd_get_file_flags(abfd) & DYNAMIC)) {
-			lerror("%s: not a dynamic object", bfd_get_filename(abfd));
+			ulp_error("%s: not a dynamic object", bfd_get_filename(abfd));
 			return NULL;
 		}
 
-		lerror("%s\n", bfd_get_filename(abfd));
+		ulp_error("%s\n", bfd_get_filename(abfd));
 		abort();
 	}
 
@@ -207,7 +207,7 @@ static asymbol **slurp_dynamic_symtab(struct objdump_elf_file *file)
 	asymbol **sy = (asymbol **) malloc(storage);
 	file->dynsymcount = bfd_canonicalize_dynamic_symtab(abfd, sy);
 	if (file->dynsymcount < 0) {
-		lerror("%s\n", bfd_get_filename(abfd));
+		ulp_error("%s\n", bfd_get_filename(abfd));
 		abort();
 	}
 
@@ -294,7 +294,7 @@ static void disassemble_data(struct objdump_elf_file *file)
 		char buf[256];
 		const char *name = asymbol_pure_name(s, buf, sizeof(buf));
 
-		ldebug("SYM: %#016lx  %s %s\n", bfd_asymbol_value(s),
+		ulp_debug("SYM: %#016lx  %s %s\n", bfd_asymbol_value(s),
 			name, asymbol_is_plt(s) ? "PLT" : "");
 
 		if (asymbol_is_plt(s)) {
@@ -346,12 +346,12 @@ static int objdump_elf_load_plt(struct objdump_elf_file *file)
 	file->bfd = bfd_openr(file->name, target);
 
 	if (bfd_check_format(file->bfd, bfd_archive)) {
-		lerror("%s is bfd archive, do nothing, close\n", file->name);
+		ulp_error("%s is bfd archive, do nothing, close\n", file->name);
 		goto close;
 	}
 
 	if (bfd_check_format_matches(file->bfd, bfd_object, &matching)) {
-		ldebug("%s is bfd_object.\n", file->name);
+		ulp_debug("%s is bfd_object.\n", file->name);
 		dump_bfd(file);
 	}
 

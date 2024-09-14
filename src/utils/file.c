@@ -29,12 +29,12 @@ int fsize(const char *filepath)
 
 	fd = open(filepath, O_RDONLY);
 	if (fd <= 0) {
-		lerror("open %s failed %s.\n", filepath, strerror(errno));
+		ulp_error("open %s failed %s.\n", filepath, strerror(errno));
 		return -1;
 	}
 	ret = fstat(fd, &statbuf);
 	if (ret != 0) {
-		lerror("fstat %s failed %s.\n", filepath, strerror(errno));
+		ulp_error("fstat %s failed %s.\n", filepath, strerror(errno));
 		return -1;
 	}
 	close(fd);
@@ -88,7 +88,7 @@ int ftouch(const char *filepath)
 
 	fd = open(filepath, O_WRONLY | O_EXCL | O_CREAT, 0644);
 	if (fd <= 0) {
-		ldebug("touch %s failed\n", filepath);
+		ulp_debug("touch %s failed\n", filepath);
 		return -errno;
 	}
 	close(fd);
@@ -109,13 +109,13 @@ static int __remove_recursive(const char *path)
 
 	/* get attribution error */
 	if (stat(path, &dir_stat) == -1) {
-		lerror("get dir:%s stat error.\n", path);
+		ulp_error("get dir:%s stat error.\n", path);
 		return -1;
 	}
 
 	/* regular file, delete */
 	if (S_ISREG(dir_stat.st_mode)) {
-		ldebug("Delete file %s\n", path);
+		ulp_debug("Delete file %s\n", path);
 		remove(path);
 	} else if (S_ISDIR(dir_stat.st_mode)) {
 		dirp = opendir(path);
@@ -127,10 +127,10 @@ static int __remove_recursive(const char *path)
 			__remove_recursive(dir_name);
 		}
 		closedir(dirp);
-		ldebug("Delete dir %s\n", path);
+		ulp_debug("Delete dir %s\n", path);
 		rmdir(path);
 	} else {
-		lerror("unknow type: %s!\n", path);
+		ulp_error("unknow type: %s!\n", path);
 	}
 	return 0;
 }
@@ -185,12 +185,12 @@ static int _file_copy(const char *srcpath, const char *dstpath)
 
 	in = fopen(srcpath, "r");
 	if (!in) {
-		lerror("open %s failed.\n", srcpath);
+		ulp_error("open %s failed.\n", srcpath);
 		return -errno;
 	}
 	out = fopen(dstpath, "w");
 	if (!out) {
-		lerror("open %s failed.\n", dstpath);
+		ulp_error("open %s failed.\n", dstpath);
 		fclose(in);
 		return -errno;
 	}
@@ -212,7 +212,7 @@ static int _file_copy(const char *srcpath, const char *dstpath)
 	fclose(in);
 	fclose(out);
 
-	ldebug("copy a %d bytes file.\n", nbytes);
+	ulp_debug("copy a %d bytes file.\n", nbytes);
 
 	return nbytes;
 }
@@ -222,17 +222,17 @@ int fcopy(const char *srcpath, const char *dstpath)
 	int err, ret = 0;
 
 	if (!srcpath || !dstpath) {
-		lerror("NULL pointer.\n");
+		ulp_error("NULL pointer.\n");
 		return -EINVAL;
 	}
 	if (!fexist(srcpath) || fexist(dstpath)) {
-		lerror("src not exist or dst exist\n");
+		ulp_error("src not exist or dst exist\n");
 		return -EEXIST;
 	}
 
 	err = _file_copy(srcpath, dstpath);
 	if (err <= 0) {
-		lerror("copy from %s to %s failed\n", srcpath, dstpath);
+		ulp_error("copy from %s to %s failed\n", srcpath, dstpath);
 		ret = err;
 	}
 
@@ -272,7 +272,7 @@ int fmemcpy(void *mem, int mem_len, const char *file)
 	fp = fopen(file, "r");
 	n = fread(mem, size, 1, fp);
 	if (n != 1) {
-		lerror("fread: %m\n");
+		ulp_error("fread: %m\n");
 		return 0;
 	}
 	fclose(fp);
@@ -288,13 +288,13 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 	struct mmap_struct *mem = NULL;
 
 	if (!(o_flags & O_CREAT) && !fexist(filepath)) {
-		lerror("%s not exist.\n", filepath);
+		ulp_error("%s not exist.\n", filepath);
 		return NULL;
 	}
 
 	mem = malloc(sizeof(struct mmap_struct));
 	if (!mem) {
-		lerror("Malloc mmap_struct failed.\n");
+		ulp_error("Malloc mmap_struct failed.\n");
 		exit(1);
 	}
 
@@ -305,7 +305,7 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 
 	mem->fd = open(filepath, o_flags, 0644);
 	if (mem->fd <= 0) {
-		lerror("open %s failed, %s\n", filepath, strerror(errno));
+		ulp_error("open %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
 	}
 
@@ -320,7 +320,7 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 	mem->size = truncate_size ?: fsize(filepath);
 	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
 	if (mem->mem == MAP_FAILED) {
-		lerror("mmap %s failed, %s\n", filepath, strerror(errno));
+		ulp_error("mmap %s failed, %s\n", filepath, strerror(errno));
 		goto free_mem;
 	}
 

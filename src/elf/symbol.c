@@ -161,7 +161,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 
 	if (GELF_ST_TYPE(sym->st_info) == STT_SECTION
 		&& sym->st_shndx == elf->shdrstrndx) {
-		lwarning("WARNING:"
+		ulp_warning("WARNING:"
 		" symbol table [%zd] contains section symbol %d"
 		" for old shdrstrndx %zd\n", ndx, isym, elf->shdrstrndx);
 	}
@@ -243,7 +243,7 @@ GElf_Sym *get_next_symbol(struct elf_file *elf, Elf_Scn *scn, int isym,
 				check_def = 0;
 
 			} else if (unlikely (!is_nobits)) {
-				lerror("bad dynamic symbol");
+				ulp_error("bad dynamic symbol");
 			} else {
 				check_def = 1;
 			}
@@ -307,7 +307,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 		if (!sym)
 			continue;
 
-		ldebug("Symtab: %s%s%s\n", symname, pversion ? "@" : "",
+		ulp_debug("Symtab: %s%s%s\n", symname, pversion ? "@" : "",
 			pversion ?: "");
 
 		struct symbol *s = alloc_symbol(symname, sym);
@@ -323,7 +323,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 			if (is_ftrace_entry(symname)) {
 				elf->support_ftrace = true;
 				elf->mcount_name = strdup(symname);
-				lwarning("Found fentry %s\n", symname);
+				ulp_warning("Found fentry %s\n", symname);
 			}
 			break;
 		default:
@@ -406,7 +406,7 @@ struct symbol *__find_symbol(struct elf_file *elf, const char *name, int type,
 	};
 	struct rb_node *node;
 
-	ldebug("Find: %s : %s\n", elf->filepath, name);
+	ulp_debug("Find: %s : %s\n", elf->filepath, name);
 
 	node = rb_search_node(&elf->symbols, cmp_symbol_name,
 			      (unsigned long)&tmp);
@@ -460,11 +460,11 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 	GElf_Shdr *shdr = &elf->shdrs[sec];
 
 	if (is_undef_symbol(&s->sym)) {
-		lwarning("Symbol %s is undef.\n", s->name);
+		ulp_warning("Symbol %s is undef.\n", s->name);
 		goto insert;
 	}
 
-	ldebug("Link: %s : %s\n", elf->filepath, s->name);
+	ulp_debug("Link: %s : %s\n", elf->filepath, s->name);
 
 	nphdrs = 0;
 	phdrs = malloc(sizeof(GElf_Phdr) * elf->phdrnum);

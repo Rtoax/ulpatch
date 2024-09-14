@@ -29,7 +29,7 @@ TEST(Elf_Ehdr, readelf, 0)
 	struct elf_file *elf;
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
-		lerror("open %s failed.\n", ulpatch_test_path);
+		ulp_error("open %s failed.\n", ulpatch_test_path);
 		return -ENOENT;
 	}
 

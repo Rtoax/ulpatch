@@ -40,13 +40,13 @@ TEST(Elf_Open, open_close, 0)
 
 		e = elf_file_open(test_elfs[i]);
 		if (!e) {
-			lerror("open %s failed.\n", test_elfs[i]);
+			ulp_error("open %s failed.\n", test_elfs[i]);
 			ret = -1;
 			break;
 		}
 		e = elf_file_find(test_elfs[i]);
 		if (!e) {
-			lerror("find %s failed.\n", test_elfs[i]);
+			ulp_error("find %s failed.\n", test_elfs[i]);
 			ret = -1;
 			break;
 		}

@@ -64,25 +64,25 @@ TEST(Rbtree, rbtree, 0)
 
 	for (i = 0; i < ARRAY_SIZE(tests); i++) {
 		if (!find_data(&rb_tree, tests[i].v)) {
-			lerror("Fail find.\n");
+			ulp_error("Fail find.\n");
 			sum = 1000;
 		}
 	}
 
 	for (node = rb_first(&rb_tree); node; node = rb_next(node)) {
 		t = rb_entry(node, struct test_data, node);
-		ldebug("value: %d\n", t->v);
+		ulp_debug("value: %d\n", t->v);
 		sum += t->v;
 	}
 
 	for (node = rb_last(&rb_tree); node; node = rb_prev(node)) {
 		t = rb_entry(node, struct test_data, node);
-		ldebug("value: %d\n", t->v);
+		ulp_debug("value: %d\n", t->v);
 		sum -= t->v;
 	}
 
 	rbtree_postorder_for_each_entry_safe(t, tmp, &rb_tree, node) {
-		ldebug("value: %d\n", t->v);
+		ulp_debug("value: %d\n", t->v);
 
 		sum += t->v;
 	}

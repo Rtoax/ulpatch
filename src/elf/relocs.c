@@ -248,7 +248,7 @@ void print_rela(GElf_Rela *rela)
 static int handle_relocs_rel(struct elf_file *elf, GElf_Shdr *shdr,
 			     Elf_Scn *scn)
 {
-	lwarning("SHT_REL not support yet.\n");
+	ulp_warning("SHT_REL not support yet.\n");
 	return -1;
 }
 
@@ -277,7 +277,7 @@ static int handle_relocs_rela(struct elf_file *elf, GElf_Shdr *shdr,
 			&destshdr_mem);
 
 	if (unlikely (symshdr == NULL || symdata == NULL || destshdr == NULL)) {
-		lerror("\nInvalid symbol table at offset %#0" PRIx64 "\n",
+		ulp_error("\nInvalid symbol table at offset %#0" PRIx64 "\n",
 			shdr->sh_offset);
 		return -1;
 	}

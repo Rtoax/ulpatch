@@ -88,7 +88,7 @@ static void __add_to_str_list(const char *name, struct list_head *list)
 {
 	struct str_node *str = malloc(sizeof(struct str_node));
 	if (!str) {
-		lerror("Malloc str_node failed.\n");
+		ulp_error("Malloc str_node failed.\n");
 		return;
 	}
 

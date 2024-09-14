@@ -40,7 +40,7 @@ int elf_core_init(void)
 		}
 	}
 	if (!default_libc_object) {
-		lerror("Could not found libc.so in possible_libc.\n");
+		ulp_error("Could not found libc.so in possible_libc.\n");
 		exit(1);
 		/* FIXME: Use getenv() */
 	}

@@ -34,11 +34,11 @@ TEST(Object, check_object, 0)
 
 		if (!fexist(obj)) {
 			ret = -EEXIST;
-			lerror("\n%s is not exist, maybe: make install\n", obj);
+			ulp_error("\n%s is not exist, maybe: make install\n", obj);
 		}
 		ret = alloc_patch_file(obj, tmpfile, &info);
 		if (ret) {
-			lerror("Parse %s failed.\n", obj);
+			ulp_error("Parse %s failed.\n", obj);
 			return ret;
 		}
 
@@ -48,7 +48,7 @@ TEST(Object, check_object, 0)
 		 * Check patch info, see ULPATCH_INFO() macro
 		 */
 		if (info.ulp_info->version != ULPATCH_FILE_VERSION) {
-			lerror("Wrong version %d, must be %d\n",
+			ulp_error("Wrong version %d, must be %d\n",
 				info.ulp_info->version, ULPATCH_FILE_VERSION);
 			ret++;
 		}
@@ -56,7 +56,7 @@ TEST(Object, check_object, 0)
 			info.ulp_info->pad[1] != 0x22 || \
 			info.ulp_info->pad[2] != 0x33 || \
 			info.ulp_info->pad[3] != 0x44) {
-			lerror("Get wrong pad 0-3.\n");
+			ulp_error("Get wrong pad 0-3.\n");
 			ret++;
 		}
 	}

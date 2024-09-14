@@ -48,7 +48,7 @@ void *text_gen_insn(union text_poke_insn *insn, uint8_t opcode,
 			 * actually fits the signed byte.
 			 */
 			if (unlikely((insn->disp >> 31) != (insn->disp >> 7))) {
-				lerror("ERROR: JMP8.\n");
+				ulp_error("ERROR: JMP8.\n");
 			}
 		}
 	}

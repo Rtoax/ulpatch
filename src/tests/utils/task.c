@@ -19,7 +19,7 @@ TEST(Task, get_proc_pid_exe, 0)
 	char buf[256] = {}, *exe;
 
 	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) != NULL) {
-		ldebug("exe: <%s>\n", exe);
+		ulp_debug("exe: <%s>\n", exe);
 		return 0;
 	}
 	return -1;
@@ -39,7 +39,7 @@ TEST(Task, open_free, 0)
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
 	/* Test current */
-	linfo("Comm %s\n", current->comm);
+	ulp_info("Comm %s\n", current->comm);
 
 	/* Make sure we could write 'current' task */
 	current->objdump = (void *)1;
@@ -203,7 +203,7 @@ TEST(Task, copy_from_task, 0)
 
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
-	ldebug("memcpy_from_task: %s\n", buf);
+	ulp_debug("memcpy_from_task: %s\n", buf);
 	n = memcpy_from_task(task, buf, (unsigned long)data, strlen(data) + 1);
 	/* memcpy failed */
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
@@ -224,7 +224,7 @@ TEST(Task, copy_to_task, 0)
 	struct task_struct *task = open_task(getpid(), FTO_RDWR);
 
 	n = memcpy_to_task(task, (unsigned long)buf, data, strlen(data) + 1);
-	ldebug("memcpy_to_task: %s\n", buf);
+	ulp_debug("memcpy_to_task: %s\n", buf);
 
 	// memcpy failed
 	if (n != strlen(data) + 1 || strcmp(data, buf)) {
@@ -269,12 +269,12 @@ TEST(Task, mmap_malloc, 0)
 
 	ret = task_attach(pid);
 	addr = task_malloc(task, 64);
-	ldebug("task %p, addr = %lx\n", task, addr);
+	ulp_debug("task %p, addr = %lx\n", task, addr);
 
 	dump_task_vmas(task, true);
 
 	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
-	ldebug("memcpy_from_task: %s\n", buf);
+	ulp_debug("memcpy_from_task: %s\n", buf);
 	n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
 	/* memcpy failed */
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
@@ -326,12 +326,12 @@ TEST(Task, fstat, 0)
 	ret = task_attach(pid);
 	remote_fd = task_open(task, filename, O_RDONLY, 0644);
 	if (remote_fd <= 0) {
-		lwarning("remote open failed.\n");
+		ulp_warning("remote open failed.\n");
 		return -1;
 	}
 	local_fd = open(filename, O_RDONLY, 0644);
 	if (local_fd <= 0) {
-		lwarning("open failed.\n");
+		ulp_warning("open failed.\n");
 		return -1;
 	}
 
@@ -339,12 +339,12 @@ TEST(Task, fstat, 0)
 	ret = task_fstat(task, remote_fd, &statbuf);
 
 	if (stat.st_size != statbuf.st_size) {
-		lerror("st_size not equal: remote(%ld) vs local(%ld)\n",
+		ulp_error("st_size not equal: remote(%ld) vs local(%ld)\n",
 			statbuf.st_size, stat.st_size);
 		ret = -1;
 	}
 
-	ldebug("stat.st_size = %ld\n", statbuf.st_size);
+	ulp_debug("stat.st_size = %ld\n", statbuf.st_size);
 
 	task_close(task, remote_fd);
 	task_detach(pid);
@@ -358,7 +358,7 @@ TEST(Task, fstat, 0)
 
 	task_wait_destroy(&waitqueue);
 
-	ldebug("ret = %d\n", ret);
+	ulp_debug("ret = %d\n", ret);
 
 	return ret;
 }
@@ -373,25 +373,25 @@ static int test_mmap_file(struct task_struct *task, int prot)
 
 	map_fd = task_open(task, filename, O_RDWR|O_CREAT|O_TRUNC, 0644);
 	if (map_fd <= 0) {
-		lwarning("remote open failed.\n");
+		ulp_warning("remote open failed.\n");
 		return -1;
 	}
-	ldebug("New open. %d\n", map_fd);
+	ulp_debug("New open. %d\n", map_fd);
 	ret = task_ftruncate(task, map_fd, map_len);
 	if (ret != 0) {
-		lwarning("remote ftruncate failed.\n");
+		ulp_warning("remote ftruncate failed.\n");
 		goto close_ret;
 	}
 	map_v = task_mmap(task,
 				0UL, map_len,
 				prot,
 				MAP_PRIVATE, map_fd, 0);
-	ldebug("New mmap. %lx\n", map_v);
+	ulp_debug("New mmap. %lx\n", map_v);
 
 	update_task_vmas_ulp(task);
 	dump_task_vmas(task, true);
 
-	ldebug("unmmap. %lx\n", map_v);
+	ulp_debug("unmmap. %lx\n", map_v);
 	task_munmap(task, map_v, map_len);
 
 	unlink(filename);
@@ -492,7 +492,7 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 
 	ret = task_attach(pid);
 	addr = task_malloc(task, 64);
-	ldebug("task %p, addr = %lx\n", task, addr);
+	ulp_debug("task %p, addr = %lx\n", task, addr);
 
 	dump_task_vmas(task, true);
 
@@ -506,7 +506,7 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 	//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
 	ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
 
-	ldebug("memcpy_from_task: %s\n", buf);
+	ulp_debug("memcpy_from_task: %s\n", buf);
 	n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
 	/* memcpy failed */
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
