@@ -334,6 +334,10 @@ static bool __should_skip_remote_fd(int remote_fd)
 		lwarning("Try to close remote 0,1,2 file descriptor.\n");
 		return true;
 	}
+	/**
+	 * TODO: ULPatch should never close target process fd, which was
+	 * created by target process own.
+	 */
 	return false;
 }
 
