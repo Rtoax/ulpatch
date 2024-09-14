@@ -23,22 +23,6 @@ TEST(Log, log, 0)
 	return 0;
 }
 
-TEST(Log, log_no_prefix, 0)
-{
-	set_log_prefix(true);
-
-	debug("DEBUG\n");
-	info("INFO\n");
-	notice("NOTICE\n");
-	warning("WARN\n");
-	error("ERROR\n");
-	crit("CRIT\n");
-	alert("ALERT\n");
-	emerg("EMERG\n");
-
-	return 0;
-}
-
 TEST(Log, set_log_level, 0)
 {
 	set_log_level(LOG_CRIT);

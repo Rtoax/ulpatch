@@ -99,8 +99,8 @@ const char *log_level_list(void)
 }
 
 int __attribute__((format(printf, 6, 7)))
-_____log(int level, bool has_prefix, const char *file, const char *func,
-	 unsigned long int line, char *fmt, ...)
+ulp_log(int level, bool has_prefix, const char *file, const char *func,
+	unsigned long int line, char *fmt, ...)
 {
 	int n = 0;
 	FILE *fp = get_log_fp();
