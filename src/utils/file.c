@@ -37,6 +37,8 @@ int fsize(const char *filepath)
 		lerror("fstat %s failed %s.\n", filepath, strerror(errno));
 		return -1;
 	}
+	close(fd);
+
 	return statbuf.st_size;
 }
 
