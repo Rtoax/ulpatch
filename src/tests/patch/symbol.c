@@ -227,8 +227,8 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 		unsigned long addr, plt_addr;
 		struct symbol *sym, *alias_sym = NULL;
 
-		plt_addr = objdump_elf_plt_symbol_address(task->objdump,
-			test_symbols[i].sym);
+		plt_addr = bfd_elf_plt_symbol_addr(task->exe_bfd,
+				     test_symbols[i].sym);
 
 		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
 		if (!sym) {

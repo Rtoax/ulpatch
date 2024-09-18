@@ -217,21 +217,21 @@ void print_rela(GElf_Rela *rela);
 int auxv_type_info(GElf_Xword a_type, const char **name, const char **format);
 
 /* Swap 'objdump' command to C code. */
-struct objdump_elf_file;
-struct objdump_symbol;
+struct bfd_elf_file;
+struct bfd_sym;
 
-struct objdump_elf_file* objdump_elf_load(const char *elf_file);
-int objdump_elf_close(struct objdump_elf_file *file);
+struct bfd_elf_file* bfd_elf_load(const char *elf_file);
+int bfd_elf_close(struct bfd_elf_file *file);
 
 unsigned long
-objdump_elf_plt_symbol_address(struct objdump_elf_file *file, const char *sym);
+bfd_elf_plt_symbol_addr(struct bfd_elf_file *file, const char *sym);
 
 
-struct objdump_symbol*
-objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
-		struct objdump_symbol *prev);
-unsigned long objdump_symbol_address(struct objdump_symbol *symbol);
-const char* objdump_symbol_name(struct objdump_symbol *symbol);
+struct bfd_sym*
+bfd_elf_plt_next_symbol(struct bfd_elf_file *file,
+		struct bfd_sym *prev);
+unsigned long bfd_sym_addr(struct bfd_sym *symbol);
+const char* bfd_sym_name(struct bfd_sym *symbol);
 
-int objdump_destroy(void);
+int bfd_elf_destroy(void);
 

@@ -42,7 +42,7 @@ TEST(Task, open_free, 0)
 	ulp_info("Comm %s\n", current->comm);
 
 	/* Make sure we could write 'current' task */
-	current->objdump = (void *)1;
+	current->exe_bfd = (void *)1;
 
 	return close_task(task);
 }

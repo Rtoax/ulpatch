@@ -29,13 +29,13 @@ static const char *test_files[] = {
 TEST(Objdump, load_nonexist, 0)
 {
 	int ret = -1;
-	struct objdump_elf_file *file;
+	struct bfd_elf_file *file;
 
-	file = objdump_elf_load("/a/b/c/d/e/f/g/h/i/j/k/l/m");
+	file = bfd_elf_load("/a/b/c/d/e/f/g/h/i/j/k/l/m");
 	if (!file) {
 		ret = 0;
 	} else {
-		objdump_elf_close(file);
+		bfd_elf_close(file);
 	}
 
 	return ret;
@@ -44,7 +44,7 @@ TEST(Objdump, load_nonexist, 0)
 TEST(Objdump, load, 0)
 {
 	int ret = 0, i;
-	struct objdump_elf_file *file;
+	struct bfd_elf_file *file;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -53,11 +53,11 @@ TEST(Objdump, load, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = objdump_elf_load(test_files[i]);
+		file = bfd_elf_load(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
-			objdump_elf_close(file);
+			bfd_elf_close(file);
 		}
 	}
 
@@ -67,7 +67,7 @@ TEST(Objdump, load, 0)
 TEST(Objdump, for_each_plt_symbol_and_search, 0)
 {
 	int ret = 0, i;
-	struct objdump_elf_file *file;
+	struct bfd_elf_file *file;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -76,39 +76,39 @@ TEST(Objdump, for_each_plt_symbol_and_search, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = objdump_elf_load(test_files[i]);
+		file = bfd_elf_load(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
 
-			struct objdump_symbol *symbol;
+			struct bfd_sym *symbol;
 
-			for (symbol = objdump_elf_plt_next_symbol(file, NULL);
+			for (symbol = bfd_elf_plt_next_symbol(file, NULL);
 				symbol;
-				symbol = objdump_elf_plt_next_symbol(file, symbol)) {
+				symbol = bfd_elf_plt_next_symbol(file, symbol)) {
 
 				/* search the address again, double check */
-				unsigned long addr = objdump_elf_plt_symbol_address(file,
-								objdump_symbol_name(symbol));
-				unsigned long addr2 = objdump_symbol_address(symbol);
+				unsigned long addr = bfd_elf_plt_symbol_addr(file,
+								bfd_sym_name(symbol));
+				unsigned long addr2 = bfd_sym_addr(symbol);
 
 				ulp_debug("%08lx %s (%08lx)\n",
 					addr2,
-					objdump_symbol_name(symbol),
+					bfd_sym_name(symbol),
 					addr);
 
 				if (addr != addr2)
 					ret = -1;
 			}
 
-			objdump_elf_close(file);
+			bfd_elf_close(file);
 		}
 	}
 
 	return ret;
 }
 
-static int __unused objdump_for_each_plt_sym(struct objdump_elf_file *efile,
+static int bfd_for_each_plt_sym(struct bfd_elf_file *efile,
 				const char *file)
 {
 	FILE *fp;
@@ -172,7 +172,7 @@ static int __unused objdump_for_each_plt_sym(struct objdump_elf_file *efile,
 
 		ulp_info("%s: %#08lx %s\n", basename(file), addr, s);
 
-		unsigned long addr2 = objdump_elf_plt_symbol_address(efile, s);
+		unsigned long addr2 = bfd_elf_plt_symbol_addr(efile, s);
 
 		if (addr2 == 0) {
 			ulp_warning("Not found symbol %s\n", s);
@@ -196,7 +196,7 @@ close_return:
 TEST(Objdump, check_each_plt_sym_addr, 0)
 {
 	int ret = 0, i;
-	struct objdump_elf_file *file;
+	struct bfd_elf_file *file;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -205,13 +205,12 @@ TEST(Objdump, check_each_plt_sym_addr, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = objdump_elf_load(test_files[i]);
+		file = bfd_elf_load(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
-			ret = objdump_for_each_plt_sym(file, test_files[i]);
-
-			objdump_elf_close(file);
+			ret = bfd_for_each_plt_sym(file, test_files[i]);
+			bfd_elf_close(file);
 		}
 	}
 

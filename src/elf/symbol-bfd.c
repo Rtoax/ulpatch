@@ -20,7 +20,7 @@ enum obj_sym_type {
 	S_T_NUM,
 };
 
-struct objdump_elf_file {
+struct bfd_elf_file {
 	char name[PATH_MAX];
 
 	bfd *bfd;
@@ -43,12 +43,12 @@ struct objdump_elf_file {
 	struct rb_root rb_tree_syms[S_T_NUM];
 };
 
-struct objdump_symbol {
+struct bfd_sym {
 	char *name;
 	unsigned long addr;
 	enum obj_sym_type type;
 
-	/* root is objdump_elf_file.rb_tree_syms[type] */
+	/* root is bfd_elf_file.rb_tree_syms[type] */
 	struct rb_node node;
 };
 
@@ -56,9 +56,9 @@ struct objdump_symbol {
 static LIST_HEAD(file_list);
 
 
-static struct objdump_elf_file* file_already_load(const char *filename)
+static struct bfd_elf_file* file_already_load(const char *filename)
 {
-	struct objdump_elf_file *f, *tmp, *ret = NULL;
+	struct bfd_elf_file *f, *tmp, *ret = NULL;
 
 	list_for_each_entry_safe(f, tmp, &file_list, node) {
 		if (!strcmp(filename, f->name)) {
@@ -69,19 +69,19 @@ static struct objdump_elf_file* file_already_load(const char *filename)
 	return ret;
 }
 
-/* the @key is (unsigned long)objdump_elf_file */
+/* the @key is (unsigned long)bfd_sym */
 static inline int cmp_sym(struct rb_node *n1, unsigned long key)
 {
-	struct objdump_symbol *s1 = rb_entry(n1, struct objdump_symbol, node);
-	struct objdump_symbol *s2 = (struct objdump_symbol*)key;
+	struct bfd_sym *s1 = rb_entry(n1, struct bfd_sym, node);
+	struct bfd_sym *s2 = (struct bfd_sym*)key;
 
 	return strcmp(s1->name, s2->name);
 }
 
-static struct objdump_symbol *alloc_sym(const char *name, unsigned long addr,
+static struct bfd_sym *alloc_sym(const char *name, unsigned long addr,
 					enum obj_sym_type type)
 {
-	struct objdump_symbol *s = malloc(sizeof(struct objdump_symbol));
+	struct bfd_sym *s = malloc(sizeof(struct bfd_sym));
 
 	memset(s, 0, sizeof(*s));
 
@@ -92,62 +92,62 @@ static struct objdump_symbol *alloc_sym(const char *name, unsigned long addr,
 	return s;
 }
 
-static void free_sym(struct objdump_symbol *s)
+static void free_sym(struct bfd_sym *s)
 {
 	free(s->name);
 	free(s);
 }
 
-static struct objdump_symbol *find_sym(struct rb_root *root, const char *name)
+static struct bfd_sym *find_sym(struct rb_root *root, const char *name)
 {
-	struct objdump_symbol tmp = {
+	struct bfd_sym tmp = {
 		.name = (char *)name,
 	};
 	struct rb_node *node = rb_search_node(root, cmp_sym,
 					(unsigned long)&tmp);
 
-	return node ? rb_entry(node, struct objdump_symbol, node) : NULL;
+	return node ? rb_entry(node, struct bfd_sym, node) : NULL;
 }
 
 /* Insert OK, return 0, else return -1 */
-static int link_sym(struct rb_root *root, struct objdump_symbol *s)
+static int link_sym(struct rb_root *root, struct bfd_sym *s)
 {
 	struct rb_node *node = rb_insert_node(root, &s->node,
 						cmp_sym, (unsigned long)s);
 	return node ? -1 : 0;
 }
 
-static struct objdump_symbol *next_sym(struct rb_root *root,
-				       struct objdump_symbol *prev)
+static struct bfd_sym *next_sym(struct rb_root *root,
+				       struct bfd_sym *prev)
 {
 	struct rb_node *next;
 	next = prev ? rb_next(&prev->node) : rb_first(root);
-	return next ? rb_entry(next, struct objdump_symbol, node) : NULL;
+	return next ? rb_entry(next, struct bfd_sym, node) : NULL;
 }
 
-struct objdump_symbol *objdump_elf_plt_next_symbol(struct objdump_elf_file *file,
-						   struct objdump_symbol *prev)
+struct bfd_sym *bfd_elf_plt_next_symbol(struct bfd_elf_file *file,
+						   struct bfd_sym *prev)
 {
 	return next_sym(&file->rb_tree_syms[S_T_PLT], prev);
 }
 
-unsigned long objdump_symbol_address(struct objdump_symbol *symbol)
+unsigned long bfd_sym_addr(struct bfd_sym *symbol)
 {
 	return symbol ? symbol->addr : 0;
 }
 
-const char* objdump_symbol_name(struct objdump_symbol *symbol)
+const char* bfd_sym_name(struct bfd_sym *symbol)
 {
 	return symbol ? symbol->name : NULL;
 }
 
-unsigned long objdump_elf_plt_symbol_address(struct objdump_elf_file *file,
+unsigned long bfd_elf_plt_symbol_addr(struct bfd_elf_file *file,
 					     const char *name)
 {
 	if (!file)
 		return 0;
 
-	struct objdump_symbol *symbol;
+	struct bfd_sym *symbol;
 	struct rb_root *rbroot = &file->rb_tree_syms[S_T_PLT];
 
 	symbol = find_sym(rbroot, name);
@@ -155,7 +155,7 @@ unsigned long objdump_elf_plt_symbol_address(struct objdump_elf_file *file,
 	return symbol ? symbol->addr : 0;
 }
 
-static asymbol **slurp_symtab(struct objdump_elf_file *file)
+static asymbol **slurp_symtab(struct bfd_elf_file *file)
 {
 	bfd *abfd = file->bfd;
 
@@ -180,7 +180,7 @@ static asymbol **slurp_symtab(struct objdump_elf_file *file)
 	return sy;
 }
 
-static asymbol **slurp_dynamic_symtab(struct objdump_elf_file *file)
+static asymbol **slurp_dynamic_symtab(struct bfd_elf_file *file)
 {
 	bfd *abfd = file->bfd;
 
@@ -263,7 +263,7 @@ static long remove_useless_symbols(asymbol **symbols, long count)
 	return out_ptr - symbols;
 }
 
-static void disassemble_data(struct objdump_elf_file *file)
+static void disassemble_data(struct bfd_elf_file *file)
 {
 	int i;
 
@@ -293,7 +293,7 @@ static void disassemble_data(struct objdump_elf_file *file)
 			name, asymbol_is_plt(s) ? "PLT" : "");
 
 		if (asymbol_is_plt(s)) {
-			struct objdump_symbol *symbol;
+			struct bfd_sym *symbol;
 			symbol = alloc_sym(name, bfd_asymbol_value(s), S_T_PLT);
 			link_sym(&file->rb_tree_syms[S_T_PLT], symbol);
 		}
@@ -302,7 +302,7 @@ static void disassemble_data(struct objdump_elf_file *file)
 	free(file->sorted_syms);
 }
 
-static void dump_bfd(struct objdump_elf_file *file)
+static void dump_bfd(struct bfd_elf_file *file)
 {
 	file->syms = slurp_symtab(file);
 	file->dynsyms = slurp_dynamic_symtab(file);
@@ -333,7 +333,7 @@ static void dump_bfd(struct objdump_elf_file *file)
 	file->synthcount = 0;
 }
 
-static int objdump_elf_load_plt(struct objdump_elf_file *file)
+static int bfd_elf_load_plt(struct bfd_elf_file *file)
 {
 	char **matching;
 	char *target = NULL;
@@ -357,29 +357,29 @@ close:
 }
 
 
-static struct objdump_elf_file* file_load(const char *filename)
+static struct bfd_elf_file* file_load(const char *filename)
 {
 	int i;
-	struct objdump_elf_file *file;
+	struct bfd_elf_file *file;
 
-	file = malloc(sizeof(struct objdump_elf_file));
-	memset(file, 0, sizeof(struct objdump_elf_file));
+	file = malloc(sizeof(struct bfd_elf_file));
+	memset(file, 0, sizeof(struct bfd_elf_file));
 
 	strncpy(file->name, filename, PATH_MAX - 1);
 
 	for (i = 0; i < S_T_PLT; i++)
 		rb_init(&file->rb_tree_syms[i]);
 
-	objdump_elf_load_plt(file);
+	bfd_elf_load_plt(file);
 
 	list_add(&file->node, &file_list);
 
 	return file;
 }
 
-struct objdump_elf_file* objdump_elf_load(const char *elf_file)
+struct bfd_elf_file* bfd_elf_load(const char *elf_file)
 {
-	struct objdump_elf_file *file = NULL;
+	struct bfd_elf_file *file = NULL;
 
 	if (!fexist(elf_file)) {
 		errno = -EEXIST;
@@ -393,7 +393,7 @@ struct objdump_elf_file* objdump_elf_load(const char *elf_file)
 	return file;
 }
 
-int objdump_elf_close(struct objdump_elf_file *file)
+int bfd_elf_close(struct bfd_elf_file *file)
 {
 	if (!file)
 		return -1;
@@ -406,13 +406,13 @@ int objdump_elf_close(struct objdump_elf_file *file)
 
 static void __rb_free_sym(struct rb_node *node)
 {
-	struct objdump_symbol *s = rb_entry(node, struct objdump_symbol, node);
+	struct bfd_sym *s = rb_entry(node, struct bfd_sym, node);
 	free_sym(s);
 }
 
-int objdump_destroy(void)
+int bfd_elf_destroy(void)
 {
-	struct objdump_elf_file *f, *tmp;
+	struct bfd_elf_file *f, *tmp;
 
 	list_for_each_entry_safe(f, tmp, &file_list, node) {
 		int i;

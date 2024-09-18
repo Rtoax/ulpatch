@@ -1661,7 +1661,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	}
 
 	if (flag & FTO_SELF_PLT) {
-		task->objdump = objdump_elf_load(task->exe);
+		task->exe_bfd = bfd_elf_load(task->exe);
 	}
 
 	/* Create a directory under ULP_PROC_ROOT_DIR */
