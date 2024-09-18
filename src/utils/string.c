@@ -155,8 +155,10 @@ unsigned long str2size(const char *str)
 {
 	unsigned long size = 0;
 
-	if (!str)
+	if (!str) {
+		errno = EINVAL;
 		return 0;
+	}
 
 	if (str[0] == '0' && str[1] == 'x')
 		size = strtoull(str, NULL, 16);
@@ -177,8 +179,10 @@ unsigned long str2addr(const char *str)
 {
 	unsigned long addr = 0;
 
-	if (!str)
+	if (!str) {
+		errno = EINVAL;
 		return 0;
+	}
 
 	if (str[0] == '0' && str[1] == 'x')
 		addr = strtoull(str, NULL, 16);
