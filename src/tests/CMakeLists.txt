@@ -15,10 +15,10 @@ add_executable(ulpatch_test
 	arch/mcount.c
 	elf/core.c
 	elf/ehdr.c
-	elf/objdump.c
 	elf/open.c
 	elf/relocs.c
 	elf/symbol.c
+	elf/symbol-bfd.c
 	patch/asm.c
 	patch/meta.c
 	patch/object.c

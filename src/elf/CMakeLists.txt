@@ -11,12 +11,12 @@ add_library(ulpatch_elf STATIC
 	core.c
 	ehdr.c
 	note.c
-	objdump.c
 	open.c
 	phdr.c
 	relocs.c
 	section.c
 	symbol.c
+	symbol-bfd.c
 )
 
 target_compile_definitions(ulpatch_elf PRIVATE ${UTILS_CFLAGS_MACROS})
