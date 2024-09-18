@@ -6,14 +6,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <bfd.h>
 
 #include <elf/elf-api.h>
-
-#ifdef HAVE_BINUTILS_BFD_H
-#include <bfd.h>
-#else
-#error "Must install binutils-devel"
-#endif
 
 #include <utils/log.h>
 #include <utils/util.h>
