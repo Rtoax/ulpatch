@@ -15,9 +15,9 @@
 #include <utils/list.h>
 
 
-enum obj_sym_type {
-	S_T_PLT, /* @plt */
-	S_T_NUM,
+enum bfd_sym_type {
+	BFD_ELF_SYM_PLT, /* @plt */
+	BFD_ELF_SYM_TYPE_NUM,
 };
 
 struct bfd_elf_file {
@@ -40,13 +40,13 @@ struct bfd_elf_file {
 	/* head is file_list */
 	struct list_head node;
 
-	struct rb_root rb_tree_syms[S_T_NUM];
+	struct rb_root rb_tree_syms[BFD_ELF_SYM_TYPE_NUM];
 };
 
 struct bfd_sym {
 	char *name;
 	unsigned long addr;
-	enum obj_sym_type type;
+	enum bfd_sym_type type;
 
 	/* root is bfd_elf_file.rb_tree_syms[type] */
 	struct rb_node node;
@@ -79,7 +79,7 @@ static inline int cmp_sym(struct rb_node *n1, unsigned long key)
 }
 
 static struct bfd_sym *alloc_bfd_sym(const char *name, unsigned long addr,
-				     enum obj_sym_type type)
+				     enum bfd_sym_type type)
 {
 	struct bfd_sym *s = malloc(sizeof(struct bfd_sym));
 
@@ -127,7 +127,7 @@ static struct bfd_sym *next_bfd_sym(struct rb_root *root, struct bfd_sym *prev)
 struct bfd_sym *bfd_next_plt_sym(struct bfd_elf_file *file,
 				 struct bfd_sym *prev)
 {
-	return next_bfd_sym(&file->rb_tree_syms[S_T_PLT], prev);
+	return next_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], prev);
 }
 
 unsigned long bfd_sym_addr(struct bfd_sym *symbol)
@@ -147,7 +147,7 @@ unsigned long bfd_elf_plt_symbol_addr(struct bfd_elf_file *file,
 		return 0;
 
 	struct bfd_sym *symbol;
-	struct rb_root *rbroot = &file->rb_tree_syms[S_T_PLT];
+	struct rb_root *rbroot = &file->rb_tree_syms[BFD_ELF_SYM_PLT];
 
 	symbol = find_bfd_sym(rbroot, name);
 
@@ -278,7 +278,7 @@ static struct bfd_elf_file *file_load(const char *filename)
 
 	strncpy(file->name, filename, PATH_MAX - 1);
 
-	for (i = 0; i < S_T_NUM; i++)
+	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
 		rb_init(&file->rb_tree_syms[i]);
 
 	file->bfd = bfd_openr(file->name, target);
@@ -334,8 +334,8 @@ static struct bfd_elf_file *file_load(const char *filename)
 
 		if (asymbol_is_plt(s)) {
 			struct bfd_sym *symbol;
-			symbol = alloc_bfd_sym(name, bfd_asymbol_value(s), S_T_PLT);
-			link_bfd_sym(&file->rb_tree_syms[S_T_PLT], symbol);
+			symbol = alloc_bfd_sym(name, bfd_asymbol_value(s), BFD_ELF_SYM_PLT);
+			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], symbol);
 		}
 	}
 
@@ -400,7 +400,7 @@ int bfd_elf_close(struct bfd_elf_file *file)
 	list_del(&file->node);
 
 	/* Destroy all type symbols rb tree */
-	for (i = 0; i < S_T_NUM; i++)
+	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
 		rb_destroy(&file->rb_tree_syms[i], __rb_free_sym);
 
 	bfd_close(file->bfd);
