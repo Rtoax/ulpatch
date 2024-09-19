@@ -345,10 +345,12 @@ static int bfd_elf_load_plt(struct bfd_elf_file *file)
 		goto close;
 	}
 
-	if (bfd_check_format_matches(file->bfd, bfd_object, &matching)) {
-		ulp_debug("%s is bfd_object.\n", file->name);
-		dump_bfd(file);
+	if (!bfd_check_format_matches(file->bfd, bfd_object, &matching)) {
+		ulp_error("%s is not bfd_object.\n", file->name);
+		goto close;
 	}
+
+	dump_bfd(file);
 
 close:
 	bfd_close(file->bfd);
@@ -356,8 +358,7 @@ close:
 	return 0;
 }
 
-
-static struct bfd_elf_file* file_load(const char *filename)
+static struct bfd_elf_file *file_load(const char *filename)
 {
 	int i;
 	struct bfd_elf_file *file;
@@ -377,7 +378,7 @@ static struct bfd_elf_file* file_load(const char *filename)
 	return file;
 }
 
-struct bfd_elf_file* bfd_elf_load(const char *elf_file)
+struct bfd_elf_file *bfd_elf_load(const char *elf_file)
 {
 	struct bfd_elf_file *file = NULL;
 
