@@ -221,6 +221,8 @@ struct bfd_elf_file;
 struct bfd_sym;
 
 struct bfd_elf_file* bfd_elf_open(const char *elf_file);
+int bfd_elf_file_refcount(struct bfd_elf_file *file);
+const char *bfd_elf_file_name(struct bfd_elf_file *file);
 int bfd_elf_close(struct bfd_elf_file *file);
 
 unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file, const char *sym);

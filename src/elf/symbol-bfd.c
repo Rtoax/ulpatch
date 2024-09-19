@@ -27,6 +27,12 @@ struct bfd_elf_file {
 
 	bfd *bfd;
 
+	/**
+	 * One ELF file could be opened more than one time, if that, refcount
+	 * prevent resources from being released while someone is using them.
+	 */
+	size_t refcount;
+
 	asymbol **syms;
 	long symcount;
 
@@ -234,6 +240,7 @@ static struct bfd_elf_file *file_already_load(const char *filename)
 
 	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node) {
 		if (!strcmp(filename, f->name)) {
+			f->refcount++;
 			ret = f;
 			break;
 		}
@@ -360,6 +367,7 @@ static struct bfd_elf_file *file_load(const char *filename)
 	file = malloc(sizeof(struct bfd_elf_file));
 	memset(file, 0, sizeof(struct bfd_elf_file));
 
+	file->refcount = 1;
 	strncpy(file->name, filename, PATH_MAX - 1);
 
 	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
@@ -467,12 +475,28 @@ static void __rb_free_bfd_sym(struct rb_node *node)
 	free_bfd_sym(s);
 }
 
+int bfd_elf_file_refcount(struct bfd_elf_file *file)
+{
+	return file ? file->refcount : -1;
+}
+
+const char *bfd_elf_file_name(struct bfd_elf_file *file)
+{
+	return file ? file->name : NULL;
+}
+
 int bfd_elf_close(struct bfd_elf_file *file)
 {
 	int i;
 
 	if (!file)
 		return -1;
+
+	file->refcount--;
+	if (file->refcount >= 1) {
+		ulp_debug("Could not close used bfd_elf_file.\n");
+		return 0;
+	}
 
 	if (file->syms) {
 		free(file->syms);

@@ -23,15 +23,15 @@ static const char *test_files[] = {
 };
 
 #define MODIFY_TEST_FILES(i) \
-	if (!strcmp(test_files[i], S_ULPATCH_TEST_PATH) == 0) { \
+	if (!strcmp(test_files[i], S_ULPATCH_TEST_PATH)) { \
 		test_files[i] = ulpatch_test_path; \
 	} \
-	if (!strcmp(test_files[i], S_LIBC_PATH) == 0) { \
+	if (!strcmp(test_files[i], S_LIBC_PATH)) { \
 		test_files[i] = libc_object(); \
 	}
 
 
-TEST(Bfd_sym, load_nonexist, 0)
+TEST(Bfd_sym, nonexist, 0)
 {
 	int ret = -1;
 	struct bfd_elf_file *file;
@@ -49,7 +49,8 @@ TEST(Bfd_sym, load_nonexist, 0)
 TEST(Bfd_sym, load, 0)
 {
 	int ret = 0, i;
-	struct bfd_elf_file *file;
+	struct bfd_elf_file *file, *open_again;
+	size_t refcount;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -59,9 +60,16 @@ TEST(Bfd_sym, load, 0)
 			continue;
 
 		file = bfd_elf_open(test_files[i]);
-		if (!file) {
+		open_again = bfd_elf_open(test_files[i]);
+		if (!file || !open_again || file != open_again) {
 			ret = -1;
 		} else {
+			refcount = bfd_elf_file_refcount(file);
+			if (refcount != 2) {
+				ulp_error("refcount = %ld, %s\n", refcount,
+					  bfd_elf_file_name(file));
+				ret = -1;
+			}
 			bfd_elf_close(file);
 		}
 	}
