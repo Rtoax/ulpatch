@@ -88,24 +88,21 @@ struct vm_area_struct {
 	/**
 	 * vaddr = load_bias + p_vaddr
 	 * addr = ELF_PAGESTART(addr)
-	 */
-	unsigned long vm_start;
-	unsigned long vm_end;
-	/**
 	 * off = p_offset - ELF_PAGEOFFSET(p_vaddr)
 	 * vm_pgoff = off >> PAGE_SHIFT
 	 */
-	unsigned long vm_pgoff;
+	unsigned long vm_start, vm_end, vm_pgoff;
 	unsigned int major, minor;
 	unsigned long inode;
-	char perms[5];
 	char name_[PATH_MAX];
+	char perms[5];
 #define PROT_FMT "%c%c%c"
 #define PROT_ARGS(p) \
 	(p & PROT_READ) ? 'r' : '-', \
 	(p & PROT_WRITE) ? 'w' : '-', \
 	(p & PROT_EXEC) ? 'e' : '-'
-	unsigned int prot; /* parse from char perms[5] */
+	/* parse from char perms field */
+	unsigned int prot;
 
 	enum vma_type type;
 
