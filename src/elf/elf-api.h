@@ -224,7 +224,7 @@ struct bfd_elf_file* bfd_elf_open(const char *elf_file);
 int bfd_elf_close(struct bfd_elf_file *file);
 
 unsigned long
-bfd_elf_plt_symbol_addr(struct bfd_elf_file *file, const char *sym);
+bfd_elf_plt_sym_addr(struct bfd_elf_file *file, const char *sym);
 
 
 struct bfd_sym*

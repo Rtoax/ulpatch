@@ -16,7 +16,7 @@
 
 
 enum bfd_sym_type {
-	BFD_ELF_SYM_PLT, /* @plt */
+	BFD_ELF_SYM_PLT, /* .plt */
 	BFD_ELF_SYM_TYPE_NUM,
 };
 
@@ -128,15 +128,15 @@ static struct bfd_sym *next_bfd_sym(struct rb_root *root, struct bfd_sym *prev)
 	return next ? rb_entry(next, struct bfd_sym, node) : NULL;
 }
 
+unsigned long bfd_sym_addr(struct bfd_sym *symbol)
+{
+	return symbol ? symbol->addr : 0;
+}
+
 struct bfd_sym *bfd_next_plt_sym(struct bfd_elf_file *file,
 				 struct bfd_sym *prev)
 {
 	return next_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], prev);
-}
-
-unsigned long bfd_sym_addr(struct bfd_sym *symbol)
-{
-	return symbol ? symbol->addr : 0;
 }
 
 const char *bfd_sym_name(struct bfd_sym *symbol)
@@ -144,7 +144,7 @@ const char *bfd_sym_name(struct bfd_sym *symbol)
 	return symbol ? symbol->name : NULL;
 }
 
-unsigned long bfd_elf_plt_symbol_addr(struct bfd_elf_file *file,
+unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file,
 				      const char *name)
 {
 	if (!file)

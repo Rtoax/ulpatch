@@ -88,7 +88,7 @@ TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
 				symbol = bfd_next_plt_sym(file, symbol)) {
 
 				/* search the address again, double check */
-				unsigned long addr = bfd_elf_plt_symbol_addr(file,
+				unsigned long addr = bfd_elf_plt_sym_addr(file,
 								bfd_sym_name(symbol));
 				unsigned long addr2 = bfd_sym_addr(symbol);
 
@@ -172,7 +172,7 @@ static int bfd_for_each_plt_sym(struct bfd_elf_file *efile,
 
 		ulp_info("%s: %#08lx %s\n", basename(file), addr, s);
 
-		unsigned long addr2 = bfd_elf_plt_symbol_addr(efile, s);
+		unsigned long addr2 = bfd_elf_plt_sym_addr(efile, s);
 
 		if (addr2 == 0) {
 			ulp_warning("Not found symbol %s\n", s);
