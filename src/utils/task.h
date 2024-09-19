@@ -103,10 +103,18 @@ struct vm_area_struct {
 	struct vma_elf_mem *vma_elf;
 
 	/**
-	 * if we found the vma is ELF format, open it when open task with PID,
+	 * If we found the vma is ELF format, open it when open task with PID,
 	 * and load all symbol, otherwise, it's NULL.
+	 *
+	 * FIXME: Use bfd instead, remove this field then.
 	 */
 	struct elf_file *elf_file;
+
+	/**
+	 * If VMA is ELF file, such as the leader of VMA_SELF, VMA_LIBC and
+	 * VMA_VDSO, open it as bfd.
+	 */
+	struct bfd_elf_file *bfd_elf_file;
 
 	/* Only VMA_ULPATCH has it */
 	struct vma_ulp *ulp;
@@ -292,7 +300,11 @@ struct task_struct {
 	 */
 	struct rb_root tsyms;
 
+	/**
+	 * Point to vma::bfd_elf_file field, no need to free or close.
+	 */
 	struct bfd_elf_file *exe_bfd;
+	struct bfd_elf_file *libc_bfd;
 
 	/* struct vma_ulp.node */
 	struct list_head ulp_list;

@@ -599,12 +599,19 @@ load_vma_elf_file:
 			ulp_error("Open ELF %s failed.\n", vma->name_);
 			return -EINVAL;
 		}
+		vma->bfd_elf_file = bfd_elf_open(vma->name_);
+		if (!vma->bfd_elf_file) {
+			ulp_error("Open ELF bfd %s failed.\n", vma->name_);
+			return -EINVAL;
+		}
 		switch (vma->type) {
 		case VMA_SELF:
 			task->exe_elf = vma->elf_file;
+			task->exe_bfd = vma->bfd_elf_file;
 			break;
 		case VMA_LIBC:
 			task->libc_elf = vma->elf_file;
+			task->libc_bfd = vma->bfd_elf_file;
 			break;
 		default:
 			break;
