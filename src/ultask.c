@@ -405,34 +405,20 @@ static int munmap_an_vma(void)
 static void list_all_symbol(void)
 {
 	int max_name_len = 0;
-	struct symbol *sym, *tmp;
+	struct task_sym *tsym;
+	struct task_struct *task = target_task;
 
-	/* Get vma name strlen for pretty print */
-	rbtree_postorder_for_each_entry_safe(sym, tmp,
-					     &target_task->vma_symbols, node) {
-
-		int len = strlen(basename(sym->vma->name_));
+	for (tsym = next_task_sym(task, NULL); tsym;
+	     tsym = next_task_sym(task, tsym))
+	{
+		int len = strlen(tsym->name);
 		if (max_name_len < len)
 			max_name_len = len;
 	}
-
-	printf("%-*s %-16s %-16s %-8s %-8s %-18s %-4s %-32s\n",
-		max_name_len, "VMA",
-		"ADDR", "ST_VALUE", "ST_SIZE", "BIND", "TYPE(rb)", "IDX", "SYMBOL");
-
-	rbtree_postorder_for_each_entry_safe(sym, tmp,
-					     &target_task->vma_symbols, node) {
-
-		printf("%-*s %#016lx %#016lx %-8ld %-8s %-8s(%-8s) %-4d %s\n",
-			max_name_len, basename(sym->vma->name_),
-			task_vma_symbol_vaddr(sym),
-			sym->sym.st_value,
-			sym->sym.st_size,
-			st_bind_string(&sym->sym),
-			st_type_string(&sym->sym),
-			i_st_type_string(sym->type),
-			sym->sym.st_shndx,
-			sym->name);
+	for (tsym = next_task_sym(task, NULL); tsym;
+	     tsym = next_task_sym(task, tsym))
+	{
+		printf("%-*s %#016lx\n", max_name_len, tsym->name, tsym->addr);
 	}
 }
 

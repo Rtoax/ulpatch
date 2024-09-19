@@ -408,7 +408,7 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 	struct task_sym *tsym;
 
 	if (!vma->is_elf || !vma->bfd_elf_file) {
-		ulp_error("vma %s is not elf or not opened.\n", vma->name_);
+		ulp_debug("vma %s is not elf or not opened.\n", vma->name_);
 		return -EINVAL;
 	}
 
