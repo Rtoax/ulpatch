@@ -24,37 +24,19 @@
 enum vma_type {
 	VMA_NONE,   /* None */
 	VMA_SELF,   /* /usr/bin/ls, ... */
-	VMA_LIBC,   /* /usr/lib64/libc.so.x */
-	VMA_LIBELF, /* /usr/lib64/libelf... */
+	VMA_LIBC,   /* libc.so.x */
 	VMA_HEAP,   /* [heap] */
-	VMA_LD,     /* /usr/lib64/ld-linux-xxxxx */
+	VMA_LD,     /* ld-linux-xxxxx */
 	VMA_STACK,  /* [stack] */
 	VMA_VVAR,   /* [vvar] */
 	VMA_VDSO,   /* [vdso] */
 	VMA_VSYSCALL, /* [vsyscall] */
-	VMA_LIB_DONT_KNOWN, /* Unknown Library */
+	VMA_LIB_UNKNOWN, /* Unknown Library */
 	VMA_ANON,   /* No name */
 	VMA_ULPATCH,/* ULPatch */
 	VMA_TYPE_NUM,
 };
 
-#define VMA_TYPE_NAME(t) __VMA_TYPE_NAME[t]
-static const char __unused *__VMA_TYPE_NAME[] = {
-	"unknown",
-	"self",
-	"libc",
-	"libelf",
-	"heap",
-	"ld",
-	"stack",
-	"vvar",
-	"vdso",
-	"vsyscall",
-	"lib?",
-	"anon",
-	"ulpatch",
-	NULL
-};
 
 struct vm_area_struct;
 
@@ -219,12 +201,9 @@ struct fd {
 			FTO_FD)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
-/* under ULP_PROC_ROOT_DIR/PID/ */
+/* under ULP_PROC_ROOT_DIR/${PID}/ */
 #define TASK_PROC_COMM	"comm"
 #define TASK_PROC_MAP_FILES	"map_files"
-
-
-struct elf_file;
 
 #define TASK_COMM_LEN	128
 
@@ -362,6 +341,7 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 void dump_task_threads(struct task_struct *task, bool detail);
 void dump_task_fds(struct task_struct *task, bool detail);
 
+const char *vma_type_name(enum vma_type type);
 void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
 void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);

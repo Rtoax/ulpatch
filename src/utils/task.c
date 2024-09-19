@@ -198,11 +198,9 @@ static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 
 	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
-	} else if (!strncmp(basename((char*)name), "libc.so", 7)
-		|| !strncmp(basename((char*)name), "libssp", 6)) {
+	} else if (!strncmp(basename((char*)name), "libc.so", 7) ||
+		   !strncmp(basename((char*)name), "libssp", 6)) {
 		type = VMA_LIBC;
-	} else if (!strncmp(basename((char*)name), "libelf", 6)) {
-		type = VMA_LIBELF;
 	} else if (!strcmp(name, "[heap]")) {
 		type = VMA_HEAP;
 	} else if (!strncmp(basename((char*)name), "ld-linux", 8)) {
@@ -215,8 +213,9 @@ static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 		type = VMA_VDSO;
 	} else if (!strcmp(name, "[vsyscall]")) {
 		type = VMA_VSYSCALL;
-	} else if (!strncmp(basename((char*)name), "lib", 3)) {
-		type = VMA_LIB_DONT_KNOWN;
+	} else if (!strncmp(basename((char*)name), "lib", 3) &&
+		   strstr(name, ".so")) {
+		type = VMA_LIB_UNKNOWN;
 	} else if (strlen(name) == 0) {
 		type = VMA_ANON;
 	/**
@@ -231,6 +230,33 @@ static enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 	}
 
 	return type;
+}
+
+static const struct {
+	enum vma_type type;
+	const char *name;
+} __vma_type_names[] = {
+	{VMA_NONE, "unknown"},
+	{VMA_SELF, "self"},
+	{VMA_LIBC, "libc"},
+	{VMA_HEAP, "heap"},
+	{VMA_LD, "ld"},
+	{VMA_STACK, "stack"},
+	{VMA_VVAR, "vvar"},
+	{VMA_VDSO, "vdso"},
+	{VMA_VSYSCALL, "vsyscall"},
+	{VMA_LIB_UNKNOWN, "lib?"},
+	{VMA_ANON, "anon"},
+	{VMA_ULPATCH, "ulpatch"},
+};
+
+const char *vma_type_name(enum vma_type type)
+{
+	int i;
+	for (i = 0; i < ARRAY_SIZE(__vma_type_names); i++)
+		if (__vma_type_names[i].type == type)
+			return __vma_type_names[i].name;
+	return "Unknown";
 }
 
 static bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
@@ -455,7 +481,7 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	case VMA_VVAR:
 	case VMA_STACK:
 	case VMA_VSYSCALL:
-		ulp_warning("skip %s\n", VMA_TYPE_NAME(vma->type));
+		ulp_warning("skip %s\n", vma_type_name(vma->type));
 		return 0;
 	case VMA_ULPATCH:
 		return vma_load_ulp(vma);
@@ -618,7 +644,7 @@ load_vma_elf_file:
 set_share_lib:
 
 	is_share_lib |= vma->type == VMA_LIBC;
-	is_share_lib |= vma->type == VMA_LIB_DONT_KNOWN;
+	is_share_lib |= vma->type == VMA_LIB_UNKNOWN;
 
 	vma->is_share_lib = !!is_share_lib;
 
@@ -854,7 +880,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 	}
 
 	fprintf(fp, "%10s: %016lx-%016lx %6s %s%s%s%s\n",
-		VMA_TYPE_NAME(vma->type),
+		vma_type_name(vma->type),
 		vma->vm_start,
 		vma->vm_end,
 		vma->perms,
