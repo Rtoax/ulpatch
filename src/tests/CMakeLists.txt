@@ -36,6 +36,7 @@ add_executable(ulpatch_test
 	utils/rbtree.c
 	utils/string.c
 	utils/task.c
+	utils/task-symbol.c
 	utils/utils.c
 	utils/version.c
 )

@@ -428,7 +428,11 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
 int vma_load_all_symbols(struct vm_area_struct *vma);
 
 /* New symbol API */
+struct task_sym *alloc_task_sym(const char *name, unsigned long addr);
+void free_task_sym(struct task_sym *s);
 struct task_sym *find_task_sym(struct task_struct *task, const char *name);
 int link_task_sym(struct task_struct *task, struct task_sym *s);
 struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev);
+int task_load_vma_elf_syms(struct vm_area_struct *vma);
+void free_task_syms(struct task_struct *task);
 

@@ -1331,6 +1331,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 {
 	struct task_struct *task = NULL;
 	int o_flags;
+	struct vm_area_struct *tmp_vma;
 
 	if (!proc_pid_exist(pid)) {
 		ulp_error("pid %d is not exist.\n", pid);
@@ -1385,7 +1386,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 	}
 
 	if (flag & FTO_VMA_ELF) {
-		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task) {
 			vma_peek_elf_hdrs(tmp_vma);
 			if (tmp_vma->is_elf)
@@ -1394,9 +1394,14 @@ struct task_struct *open_task(pid_t pid, int flag)
 	}
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
-		struct vm_area_struct *tmp_vma;
-		task_for_each_vma(tmp_vma, task)
+		task_for_each_vma(tmp_vma, task) {
+			/**
+			 * FIXME: Remove vma_load_all_symbols() if
+			 * task_load_vma_elf_syms() done.
+			 */
 			vma_load_all_symbols(tmp_vma);
+			task_load_vma_elf_syms(tmp_vma);
+		}
 	}
 
 	/* Create a directory under ULP_PROC_ROOT_DIR */
@@ -1594,6 +1599,9 @@ int close_task(struct task_struct *task)
 				bfd_elf_close(tmp_vma->bfd_elf_file);
 		}
 	}
+
+	if (task->fto_flag & FTO_VMA_ELF_SYMBOLS)
+		free_task_syms(task);
 
 	if (task->fto_flag & FTO_PROC)
 		__check_and_free_task_proc(task);

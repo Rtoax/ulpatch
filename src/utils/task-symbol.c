@@ -346,6 +346,30 @@ static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)
 	return strcmp(s1->name, s2->name);
 }
 
+static void __rb_free_task_sym(struct rb_node *node)
+{
+	struct task_sym *s = rb_entry(node, struct task_sym, node);
+	free_task_sym(s);
+}
+
+struct task_sym *alloc_task_sym(const char *name, unsigned long addr)
+{
+	struct task_sym *s = malloc(sizeof(struct task_sym));
+
+	memset(s, 0, sizeof(*s));
+
+	s->name = strdup(name);
+	s->addr = addr;
+
+	return s;
+}
+
+void free_task_sym(struct task_sym *s)
+{
+	free(s->name);
+	free(s);
+}
+
 struct task_sym *find_task_sym(struct task_struct *task, const char *name)
 {
 	struct rb_root *root;
@@ -374,4 +398,57 @@ struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev)
 	root = &task->tsyms;
 	next = prev ? rb_next(&prev->node) : rb_first(root);
 	return next ? rb_entry(next, struct task_sym, node) : NULL;
+}
+
+int task_load_vma_elf_syms(struct vm_area_struct *vma)
+{
+	struct task_struct *task;
+	struct bfd_elf_file *bfile;
+	struct bfd_sym *bsym;
+	struct task_sym *tsym;
+
+	if (!vma->is_elf || !vma->bfd_elf_file) {
+		ulp_error("vma %s is not elf or not opened.\n", vma->name_);
+		return -EINVAL;
+	}
+
+	task = vma->task;
+	bfile = vma->bfd_elf_file;
+
+	for (bsym = bfd_next_text_sym(bfile, NULL); bsym;
+		bsym = bfd_next_text_sym(bfile, bsym)) {
+		const char *name = bfd_sym_name(bsym);
+		unsigned long addr = bfd_sym_addr(bsym);
+		unsigned long off = vma->vma_elf->load_addr;
+
+		tsym = alloc_task_sym(name, addr + off);
+		link_task_sym(task, tsym);
+	}
+
+	for (bsym = bfd_next_data_sym(bfile, NULL); bsym;
+		bsym = bfd_next_data_sym(bfile, bsym)) {
+		const char *name = bfd_sym_name(bsym);
+		unsigned long addr = bfd_sym_addr(bsym);
+		unsigned long off = vma->vma_elf->load_addr;
+
+		tsym = alloc_task_sym(name, addr + off);
+		link_task_sym(task, tsym);
+	}
+
+	for (bsym = bfd_next_plt_sym(bfile, NULL); bsym;
+		bsym = bfd_next_plt_sym(bfile, bsym)) {
+		const char *name = bfd_sym_name(bsym);
+		unsigned long addr = bfd_sym_addr(bsym);
+		unsigned long off = vma->vma_elf->load_addr;
+
+		tsym = alloc_task_sym(name, addr + off);
+		link_task_sym(task, tsym);
+	}
+
+	return 0;
+}
+
+void free_task_syms(struct task_struct *task)
+{
+	rb_destroy(&task->tsyms, __rb_free_task_sym);
 }
