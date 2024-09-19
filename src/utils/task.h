@@ -42,7 +42,11 @@ struct vm_area_struct;
 
 struct vma_elf_mem {
 	GElf_Ehdr ehdr;
-	/* If no program headers, phdrs = NULL */
+	/**
+	 * If no program headers, phdrs = NULL. Actually, in task vma mapping
+	 * space, only ULP ELF don't have phdrs, other ELF like libc,self,vdso
+	 * have phdrs.
+	 */
 	GElf_Phdr *phdrs;
 	unsigned long load_addr;
 };
