@@ -37,7 +37,7 @@ struct bfd_elf_file {
 	asymbol **sorted_syms;
 	long sorted_symcount;
 
-	/* head is file_list */
+	/* head is bfd_elf_file_list */
 	struct list_head node;
 
 	struct rb_root rb_tree_syms[BFD_ELF_SYM_TYPE_NUM];
@@ -53,14 +53,14 @@ struct bfd_sym {
 };
 
 /* We just open few elf files, link list is ok. */
-static LIST_HEAD(file_list);
+static LIST_HEAD(bfd_elf_file_list);
 
 
-static struct bfd_elf_file* file_already_load(const char *filename)
+static struct bfd_elf_file *file_already_load(const char *filename)
 {
 	struct bfd_elf_file *f, *tmp, *ret = NULL;
 
-	list_for_each_entry_safe(f, tmp, &file_list, node) {
+	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node) {
 		if (!strcmp(filename, f->name)) {
 			ret = f;
 			break;
@@ -339,7 +339,7 @@ static struct bfd_elf_file *file_load(const char *filename)
 		}
 	}
 
-	list_add(&file->node, &file_list);
+	list_add(&file->node, &bfd_elf_file_list);
 
 	return file;
 
@@ -416,7 +416,7 @@ int bfd_elf_destroy(void)
 {
 	struct bfd_elf_file *f, *tmp;
 
-	list_for_each_entry_safe(f, tmp, &file_list, node)
+	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node)
 		bfd_elf_close(f);
 
 	return 0;
