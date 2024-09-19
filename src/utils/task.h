@@ -410,4 +410,5 @@ int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma);
 int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
 			       GElf_Sym *sym);
 unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
+int vma_load_all_symbols(struct vm_area_struct *vma);
 

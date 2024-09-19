@@ -49,6 +49,7 @@ add_library(ulpatch_utils STATIC
 	task.c
 	task-current.c
 	task-proc.c
+	task-symbol.c
 	task-syscall.c
 	time.c
 	${unwind}
