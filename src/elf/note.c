@@ -324,7 +324,7 @@ int handle_notes(struct elf_file *elf, GElf_Shdr *shdr, Elf_Scn *scn)
 		 * prefix here, then use the rest later as data.
 		 */
 		bool is_gnu_build_attr =
-			ulpatch_startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX);
+			ulp_startswith(name, ELF_NOTE_GNU_BUILD_ATTRIBUTE_PREFIX);
 
 		/* if name has "GA" prefix */
 		const char *print_name = (is_gnu_build_attr

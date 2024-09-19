@@ -83,9 +83,9 @@ TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
 
 			struct bfd_sym *symbol;
 
-			for (symbol = bfd_elf_plt_next_symbol(file, NULL);
+			for (symbol = bfd_next_plt_sym(file, NULL);
 				symbol;
-				symbol = bfd_elf_plt_next_symbol(file, symbol)) {
+				symbol = bfd_next_plt_sym(file, symbol)) {
 
 				/* search the address again, double check */
 				unsigned long addr = bfd_elf_plt_symbol_addr(file,

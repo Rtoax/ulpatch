@@ -77,11 +77,10 @@ void print_string_hex(FILE *fp, const char *comment, unsigned char *str,
 	fprintf(fp, "\n");
 }
 
-
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
-int ulpatch_startswith(const char *str, const char *prefix)
+int ulp_startswith(const char *str, const char *prefix)
 {
-	return strncmp(str, prefix, strlen (prefix)) == 0;
+	return strncmp(str, prefix, strlen(prefix)) == 0;
 }
 
 static void __add_to_str_list(const char *name, struct list_head *list)

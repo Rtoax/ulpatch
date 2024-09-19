@@ -228,8 +228,7 @@ bfd_elf_plt_symbol_addr(struct bfd_elf_file *file, const char *sym);
 
 
 struct bfd_sym*
-bfd_elf_plt_next_symbol(struct bfd_elf_file *file,
-		struct bfd_sym *prev);
+bfd_next_plt_sym(struct bfd_elf_file *file, struct bfd_sym *prev);
 unsigned long bfd_sym_addr(struct bfd_sym *symbol);
 const char* bfd_sym_name(struct bfd_sym *symbol);
 
