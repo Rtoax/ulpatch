@@ -42,6 +42,7 @@ struct vm_area_struct;
 
 struct vma_elf_mem {
 	GElf_Ehdr ehdr;
+	/* If no program headers, phdrs = NULL */
 	GElf_Phdr *phdrs;
 	unsigned long load_addr;
 };

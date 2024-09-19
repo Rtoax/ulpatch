@@ -591,34 +591,6 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 load_vma_elf_file:
 
 	/**
-	 * "[vdso]" vma is elf, but file is not exist, could not open it.
-	 */
-	if (task->fto_flag & FTO_VMA_ELF_FILE && fexist(vma->name_)) {
-		vma->elf_file = elf_file_open(vma->name_);
-		if (!vma->elf_file) {
-			ulp_error("Open ELF %s failed.\n", vma->name_);
-			return -EINVAL;
-		}
-		vma->bfd_elf_file = bfd_elf_open(vma->name_);
-		if (!vma->bfd_elf_file) {
-			ulp_error("Open ELF bfd %s failed.\n", vma->name_);
-			return -EINVAL;
-		}
-		switch (vma->type) {
-		case VMA_SELF:
-			task->exe_elf = vma->elf_file;
-			task->exe_bfd = vma->bfd_elf_file;
-			break;
-		case VMA_LIBC:
-			task->libc_elf = vma->elf_file;
-			task->libc_bfd = vma->bfd_elf_file;
-			break;
-		default:
-			break;
-		}
-	}
-
-	/**
 	 * If type of the ELF is not ET_DYN, this is definitely not a shared
 	 * library.
 	 *
@@ -740,6 +712,44 @@ set_share_lib:
 
 	ulp_info("%s vma start %lx, load_addr %lx\n",
 		vma->name_, vma->vm_start, vma->vma_elf->load_addr);
+
+	return 0;
+}
+
+static int vma_load_elf_file(struct vm_area_struct *vma)
+{
+	struct task_struct *task = vma->task;
+
+	if (!vma->is_elf)
+		return -EINVAL;
+
+	/**
+	 * "[vdso]" vma is elf, but file is not exist, could not open it.
+	 */
+	if (task->fto_flag & FTO_VMA_ELF_FILE && fexist(vma->name_)) {
+		vma->elf_file = elf_file_open(vma->name_);
+		if (!vma->elf_file) {
+			ulp_error("Open ELF %s failed.\n", vma->name_);
+			return -EINVAL;
+		}
+		vma->bfd_elf_file = bfd_elf_open(vma->name_);
+		if (!vma->bfd_elf_file) {
+			ulp_error("Open ELF bfd %s failed.\n", vma->name_);
+			return -EINVAL;
+		}
+		switch (vma->type) {
+		case VMA_SELF:
+			task->exe_elf = vma->elf_file;
+			task->exe_bfd = vma->bfd_elf_file;
+			break;
+		case VMA_LIBC:
+			task->libc_elf = vma->elf_file;
+			task->libc_bfd = vma->bfd_elf_file;
+			break;
+		default:
+			break;
+		}
+	}
 
 	return 0;
 }
@@ -1375,8 +1385,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	if (flag & FTO_VMA_ELF) {
 		struct vm_area_struct *tmp_vma;
-		task_for_each_vma(tmp_vma, task)
+		task_for_each_vma(tmp_vma, task) {
 			vma_peek_elf_hdrs(tmp_vma);
+			if (tmp_vma->is_elf)
+				vma_load_elf_file(tmp_vma);
+		}
 	}
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
