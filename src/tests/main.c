@@ -820,13 +820,13 @@ int main(int argc, char *argv[])
 		return -ENOENT;
 	}
 
-	COMMON_IN_MAIN();
-
 	ulpatch_init();
 
 	signal(SIGINT, sig_handler);
 
 	parse_config(argc, argv);
+
+	COMMON_IN_MAIN();
 
 	init_test_symbols();
 
