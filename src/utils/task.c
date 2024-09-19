@@ -556,7 +556,8 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 
 	if (vma->vma_elf->ehdr.e_phnum == 0) {
 		ulp_debug("%s has no phdr\n", vma->name_);
-		goto load_vma_elf_file;
+		vma->vma_elf->phdrs = NULL;
+		goto peek_phdrs_done;
 	}
 
 	phaddr = vma->vm_start + vma->vma_elf->ehdr.e_phoff;
@@ -588,7 +589,7 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 		return -EAGAIN;
 	}
 
-load_vma_elf_file:
+peek_phdrs_done:
 
 	/**
 	 * If type of the ELF is not ET_DYN, this is definitely not a shared
