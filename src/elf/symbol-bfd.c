@@ -18,6 +18,7 @@
 enum bfd_sym_type {
 	BFD_ELF_SYM_TEXT, /* .text */
 	BFD_ELF_SYM_PLT, /* .plt */
+	BFD_ELF_SYM_DATA, /* .data, .data.rel.ro, .bss */
 	BFD_ELF_SYM_TYPE_NUM,
 };
 
@@ -187,6 +188,39 @@ unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file, const char *name)
 
 	symbol = find_bfd_sym(rbroot, name);
 
+	return bfd_sym_addr(symbol);
+}
+
+/**
+ * The following is the DATA related function interface.
+ */
+
+static bool asymbol_is_data(asymbol *sym)
+{
+	asection *asect;
+	flagword flags;
+	asect = bfd_asymbol_section(sym);
+	flags = bfd_section_flags(asect);
+	return (flags & SEC_DATA) ||
+		!strcmp(bfd_section_name(asect), ".data") ||
+		!strcmp(bfd_section_name(asect), ".data.rel.ro") ||
+		!strcmp(bfd_section_name(asect), ".bss");
+}
+
+struct bfd_sym *bfd_next_data_sym(struct bfd_elf_file *file,
+				  struct bfd_sym *prev)
+{
+	return next_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_DATA], prev);
+}
+
+unsigned long bfd_elf_data_sym_addr(struct bfd_elf_file *file, const char *name)
+{
+	if (!file)
+		return 0;
+
+	struct bfd_sym *symbol;
+	struct rb_root *rbroot = &file->rb_tree_syms[BFD_ELF_SYM_DATA];
+	symbol = find_bfd_sym(rbroot, name);
 	return bfd_sym_addr(symbol);
 }
 
@@ -392,6 +426,13 @@ static struct bfd_elf_file *file_load(const char *filename)
 			symbol = alloc_bfd_sym(name, value, BFD_ELF_SYM_TEXT, s);
 			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_TEXT], symbol);
 			ulp_debug("Bfd_sym: %#016lx %s .text\n", value, name);
+		}
+
+		if (asymbol_is_data(s)) {
+			struct bfd_sym *symbol;
+			symbol = alloc_bfd_sym(name, value, BFD_ELF_SYM_DATA, s);
+			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_DATA], symbol);
+			ulp_debug("Bfd_sym: %#016lx %s .data\n", value, name);
 		}
 	}
 

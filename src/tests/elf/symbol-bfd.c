@@ -113,6 +113,21 @@ TEST(Bfd_sym, for_each_sym, 0)
 				ret = -1;
 		}
 
+		for (symbol = bfd_next_data_sym(file, NULL); symbol;
+			symbol = bfd_next_data_sym(file, symbol)) {
+
+			/* search the address again, double check */
+			unsigned long addr = bfd_elf_data_sym_addr(file,
+							bfd_sym_name(symbol));
+			unsigned long addr2 = bfd_sym_addr(symbol);
+
+			ulp_debug("data: %08lx %s (%08lx)\n", addr2,
+				  bfd_sym_name(symbol), addr);
+
+			if (addr != addr2)
+				ret = -1;
+		}
+
 		bfd_elf_close(file);
 	}
 

@@ -229,6 +229,10 @@ struct bfd_sym *bfd_next_plt_sym(struct bfd_elf_file *file,
 unsigned long bfd_elf_text_sym_addr(struct bfd_elf_file *file, const char *name);
 struct bfd_sym *bfd_next_text_sym(struct bfd_elf_file *file,
 				  struct bfd_sym *prev);
+unsigned long bfd_elf_data_sym_addr(struct bfd_elf_file *file, const char *name);
+struct bfd_sym *bfd_next_data_sym(struct bfd_elf_file *file,
+				  struct bfd_sym *prev);
+
 unsigned long bfd_sym_addr(struct bfd_sym *symbol);
 const char *bfd_sym_name(struct bfd_sym *symbol);
 
