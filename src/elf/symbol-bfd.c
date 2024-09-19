@@ -333,10 +333,20 @@ static void dump_bfd(struct bfd_elf_file *file)
 	file->synthcount = 0;
 }
 
-static int bfd_elf_load_plt(struct bfd_elf_file *file)
+static struct bfd_elf_file *file_load(const char *filename)
 {
+	int i;
+	struct bfd_elf_file *file;
 	char **matching;
 	char *target = NULL;
+
+	file = malloc(sizeof(struct bfd_elf_file));
+	memset(file, 0, sizeof(struct bfd_elf_file));
+
+	strncpy(file->name, filename, PATH_MAX - 1);
+
+	for (i = 0; i < S_T_PLT; i++)
+		rb_init(&file->rb_tree_syms[i]);
 
 	file->bfd = bfd_openr(file->name, target);
 
@@ -352,30 +362,13 @@ static int bfd_elf_load_plt(struct bfd_elf_file *file)
 
 	dump_bfd(file);
 
-close:
-	bfd_close(file->bfd);
-
-	return 0;
-}
-
-static struct bfd_elf_file *file_load(const char *filename)
-{
-	int i;
-	struct bfd_elf_file *file;
-
-	file = malloc(sizeof(struct bfd_elf_file));
-	memset(file, 0, sizeof(struct bfd_elf_file));
-
-	strncpy(file->name, filename, PATH_MAX - 1);
-
-	for (i = 0; i < S_T_PLT; i++)
-		rb_init(&file->rb_tree_syms[i]);
-
-	bfd_elf_load_plt(file);
-
 	list_add(&file->node, &file_list);
 
 	return file;
+
+close:
+	bfd_close(file->bfd);
+	return NULL;
 }
 
 struct bfd_elf_file *bfd_elf_load(const char *elf_file)
@@ -400,8 +393,8 @@ int bfd_elf_close(struct bfd_elf_file *file)
 		return -1;
 
 	list_del(&file->node);
+	bfd_close(file->bfd);
 	free(file);
-
 	return 0;
 }
 
