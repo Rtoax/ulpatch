@@ -438,7 +438,7 @@ int vma_load_ulp(struct vm_area_struct *vma)
 }
 
 /* Only FTO_VMA_ELF flag will load VMA ELF */
-int vma_peek_phdr(struct vm_area_struct *vma)
+static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 {
 	GElf_Ehdr ehdr = {};
 	struct task_struct *task = vma->task;
@@ -477,7 +477,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		return 0;
 	}
 
-	ulp_debug("Peek a phdr from %s, addr %lx\n", vma->name_, vma->vm_start);
+	ulp_debug("Try peek elf hdr from %s, addr %lx\n", vma->name_,
+		  vma->vm_start);
 
 	/**
 	 * Read the ELF header from target task memory.
@@ -491,6 +492,8 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	/* If it's not ELF, return success, skip the non-ELF VMAs */
 	if (!ehdr_ok(&ehdr))
 		return 0;
+
+	vma->is_elf = true;
 
 	ulp_debug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
@@ -525,6 +528,11 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	/* Copy ehdr from load var */
 	memcpy(&vma->vma_elf->ehdr, &ehdr, sizeof(ehdr));
 
+	if (vma->vma_elf->ehdr.e_phnum == 0) {
+		ulp_debug("%s has no phdr\n", vma->name_);
+		goto load_vma_elf_file;
+	}
+
 	phaddr = vma->vm_start + vma->vma_elf->ehdr.e_phoff;
 	phsz = vma->vma_elf->ehdr.e_phnum * sizeof(GElf_Phdr);
 
@@ -554,7 +562,7 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		return -EAGAIN;
 	}
 
-	vma->is_elf = true;
+load_vma_elf_file:
 
 	/**
 	 * "[vdso]" vma is elf, but file is not exist, could not open it.
@@ -584,9 +592,9 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 	 * Actually, if the executable file is compiled with '-fPIE'(Position-
 	 * Independent Executable file), it's ET_DYN too.
 	 */
-	if (vma->vma_elf->ehdr.e_type != ET_DYN) {
+	if (vma->vma_elf->ehdr.e_type != ET_DYN || vma->type == VMA_SELF) {
 		is_share_lib = false;
-		goto share_lib;
+		goto set_share_lib;
 	}
 
 	/**
@@ -603,16 +611,16 @@ int vma_peek_phdr(struct vm_area_struct *vma)
 		if (vma->vma_elf->phdrs[i].p_type == PT_INTERP &&
 			!elf_vma_is_interp_exception(vma)) {
 			is_share_lib = false;
-			goto share_lib;
+			goto set_share_lib;
 		}
 	}
 
-share_lib:
+set_share_lib:
 
 	is_share_lib |= vma->type == VMA_LIBC;
 	is_share_lib |= vma->type == VMA_LIB_DONT_KNOWN;
 
-	vma->is_share_lib = is_share_lib;
+	vma->is_share_lib = !!is_share_lib;
 
 	/**
 	 * VMA is ELF, for each program header to find the lowest Virtual
@@ -1335,7 +1343,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	if (flag & FTO_VMA_ELF) {
 		struct vm_area_struct *tmp_vma;
 		task_for_each_vma(tmp_vma, task)
-			vma_peek_phdr(tmp_vma);
+			vma_peek_elf_hdrs(tmp_vma);
 	}
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
