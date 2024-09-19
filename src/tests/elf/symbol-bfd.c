@@ -16,13 +16,18 @@ static const char *test_files[] = {
 	"/usr/bin/cat",
 	"/usr/bin/grep",
 	"/usr/bin/vim",
-#define S_ULPATCH_TEST_PATH	"0"
-	S_ULPATCH_TEST_PATH, // for ulpatch_test_path
+#define S_ULPATCH_TEST_PATH	"000"
+	S_ULPATCH_TEST_PATH, /* for ulpatch_test_path */
+#define S_LIBC_PATH	"001"
+	S_LIBC_PATH, /* for libc.so */
 };
 
 #define MODIFY_TEST_FILES(i) \
 	if (!strcmp(test_files[i], S_ULPATCH_TEST_PATH) == 0) { \
 		test_files[i] = ulpatch_test_path; \
+	} \
+	if (!strcmp(test_files[i], S_LIBC_PATH) == 0) { \
+		test_files[i] = libc_object(); \
 	}
 
 

@@ -26,6 +26,10 @@ static const char *possible_libc[] = {
 };
 
 
+/**
+ * If execution was compiled static, libc object should be NULL. This pointer
+ * only store the libc that exist in file system, not in target task's mappings.
+ */
 static const char *default_libc_object = NULL;
 
 
@@ -39,10 +43,16 @@ int elf_core_init(void)
 			break;
 		}
 	}
+	/**
+	 * ULPatch only works on GNU/Linux, thus, LIBC is needed. You Could
+	 * check /usr/include/gnu/lib-names.h header to check libc name.
+	 *
+	 * FIXME: We could get libc path by getenv(), maybe LIBC=SKIP to skip
+	 * if not exist.
+	 */
 	if (!default_libc_object) {
 		ulp_error("Could not found libc.so in possible_libc.\n");
 		exit(1);
-		/* FIXME: Use getenv() */
 	}
 
 	return 0;
