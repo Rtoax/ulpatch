@@ -48,6 +48,9 @@ struct bfd_sym {
 	unsigned long addr;
 	enum bfd_sym_type type;
 
+	/* Point to struct bfd_elf_file syms, no need to free */
+	asymbol *bfd_asym;
+
 	/* root is bfd_elf_file.rb_tree_syms[type] */
 	struct rb_node node;
 };
@@ -79,7 +82,7 @@ static inline int cmp_sym(struct rb_node *n1, unsigned long key)
 }
 
 static struct bfd_sym *alloc_bfd_sym(const char *name, unsigned long addr,
-				     enum bfd_sym_type type)
+				     enum bfd_sym_type type, asymbol *asym)
 {
 	struct bfd_sym *s = malloc(sizeof(struct bfd_sym));
 
@@ -88,11 +91,12 @@ static struct bfd_sym *alloc_bfd_sym(const char *name, unsigned long addr,
 	s->name = strdup(name);
 	s->addr = addr;
 	s->type = type;
+	s->bfd_asym = asym;
 
 	return s;
 }
 
-static void free_sym(struct bfd_sym *s)
+static void free_bfd_sym(struct bfd_sym *s)
 {
 	free(s->name);
 	free(s);
@@ -328,13 +332,14 @@ static struct bfd_elf_file *file_load(const char *filename)
 		asymbol *s = file->sorted_syms[i];
 		char buf[256];
 		const char *name = asymbol_pure_name(s, buf, sizeof(buf));
+		unsigned long value = bfd_asymbol_value(s);
 
-		ulp_debug("Bfd_sym: %#016lx %s %s\n", bfd_asymbol_value(s),
-			  name, asymbol_is_plt(s) ? "@plt" : "");
+		ulp_debug("Bfd_sym: %#016lx %s %s\n", value, name,
+			  asymbol_is_plt(s) ? "@plt" : "");
 
 		if (asymbol_is_plt(s)) {
 			struct bfd_sym *symbol;
-			symbol = alloc_bfd_sym(name, bfd_asymbol_value(s), BFD_ELF_SYM_PLT);
+			symbol = alloc_bfd_sym(name, value, BFD_ELF_SYM_PLT, s);
 			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], symbol);
 		}
 	}
@@ -364,10 +369,10 @@ struct bfd_elf_file *bfd_elf_open(const char *elf_file)
 	return file;
 }
 
-static void __rb_free_sym(struct rb_node *node)
+static void __rb_free_bfd_sym(struct rb_node *node)
 {
 	struct bfd_sym *s = rb_entry(node, struct bfd_sym, node);
-	free_sym(s);
+	free_bfd_sym(s);
 }
 
 int bfd_elf_close(struct bfd_elf_file *file)
@@ -405,7 +410,7 @@ int bfd_elf_close(struct bfd_elf_file *file)
 
 	/* Destroy all type symbols rb tree */
 	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
-		rb_destroy(&file->rb_tree_syms[i], __rb_free_sym);
+		rb_destroy(&file->rb_tree_syms[i], __rb_free_bfd_sym);
 
 	bfd_close(file->bfd);
 	free(file);
