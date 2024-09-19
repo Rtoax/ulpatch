@@ -255,6 +255,13 @@ struct task_status {
 	gid_t gid, egid, sgid, fsgid;
 };
 
+struct task_sym {
+	char *name;
+	unsigned long addr;
+	/* root is struct task_struct.tsyms */
+	struct rb_node node;
+};
+
 /**
  * This struct use to discript a running process in system, like you can see in
  * proc file system, there are lots of HANDLE in this structure get from procfs.
@@ -297,8 +304,17 @@ struct task_struct {
 	/**
 	 * save all symbol for fast search
 	 * struct symbol.node
+	 *
+	 * FIXME: use tsyms instead, If tsyms is developed, this needs to be
+	 * deleted
 	 */
 	struct rb_root vma_symbols;
+
+	/**
+	 * Store all symbols that task defined.
+	 * node is struct task_sym.node
+	 */
+	struct rb_root tsyms;
 
 	struct bfd_elf_file *exe_bfd;
 
@@ -404,6 +420,9 @@ int task_syscall(struct task_struct *task, int nr,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res);
 
+/**
+ * FIXME: Those Old symbol API should be removed if new symbol APIs developed.
+ */
 struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
 				    int type);
 int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma);
@@ -411,4 +430,9 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
 			       GElf_Sym *sym);
 unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
 int vma_load_all_symbols(struct vm_area_struct *vma);
+
+/* New symbol API */
+struct task_sym *find_task_sym(struct task_struct *task, const char *name);
+int link_task_sym(struct task_struct *task, struct task_sym *s);
+struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev);
 
