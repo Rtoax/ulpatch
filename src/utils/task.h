@@ -170,36 +170,42 @@ struct fd {
 /**
  * When task opening, what do you want to do?
  *
- * FTO means Flag of Task when Open.
- *
- * @FTO_PROC Create '/proc' like directory under ULP_PROC_ROOT_DIR. If you need
- *           to map a file into target process address space, the flag is
- *           necessary.
- * @FTO_PATCH parse patch VMA when open a task.
- * @FTO_VMA_ELF different with @FTO_VMA_ELF_FILE, it's open target process address
- *               space's ELF VMA in memory.
- * @FTO_VMA_ELF_FILE in /proc/PID/maps specify ELF file, if you want to open it
- *               when open task, set this flag.
- * @FTO_VMA_ELF_SYMBOLS load each ELF VMA's PT_DYNAMIC, at same time, for load
- *                all symbols, need to load SELF
- * @FTO_THREADS open /proc/PID/task/ and record it.
- * @FTO_RDWR Open task with read and write permission, otherwise readonly.
- * @FTO_FD open /proc/PID/fd/ directory and for each FD.
+ * FTO: Flag of Task when Open.
  */
 #define FTO_NONE	0x0
+/**
+ * Create '/proc' like directory under ULP_PROC_ROOT_DIR. If you need to map a
+ * file into target process address space, the flag is necessary.
+ */
 #define FTO_PROC	BIT(0)
-#define FTO_PATCH	BIT(1)
-#define FTO_VMA_ELF	BIT(2)
-#define FTO_VMA_ELF_FILE	(BIT(3) | FTO_VMA_ELF)
-#define FTO_VMA_ELF_SYMBOLS	(BIT(4) | FTO_VMA_ELF | FTO_VMA_ELF_FILE)
-#define FTO_THREADS	BIT(5)
-#define FTO_RDWR	BIT(6)
-#define FTO_FD		BIT(7)
+/**
+ * This flag will open target process address space's ELF in memory.
+ */
+#define FTO_VMA_ELF	BIT(1)
+/**
+ * This flag open /proc/PID/maps specify ELF file.
+ */
+#define FTO_VMA_ELF_FILE	(BIT(2) | FTO_VMA_ELF)
+/**
+ * This flag will load all symbols, at same time.
+ */
+#define FTO_VMA_ELF_SYMBOLS	(BIT(3) | FTO_VMA_ELF | FTO_VMA_ELF_FILE)
+/**
+ * Open and load /proc/PID/task/, get all target process's thread id.
+ */
+#define FTO_THREADS	BIT(4)
+/**
+ * Open task with read and write permission, otherwise readonly.
+ */
+#define FTO_RDWR	BIT(5)
+/**
+ * Open /proc/PID/fd/ directory and for each FD.
+ */
+#define FTO_FD		BIT(6)
 
 #define FTO_ALL 0xffffffff
 
 #define FTO_ULFTRACE	(FTO_PROC | \
-			FTO_PATCH | \
 			FTO_VMA_ELF_SYMBOLS | \
 			FTO_THREADS | \
 			FTO_RDWR | \
@@ -263,7 +269,7 @@ struct task_struct {
 	struct task_struct_auxv auxv;
 	struct task_status status;
 
-	/* If set FTO_VMA_ELF_FILE, point self::vma->elf_file */
+	/* If set FTO_VMA_ELF_FILE, point to self::vma->elf_file */
 	struct elf_file *exe_elf;
 	/* If set FTO_VMA_ELF_FILE, point to libc.so::vma->elf_file */
 	struct elf_file *libc_elf;
