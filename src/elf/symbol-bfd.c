@@ -238,7 +238,7 @@ static const char *asymbol_pure_name(asymbol *sym, char *buf, int blen)
 	return buf;
 }
 
-static bool is_significant_symbol_name(const char * name)
+static bool is_significant_symbol_name(const char *name)
 {
 	return ulp_startswith(name, ".plt") || ulp_startswith(name, ".got");
 }
@@ -303,37 +303,6 @@ static void disassemble_data(struct bfd_elf_file *file)
 	free(file->sorted_syms);
 }
 
-static void dump_bfd(struct bfd_elf_file *file)
-{
-	file->syms = slurp_symtab(file);
-	file->dynsyms = slurp_dynamic_symtab(file);
-
-	file->synthcount = bfd_get_synthetic_symtab(file->bfd, file->symcount,
-					file->syms, file->dynsymcount, file->dynsyms,
-					&file->synthsyms);
-	if (file->synthcount < 0)
-		file->synthcount = 0;
-
-	disassemble_data(file);
-
-	if (file->syms) {
-		free(file->syms);
-		file->syms = NULL;
-	}
-	if (file->dynsyms) {
-		free(file->dynsyms);
-		file->dynsyms = NULL;
-	}
-
-	if (file->synthsyms) {
-		free(file->synthsyms);
-		file->synthsyms = NULL;
-	}
-	file->symcount = 0;
-	file->dynsymcount = 0;
-	file->synthcount = 0;
-}
-
 static struct bfd_elf_file *file_load(const char *filename)
 {
 	int i;
@@ -346,7 +315,7 @@ static struct bfd_elf_file *file_load(const char *filename)
 
 	strncpy(file->name, filename, PATH_MAX - 1);
 
-	for (i = 0; i < S_T_PLT; i++)
+	for (i = 0; i < S_T_NUM; i++)
 		rb_init(&file->rb_tree_syms[i]);
 
 	file->bfd = bfd_openr(file->name, target);
@@ -361,7 +330,17 @@ static struct bfd_elf_file *file_load(const char *filename)
 		goto close;
 	}
 
-	dump_bfd(file);
+	file->syms = slurp_symtab(file);
+	file->dynsyms = slurp_dynamic_symtab(file);
+
+	file->synthcount = bfd_get_synthetic_symtab(file->bfd,
+					     file->symcount, file->syms,
+					     file->dynsymcount, file->dynsyms,
+					     &file->synthsyms);
+	if (file->synthcount < 0)
+		file->synthcount = 0;
+
+	disassemble_data(file);
 
 	list_add(&file->node, &file_list);
 
@@ -388,38 +367,54 @@ struct bfd_elf_file *bfd_elf_open(const char *elf_file)
 	return file;
 }
 
-int bfd_elf_close(struct bfd_elf_file *file)
-{
-	if (!file)
-		return -1;
-
-	list_del(&file->node);
-	bfd_close(file->bfd);
-	free(file);
-	return 0;
-}
-
 static void __rb_free_sym(struct rb_node *node)
 {
 	struct bfd_sym *s = rb_entry(node, struct bfd_sym, node);
 	free_sym(s);
 }
 
+int bfd_elf_close(struct bfd_elf_file *file)
+{
+	int i;
+
+	if (!file)
+		return -1;
+
+	if (file->syms) {
+		free(file->syms);
+		file->syms = NULL;
+	}
+	if (file->dynsyms) {
+		free(file->dynsyms);
+		file->dynsyms = NULL;
+	}
+
+	if (file->synthsyms) {
+		free(file->synthsyms);
+		file->synthsyms = NULL;
+	}
+
+	file->symcount = 0;
+	file->dynsymcount = 0;
+	file->synthcount = 0;
+
+	list_del(&file->node);
+
+	/* Destroy all type symbols rb tree */
+	for (i = 0; i < S_T_NUM; i++)
+		rb_destroy(&file->rb_tree_syms[i], __rb_free_sym);
+
+	bfd_close(file->bfd);
+	free(file);
+	return 0;
+}
+
 int bfd_elf_destroy(void)
 {
 	struct bfd_elf_file *f, *tmp;
 
-	list_for_each_entry_safe(f, tmp, &file_list, node) {
-		int i;
-
-		list_del(&f->node);
-
-		/* Destroy all type symbols rb tree */
-		for (i = 0; i < S_T_NUM; i++)
-			rb_destroy(&f->rb_tree_syms[i], __rb_free_sym);
-
-		free(f);
-	}
+	list_for_each_entry_safe(f, tmp, &file_list, node)
+		bfd_elf_close(f);
 
 	return 0;
 }
