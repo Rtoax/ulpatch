@@ -182,8 +182,6 @@ struct fd {
  *               when open task, set this flag.
  * @FTO_VMA_ELF_SYMBOLS load each ELF VMA's PT_DYNAMIC, at same time, for load
  *                all symbols, need to load SELF
- * @FTO_SELF_PLT load elf file's @plt symbol address value by bfd.
- *                 ftrace/patch will need those @plt address value.
  * @FTO_THREADS open /proc/PID/task/ and record it.
  * @FTO_RDWR Open task with read and write permission, otherwise readonly.
  * @FTO_FD open /proc/PID/fd/ directory and for each FD.
@@ -194,17 +192,15 @@ struct fd {
 #define FTO_VMA_ELF	BIT(2)
 #define FTO_VMA_ELF_FILE	(BIT(3) | FTO_VMA_ELF)
 #define FTO_VMA_ELF_SYMBOLS	(BIT(4) | FTO_VMA_ELF | FTO_VMA_ELF_FILE)
-#define FTO_SELF_PLT	BIT(5)
-#define FTO_THREADS	BIT(6)
-#define FTO_RDWR	BIT(7)
-#define FTO_FD		BIT(8)
+#define FTO_THREADS	BIT(5)
+#define FTO_RDWR	BIT(6)
+#define FTO_FD		BIT(7)
 
 #define FTO_ALL 0xffffffff
 
 #define FTO_ULFTRACE	(FTO_PROC | \
 			FTO_PATCH | \
 			FTO_VMA_ELF_SYMBOLS | \
-			FTO_SELF_PLT | \
 			FTO_THREADS | \
 			FTO_RDWR | \
 			FTO_FD)

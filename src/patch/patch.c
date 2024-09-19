@@ -589,7 +589,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	 * FIXME: We should not get symbol address from @plt, use actual addr in so
 	 * instead.
 	 */
-	if (!addr && task->fto_flag & FTO_SELF_PLT) {
+	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
 		unsigned long plt = bfd_elf_plt_sym_addr(task->exe_bfd, name);
 		if (plt && task->vma_self_elf) {
 			addr = plt + task->vma_self_elf->vma_elf->load_addr;

@@ -1398,10 +1398,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 			vma_load_all_symbols(tmp_vma);
 	}
 
-	if (flag & FTO_SELF_PLT) {
-		task->exe_bfd = bfd_elf_open(task->exe);
-	}
-
 	/* Create a directory under ULP_PROC_ROOT_DIR */
 	if (flag & FTO_PROC) {
 		FILE *fp;
@@ -1614,9 +1610,6 @@ int close_task(struct task_struct *task)
 			free(fd);
 		}
 	}
-
-	if (task->fto_flag & FTO_SELF_PLT)
-		bfd_elf_close(task->exe_bfd);
 
 	/* Destroy symbols rb tree */
 	rb_destroy(&task->vma_symbols, rb_free_symbol);
