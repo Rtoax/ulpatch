@@ -137,8 +137,10 @@ const char *bfd_sym_name(struct bfd_sym *symbol)
 static bool asymbol_is_text(asymbol *sym)
 {
 	asection *asect;
+	flagword flags;
 	asect = bfd_asymbol_section(sym);
-	return !strcmp(bfd_section_name(asect), ".text");
+	flags = bfd_section_flags(asect);
+	return (flags & SEC_CODE) || !strcmp(bfd_section_name(asect), ".text");
 }
 
 struct bfd_sym *bfd_next_text_sym(struct bfd_elf_file *file,
