@@ -352,7 +352,8 @@ static void __rb_free_task_sym(struct rb_node *node)
 	free_task_sym(s);
 }
 
-struct task_sym *alloc_task_sym(const char *name, unsigned long addr)
+struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
+				struct vm_area_struct *vma)
 {
 	struct task_sym *s = malloc(sizeof(struct task_sym));
 
@@ -360,6 +361,7 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr)
 
 	s->name = strdup(name);
 	s->addr = addr;
+	s->vma = vma;
 
 	return s;
 }
@@ -421,7 +423,7 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 		unsigned long addr = bfd_sym_addr(bsym);
 		unsigned long off = vma->vma_elf->load_addr;
 
-		tsym = alloc_task_sym(name, addr + off);
+		tsym = alloc_task_sym(name, addr + off, vma);
 		link_task_sym(task, tsym);
 	}
 
@@ -431,7 +433,7 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 		unsigned long addr = bfd_sym_addr(bsym);
 		unsigned long off = vma->vma_elf->load_addr;
 
-		tsym = alloc_task_sym(name, addr + off);
+		tsym = alloc_task_sym(name, addr + off, vma);
 		link_task_sym(task, tsym);
 	}
 
@@ -441,7 +443,7 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 		unsigned long addr = bfd_sym_addr(bsym);
 		unsigned long off = vma->vma_elf->load_addr;
 
-		tsym = alloc_task_sym(name, addr + off);
+		tsym = alloc_task_sym(name, addr + off, vma);
 		link_task_sym(task, tsym);
 	}
 

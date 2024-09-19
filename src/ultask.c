@@ -404,7 +404,7 @@ static int munmap_an_vma(void)
 
 static void list_all_symbol(void)
 {
-	int max_name_len = 0;
+	int max_name_len = 0, max_vma_len = 0;
 	struct task_sym *tsym;
 	struct task_struct *task = target_task;
 
@@ -414,11 +414,17 @@ static void list_all_symbol(void)
 		int len = strlen(tsym->name);
 		if (max_name_len < len)
 			max_name_len = len;
+		len = strlen(basename(tsym->vma->name_));
+		if (max_vma_len < len)
+			max_vma_len = len;
 	}
 	for (tsym = next_task_sym(task, NULL); tsym;
 	     tsym = next_task_sym(task, tsym))
 	{
-		printf("%-*s %#016lx\n", max_name_len, tsym->name, tsym->addr);
+		printf("%-*s %-*s %#016lx\n",
+			max_vma_len, basename(tsym->vma->name_),
+			max_name_len, tsym->name,
+			tsym->addr);
 	}
 }
 

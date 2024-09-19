@@ -249,6 +249,7 @@ struct task_status {
 struct task_sym {
 	char *name;
 	unsigned long addr;
+	struct vm_area_struct *vma;
 	/* root is struct task_struct.tsyms */
 	struct rb_node node;
 };
@@ -428,7 +429,8 @@ unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
 int vma_load_all_symbols(struct vm_area_struct *vma);
 
 /* New symbol API */
-struct task_sym *alloc_task_sym(const char *name, unsigned long addr);
+struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
+				struct vm_area_struct *vma);
 void free_task_sym(struct task_sym *s);
 struct task_sym *find_task_sym(struct task_struct *task, const char *name);
 int link_task_sym(struct task_struct *task, struct task_sym *s);
