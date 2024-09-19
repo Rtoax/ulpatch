@@ -543,3 +543,25 @@ int bfd_elf_destroy(void)
 	return 0;
 }
 
+const struct bfd_build_id *bfd_elf_bid(struct bfd_elf_file *file)
+{
+	return file->bfd->build_id;
+}
+
+const char *bfd_strbid(const struct bfd_build_id *bid, char *buf, int blen)
+{
+	int i;
+
+	/* 1 for '\0' */
+	if (!bid || !buf || bid->size * 2 + 1 > blen) {
+		ulp_error("Invalid args for strbid.\n");
+		errno = EINVAL;
+		return NULL;
+	}
+
+	for (i = 0; i < bid->size && i * 2 < blen; i++)
+		sprintf(buf + i * 2, "%02x", bid->data[i]);
+	buf[i * 2] = '\0';
+
+	return buf;
+}

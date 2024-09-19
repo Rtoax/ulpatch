@@ -51,6 +51,7 @@ TEST(Bfd_sym, load, 0)
 	int ret = 0, i;
 	struct bfd_elf_file *file, *open_again;
 	size_t refcount;
+	char buf[512];
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -70,6 +71,10 @@ TEST(Bfd_sym, load, 0)
 					  bfd_elf_file_name(file));
 				ret = -1;
 			}
+
+			ulp_info("%s Build ID %s\n", test_files[i],
+				 bfd_strbid(bfd_elf_bid(file), buf, sizeof(buf)));
+
 			bfd_elf_close(file);
 		}
 	}

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <gelf.h>
+#include <bfd.h>
 #include <sys/types.h>
 
 #include <utils/util.h>
@@ -237,6 +238,9 @@ struct bfd_sym *bfd_next_data_sym(struct bfd_elf_file *file,
 
 unsigned long bfd_sym_addr(struct bfd_sym *symbol);
 const char *bfd_sym_name(struct bfd_sym *symbol);
+
+const struct bfd_build_id *bfd_elf_bid(struct bfd_elf_file *file);
+const char *bfd_strbid(const struct bfd_build_id *bid, char *buf, int blen);
 
 int bfd_elf_destroy(void);
 
