@@ -264,45 +264,6 @@ static long remove_useless_symbols(asymbol **symbols, long count)
 	return out_ptr - symbols;
 }
 
-static void disassemble_data(struct bfd_elf_file *file)
-{
-	int i;
-
-	file->sorted_symcount = file->symcount ? file->symcount : file->dynsymcount;
-	file->sorted_syms = (asymbol **) malloc((file->sorted_symcount + file->synthcount)
-						* sizeof(asymbol *));
-
-	if (file->sorted_symcount != 0) {
-		memcpy(file->sorted_syms, file->symcount ? file->syms : file->dynsyms,
-			file->sorted_symcount * sizeof(asymbol *));
-
-		file->sorted_symcount = remove_useless_symbols(file->sorted_syms,
-							file->sorted_symcount);
-	}
-
-	for (i = 0; i < file->synthcount; ++i) {
-		file->sorted_syms[file->sorted_symcount] = file->synthsyms + i;
-		++file->sorted_symcount;
-	}
-
-	for (i = 0; i < file->sorted_symcount; i++) {
-		asymbol *s = file->sorted_syms[i];
-		char buf[256];
-		const char *name = asymbol_pure_name(s, buf, sizeof(buf));
-
-		ulp_debug("SYM: %#016lx  %s %s\n", bfd_asymbol_value(s),
-			name, asymbol_is_plt(s) ? "PLT" : "");
-
-		if (asymbol_is_plt(s)) {
-			struct bfd_sym *symbol;
-			symbol = alloc_bfd_sym(name, bfd_asymbol_value(s), S_T_PLT);
-			link_bfd_sym(&file->rb_tree_syms[S_T_PLT], symbol);
-		}
-	}
-
-	free(file->sorted_syms);
-}
-
 static struct bfd_elf_file *file_load(const char *filename)
 {
 	int i;
@@ -340,7 +301,39 @@ static struct bfd_elf_file *file_load(const char *filename)
 	if (file->synthcount < 0)
 		file->synthcount = 0;
 
-	disassemble_data(file);
+	file->sorted_symcount = file->symcount ? file->symcount : file->dynsymcount;
+	file->sorted_syms = (asymbol **)malloc((file->sorted_symcount + file->synthcount)
+						* sizeof(asymbol *));
+
+	if (file->sorted_symcount != 0) {
+		memcpy(file->sorted_syms, file->symcount ? file->syms : file->dynsyms,
+			file->sorted_symcount * sizeof(asymbol *));
+
+		file->sorted_symcount = remove_useless_symbols(file->sorted_syms,
+							file->sorted_symcount);
+	}
+
+	for (i = 0; i < file->synthcount; ++i) {
+		file->sorted_syms[file->sorted_symcount] = file->synthsyms + i;
+		++file->sorted_symcount;
+	}
+
+	for (i = 0; i < file->sorted_symcount; i++) {
+		asymbol *s = file->sorted_syms[i];
+		char buf[256];
+		const char *name = asymbol_pure_name(s, buf, sizeof(buf));
+
+		ulp_debug("Bfd_sym: %#016lx %s %s\n", bfd_asymbol_value(s),
+			  name, asymbol_is_plt(s) ? "@plt" : "");
+
+		if (asymbol_is_plt(s)) {
+			struct bfd_sym *symbol;
+			symbol = alloc_bfd_sym(name, bfd_asymbol_value(s), S_T_PLT);
+			link_bfd_sym(&file->rb_tree_syms[S_T_PLT], symbol);
+		}
+	}
+
+	free(file->sorted_syms);
 
 	list_add(&file->node, &file_list);
 
