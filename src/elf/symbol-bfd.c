@@ -16,6 +16,7 @@
 
 
 enum bfd_sym_type {
+	BFD_ELF_SYM_TEXT, /* .text */
 	BFD_ELF_SYM_PLT, /* .plt */
 	BFD_ELF_SYM_TYPE_NUM,
 };
@@ -130,6 +131,36 @@ const char *bfd_sym_name(struct bfd_sym *symbol)
 }
 
 /**
+ * The following is the TEXT related function interface.
+ */
+
+static bool asymbol_is_text(asymbol *sym)
+{
+	asection *asect;
+	asect = bfd_asymbol_section(sym);
+	return !strcmp(bfd_section_name(asect), ".text");
+}
+
+struct bfd_sym *bfd_next_text_sym(struct bfd_elf_file *file,
+				  struct bfd_sym *prev)
+{
+	return next_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_TEXT], prev);
+}
+
+unsigned long bfd_elf_text_sym_addr(struct bfd_elf_file *file, const char *name)
+{
+	if (!file)
+		return 0;
+
+	struct bfd_sym *symbol;
+	struct rb_root *rbroot = &file->rb_tree_syms[BFD_ELF_SYM_TEXT];
+
+	symbol = find_bfd_sym(rbroot, name);
+
+	return bfd_sym_addr(symbol);
+}
+
+/**
  * The following is the PLT related function interface.
  */
 
@@ -154,9 +185,12 @@ unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file, const char *name)
 
 	symbol = find_bfd_sym(rbroot, name);
 
-	return symbol ? symbol->addr : 0;
+	return bfd_sym_addr(symbol);
 }
 
+/**
+ * Common load functions
+ */
 
 static struct bfd_elf_file *file_already_load(const char *filename)
 {
@@ -344,13 +378,18 @@ static struct bfd_elf_file *file_load(const char *filename)
 		const char *name = asymbol_pure_name(s, buf, sizeof(buf));
 		unsigned long value = bfd_asymbol_value(s);
 
-		ulp_debug("Bfd_sym: %#016lx %s %s\n", value, name,
-			  asymbol_is_plt(s) ? "@plt" : "");
-
 		if (asymbol_is_plt(s)) {
 			struct bfd_sym *symbol;
 			symbol = alloc_bfd_sym(name, value, BFD_ELF_SYM_PLT, s);
 			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], symbol);
+			ulp_debug("Bfd_sym: %#016lx %s @plt\n", value, name);
+		}
+
+		if (asymbol_is_text(s)) {
+			struct bfd_sym *symbol;
+			symbol = alloc_bfd_sym(name, value, BFD_ELF_SYM_TEXT, s);
+			link_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_TEXT], symbol);
+			ulp_debug("Bfd_sym: %#016lx %s .text\n", value, name);
 		}
 	}
 

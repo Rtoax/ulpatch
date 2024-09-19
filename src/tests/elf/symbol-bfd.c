@@ -64,10 +64,11 @@ TEST(Bfd_sym, load, 0)
 	return ret;
 }
 
-TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
+TEST(Bfd_sym, for_each_sym, 0)
 {
 	int ret = 0, i;
 	struct bfd_elf_file *file;
+	struct bfd_sym *symbol;
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
 
@@ -79,30 +80,40 @@ TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
 		file = bfd_elf_open(test_files[i]);
 		if (!file) {
 			ret = -1;
-		} else {
-
-			struct bfd_sym *symbol;
-
-			for (symbol = bfd_next_plt_sym(file, NULL);
-				symbol;
-				symbol = bfd_next_plt_sym(file, symbol)) {
-
-				/* search the address again, double check */
-				unsigned long addr = bfd_elf_plt_sym_addr(file,
-								bfd_sym_name(symbol));
-				unsigned long addr2 = bfd_sym_addr(symbol);
-
-				ulp_debug("%08lx %s (%08lx)\n",
-					addr2,
-					bfd_sym_name(symbol),
-					addr);
-
-				if (addr != addr2)
-					ret = -1;
-			}
-
-			bfd_elf_close(file);
+			continue;
 		}
+
+		for (symbol = bfd_next_plt_sym(file, NULL); symbol;
+			symbol = bfd_next_plt_sym(file, symbol)) {
+
+			/* search the address again, double check */
+			unsigned long addr = bfd_elf_plt_sym_addr(file,
+							bfd_sym_name(symbol));
+			unsigned long addr2 = bfd_sym_addr(symbol);
+
+			ulp_debug("plt: %08lx %s (%08lx)\n", addr2,
+				  bfd_sym_name(symbol), addr);
+
+			if (addr != addr2)
+				ret = -1;
+		}
+
+		for (symbol = bfd_next_text_sym(file, NULL); symbol;
+			symbol = bfd_next_text_sym(file, symbol)) {
+
+			/* search the address again, double check */
+			unsigned long addr = bfd_elf_text_sym_addr(file,
+							bfd_sym_name(symbol));
+			unsigned long addr2 = bfd_sym_addr(symbol);
+
+			ulp_debug("text: %08lx %s (%08lx)\n", addr2,
+				  bfd_sym_name(symbol), addr);
+
+			if (addr != addr2)
+				ret = -1;
+		}
+
+		bfd_elf_close(file);
 	}
 
 	return ret;
