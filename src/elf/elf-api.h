@@ -220,7 +220,7 @@ int auxv_type_info(GElf_Xword a_type, const char **name, const char **format);
 struct bfd_elf_file;
 struct bfd_sym;
 
-struct bfd_elf_file* bfd_elf_load(const char *elf_file);
+struct bfd_elf_file* bfd_elf_open(const char *elf_file);
 int bfd_elf_close(struct bfd_elf_file *file);
 
 unsigned long

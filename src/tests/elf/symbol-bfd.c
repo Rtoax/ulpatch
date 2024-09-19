@@ -31,7 +31,7 @@ TEST(Bfd_sym, load_nonexist, 0)
 	int ret = -1;
 	struct bfd_elf_file *file;
 
-	file = bfd_elf_load("/a/b/c/d/e/f/g/h/i/j/k/l/m");
+	file = bfd_elf_open("/a/b/c/d/e/f/g/h/i/j/k/l/m");
 	if (!file) {
 		ret = 0;
 	} else {
@@ -53,7 +53,7 @@ TEST(Bfd_sym, load, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = bfd_elf_load(test_files[i]);
+		file = bfd_elf_open(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
@@ -76,7 +76,7 @@ TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = bfd_elf_load(test_files[i]);
+		file = bfd_elf_open(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
@@ -205,7 +205,7 @@ TEST(Bfd_sym, check_each_plt_sym_addr, 0)
 		if (!fexist(test_files[i]))
 			continue;
 
-		file = bfd_elf_load(test_files[i]);
+		file = bfd_elf_open(test_files[i]);
 		if (!file) {
 			ret = -1;
 		} else {
