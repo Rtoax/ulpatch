@@ -226,19 +226,21 @@ static bool asymbol_is_plt(asymbol *sym)
 
 static const char *asymbol_pure_name(asymbol *sym, char *buf, int blen)
 {
-	char *name = strstr(sym->name, "@");
+	unsigned int len;
+	char *name;
+
+	name = strstr(sym->name, "@");
 	if (!name)
 		return sym->name;
 
-	unsigned int len = name - sym->name;
+	len = name - sym->name;
 	if (len > blen) {
-		fprintf(stderr, "Too short buffer length.\n");
+		ulp_error("bfd-sym: Too short buffer length.\n");
 		return NULL;
 	}
 
 	strncpy(buf, sym->name, len);
 	buf[len] = '\0';
-
 	return buf;
 }
 
