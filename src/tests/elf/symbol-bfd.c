@@ -26,7 +26,7 @@ static const char *test_files[] = {
 	}
 
 
-TEST(Objdump, load_nonexist, 0)
+TEST(Bfd_sym, load_nonexist, 0)
 {
 	int ret = -1;
 	struct bfd_elf_file *file;
@@ -41,7 +41,7 @@ TEST(Objdump, load_nonexist, 0)
 	return ret;
 }
 
-TEST(Objdump, load, 0)
+TEST(Bfd_sym, load, 0)
 {
 	int ret = 0, i;
 	struct bfd_elf_file *file;
@@ -64,7 +64,7 @@ TEST(Objdump, load, 0)
 	return ret;
 }
 
-TEST(Objdump, for_each_plt_symbol_and_search, 0)
+TEST(Bfd_sym, for_each_plt_symbol_and_search, 0)
 {
 	int ret = 0, i;
 	struct bfd_elf_file *file;
@@ -193,7 +193,7 @@ close_return:
 	return ret;
 }
 
-TEST(Objdump, check_each_plt_sym_addr, 0)
+TEST(Bfd_sym, check_each_plt_sym_addr, 0)
 {
 	int ret = 0, i;
 	struct bfd_elf_file *file;
