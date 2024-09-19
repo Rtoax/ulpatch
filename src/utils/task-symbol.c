@@ -414,6 +414,13 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 		return -EINVAL;
 	}
 
+	/**
+	 * FIXME: ULP ELF VMA don't has vma::vma_elf value, maybe we should
+	 * resolve symbol same as oridinary ELF VMA.
+	 */
+	if (vma->type == VMA_ULPATCH)
+		return -EINVAL;
+
 	task = vma->task;
 	bfile = vma->bfd_elf_file;
 

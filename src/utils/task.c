@@ -1400,7 +1400,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 * task_load_vma_elf_syms() done.
 			 */
 			vma_load_all_symbols(tmp_vma);
-			task_load_vma_elf_syms(tmp_vma);
+			if (tmp_vma->is_elf)
+				task_load_vma_elf_syms(tmp_vma);
 		}
 	}
 
