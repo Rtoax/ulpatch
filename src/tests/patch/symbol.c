@@ -43,18 +43,18 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	/* Parent */
 	task_wait_wait(&waitqueue);
 
-	struct symbol *sym;
+	struct task_sym *tsym;
 	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
 	unsigned long memaddr = real_addr;
 	unsigned long addr;
 
-	sym = task_vma_find_symbol(task, name, STT_FUNC);
-	if (!sym) {
+	tsym = find_task_sym(task, name);
+	if (!tsym) {
 		ulp_error("Not found %s.\n", name);
 		ret = -1;
 		goto out;
 	}
-	addr = task_vma_symbol_vaddr(sym);
+	addr = tsym->addr;
 
 	ulp_info("%s: find %lx, real %lx\n", name, addr, memaddr);
 
@@ -154,18 +154,18 @@ static int find_task_symbol(struct task_struct *task)
 {
 	int i;
 	int err = 0;
-	struct symbol *sym;
+	struct task_sym *tsym;
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 
-		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
+		tsym = find_task_sym(task, test_symbols[i].sym);
 
 		ulp_info("%s %-30s: 0x%lx\n",
-			sym?"Exist":"NoExi",
+			tsym ? "Exist" : "NoExi",
 			test_symbols[i].sym,
-			sym?sym->sym.st_value:0);
+			tsym ? tsym->addr : 0);
 
-		if (!sym)
+		if (!tsym)
 			err = -1;
 	}
 
@@ -225,13 +225,13 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 		unsigned long addr, plt_addr;
-		struct symbol *sym, *alias_sym = NULL;
+		struct task_sym *tsym, *alias_tsym = NULL;
 
 		plt_addr = bfd_elf_plt_sym_addr(task->exe_bfd,
 				     test_symbols[i].sym);
 
-		sym = task_vma_find_symbol(task, test_symbols[i].sym, STT_FUNC);
-		if (!sym) {
+		tsym = find_task_sym(task, test_symbols[i].sym);
+		if (!tsym) {
 			ulp_error("Could not find %s in pid %d vma.\n",
 				test_symbols[i].sym, task->pid);
 			ret = -EEXIST;
@@ -240,7 +240,7 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 
 		/* Only non static has alias symbol name, such as 'stdout' */
 		if (test_symbols[i].type == TST_NON_STATIC)
-			alias_sym = task_vma_find_symbol(task, test_symbols[i].alias, STT_FUNC);
+			alias_tsym = find_task_sym(task, test_symbols[i].alias);
 
 		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 
@@ -252,22 +252,20 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 			test_symbols[i].alias ?: "",
 			test_symbols[i].alias ? "(alias)" : "",
 			addr,
-			task_vma_symbol_vaddr(sym),
-			alias_sym ? task_vma_symbol_vaddr(alias_sym) : 0,
+			tsym->addr,
+			alias_tsym ? alias_tsym->addr : 0,
 			plt_addr);
 
 		/* When relocate, we can use symbol's real virtual address in libc,
 		 * as the same time, we can use the @plt address in target elf file.
 		 */
-		if (addr == 0 ||
-			(addr != sym->sym.st_value && addr != plt_addr)) {
+		if (addr == 0 || (addr != tsym->addr && addr != plt_addr)) {
 
 			/* Can't found the symbol address, try find with alias symbol
 			 * if have one. */
 			unsigned long alias_addr = 0;
-			if (alias_sym &&
-				(alias_addr = task_vma_symbol_vaddr(alias_sym))) {
-			/* Couldn't found symbol in anyway. */
+			if (alias_tsym && (alias_addr = alias_tsym->addr)) {
+				/* Couldn't found symbol in anyway. */
 			} else
 				ret = -1;
 		}

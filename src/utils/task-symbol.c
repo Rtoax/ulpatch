@@ -18,7 +18,7 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
-
+#if 0
 static unsigned long offset_to_vaddr(struct vm_area_struct *vma, loff_t offset)
 {
 	return vma->vm_start + offset - ((loff_t)vma->vm_pgoff << PAGE_SHIFT);
@@ -334,6 +334,7 @@ out_free:
 	free(dynamics);
 	return 0;
 }
+#endif
 
 /**
  * New API of task symbols

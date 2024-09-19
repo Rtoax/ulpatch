@@ -417,6 +417,7 @@ int task_syscall(struct task_struct *task, int nr,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res);
 
+#if 0
 /**
  * FIXME: Those Old symbol API should be removed if new symbol APIs developed.
  */
@@ -427,6 +428,7 @@ int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
 			       GElf_Sym *sym);
 unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
 int vma_load_all_symbols(struct vm_area_struct *vma);
+#endif
 
 /* New symbol API */
 struct task_sym *alloc_task_sym(const char *name, unsigned long addr,

@@ -154,7 +154,7 @@ static int parse_config(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int __unused ret = 0;
-	struct symbol *target_sym;
+	struct task_sym *tsym;
 
 	parse_config(argc, argv);
 
@@ -168,8 +168,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	target_sym = task_vma_find_symbol(target_task, target_func, STT_FUNC);
-	if (!target_sym) {
+	tsym = find_task_sym(target_task, target_func);
+	if (!tsym) {
 		fprintf(stderr, "couldn't found symbol '%s'\n", target_func);
 		errno = -ENOENT;
 		ret = 1;

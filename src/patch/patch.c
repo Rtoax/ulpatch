@@ -560,78 +560,28 @@ unsigned long arch_jmp_table_jmp(void)
 static const unsigned long resolve_symbol(const struct task_struct *task,
 					  const char *name, int type)
 {
-	const struct symbol *sym = NULL;
+	const struct task_sym *tsym;
 	unsigned long addr = 0;
 
 	if (!task || !name) {
 		errno = -EINVAL;
 		return 0;
 	}
-
-	/**
-	 * Try find symbol in SELF
-	 */
-	if (task->fto_flag & FTO_VMA_ELF_FILE) {
-		sym = find_symbol(task->exe_elf, name, type);
-		if (sym) {
-			addr = sym->sym.st_value;
-			if (addr) {
-				ulp_debug("Found %s in self, addr = %lx\n",
-					name, addr);
-				goto found;
-			}
-		}
-	}
-	ulp_debug("Not found %s in self ELF.\n", name);
-
-	/**
-	 * Try find symbol address from @plt
-	 * FIXME: We should not get symbol address from @plt, use actual addr in so
-	 * instead.
-	 */
-	if (!addr && task->fto_flag & FTO_VMA_ELF_FILE) {
-		unsigned long plt = bfd_elf_plt_sym_addr(task->exe_bfd, name);
-		if (plt && task->vma_self_elf) {
-			addr = plt + task->vma_self_elf->vma_elf->load_addr;
-		}
-		if (addr) {
-			ulp_debug("Found %s in self @plt, addr = %lx\n",
-				name, addr);
-			goto found;
-		}
-	}
-	ulp_debug("Not found %s in @plt.\n", name);
-
-	/**
-	 * Try find symbol in other libraries mapped in target process address
-	 * space.
-	 */
-	if (!addr && task->fto_flag & FTO_VMA_ELF_SYMBOLS) {
-		sym = task_vma_find_symbol((struct task_struct *)task, name,
-					   type);
-		if (sym) {
-			/**
-			 * FIXME: right? I'm not sure.
-			 */
-			addr = task_vma_symbol_vaddr(sym);
-			if (addr) {
-				struct vm_area_struct *vma = sym->vma;
-				ulp_debug("Found %s in %s, addr = %lx\n",
-					name,
-					vma ? vma->name_ : "Unknown lib",
-					addr);
-				goto found;
-			}
-		}
+	if (!(task->fto_flag & FTO_VMA_ELF_SYMBOLS)) {
+		ulp_error("Must open task with FTO_VMA_ELF_SYMBOLS.\n");
+		errno = EINVAL;
+		return 0;
 	}
 
-	if (!addr)
-		ulp_error("Not find symbol %s(%s) in anywhere\n", name,
-			i_st_type_string(type));
+	tsym = find_task_sym((struct task_struct *)task, name);
+	if (tsym)
+		addr = tsym->addr;
 
-	ulp_debug("%s value %#016lx\n", name, addr);
+	if (!addr) {
+		errno = ENOENT;
+		ulp_error("Couldn't found symbol %s\n", name);
+	}
 
-found:
 	return addr;
 }
 
@@ -760,15 +710,15 @@ static int solve_patch_symbols(struct load_info *info)
 {
 	int i;
 	struct task_struct *task = info->target_task;
-	struct symbol *sym;
+	struct task_sym *tsym;
 	const char *dst_func, *src_func;
 	GElf_Sym *sym_src_func = NULL;
 
 	dst_func = info->ulp_strtab.dst_func;
 	src_func = info->ulp_strtab.src_func;
 
-	sym = task_vma_find_symbol(task, dst_func, STT_FUNC);
-	if (!sym) {
+	tsym = find_task_sym(task, dst_func);
+	if (!tsym) {
 		ulp_error("Couldn't found %s in target process, maybe %s is stripped.\n",
 		       dst_func, task->exe);
 		return -ENOENT;
@@ -792,7 +742,7 @@ static int solve_patch_symbols(struct load_info *info)
 	}
 
 	info->ulp_info->ulp_id = ++task->max_ulp_id;
-	info->ulp_info->target_func_addr = task_vma_symbol_vaddr(sym);
+	info->ulp_info->target_func_addr = tsym->addr;
 	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */
 	info->ulp_info->virtual_addr = info->ulp_info->target_func_addr;

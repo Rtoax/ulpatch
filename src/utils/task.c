@@ -1395,11 +1395,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	if (flag & FTO_VMA_ELF_SYMBOLS) {
 		task_for_each_vma(tmp_vma, task) {
-			/**
-			 * FIXME: Remove vma_load_all_symbols() if
-			 * task_load_vma_elf_syms() done.
-			 */
-			vma_load_all_symbols(tmp_vma);
 			if (tmp_vma->is_elf)
 				task_load_vma_elf_syms(tmp_vma);
 		}
