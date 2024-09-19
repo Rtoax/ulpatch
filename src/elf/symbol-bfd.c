@@ -58,22 +58,14 @@ struct bfd_sym {
 /* We just open few elf files, link list is ok. */
 static LIST_HEAD(bfd_elf_file_list);
 
+/**
+ * The following is the BFD-SYM symbol related public function interface.
+ */
 
-static struct bfd_elf_file *file_already_load(const char *filename)
-{
-	struct bfd_elf_file *f, *tmp, *ret = NULL;
-
-	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node) {
-		if (!strcmp(filename, f->name)) {
-			ret = f;
-			break;
-		}
-	}
-	return ret;
-}
-
-/* the @key is (unsigned long)bfd_sym */
-static inline int cmp_sym(struct rb_node *n1, unsigned long key)
+/**
+ * @key is (unsigned long)bfd_sym
+ */
+static inline int __cmp_bfd_sym(struct rb_node *n1, unsigned long key)
 {
 	struct bfd_sym *s1 = rb_entry(n1, struct bfd_sym, node);
 	struct bfd_sym *s2 = (struct bfd_sym *)key;
@@ -107,17 +99,16 @@ static struct bfd_sym *find_bfd_sym(struct rb_root *root, const char *name)
 	struct bfd_sym tmp = {
 		.name = (char *)name,
 	};
-	struct rb_node *node = rb_search_node(root, cmp_sym,
+	struct rb_node *node = rb_search_node(root, __cmp_bfd_sym,
 					(unsigned long)&tmp);
 
 	return node ? rb_entry(node, struct bfd_sym, node) : NULL;
 }
 
-/* Insert OK, return 0, else return -1 */
 static int link_bfd_sym(struct rb_root *root, struct bfd_sym *s)
 {
 	struct rb_node *node;
-	node = rb_insert_node(root, &s->node, cmp_sym, (unsigned long)s);
+	node = rb_insert_node(root, &s->node, __cmp_bfd_sym, (unsigned long)s);
 	return node ? -1 : 0;
 }
 
@@ -133,19 +124,27 @@ unsigned long bfd_sym_addr(struct bfd_sym *symbol)
 	return symbol ? symbol->addr : 0;
 }
 
+const char *bfd_sym_name(struct bfd_sym *symbol)
+{
+	return symbol ? symbol->name : NULL;
+}
+
+/**
+ * The following is the PLT related function interface.
+ */
+
+static bool asymbol_is_plt(asymbol *sym)
+{
+	return strstr(sym->name, "@plt") ? true : false;
+}
+
 struct bfd_sym *bfd_next_plt_sym(struct bfd_elf_file *file,
 				 struct bfd_sym *prev)
 {
 	return next_bfd_sym(&file->rb_tree_syms[BFD_ELF_SYM_PLT], prev);
 }
 
-const char *bfd_sym_name(struct bfd_sym *symbol)
-{
-	return symbol ? symbol->name : NULL;
-}
-
-unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file,
-				      const char *name)
+unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file, const char *name)
 {
 	if (!file)
 		return 0;
@@ -156,6 +155,20 @@ unsigned long bfd_elf_plt_sym_addr(struct bfd_elf_file *file,
 	symbol = find_bfd_sym(rbroot, name);
 
 	return symbol ? symbol->addr : 0;
+}
+
+
+static struct bfd_elf_file *file_already_load(const char *filename)
+{
+	struct bfd_elf_file *f, *tmp, *ret = NULL;
+
+	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node) {
+		if (!strcmp(filename, f->name)) {
+			ret = f;
+			break;
+		}
+	}
+	return ret;
 }
 
 static asymbol **slurp_symtab(struct bfd_elf_file *file)
@@ -217,11 +230,6 @@ static asymbol **slurp_dynamic_symtab(struct bfd_elf_file *file)
 	}
 
 	return sy;
-}
-
-static bool asymbol_is_plt(asymbol *sym)
-{
-	return strstr(sym->name, "@plt") ? true : false;
 }
 
 static const char *asymbol_pure_name(asymbol *sym, char *buf, int blen)
