@@ -1873,6 +1873,9 @@ int close_task(struct task_struct *task)
 		}
 	}
 
+	if (task->fto_flag & FTO_SELF_PLT)
+		bfd_elf_close(task->exe_bfd);
+
 	/* Destroy symbols rb tree */
 	rb_destroy(&task->vma_symbols, rb_free_symbol);
 
