@@ -250,13 +250,15 @@ static long remove_useless_symbols(asymbol **symbols, long count)
 	while (--count >= 0) {
 		asymbol *sym = *in_ptr++;
 
+		if (bfd_asymbol_value(sym) == 0)
+			continue;
 		if (sym->name == NULL || sym->name[0] == '\0')
 			continue;
 		if ((sym->flags & (BSF_DEBUGGING | BSF_SECTION_SYM))
 			&& ! is_significant_symbol_name(sym->name))
 			continue;
-		if (bfd_is_und_section(sym->section)
-			|| bfd_is_com_section(sym->section))
+		if (bfd_is_und_section(sym->section) ||
+		    bfd_is_com_section(sym->section))
 			continue;
 
 		*out_ptr++ = sym;
@@ -300,6 +302,10 @@ static struct bfd_elf_file *file_load(const char *filename)
 					     &file->synthsyms);
 	if (file->synthcount < 0)
 		file->synthcount = 0;
+
+	ulp_debug("Bfd_sym: %s has %ld syms, %ld dynsyms, %ld synthsyms.\n",
+		  file->name, file->symcount, file->dynsymcount,
+		  file->synthcount);
 
 	file->sorted_symcount = file->symcount ? file->symcount : file->dynsymcount;
 	file->sorted_syms = (asymbol **)malloc((file->sorted_symcount + file->synthcount)
