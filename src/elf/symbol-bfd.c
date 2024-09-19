@@ -339,8 +339,6 @@ static struct bfd_elf_file *file_load(const char *filename)
 		}
 	}
 
-	free(file->sorted_syms);
-
 	list_add(&file->node, &file_list);
 
 	return file;
@@ -393,9 +391,15 @@ int bfd_elf_close(struct bfd_elf_file *file)
 		file->synthsyms = NULL;
 	}
 
+	if (file->sorted_syms) {
+		free(file->sorted_syms);
+		file->sorted_syms = NULL;
+	}
+
 	file->symcount = 0;
 	file->dynsymcount = 0;
 	file->synthcount = 0;
+	file->sorted_symcount = 0;
 
 	list_del(&file->node);
 
