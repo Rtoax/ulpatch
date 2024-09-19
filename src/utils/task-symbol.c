@@ -343,7 +343,6 @@ static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)
 {
 	struct task_sym *s1 = rb_entry(n1, struct task_sym, node);
 	struct task_sym *s2 = (struct task_sym *)key;
-
 	return strcmp(s1->name, s2->name);
 }
 
@@ -351,15 +350,11 @@ struct task_sym *find_task_sym(struct task_struct *task, const char *name)
 {
 	struct rb_root *root;
 	struct rb_node *node;
-
 	struct task_sym tmp = {
 		.name = (char *)name,
 	};
-
 	root = &task->tsyms;
-
 	node = rb_search_node(root, __cmp_task_sym, (unsigned long)&tmp);
-
 	return node ? rb_entry(node, struct task_sym, node) : NULL;
 }
 

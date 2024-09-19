@@ -1590,9 +1590,13 @@ int close_task(struct task_struct *task)
 			vma_free_elf(tmp_vma);
 	}
 
-	if (task->fto_flag & FTO_VMA_ELF_FILE)
-		task_for_each_vma(tmp_vma, task)
+	if (task->fto_flag & FTO_VMA_ELF_FILE) {
+		task_for_each_vma(tmp_vma, task) {
 			elf_file_close(tmp_vma->name_);
+			if (tmp_vma->is_elf)
+				bfd_elf_close(tmp_vma->bfd_elf_file);
+		}
+	}
 
 	if (task->fto_flag & FTO_PROC)
 		__check_and_free_task_proc(task);
