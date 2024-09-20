@@ -1,10 +1,20 @@
 # All changes to build and install RPM packages go here.
+#
+# The upatch.spec file may only be applicable to the rpm package building
+# method, and can adapt to RHEL/Fedora/openEuler/CentOS/AlmaLinux/RockyLinux
+# and other RHEL-like Linux distribution operating systems. If you want to
+# support Debian (usually means deb package), obviously you cannot use this
+# ulpatch.spec.
 
 # Default disable ulftrace, beacuse it's is unimplemented.
 %global with_ulftrace	0
+# By default, the capstone disassembly function is supported, which is helpful
+# for debugging.
 %global with_capstone	1
 
 Name:		ulpatch
+# The version number must be consistent with the CMakeLists.txt in the
+# top-level directory.
 Version:	0.5.9
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
