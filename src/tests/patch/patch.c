@@ -163,14 +163,14 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
+	fdisasm_arch(stdout, disasm_addr, (void *)disasm_addr, disasm_size);
 
 	ret = memcpy_to_task(task, ip, (void*)new, MCOUNT_INSN_SIZE);
 	if (ret == -1 || ret != MCOUNT_INSN_SIZE) {
 		ulp_error("failed to memcpy.\n");
 	}
 
-	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
+	fdisasm_arch(stdout, disasm_addr, (void *)disasm_addr, disasm_size);
 
 #elif defined(__aarch64__)
 
@@ -194,12 +194,12 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
+	fdisasm_arch(stdout, disasm_addr, (void *)disasm_addr, disasm_size);
 
 	/* application the patch */
 	ftrace_modify_code(task, pc, 0, new, false);
 
-	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
+	fdisasm_arch(stdout, disasm_addr, (void *)disasm_addr, disasm_size);
 #endif
 
 	/**
@@ -214,7 +214,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)disasm_addr, disasm_size);
+	fdisasm_arch(stdout, disasm_addr, (void *)disasm_addr, disasm_size);
 
 	close_task(task);
 
@@ -326,7 +326,7 @@ TEST(Patch, direct_jmp_table, 0)
 	ulp_info("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
-	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, ip_pc, sizeof(jmp_entry));
@@ -339,7 +339,7 @@ TEST(Patch, direct_jmp_table, 0)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	/* This will called patched function ulpatch_try_to_wake_up() */
 	ret = try_to_wake_up(task, 1, 1);
@@ -354,7 +354,7 @@ TEST(Patch, direct_jmp_table, 0)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	close_task(task);
 	return test_ret;

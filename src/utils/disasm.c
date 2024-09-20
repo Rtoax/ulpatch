@@ -22,12 +22,13 @@ int current_disasm_arch(void)
 #endif
 }
 
-int fdisasm_arch(FILE *fp, unsigned char *code, size_t size)
+int fdisasm_arch(FILE *fp, unsigned long base, unsigned char *code, size_t size)
 {
-	return fdisasm(fp, current_disasm_arch(), code, size);
+	return fdisasm(fp, current_disasm_arch(), base, code, size);
 }
 
-int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
+int fdisasm(FILE *fp, int disasm_arch, unsigned long base, unsigned char *code,
+	    size_t size)
 {
 	uint64_t address;
 	cs_insn *insn;
@@ -38,8 +39,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 	cs_mode mode;
 
 
-	/* FIXME: Prefix */
-	address = 0x0;
+	address = base ?: (unsigned long)code;
 
 	switch (disasm_arch) {
 	case DISASM_ARCH_X86_64:
@@ -70,7 +70,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned char *code, size_t size)
 		goto close;
 	}
 
-	fprintf(fp, "Disasm:\n");
+	fprintf(fp, "Disasm: code addr %p, size %ld\n", code, size);
 	for (j = 0; j < count; j++)
 		fprintf(fp, "0x%" PRIx64 ":\t%s\t%s\n",
 			insn[j].address,
