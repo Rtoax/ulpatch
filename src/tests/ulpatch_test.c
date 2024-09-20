@@ -149,6 +149,15 @@ static int filter_matched(const char *category_name)
 	return false;
 }
 
+static void free_filter_fmt_list(void)
+{
+	struct filter_fmt *fmt, *tmp;
+	list_for_each_entry_safe(fmt, tmp, &filter_fmt_list, node) {
+		free((void *)fmt->fmt);
+		free(fmt);
+	}
+}
+
 static enum who who_am_i(const char *s)
 {
 	int i;
@@ -886,6 +895,7 @@ int main(int argc, char *argv[])
 
 	free_strstr_list(&mix_role_list);
 	release_tests();
+	free_filter_fmt_list();
 
 	return 0;
 }
