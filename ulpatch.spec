@@ -5,7 +5,7 @@
 %global with_capstone	1
 
 Name:		ulpatch
-Version:	0.5.8
+Version:	0.5.9
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
@@ -113,6 +113,6 @@ popd
 %{_bindir}/ulpatch_test
 
 %changelog
-* Thu Aug 29 2024 Rong Tao <rtoax@foxmail.com> - 0.5.8-0
-- First changelog.
+* Fri Sep 20 2024 Rong Tao <rtoax@foxmail.com> - 0.5.9-0
+- First release version.
 
