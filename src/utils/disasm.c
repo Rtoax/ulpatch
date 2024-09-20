@@ -70,7 +70,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned long base, unsigned char *code,
 		goto close;
 	}
 
-	fprintf(fp, "Disasm: code addr %p, size %ld\n", code, size);
+	fprintf(fp, "Disasm: code addr %p, size %ld, count %ld\n", code, size, count);
 	for (j = 0; j < count; j++)
 		fprintf(fp, "0x%" PRIx64 ":\t%s\t%s\n",
 			insn[j].address,
