@@ -290,7 +290,7 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 	 * $ cat /proc/$(pidof hello)/maps
 	 * 5583490000-5583491000 r-xp 00000000 b3:02 1061933 /hello
 	 */
-	addr = find_vma_span_area(task, map_len);
+	addr = find_vma_span_area(task, map_len, 0);
 	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
 		ulp_warning("Not found 4 bytes length address span area in memory space.\n"\
 			"please: cat /proc/%d/maps\n", task->pid);

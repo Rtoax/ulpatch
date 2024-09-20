@@ -130,7 +130,8 @@ struct vm_area_struct *next_vma(struct task_struct *task,
 	return  next ? rb_entry(next, struct vm_area_struct, node_rb) : NULL;
 }
 
-unsigned long find_vma_span_area(struct task_struct *task, size_t size)
+unsigned long find_vma_span_area(struct task_struct *task, size_t size,
+				 unsigned long base)
 {
 	struct vm_area_struct *ivma, *first_vma, *next_vma;
 	struct rb_node *first, *next, *rnode;
@@ -139,12 +140,16 @@ unsigned long find_vma_span_area(struct task_struct *task, size_t size)
 	first_vma = rb_entry(first, struct vm_area_struct, node_rb);
 
 	/**
-	 * Return the minimal address if the space is enough to store 'size'.
+	 * Start from base if base non-zero.
 	 */
-	if (first_vma->vm_start > MIN_ULP_START_VMA_ADDR &&
-	    first_vma->vm_start - MIN_ULP_START_VMA_ADDR >= size)
-		return MIN_ULP_START_VMA_ADDR;
+	if (base && base >= MIN_ULP_START_VMA_ADDR &&
+	    first_vma->vm_start > base &&
+	    first_vma->vm_start - base >= size)
+		return base;
 
+	/**
+	 * For each vma to find span area.
+	 */
 	for (rnode = first; rnode; rnode = rb_next(rnode)) {
 		ivma = rb_entry(rnode, struct vm_area_struct, node_rb);
 		next = rb_next(rnode);

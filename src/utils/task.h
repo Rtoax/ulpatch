@@ -346,7 +346,8 @@ struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct 
 struct vm_area_struct *find_vma(const struct task_struct *task,
 				unsigned long vaddr);
 /* Find a span area between two vma */
-unsigned long find_vma_span_area(struct task_struct *task, size_t size);
+unsigned long find_vma_span_area(struct task_struct *task, size_t size,
+				 unsigned long base);
 int read_task_vmas(struct task_struct *task, bool update_ulp);
 int update_task_vmas_ulp(struct task_struct *task);
 int free_task_vmas(struct task_struct *task);
