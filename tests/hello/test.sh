@@ -90,14 +90,14 @@ fi
 make
 
 if [[ ${patch} ]]; then
-	ulpatch -p ${pid} --patch ${patch} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+	ulpatch -p ${pid} --patch ${patch} ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
 fi
 if [[ ${unpatch} ]]; then
-	ulpatch -p ${pid} --unpatch ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+	ulpatch -p ${pid} --unpatch ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
 fi
 
 cat /proc/${pid}/maps
-ulpinfo -p ${pid} ${debug:+--log-level=9 -v} ${error:+--lv=err -v}
+ulpinfo -p ${pid} ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
 
 dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
