@@ -262,21 +262,21 @@ enum {
 static int parse_config(int argc, char *argv[])
 {
 	struct option options[] = {
-	{ "list-tests",         no_argument,        0,  'l' },
-	{ "filter",             required_argument,  0,  'f' },
-	{ "role",               required_argument,  0,  'r' },
-	{ "usecond",            required_argument,  0,  's' },
-	{ "msgq",               required_argument,  0,  'm' },
-	{ "print-nloop",        required_argument,  0,  ARG_PRINT_NLOOP },
-	{ "nr-threads",         required_argument,  0,  ARG_NR_THREADS },
-	{ "print-usec",         required_argument,  0,  ARG_PRINT_INTERVAL_USEC },
-	{ "listener-request",   required_argument,  0,  ARG_LISTENER_REQUEST },
-	{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
-	{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
-	{ "listener-epoll",     no_argument,        0,  ARG_LISTENER_EPOLL },
-	{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
-	COMMON_OPTIONS
-	{ NULL }
+		{ "list-tests",         no_argument,        0,  'l' },
+		{ "filter",             required_argument,  0,  'f' },
+		{ "role",               required_argument,  0,  'r' },
+		{ "usecond",            required_argument,  0,  's' },
+		{ "msgq",               required_argument,  0,  'm' },
+		{ "print-nloop",        required_argument,  0,  ARG_PRINT_NLOOP },
+		{ "nr-threads",         required_argument,  0,  ARG_NR_THREADS },
+		{ "print-usec",         required_argument,  0,  ARG_PRINT_INTERVAL_USEC },
+		{ "listener-request",   required_argument,  0,  ARG_LISTENER_REQUEST },
+		{ "listener-req-list",  no_argument,        0,  ARG_LISTENER_REQUEST_LIST },
+		{ "listener-nloop",     required_argument,  0,  ARG_LISTENER_NLOOP },
+		{ "listener-epoll",     no_argument,        0,  ARG_LISTENER_EPOLL },
+		{ "error-exit",         no_argument,        0,  ARG_ERROR_EXIT },
+		COMMON_OPTIONS
+		{ NULL }
 	};
 
 	reset_getopt();
