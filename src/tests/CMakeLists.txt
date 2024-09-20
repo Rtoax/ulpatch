@@ -8,7 +8,6 @@ find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
 add_executable(ulpatch_test
 	listener.c
-	main.c
 	test.c
 	arch/ftrace.c
 	arch/instruments.c
@@ -29,6 +28,7 @@ add_executable(ulpatch_test
 	patch/object/hello/hello.c
 	patch/patch.c
 	patch/symbol.c
+	ulpatch_test.c
 	utils/ansi.c
 	utils/backtrace.c
 	utils/disasm.c
