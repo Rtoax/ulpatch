@@ -67,7 +67,11 @@ static unsigned long total_spent_us = 0;
 /* For -l, --list-tests */
 static bool just_list_tests = false;
 /* For -f, --filter */
-static char *filter_format = NULL;
+struct filter_fmt {
+	const char *fmt;
+	struct list_head node; /* head is filter_fmt_list */
+};
+static LIST_HEAD(filter_fmt_list);
 
 /* exit if Error */
 static bool error_exit = false;
@@ -123,6 +127,28 @@ static void print_test_symbol(void);
 static const char *prog_name = "ulpatch_test";
 
 
+static void add_filter_fmt(const char *str)
+{
+	struct filter_fmt *fmt = malloc(sizeof(struct filter_fmt));
+	fmt->fmt = strdup(str);
+	fprintf(stderr, "Filter %s\n", str);
+	list_add(&fmt->node, &filter_fmt_list);
+}
+
+static inline int has_filter(void)
+{
+	return !list_empty(&filter_fmt_list);
+}
+
+static int filter_matched(const char *category_name)
+{
+	struct filter_fmt *fmt;
+	list_for_each_entry(fmt, &filter_fmt_list, node)
+		if (strstr(category_name, fmt->fmt))
+			return true;
+	return false;
+}
+
 static enum who who_am_i(const char *s)
 {
 	int i;
@@ -176,7 +202,7 @@ static void print_help(void)
 	"Tests:\n"
 	"\n"
 	" -l, --list-tests    list all tests\n"
-	" -f, --filter [STR]  filter out some tests\n"
+	" -f, --filter [STR]  filter out some tests, (may be listed multiple times)\n"
 	"\n");
 	printf(
 	"Role:\n"
@@ -295,7 +321,7 @@ static int parse_config(int argc, char *argv[])
 			just_list_tests = true;
 			break;
 		case 'f':
-			filter_format = optarg;
+			add_filter_fmt(optarg);
 			break;
 		case 'r':
 			role = who_am_i(optarg);
@@ -406,12 +432,12 @@ static bool should_filter_out(struct test *test)
 	char category_name[256];
 
 	/* Default: test all */
-	if (!filter_format)
+	if (!has_filter())
 		return false;
 
 	snprintf(category_name, 256, "%s.%s", test->category, test->name);
 
-	if (strstr(category_name, filter_format))
+	if (filter_matched(category_name))
 		return false;
 	else if (test->prio < TEST_PRIO_HIGHER) {
 		if (just_list_tests)
