@@ -59,6 +59,7 @@ struct vma_ulp {
 	void *elf_mem;
 
 #define MIN_ULP_START_VMA_ADDR	0x400000U
+#define MAX_ULP_START_VMA_ADDR	0xFFFFFFFFUL
 	/* Belongs to */
 	struct vm_area_struct *vma;
 

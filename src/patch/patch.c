@@ -285,12 +285,12 @@ static int create_mmap_vma_file(struct task_struct *task, struct load_info *info
 	 * 0xFFFFFFFFUL, maybe i should use jmp_table, see arch_jmp_table_jmp()
 	 * or, maybe we could use jmp/bl to register.
 	 *
-	 * Such ad base address on ASLR process address space(PIC ELF) is
+	 * Such as base address on ASLR process address space(PIE) is
 	 * bigger than 4 bytes, Such as:
-	 * $ cat /proc/$(pidof hello)/maps
-	 * 5583490000-5583491000 r-xp 00000000 b3:02 1061933 /hello
+	 *    $ cat /proc/$(pidof hello)/maps
+	 *    5583490000-5583491000 r-xp 00000000 b3:02 1061933 /hello
 	 */
-	addr = find_vma_span_area(task, map_len, 0);
+	addr = find_vma_span_area(task, map_len, MIN_ULP_START_VMA_ADDR);
 	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
 		ulp_warning("Not found 4 bytes length address span area in memory space.\n"\
 			"please: cat /proc/%d/maps\n", task->pid);
