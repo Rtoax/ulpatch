@@ -40,20 +40,22 @@ static void __ctor(TEST_PRIO_START) __init_test_list(void)
 }
 
 #define test_log(fmt...) ({	\
-	int __n = 0;	\
-	__n = fprintf(stderr, fmt);	\
-	__n;	\
+		int __n = 0;	\
+		__n = fprintf(stderr, fmt);	\
+		__n;	\
 	})
 
-#define test_ok(fmt...) \
-	fprintf(stderr, "\033[32m");	\
-	fprintf(stderr, fmt);	\
-	fprintf(stderr, "\033[m");
+#define test_ok(fmt...) do {	\
+		fprintf(stderr, "\033[32m");	\
+		fprintf(stderr, fmt);	\
+		fprintf(stderr, "\033[m");	\
+	} while (0)
 
-#define test_failed(fmt...) \
-	fprintf(stderr, "\033[31m");	\
-	fprintf(stderr, fmt);	\
-	fprintf(stderr, "\033[m");
+#define test_failed(fmt...) do {	\
+		fprintf(stderr, "\033[31m");	\
+		fprintf(stderr, fmt);	\
+		fprintf(stderr, "\033[m");	\
+	} while (0)
 
 
 #define STAT_IDX_SUCCESS	0
