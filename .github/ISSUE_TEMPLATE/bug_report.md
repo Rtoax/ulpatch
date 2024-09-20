@@ -17,6 +17,7 @@ A clear and concise description of what the bug is.
 -- OS platform and distribution (e.g., Linux Ubuntu 16.04):
 -- GLibc Version (e.g., ldconfig (GNU libc) 2.38) :
 -- GCC/Compiler version (e.g., gcc (GCC) 13.2.1 20231205 (Red Hat 13.2.1-6)) :
+-- You can directly use the --info parameter to view system and ULPatch related information:
 
 **To Reproduce (Required)**
 Steps to reproduce the behavior:

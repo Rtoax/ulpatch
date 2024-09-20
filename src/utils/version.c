@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2024 Rong Tao */
 #include <stdio.h>
+#include <sys/utsname.h>
+#include <gnu/libc-version.h>
+
+#define __ULP_DEV 1
+#include <patch/meta.h>
 
 #include <utils/util.h>
 #include <utils/compiler.h>
@@ -49,3 +54,18 @@ const char *ulpatch_version(void)
 	return ULPATCH_VERSION;
 }
 
+void ulpatch_info(const char *progname)
+{
+	struct utsname name;
+
+	uname(&name);
+
+	printf("System\n");
+	printf("  OS: %s %s %s\n", name.sysname, name.release, name.version);
+	printf("  Arch: %s\n", name.machine);
+	printf("  Glibc: %s-%s\n", gnu_get_libc_version(), gnu_get_libc_release());
+	printf("Build\n");
+	printf("  version: %s\n", ulpatch_version());
+	printf("  GNUC: %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+	printf("  ULP version: %d\n", ULPATCH_FILE_VERSION);
+}

@@ -13,6 +13,7 @@ enum {
 	ARG_LOG_LEVEL = 139,
 	ARG_LOG_DEBUG,
 	ARG_LOG_ERR,
+	ARG_LOG_INFO,
 	ARG_COMMON_MAX,
 };
 
@@ -39,6 +40,8 @@ static void print_usage_common(const char *progname)
 	"  -v, --verbose       set verbose\n"
 	"  -h, --help          display this help and exit\n"
 	"  -V, --version       output version information and exit\n"
+	"  --info              Print detailed information about features \n"
+	"                      supported by the kernel and the ulpatch build.\n"
 	"\n");
 	printf(" %s %s\n", progname, ulpatch_version());
 }
@@ -57,7 +60,8 @@ static void reset_getopt(void)
 	{ "log-debug",      no_argument,       0, ARG_LOG_DEBUG },	\
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
 	{ "dry-run",        no_argument,       0, 'u' },	\
-	{ "verbose",        no_argument,       0, 'v' },
+	{ "verbose",        no_argument,       0, 'v' },	\
+	{ "info",           no_argument,       0, ARG_LOG_INFO },
 #define COMMON_GETOPT_OPTSTRING "uVvh"
 
 #define COMMON_GETOPT_CASES(progname, usage)	\
@@ -86,6 +90,9 @@ static void reset_getopt(void)
 	case ARG_LOG_ERR:	\
 		log_level = LOG_ERR;	\
 		break;	\
+	case ARG_LOG_INFO:	\
+		ulpatch_info(progname);	\
+		cmd_exit_success();	\
 	case '?':	\
 		fprintf(stderr, "Unknown option or option missing argument.\n");	\
 		cmd_exit(1);

@@ -22,3 +22,9 @@ TEST(ulpinfo, help, 0)
 	return ulpinfo(argc, argv) + ulpinfo(argc, argv2);
 }
 
+TEST(ulpinfo, info, 0)
+{
+	int argc = 2;
+	char *argv[] = {"ulpinfo", "--info"};
+	return ulpinfo(argc, argv);
+}

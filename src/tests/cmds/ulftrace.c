@@ -22,3 +22,10 @@ TEST(ulftrace, help, 0)
 	return ulftrace(argc, argv) + ulftrace(argc, argv2);
 }
 
+TEST(ulftrace, info, 0)
+{
+	int argc = 2;
+	char *argv[] = {"ulftrace", "--info"};
+	return ulftrace(argc, argv);
+}
+

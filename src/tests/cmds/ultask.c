@@ -22,3 +22,9 @@ TEST(ultask, help, 0)
 	return ultask(argc, argv) + ultask(argc, argv2);
 }
 
+TEST(ultask, info, 0)
+{
+	int argc = 2;
+	char *argv[] = {"ultask", "--info"};
+	return ultask(argc, argv);
+}

@@ -21,3 +21,10 @@ TEST(ulpatch, help, 0)
 	char *argv2[] = {"ulpatch", "-h"};
 	return ulpatch(argc, argv) + ulpatch(argc, argv2);
 }
+
+TEST(ulpatch, info, 0)
+{
+	int argc = 2;
+	char *argv[] = {"ulpatch", "--info"};
+	return ulpatch(argc, argv);
+}

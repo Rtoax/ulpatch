@@ -21,6 +21,12 @@
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
+/* Must between utils/cmds.h and args-common.c */
+#undef cmd_exit_success
+#define cmd_exit_success() exit(0)
+#undef cmd_exit
+#define cmd_exit(v) exit(v)
+
 #include <args-common.c>
 
 
