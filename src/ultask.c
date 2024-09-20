@@ -17,6 +17,7 @@
 #include <utils/task.h>
 #include <utils/disasm.h>
 #include <utils/compiler.h>
+#include <utils/cmds.h>
 
 #include <patch/patch.h>
 
@@ -72,7 +73,7 @@ static struct task_struct *target_task = NULL;
 static const char *prog_name = "ultask";
 
 
-static void print_help(void)
+static int print_help(void)
 {
 	printf(
 	"\n"
@@ -127,7 +128,8 @@ static void print_help(void)
 	"\n"
 	);
 	print_usage_common(prog_name);
-	exit(0);
+	cmd_exit_success();
+	return 0;
 }
 
 static int parse_config(int argc, char *argv[])
@@ -154,6 +156,8 @@ static int parse_config(int argc, char *argv[])
 		{ NULL }
 	};
 
+	reset_getopt();
+
 	while (1) {
 		int c;
 		int option_index = 0;
@@ -174,7 +178,7 @@ static int parse_config(int argc, char *argv[])
 			vma_addr = str2addr(optarg);
 			if (vma_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-vma.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_DUMP_ADDR:
@@ -182,14 +186,14 @@ static int parse_config(int argc, char *argv[])
 			dump_addr = str2addr(optarg);
 			if (dump_addr == 0) {
 				fprintf(stderr, "Wrong address for --dump-addr.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_DUMP_SIZE:
 			dump_size = str2size(optarg);
 			if (dump_size == 0) {
 				fprintf(stderr, "Wrong value for --dump-size.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_JMP_FROM_ADDR:
@@ -197,7 +201,7 @@ static int parse_config(int argc, char *argv[])
 			jmp_addr_from = str2addr(optarg);
 			if (jmp_addr_from == 0) {
 				fprintf(stderr, "Wrong address for --jmp-from.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_JMP_TO_ADDR:
@@ -205,7 +209,7 @@ static int parse_config(int argc, char *argv[])
 			jmp_addr_to = str2addr(optarg);
 			if (jmp_addr_to == 0) {
 				fprintf(stderr, "Wrong address for --jmp-to.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_FILE_MAP_TO_VMA:
@@ -237,14 +241,14 @@ static int parse_config(int argc, char *argv[])
 			disasm_addr = str2addr(optarg);
 			if (disasm_addr == 0) {
 				fprintf(stderr, "Invalid --disasm-addr argument.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case ARG_DISASM_SIZE:
 			disasm_size = str2size(optarg);
 			if (disasm_size == 0) {
 				fprintf(stderr, "Wrong value for --disasm-size.\n");
-				exit(1);
+				cmd_exit(1);
 			}
 			break;
 		case 'o':
@@ -253,7 +257,7 @@ static int parse_config(int argc, char *argv[])
 		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
-			exit(1);
+			cmd_exit(1);
 			break;
 		}
 	}
@@ -263,12 +267,12 @@ static int parse_config(int argc, char *argv[])
 	 */
 	if (target_pid == -1) {
 		fprintf(stderr, "Specify pid with -p, --pid.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (!proc_pid_exist(target_pid)) {
 		fprintf(stderr, "pid %d not exist.\n", target_pid);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	/**
@@ -289,7 +293,7 @@ static int parse_config(int argc, char *argv[])
 		if ((!jmp_addr_from && jmp_addr_to) || \
 			(jmp_addr_from && !jmp_addr_to)) {
 			fprintf(stderr, "must specify --jmp-from and --jmp-to at the same time.\n");
-			exit(1);
+			cmd_exit(1);
 		}
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 	} else {
@@ -303,32 +307,32 @@ static int parse_config(int argc, char *argv[])
 
 	if (flag_dump_vma && !output_file) {
 		fprintf(stderr, "--dump-vma need output file(-o).\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (flag_dump_addr && !output_file) {
 		fprintf(stderr, "--dump-addr need output file(-o).\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (flag_dump_addr && (!dump_addr || !dump_size)) {
 		fprintf(stderr, "--dump-addr need --dump-size.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (flag_disasm && disasm_addr && !disasm_size) {
 		fprintf(stderr, "need --disasm-size if disassemble\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (map_file && !fexist(map_file)) {
 		fprintf(stderr, "%s is not exist.\n", map_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (output_file && fexist(output_file)) {
 		fprintf(stderr, "%s is already exist.\n", output_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	return 0;
@@ -428,12 +432,18 @@ static void list_all_symbol(void)
 	}
 }
 
-int main(int argc, char *argv[])
+int ultask(int argc, char *argv[])
 {
 	int ret = 0;
 	int flags = FTO_ALL;
 
-	parse_config(argc, argv);
+	ret = parse_config(argc, argv);
+#if !defined(ULP_CMD_MAIN)
+	if (ret == CMD_RETURN_SUCCESS_VALUE)
+		return 0;
+#endif
+	if (ret)
+		return ret;
 
 	COMMON_IN_MAIN();
 
@@ -534,3 +544,9 @@ done:
 	return ret;
 }
 
+#if defined(ULP_CMD_MAIN)
+int main(int argc, char *argv[])
+{
+	return ultask(argc, argv);
+}
+#endif

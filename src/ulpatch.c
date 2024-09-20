@@ -15,6 +15,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <utils/task.h>
+#include <utils/cmds.h>
 
 #include <args-common.c>
 
@@ -41,7 +42,7 @@ static const char *prog_name = "ulpatch";
 int check_patch_file(const char *file);
 
 
-static void print_help(void)
+static int print_help(void)
 {
 	printf(
 	"\n"
@@ -62,7 +63,8 @@ static void print_help(void)
 	"  --unpatch           unpatch the latest ulpatch from target task.\n"
 	"\n");
 	print_usage_common(prog_name);
-	exit(0);
+	cmd_exit_success();
+	return 0;
 }
 
 static int parse_config(int argc, char *argv[])
@@ -76,6 +78,8 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
+
+	reset_getopt();
 
 	while (1) {
 		int c;
@@ -99,24 +103,24 @@ static int parse_config(int argc, char *argv[])
 		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
-			exit(1);
+			cmd_exit(1);
 			break;
 		}
 	}
 
 	if (command_type == CMD_NONE) {
 		fprintf(stderr, "Nothing to do, check -h, --help.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (target_pid == -1) {
 		fprintf(stderr, "Specify pid with -p, --pid.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (!proc_pid_exist(target_pid)) {
 		fprintf(stderr, "pid %d not exist.\n", target_pid);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	/* check patch file */
@@ -124,7 +128,7 @@ static int parse_config(int argc, char *argv[])
 		ret = check_patch_file(patch_file);
 		if (ret) {
 			fprintf(stderr, "Check %s failed.\n", patch_file);
-			exit(1);
+			cmd_exit(1);
 		}
 	}
 
@@ -176,9 +180,17 @@ static int command_unpatch(void)
 	return delete_patch(target_task);
 }
 
-int main(int argc, char *argv[])
+int ulpatch(int argc, char *argv[])
 {
-	parse_config(argc, argv);
+	int ret;
+
+	ret = parse_config(argc, argv);
+#if !defined(ULP_CMD_MAIN)
+	if (ret == CMD_RETURN_SUCCESS_VALUE)
+		return 0;
+#endif
+	if (ret)
+		return ret;
 
 	COMMON_IN_MAIN();
 
@@ -210,3 +222,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#if defined(ULP_CMD_MAIN)
+int main(int argc, char *argv[])
+{
+	return ulpatch(argc, argv);
+}
+#endif

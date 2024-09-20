@@ -16,7 +16,7 @@ enum {
 	ARG_COMMON_MAX,
 };
 
-void print_usage_common(const char *progname)
+static void print_usage_common(const char *progname)
 {
 	printf(
 	" Common argument:\n"
@@ -43,6 +43,12 @@ void print_usage_common(const char *progname)
 	printf(" %s %s\n", progname, ulpatch_version());
 }
 
+static void reset_getopt(void)
+{
+	optarg = NULL;
+	optind = opterr = optopt = 0;
+}
+
 #define COMMON_OPTIONS	\
 	{ "version",        no_argument,       0, 'V' },	\
 	{ "help",           no_argument,       0, 'h' },	\
@@ -57,10 +63,10 @@ void print_usage_common(const char *progname)
 #define COMMON_GETOPT_CASES(progname, usage)	\
 	case 'V':	\
 		printf("%s %s\n", progname, ulpatch_version());	\
-		exit(0);	\
+		cmd_exit_success();	\
 	case 'h':	\
 		usage();	\
-		exit(0);	\
+		cmd_exit_success();	\
 		break;	\
 	case 'v':	\
 		enable_verbose();	\
@@ -82,9 +88,9 @@ void print_usage_common(const char *progname)
 		break;	\
 	case '?':	\
 		fprintf(stderr, "Unknown option or option missing argument.\n");	\
-		exit(1);
+		cmd_exit(1);
 
 #define COMMON_IN_MAIN() do {	\
-	set_log_level(log_level);	\
+		set_log_level(log_level);	\
 	} while (0)
 

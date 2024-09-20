@@ -13,6 +13,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <utils/task.h>
+#include <utils/cmds.h>
 
 #include <patch/patch.h>
 
@@ -36,7 +37,7 @@ static const char *patch_object_file = NULL;
 static const char *prog_name = "ulftrace";
 
 
-static void print_help(void)
+static int print_help(void)
 {
 	printf(
 	"\n"
@@ -63,7 +64,8 @@ static void print_help(void)
 	"\n",
 	ULPATCH_FTRACE_OBJ_PATH);
 	print_usage_common(prog_name);
-	exit(0);
+	cmd_exit_success();
+	return 0;
 }
 
 static int parse_config(int argc, char *argv[])
@@ -75,6 +77,8 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
+
+	reset_getopt();
 
 	while (1) {
 		int c;
@@ -97,29 +101,29 @@ static int parse_config(int argc, char *argv[])
 		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
-			exit(1);
+			cmd_exit(2);
 			break;
 		}
 	}
 
 	if (target_pid == -1) {
 		fprintf(stderr, "Specify pid with -p, --pid.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (!target_func) {
 		fprintf(stderr, "Specify target function to trace with -f, --function.\n");
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (!proc_pid_exist(target_pid)) {
 		fprintf(stderr, "pid %d not exist.\n", target_pid);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (patch_object_file && !fexist(patch_object_file)) {
 		fprintf(stderr, "%s not exist.\n", patch_object_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if (!patch_object_file) {
@@ -129,7 +133,7 @@ static int parse_config(int argc, char *argv[])
 				"Make sure you install ulpatch correctly.\n",
 				ULPATCH_FTRACE_OBJ_PATH
 			);
-			exit(1);
+			cmd_exit(1);
 		}
 		fprintf(stderr, "WARNING: use default %s.\n",
 			ULPATCH_FTRACE_OBJ_PATH);
@@ -138,25 +142,31 @@ static int parse_config(int argc, char *argv[])
 
 	if (!fexist(patch_object_file)) {
 		fprintf(stderr, "%s is not exist.\n", patch_object_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	if ((ftype(patch_object_file) & FILE_ELF_RELO) != FILE_ELF_RELO) {
 		fprintf(stderr, "%s is not ELF or ELF LSB relocatable.\n",
 			patch_object_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	return 0;
 }
 
 
-int main(int argc, char *argv[])
+int ulftrace(int argc, char *argv[])
 {
-	int __unused ret = 0;
+	int ret = 0;
 	struct task_sym *tsym;
 
-	parse_config(argc, argv);
+	ret = parse_config(argc, argv);
+#if !defined(ULP_CMD_MAIN)
+	if (ret == CMD_RETURN_SUCCESS_VALUE)
+		return 0;
+#endif
+	if (ret)
+		return ret;
 
 	COMMON_IN_MAIN();
 
@@ -188,3 +198,9 @@ done:
 	return ret;
 }
 
+#if defined(ULP_CMD_MAIN)
+int main(int argc, char *argv[])
+{
+	return ulftrace(argc, argv);
+}
+#endif

@@ -13,6 +13,10 @@ add_executable(ulpatch_test
 	arch/ftrace.c
 	arch/instruments.c
 	arch/mcount.c
+	cmds/ulftrace.c
+	cmds/ulpatch.c
+	cmds/ulpinfo.c
+	cmds/ultask.c
 	elf/core.c
 	elf/ehdr.c
 	elf/open.c
@@ -39,6 +43,10 @@ add_executable(ulpatch_test
 	utils/task-symbol.c
 	utils/utils.c
 	utils/version.c
+	${PROJECT_SOURCE_DIR}/src/ulftrace.c
+	${PROJECT_SOURCE_DIR}/src/ulpatch.c
+	${PROJECT_SOURCE_DIR}/src/ulpinfo.c
+	${PROJECT_SOURCE_DIR}/src/ultask.c
 )
 
 target_include_directories(ulpatch_test PRIVATE ..)

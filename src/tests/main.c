@@ -17,6 +17,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <utils/task.h>
+#include <utils/cmds.h>
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
@@ -277,6 +278,8 @@ static int parse_config(int argc, char *argv[])
 	COMMON_OPTIONS
 	{ NULL }
 	};
+
+	reset_getopt();
 
 	while (1) {
 		int c;

@@ -16,6 +16,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <utils/task.h>
+#include <utils/cmds.h>
 
 #include <args-common.c>
 
@@ -25,7 +26,7 @@ static const char *prog_name = "ulpinfo";
 static char *patch_file = NULL;
 static pid_t pid = 0;
 
-static void print_help(void)
+static int print_help(void)
 {
 	printf(
 	"\n"
@@ -42,7 +43,8 @@ static void print_help(void)
 	"  -p, --pid [PID]     list all patches in specified PID process\n"
 	"\n");
 	print_usage_common(prog_name);
-	exit(0);
+	cmd_exit_success();
+	return 0;
 }
 
 static int parse_config(int argc, char *argv[])
@@ -53,6 +55,8 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
+
+	reset_getopt();
 
 	while (1) {
 		int c;
@@ -72,7 +76,7 @@ static int parse_config(int argc, char *argv[])
 		COMMON_GETOPT_CASES(prog_name, print_help)
 		default:
 			print_help();
-			exit(1);
+			cmd_exit(1);
 			break;
 		}
 	}
@@ -87,11 +91,11 @@ int show_patch_info(void)
 
 	if (!patch_file) {
 		fprintf(stderr, "Must specify --patch\n");
-		exit(1);
+		cmd_exit(1);
 	}
 	if (!fexist(patch_file)) {
 		fprintf(stderr, "%s is not exist\n", patch_file);
-		exit(1);
+		cmd_exit(1);
 	}
 
 	err = alloc_patch_file(patch_file, "temp.up", &info);
@@ -169,9 +173,17 @@ free:
 	return 0;
 }
 
-int main(int argc, char *argv[])
+int ulpinfo(int argc, char *argv[])
 {
-	parse_config(argc, argv);
+	int ret;
+
+	ret = parse_config(argc, argv);
+#if !defined(ULP_CMD_MAIN)
+	if (ret == CMD_RETURN_SUCCESS_VALUE)
+		return 0;
+#endif
+	if (ret)
+		return ret;
 
 	COMMON_IN_MAIN();
 
@@ -191,3 +203,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#if defined(ULP_CMD_MAIN)
+int main(int argc, char *argv[])
+{
+	return ulpinfo(argc, argv);
+}
+#endif

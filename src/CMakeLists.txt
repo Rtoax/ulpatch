@@ -22,22 +22,22 @@ link_libraries(${ELF} ${RT}
 # Target: ultask
 if (BUILD_ULTASK)
 	add_executable(ultask ultask.c)
-	target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS})
+	target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 endif()
 
 # Target: ulftrace
 if (BUILD_ULFTRACE)
 	add_executable(ulftrace ulftrace.c)
-	target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS})
+	target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 endif()
 
 # Target: ulpatch
 add_executable(ulpatch ulpatch.c)
-target_compile_definitions(ulpatch PRIVATE ${UTILS_CFLAGS_MACROS})
+target_compile_definitions(ulpatch PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 
 # Target: ulpinfo
 add_executable(ulpinfo ulpinfo.c)
-target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS})
+target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 
 message(STATUS "target ulp-config")
 add_custom_target(ulp-config ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulp-config)
