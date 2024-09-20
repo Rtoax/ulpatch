@@ -452,10 +452,12 @@ int setup_load_info(struct load_info *info)
 	/* Find internal symbols and strings. */
 	for (i = 1; i < info->hdr->e_shnum; i++) {
 		if (info->sechdrs[i].sh_type == SHT_SYMTAB) {
+			ulp_debug("Found symtab in ulp.\n");
 			info->index.sym = i;
 			info->index.str = info->sechdrs[i].sh_link;
 			info->strtab = (char *)info->hdr
 				+ info->sechdrs[info->index.str].sh_offset;
+			memshowinlog(LOG_DEBUG, info->strtab, info->sechdrs[i].sh_size);
 			break;
 		}
 	}

@@ -49,3 +49,5 @@ SRPMS
 SOURCES
 *.rpm
 
+# Log
+*.log

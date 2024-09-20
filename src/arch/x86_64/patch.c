@@ -91,6 +91,11 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 		sym = (Elf64_Sym *)(sechdrs[symindex].sh_addr + t_off)
 			+ ELF64_R_SYM(rel[i].r_info);
 
+		memshowinlog(LOG_DEBUG, info->strtab, info->sechdrs[info->index.sym].sh_size);
+		ulp_debug("symname: st_name = %d, st_value %lx, bind %d, SYM:r_info %ld, ndx %d\n",
+			  sym->st_name, sym->st_value, ELF64_ST_BIND(sym->st_info),
+			  ELF64_R_SYM(rel[i].r_info), sym->st_shndx);
+
 		symname = strtab + sym->st_name;
 		r_type = (int)ELF64_R_TYPE(rel[i].r_info);
 		val = sym->st_value + rel[i].r_addend;
