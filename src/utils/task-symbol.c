@@ -171,7 +171,7 @@ static int load_self_vma_symbols(struct vm_area_struct *leader)
 	struct symbol *sym, *tmp;
 	struct rb_root *root = &task->exe_elf->symbols;
 
-	rbtree_postorder_for_each_entry_safe(sym, tmp, root, node)
+	rbtree_postorder_for_each_entry_safe(sym, tmp, root, sort_by_name)
 		err |= task_vma_alloc_link_symbol(leader, sym->name, &sym->sym);
 
 	return err;
@@ -345,14 +345,14 @@ out_free:
 
 static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)
 {
-	struct task_sym *s1 = rb_entry(n1, struct task_sym, node);
+	struct task_sym *s1 = rb_entry(n1, struct task_sym, sort_by_name);
 	struct task_sym *s2 = (struct task_sym *)key;
 	return strcmp(s1->name, s2->name);
 }
 
 static void __rb_free_task_sym(struct rb_node *node)
 {
-	struct task_sym *s = rb_entry(node, struct task_sym, node);
+	struct task_sym *s = rb_entry(node, struct task_sym, sort_by_name);
 	free_task_sym(s);
 }
 
@@ -385,7 +385,7 @@ struct task_sym *find_task_sym(struct task_struct *task, const char *name)
 	};
 	root = &task->tsyms.syms;
 	node = rb_search_node(root, __cmp_task_sym, (unsigned long)&tmp);
-	return node ? rb_entry(node, struct task_sym, node) : NULL;
+	return node ? rb_entry(node, struct task_sym, sort_by_name) : NULL;
 }
 
 int link_task_sym(struct task_struct *task, struct task_sym *s)
@@ -393,7 +393,8 @@ int link_task_sym(struct task_struct *task, struct task_sym *s)
 	struct rb_root *root;
 	struct rb_node *node;
 	root = &task->tsyms.syms;
-	node = rb_insert_node(root, &s->node, __cmp_task_sym, (unsigned long)s);
+	node = rb_insert_node(root, &s->sort_by_name, __cmp_task_sym,
+		       (unsigned long)s);
 	return node ? -1 : 0;
 }
 
@@ -402,8 +403,8 @@ struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev)
 	struct rb_root *root;
 	struct rb_node *next;
 	root = &task->tsyms.syms;
-	next = prev ? rb_next(&prev->node) : rb_first(root);
-	return next ? rb_entry(next, struct task_sym, node) : NULL;
+	next = prev ? rb_next(&prev->sort_by_name) : rb_first(root);
+	return next ? rb_entry(next, struct task_sym, sort_by_name) : NULL;
 }
 
 int task_load_vma_elf_syms(struct vm_area_struct *vma)

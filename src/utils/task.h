@@ -252,7 +252,7 @@ struct task_sym {
 	unsigned long addr;
 	struct vm_area_struct *vma;
 	/* root is struct task_syms.syms */
-	struct rb_node node;
+	struct rb_node sort_by_name;
 };
 
 struct task_syms {
