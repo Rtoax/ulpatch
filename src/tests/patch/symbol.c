@@ -14,8 +14,9 @@
 #include <tests/test-api.h>
 
 
-static __unused void STATIC_FUNC_FN(void)
+static void STATIC_FUNC_FN(void)
 {
+	return;
 }
 
 void *get_static_func_fn(void)
@@ -26,31 +27,11 @@ void *get_static_func_fn(void)
 static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 {
 	int ret = 0;
-	int status = 0;
-	struct task_wait waitqueue;
-
-	task_wait_init(&waitqueue, NULL);
-
-	pid_t pid = fork();
-	if (pid == 0) {
-		char *argv[] = {
-			(char*)ulpatch_test_path,
-			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
-			NULL
-		};
-		ret = execvp(argv[0], argv);
-		if (ret == -1)
-			exit(1);
-	}
-
-	/* Parent */
-	task_wait_wait(&waitqueue);
-
 	struct task_sym *tsym;
-	struct task_struct *task = open_task(pid, FTO_VMA_ELF_FILE);
-	unsigned long memaddr = real_addr;
+	struct task_struct *task;
 	unsigned long addr;
+
+	task = open_task(getpid(), FTO_VMA_ELF_FILE);
 
 	tsym = find_task_sym(task, name);
 	if (!tsym) {
@@ -60,23 +41,15 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	}
 	addr = tsym->addr;
 
-	ulp_info("%s: find %lx, real %lx\n", name, addr, memaddr);
+	ulp_info("%s: find %lx, real %lx\n", name, addr, real_addr);
 
-	if (addr != memaddr) {
-		ulp_error("%s: find %lx, real %lx\n", name, addr, memaddr);
+	if (addr != real_addr) {
+		ulp_error("%s: find %lx, real %lx\n", name, addr, real_addr);
 		ret = -1;
 	}
 
 out:
-	task_wait_trigger(&waitqueue);
-
-	waitpid(pid, &status, __WALL);
-	if (status != 0) {
-		ret = -EINVAL;
-	}
 	close_task(task);
-
-	task_wait_destroy(&waitqueue);
 	return ret;
 }
 
@@ -144,7 +117,6 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	close_task(task);
 
 	task_wait_destroy(&waitqueue);
-
 	return ret;
 }
 
