@@ -251,8 +251,15 @@ struct task_sym {
 	char *name;
 	unsigned long addr;
 	struct vm_area_struct *vma;
-	/* root is struct task_struct.tsyms */
+	/* root is struct task_syms.syms */
 	struct rb_node node;
+};
+
+struct task_syms {
+	/**
+	 * node is struct task_sym.node
+	 */
+	struct rb_root syms;
 };
 
 /**
@@ -305,9 +312,8 @@ struct task_struct {
 
 	/**
 	 * Store all symbols that task defined.
-	 * node is struct task_sym.node
 	 */
-	struct rb_root tsyms;
+	struct task_syms tsyms;
 
 	/**
 	 * Point to vma::bfd_elf_file field, no need to free or close.

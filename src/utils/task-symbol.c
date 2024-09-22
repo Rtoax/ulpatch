@@ -383,7 +383,7 @@ struct task_sym *find_task_sym(struct task_struct *task, const char *name)
 	struct task_sym tmp = {
 		.name = (char *)name,
 	};
-	root = &task->tsyms;
+	root = &task->tsyms.syms;
 	node = rb_search_node(root, __cmp_task_sym, (unsigned long)&tmp);
 	return node ? rb_entry(node, struct task_sym, node) : NULL;
 }
@@ -392,7 +392,7 @@ int link_task_sym(struct task_struct *task, struct task_sym *s)
 {
 	struct rb_root *root;
 	struct rb_node *node;
-	root = &task->tsyms;
+	root = &task->tsyms.syms;
 	node = rb_insert_node(root, &s->node, __cmp_task_sym, (unsigned long)s);
 	return node ? -1 : 0;
 }
@@ -401,7 +401,7 @@ struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev)
 {
 	struct rb_root *root;
 	struct rb_node *next;
-	root = &task->tsyms;
+	root = &task->tsyms.syms;
 	next = prev ? rb_next(&prev->node) : rb_first(root);
 	return next ? rb_entry(next, struct task_sym, node) : NULL;
 }
@@ -463,5 +463,5 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 
 void free_task_syms(struct task_struct *task)
 {
-	rb_destroy(&task->tsyms, __rb_free_task_sym);
+	rb_destroy(&task->tsyms.syms, __rb_free_task_sym);
 }
