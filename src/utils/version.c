@@ -7,6 +7,7 @@
 #define __ULP_DEV 1
 #include <patch/meta.h>
 
+#include <utils/ansi.h>
 #include <utils/util.h>
 #include <utils/compiler.h>
 
@@ -64,8 +65,21 @@ void ulpatch_info(const char *progname)
 	printf("  OS: %s %s %s\n", name.sysname, name.release, name.version);
 	printf("  Arch: %s\n", name.machine);
 	printf("  Glibc: %s-%s\n", gnu_get_libc_version(), gnu_get_libc_release());
+	printf("\n");
 	printf("Build\n");
 	printf("  version: %s\n", ulpatch_version());
-	printf("  GNUC: %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printf("  ULP version: %d\n", ULPATCH_FILE_VERSION);
+	printf("  Support:");
+#if defined(CONFIG_CAPSTONE)
+		printf(" capstone");
+#endif
+#if defined(CONFIG_LIBUNWIND)
+		printf(" libunwind");
+#endif
+#if defined(HAVE_BINUTILS_BFD_H)
+		printf(" bfd");
+#endif
+		printf("\n");
+	printf("\n");
 }
