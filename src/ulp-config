@@ -33,7 +33,9 @@ ${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
     the  compiler flags, linker  flags  and  object  libraries  needed  to link
     against ULPatch.
 
-    Good output to stdout, Wrong output to stderr.
+    Good output to ${ANSI_BOLD}stdout${ANSI_RESET}, Wrong output to ${ANSI_BOLD}stderr${ANSI_RESET}.
+
+    This program is a basic command of ULPatch.
 
 ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
 
