@@ -678,8 +678,12 @@ static void launch_trigger(void)
 #endif
 int PRINTER_FN(int nloop, const char *content)
 {
-	return printf("%d %s %s:%p\n",
-		nloop, print_content, __stringify(LIBC_PUTS_FN), LIBC_PUTS_FN);
+	int ret = 0;
+	ret += printf("%d %s %s:%p, %s:%p, %s:%p\n", nloop, print_content,
+			__stringify(LIBC_PUTS_FN), LIBC_PUTS_FN,
+			__stringify(PRINTER_FN), PRINTER_FN,
+			__stringify(STATIC_FUNC_FN), get_static_func_fn());
+	return 0;
 }
 
 static void launch_printer(void)

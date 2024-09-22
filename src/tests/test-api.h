@@ -101,6 +101,8 @@ extern const char *ulpatch_test_path;
 #define PRINTER_FN	print_hello
 int PRINTER_FN(int nloop, const char *content);
 
+#define STATIC_FUNC_FN	test_static_func
+void *get_static_func_fn(void);
 
 #define LIBC_PUTS_FN	puts
 

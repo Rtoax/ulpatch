@@ -14,9 +14,13 @@
 #include <tests/test-api.h>
 
 
-#define STATIC_FUNC_FN	test_static_func
 static __unused void STATIC_FUNC_FN(void)
 {
+}
+
+void *get_static_func_fn(void)
+{
+	return STATIC_FUNC_FN;
 }
 
 static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
