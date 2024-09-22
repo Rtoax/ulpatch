@@ -18,6 +18,9 @@
 #include <utils/log.h>
 #include <utils/task.h>
 
+/**
+ * FIXME: If the new API test is fine, you can simply delete the following code.
+ */
 #if 0
 static unsigned long offset_to_vaddr(struct vm_area_struct *vma, loff_t offset)
 {
