@@ -1384,8 +1384,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 	if (read_task_vmas(task, false))
 		goto free_task;
 
-	rb_init(&task->vma_symbols);
-
 	if (!task->libc_vma || !task->stack) {
 		ulp_error("No libc or stack founded.\n");
 		goto free_task;
@@ -1621,9 +1619,6 @@ int close_task(struct task_struct *task)
 			free(fd);
 		}
 	}
-
-	/* Destroy symbols rb tree */
-	rb_destroy(&task->vma_symbols, rb_free_symbol);
 
 	free_task_vmas(task);
 	free(task->exe);

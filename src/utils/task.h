@@ -331,15 +331,6 @@ struct task_struct {
 	struct vm_area_struct *stack;
 
 	/**
-	 * save all symbol for fast search
-	 * struct symbol.node
-	 *
-	 * FIXME: use tsyms instead, If tsyms is developed, this needs to be
-	 * deleted
-	 */
-	struct rb_root vma_symbols;
-
-	/**
 	 * Store all symbols that task defined.
 	 */
 	struct task_syms tsyms;
@@ -454,20 +445,7 @@ int task_syscall(struct task_struct *task, int nr,
 		unsigned long arg4, unsigned long arg5, unsigned long arg6,
 		unsigned long *res);
 
-#if 0
-/**
- * FIXME: Those Old symbol API should be removed if new symbol APIs developed.
- */
-struct symbol *task_vma_find_symbol(struct task_struct *task, const char *name,
-				    int type);
-int task_vma_link_symbol(struct symbol *s, struct vm_area_struct *vma);
-int task_vma_alloc_link_symbol(struct vm_area_struct *vma, const char *name,
-			       GElf_Sym *sym);
-unsigned long task_vma_symbol_vaddr(const struct symbol *sym);
-int vma_load_all_symbols(struct vm_area_struct *vma);
-#endif
-
-/* New symbol API */
+/* Task symbol APIs */
 struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 				struct vm_area_struct *vma);
 void free_task_sym(struct task_sym *s);
