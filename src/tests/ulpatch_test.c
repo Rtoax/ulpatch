@@ -454,6 +454,9 @@ static bool should_skip(struct test *test)
 
 	if (filter_matched(category_name))
 		return false;
+	/**
+	 * If priority is too high, it couldn't be skipped.
+	 */
 	else if (test->prio < TEST_PRIO_HIGHER) {
 		if (just_list_tests)
 			return true;
