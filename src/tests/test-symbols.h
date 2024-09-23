@@ -22,6 +22,7 @@ TEST_FUNC_SYM(exit)
 TEST_FUNC_SYM(system)
 
 /* stdio.h */
+TEST_FUNC_SYM(puts)
 TEST_FUNC_SYM(printf)
 TEST_FUNC_SYM(sprintf)
 TEST_FUNC_SYM(snprintf)
@@ -123,6 +124,8 @@ TEST_FUNC_SYM(who_am_i)
 #ifdef TODO_TEST_STT_OBJECT
 TEST_FUNC_SYM(test_list)
 #endif
+
+TEST_FUNC_SYM(static_func1)
 
 #ifdef TEST_SYM_FOR_EACH
 }

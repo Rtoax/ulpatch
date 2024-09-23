@@ -94,18 +94,6 @@ extern struct list_head test_list[TEST_PRIO_NUM];
 
 extern const char *ulpatch_test_path;
 
-
-#ifdef PRINTER_FN
-# error "Redefine PRINTER_FN"
-#endif
-#define PRINTER_FN	print_hello
-int PRINTER_FN(int nloop, const char *content);
-
-#define STATIC_FUNC_FN	test_static_func
-void *get_static_func_fn(void);
-
-#define LIBC_PUTS_FN	puts
-
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
 

@@ -14,16 +14,6 @@
 #include <tests/test-api.h>
 
 
-static void STATIC_FUNC_FN(void)
-{
-	return;
-}
-
-void *get_static_func_fn(void)
-{
-	return STATIC_FUNC_FN;
-}
-
 static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 {
 	int ret = 0;
@@ -71,21 +61,6 @@ out:
 	if (unlikely(ret))
 		ulp_error("%s: find %lx, real %lx, extra %ld (addr %lx)\n",
 			  name, addr, real_addr, nr_extras, extra_addr1);
-	return ret;
-}
-
-TEST(Symbol, task_func_addr, 0)
-{
-	int ret = 0;
-	/* static */
-	ret += open_task_and_resolve_sym((unsigned long)STATIC_FUNC_FN,
-					 __stringify(STATIC_FUNC_FN));
-	/* global */
-	ret += open_task_and_resolve_sym((unsigned long)PRINTER_FN,
-					 __stringify(PRINTER_FN));
-	/* FIXME: puts in SELF and libc.so??? */
-	ret += open_task_and_resolve_sym((unsigned long)LIBC_PUTS_FN,
-					 __stringify(LIBC_PUTS_FN));
 	return ret;
 }
 

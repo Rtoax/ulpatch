@@ -673,16 +673,17 @@ static void launch_trigger(void)
 	// task_wait_destroy(&wait_here);
 }
 
-#ifndef PRINTER_FN
-# error "Must define PRINTER_FN"
-#endif
-int PRINTER_FN(int nloop, const char *content)
+static void static_func1(void)
+{
+}
+
+int printer_print_hello(int nloop, const char *content)
 {
 	int ret = 0;
 	ret += printf("%d %s %s:%p, %s:%p, %s:%p\n", nloop, print_content,
-			__stringify(LIBC_PUTS_FN), LIBC_PUTS_FN,
-			__stringify(PRINTER_FN), PRINTER_FN,
-			__stringify(STATIC_FUNC_FN), get_static_func_fn());
+			__stringify(puts), puts,
+			__stringify(printer_print_hello), printer_print_hello,
+			__stringify(static_func1), static_func1);
 	return 0;
 }
 
@@ -691,7 +692,7 @@ static void launch_printer(void)
 	int nloop = print_nloop_default;
 
 	while (nloop--) {
-		PRINTER_FN(nloop, print_content);
+		printer_print_hello(nloop, print_content);
 		usleep(print_interval_usec);
 	}
 }
