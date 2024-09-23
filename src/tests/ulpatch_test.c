@@ -442,7 +442,7 @@ static int show_test(struct test *test, bool after_test)
 	return 0;
 }
 
-static bool should_filter_out(struct test *test)
+static bool should_skip(struct test *test)
 {
 	char category_name[256];
 
@@ -552,7 +552,7 @@ static void launch_tester(void)
 		/* for each test entry */
 		list_for_each_entry(test, &test_list[i], node) {
 			int ret;
-			if (should_filter_out(test))
+			if (should_skip(test))
 				continue;
 
 			if (just_list_tests) {
