@@ -171,7 +171,7 @@ static int load_self_vma_symbols(struct vm_area_struct *leader)
 	struct symbol *sym, *tmp;
 	struct rb_root *root = &task->exe_elf->symbols;
 
-	rbtree_postorder_for_each_entry_safe(sym, tmp, root, sort_by_name)
+	rbtree_postorder_for_each_entry_safe(sym, tmp, root, node)
 		err |= task_vma_alloc_link_symbol(leader, sym->name, &sym->sym);
 
 	return err;
@@ -350,6 +350,13 @@ static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)
 	return strcmp(s1->name, s2->name);
 }
 
+static inline int __cmp_task_addr(struct rb_node *n1, unsigned long key)
+{
+	struct task_sym *s1 = rb_entry(n1, struct task_sym, sort_by_addr);
+	struct task_sym *s2 = (struct task_sym *)key;
+	return s1->addr - s2->addr;
+}
+
 static void __rb_free_task_sym(struct rb_node *node)
 {
 	struct task_sym *s = rb_entry(node, struct task_sym, sort_by_name);
@@ -366,12 +373,22 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 	s->name = strdup(name);
 	s->addr = addr;
 	s->vma = vma;
+	s->is_head = false;
+	list_init(&s->list_node_or_head);
 
 	return s;
 }
 
 void free_task_sym(struct task_sym *s)
 {
+	if (s->is_head) {
+		struct task_sym *node, *tmp;
+		list_for_each_entry_safe(node, tmp,
+		    &s->list_node_or_head, list_node_or_head)
+			list_del(&node->list_node_or_head);
+	} else
+		list_del(&s->list_node_or_head);
+
 	free(s->name);
 	free(s);
 }
@@ -388,13 +405,48 @@ struct task_sym *find_task_sym(struct task_struct *task, const char *name)
 	return node ? rb_entry(node, struct task_sym, sort_by_name) : NULL;
 }
 
+struct task_sym *find_task_addr(struct task_struct *task, unsigned long addr)
+{
+	struct rb_root *root;
+	struct rb_node *node;
+	struct task_sym tmp = {
+		.addr = addr,
+	};
+	root = &task->tsyms.addrs;
+	node = rb_search_node(root, __cmp_task_addr, (unsigned long)&tmp);
+	return node ? rb_entry(node, struct task_sym, sort_by_addr) : NULL;
+}
+
 int link_task_sym(struct task_struct *task, struct task_sym *s)
 {
 	struct rb_root *root;
 	struct rb_node *node;
+
 	root = &task->tsyms.syms;
+
 	node = rb_insert_node(root, &s->sort_by_name, __cmp_task_sym,
 		       (unsigned long)s);
+
+	ulp_debug("TSYM new %s, %lx\n", s->name, s->addr);
+
+	/* If insert new symbol, then, insert it to the tree sorted by
+	 * address */
+	if (!node) {
+		struct task_sym *head;
+		head = find_task_addr(task, s->addr);
+		if (head) {
+			list_add(&s->list_node_or_head, &head->list_node_or_head);
+			ulp_debug("TADDR dup %lx %s\n", s->addr, s->name);
+		} else {
+			root = &task->tsyms.addrs;
+			rb_insert_node(root, &s->sort_by_addr,
+					__cmp_task_addr, (unsigned long)s);
+			list_init(&s->list_node_or_head);
+			s->is_head = true;
+			ulp_debug("TADDR new %lx %s\n", s->addr, s->name);
+		}
+	}
+
 	return node ? -1 : 0;
 }
 
@@ -405,6 +457,15 @@ struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev)
 	root = &task->tsyms.syms;
 	next = prev ? rb_next(&prev->sort_by_name) : rb_first(root);
 	return next ? rb_entry(next, struct task_sym, sort_by_name) : NULL;
+}
+
+struct task_sym *next_task_addr(struct task_struct *task, struct task_sym *prev)
+{
+	struct rb_root *root;
+	struct rb_node *next;
+	root = &task->tsyms.addrs;
+	next = prev ? rb_next(&prev->sort_by_addr) : rb_first(root);
+	return next ? rb_entry(next, struct task_sym, sort_by_addr) : NULL;
 }
 
 int task_load_vma_elf_syms(struct vm_area_struct *vma)

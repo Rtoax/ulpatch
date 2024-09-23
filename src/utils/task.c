@@ -1360,7 +1360,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);
 	rb_init(&task->vmas_rb);
-	rb_init(&task->tsyms.syms);
+	task_syms_init(&task->tsyms);
 
 	if (load_task_auxv(pid, &task->auxv))
 		goto free_task;

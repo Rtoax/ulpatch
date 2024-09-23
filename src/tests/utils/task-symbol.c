@@ -22,7 +22,21 @@ TEST(Task_sym, for_each, 0)
 	for (tsym = next_task_sym(task, NULL); tsym;
 	     tsym = next_task_sym(task, tsym))
 	{
-		ulp_info("TSYM: %s %lx\n", tsym->name, tsym->addr);
+		ulp_info("TSYM: %s 0x%016lx\n", tsym->name, tsym->addr);
+	}
+
+	for (tsym = next_task_addr(task, NULL); tsym;
+	     tsym = next_task_addr(task, tsym))
+	{
+		ulp_info("TADDR: 0x%016lx %s\n", tsym->addr, tsym->name);
+		if (!list_empty(&tsym->list_node_or_head)) {
+			struct task_sym *s, *tmp;
+			list_for_each_entry_safe(s, tmp,
+			    &tsym->list_node_or_head, list_node_or_head) {
+				ulp_info("TADDR: SUB 0x%016lx %s\n", s->addr,
+					 s->name);
+			}
+		}
 	}
 
 	return close_task(task);

@@ -253,14 +253,43 @@ struct task_sym {
 	struct vm_area_struct *vma;
 	/* root is struct task_syms.syms */
 	struct rb_node sort_by_name;
+	/* root is struct task_syms.addrs */
+	struct rb_node sort_by_addr;
+	/**
+	 * Maybe more than one symbols have same address, if that, the first
+	 * symbol inserted to task_syms::addrs with node task_sym::sort_by_addr,
+	 * and task_sym::list_node_or_head initialized as list head. The
+	 * following inserted symbol's task_sym::sort_by_addr was ignored, and
+	 * insert to first task_sym::list_node_or_head with node
+	 * task_sym::list_node_or_head.
+	 *
+	 *                task_syms::addrs
+	 *                        ()
+	 *                        /\
+	 *                       /  \
+	 *                      /   ...
+	 *                     ()
+	 *  task_sym::sort_by_addr               task_sym           task_sym
+	 *            [list_node_or_head]<-->[list_node_or_head]<-->[...]
+	 */
+	bool is_head;
+	struct list_head list_node_or_head;
 };
 
 struct task_syms {
 	/**
-	 * node is struct task_sym.node
+	 * syms:
+	 * - node is struct task_sym.sort_by_name
+	 * addrs:
+	 * - node is struct task_sym.sort_by_addr
 	 */
-	struct rb_root syms;
+	struct rb_root syms, addrs;
 };
+
+static inline void task_syms_init(struct task_syms *tsyms) {
+	rb_init(&tsyms->syms);
+	rb_init(&tsyms->addrs);
+}
 
 /**
  * This struct use to discript a running process in system, like you can see in
@@ -442,9 +471,15 @@ int vma_load_all_symbols(struct vm_area_struct *vma);
 struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 				struct vm_area_struct *vma);
 void free_task_sym(struct task_sym *s);
+
 struct task_sym *find_task_sym(struct task_struct *task, const char *name);
+
 int link_task_sym(struct task_struct *task, struct task_sym *s);
+
 struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev);
+struct task_sym *next_task_addr(struct task_struct *task,
+				struct task_sym *prev);
+
 int task_load_vma_elf_syms(struct vm_area_struct *vma);
 void free_task_syms(struct task_struct *task);
 
