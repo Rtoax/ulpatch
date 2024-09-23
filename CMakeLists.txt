@@ -13,6 +13,9 @@ endif()
 
 PROJECT(ulpatch)
 
+string(TIMESTAMP ULPATCH_COMPILE_TIME "%Y/%m/%d %H:%M:%S")
+message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
+
 # Version number components. You _MUST_ modify ulpatch.spec file at the same,
 # if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
@@ -60,6 +63,7 @@ add_definitions("-DULPATCH_VERSION_MAJOR=${ULPATCH_VERSION_MAJOR}")
 add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
 add_definitions("-DULPATCH_VERSION_PATCH=${ULPATCH_VERSION_PATCH}")
 add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
+add_definitions("-DULPATCH_COMPILE_TIME=\"${ULPATCH_COMPILE_TIME}\"")
 
 add_compile_options(-MD)
 add_compile_options(-Wall)

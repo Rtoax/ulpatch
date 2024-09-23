@@ -68,8 +68,8 @@ void ulpatch_info(const char *progname)
 	printf("\n");
 	printf("Build\n");
 	printf("  version: %s\n", ulpatch_version());
+	printf("  build time: %s\n", ULPATCH_COMPILE_TIME);
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-	printf("  ULP version: %d\n", ULPATCH_FILE_VERSION);
 	printf("  Support:");
 #if defined(CONFIG_CAPSTONE)
 		printf(" capstone");
@@ -81,5 +81,8 @@ void ulpatch_info(const char *progname)
 		printf(" bfd");
 #endif
 		printf("\n");
+	printf("\n");
+	printf("ULPatch\n");
+	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);
 	printf("\n");
 }
