@@ -251,6 +251,10 @@ struct task_sym {
 	char *name;
 	unsigned long addr;
 	struct vm_area_struct *vma;
+
+#define TS_REFCOUNT_NOT_USED	0
+	size_t refcount;
+
 	/* root is struct task_syms.rb_syms */
 	struct rb_node sort_by_name;
 	/* root is struct task_syms.rb_addrs */

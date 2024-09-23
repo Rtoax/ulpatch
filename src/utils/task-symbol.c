@@ -33,9 +33,39 @@ static inline int __cmp_task_addr(struct rb_node *n1, unsigned long key)
 	return s1->addr - s2->addr;
 }
 
-static void __rb_free_task_sym(struct rb_node *node)
+static void __rb_free_task_sym_name(struct rb_node *node)
 {
 	struct task_sym *s = rb_entry(node, struct task_sym, sort_by_name);
+
+	if (s->list_name.is_head) {
+		struct task_sym *node, *tmp;
+		list_for_each_entry_safe(node, tmp, &s->list_name.head,
+			   list_name.node) {
+			list_del(&node->list_name.node);
+			s->refcount--;
+			free_task_sym(node);
+		}
+	}
+
+	list_del(&s->list_name.node);
+	free_task_sym(s);
+}
+
+static void __rb_free_task_sym_addr(struct rb_node *node)
+{
+	struct task_sym *s = rb_entry(node, struct task_sym, sort_by_addr);
+
+	if (s->list_addr.is_head) {
+		struct task_sym *node, *tmp;
+		list_for_each_entry_safe(node, tmp, &s->list_addr.head,
+			   list_addr.node) {
+			list_del(&node->list_addr.node);
+			s->refcount--;
+			free_task_sym(node);
+		}
+	}
+
+	list_del(&s->list_addr.node);
 	free_task_sym(s);
 }
 
@@ -49,6 +79,9 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 	s->name = strdup(name);
 	s->addr = addr;
 	s->vma = vma;
+
+	s->refcount = TS_REFCOUNT_NOT_USED;
+
 	s->list_addr.is_head = false;
 	list_init(&s->list_addr.head);
 	s->list_name.is_head = false;
@@ -59,24 +92,10 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 
 void free_task_sym(struct task_sym *s)
 {
-	if (s->list_addr.is_head) {
-		struct task_sym *node, *tmp;
-		list_for_each_entry_safe(node, tmp, &s->list_addr.head,
-			   list_addr.node)
-			list_del(&node->list_addr.node);
-	} else
-		list_del(&s->list_addr.node);
-
-	if (s->list_name.is_head) {
-		struct task_sym *node, *tmp;
-		list_for_each_entry_safe(node, tmp, &s->list_name.head,
-			   list_name.node)
-			list_del(&node->list_name.node);
-	} else
-		list_del(&s->list_name.node);
-
-	free(s->name);
-	free(s);
+	if (--s->refcount == TS_REFCOUNT_NOT_USED) {
+		free(s->name);
+		free(s);
+	}
 }
 
 struct task_sym *find_task_sym(struct task_struct *task, const char *name)
@@ -103,66 +122,109 @@ struct task_sym *find_task_addr(struct task_struct *task, unsigned long addr)
 	return node ? rb_entry(node, struct task_sym, sort_by_addr) : NULL;
 }
 
-int link_task_sym(struct task_struct *task, struct task_sym *s)
+/* If inserted, return 0 */
+static int __link_task_sym_name(struct task_struct *task, struct task_sym *new)
 {
 	struct rb_root *root;
 	struct rb_node *node;
+	struct task_sym *head;
+	struct task_sym *is, *tmp;
+	bool need_insert = true;
 
 	root = &task->tsyms.rb_syms;
 
-	node = rb_insert_node(root, &s->sort_by_name, __cmp_task_sym,
-		       (unsigned long)s);
+	node = rb_insert_node(root, &new->sort_by_name, __cmp_task_sym,
+		       (unsigned long)new);
 
-	ulp_debug("TSYM new %s, %lx\n", s->name, s->addr);
-
-	/* If insert new symbol, then, insert it to the tree sorted by
-	 * address */
+	/* brand new symbol */
 	if (!node) {
-		struct task_sym *head;
-		head = find_task_addr(task, s->addr);
-		if (head) {
-			list_add(&s->list_addr.node, &head->list_addr.head);
-			ulp_debug("TADDR dup %lx %s\n", s->addr, s->name);
-		} else {
-			root = &task->tsyms.rb_addrs;
-			node = rb_insert_node(root, &s->sort_by_addr,
-					__cmp_task_addr, (unsigned long)s);
-			list_init(&s->list_addr.head);
-			s->list_addr.is_head = true;
-			ulp_debug("TADDR new %lx %s\n", s->addr, s->name);
-		}
+		ulp_debug("TSYM new %s, %lx\n", new->name, new->addr);
+		new->list_name.is_head = true;
+		new->refcount++;
+		goto done;
+	}
 
-		s->list_name.is_head = true;
 	/**
 	 * If symbol string was already inserted into rb_syms, we should check
 	 * address exist or not first, if address not exist, insert it into
 	 * list_name linklist.
 	 */
-	} else {
-		struct task_sym *head;
-		struct task_sym *is, *tmp;
-		bool new_addr = true;
+	head = rb_entry(node, struct task_sym, sort_by_name);
 
-		head = rb_entry(node, struct task_sym, sort_by_name);
+	if (head->addr == new->addr) {
+		need_insert = false;
+		goto done;
+	}
 
-		if (head->addr == s->addr) {
-			new_addr = false;
-			goto done;
+	list_for_each_entry_safe(is, tmp, &head->list_name.head,
+		   list_name.node) {
+		if (unlikely(is->addr == new->addr)) {
+			need_insert = false;
+			break;
 		}
-
-		list_for_each_entry_safe(is, tmp, &head->list_name.head,
-			   list_name.node) {
-			if (is->addr == s->addr) {
-				new_addr = false;
-				break;
-			}
-		}
-		if (new_addr)
-			list_add(&s->list_name.node, &head->list_name.head);
+	}
+	if (need_insert) {
+		list_add(&new->list_name.node, &head->list_name.head);
+		new->refcount++;
+		head->refcount++;
 	}
 
 done:
-	return node ? -1 : 0;
+	return need_insert ? 0 : -1;
+}
+
+/* If inserted, return 0 */
+static int __link_task_sym_addr(struct task_struct *task, struct task_sym *new)
+{
+	struct rb_root *root;
+	struct rb_node *node;
+	struct task_sym *head;
+	struct task_sym *is, *tmp;
+	bool need_insert = true;
+
+	root = &task->tsyms.rb_addrs;
+
+	node = rb_insert_node(root, &new->sort_by_addr, __cmp_task_addr,
+		       (unsigned long)new);
+
+	/* brand new symbol */
+	if (!node) {
+		ulp_debug("TADDR new %s, %lx\n", new->name, new->addr);
+		new->list_addr.is_head = true;
+		new->refcount++;
+		goto done;
+	}
+
+	head = rb_entry(node, struct task_sym, sort_by_addr);
+
+	if (!strcmp(head->name, new->name)) {
+		need_insert = false;
+		goto done;
+	}
+
+	list_for_each_entry_safe(is, tmp, &head->list_addr.head,
+		   list_addr.node) {
+		if (unlikely(!strcmp(is->name, new->name))) {
+			need_insert = false;
+			break;
+		}
+	}
+
+	if (need_insert) {
+		list_add(&new->list_addr.node, &head->list_addr.head);
+		new->refcount++;
+		head->refcount++;
+	}
+
+done:
+	return need_insert ? 0 : -1;
+}
+
+int link_task_sym(struct task_struct *task, struct task_sym *s)
+{
+	__link_task_sym_name(task, s);
+	__link_task_sym_addr(task, s);
+	return 0;
 }
 
 struct task_sym *next_task_sym(struct task_struct *task, struct task_sym *prev)
@@ -240,5 +302,6 @@ int task_load_vma_elf_syms(struct vm_area_struct *vma)
 
 void free_task_syms(struct task_struct *task)
 {
-	rb_destroy(&task->tsyms.rb_syms, __rb_free_task_sym);
+	rb_destroy(&task->tsyms.rb_syms, __rb_free_task_sym_name);
+	rb_destroy(&task->tsyms.rb_addrs, __rb_free_task_sym_addr);
 }
