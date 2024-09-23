@@ -30,7 +30,7 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	struct task_sym *tsym;
 	const struct task_sym **extras = NULL;
 	struct task_struct *task;
-	unsigned long addr;
+	unsigned long addr, extra_addr1 = 0;
 	size_t ie, nr_extras;
 
 	task = open_task(getpid(), FTO_VMA_ELF_FILE);
@@ -54,17 +54,23 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	if (nr_extras > 0) {
 		for (ie = 0; ie < nr_extras; ie++) {
 			if (extras[ie]->addr == real_addr) {
-				ulp_warning("Match %s with extra symbol %s\n",
-					name, extras[ie]->name);
+				ulp_warning("Match %s with extra symbol %s, "
+					    "addr 0x%lx\n",
+					    name, extras[ie]->name,
+					    extras[ie]->addr);
 				ret = 0;
 				break;
 			}
 		}
+		extra_addr1 = extras[0]->addr;
 		free((void *)extras);
 	}
 
 out:
 	close_task(task);
+	if (unlikely(ret))
+		ulp_error("%s: find %lx, real %lx, extra %ld (addr %lx)\n",
+			  name, addr, real_addr, nr_extras, extra_addr1);
 	return ret;
 }
 
@@ -147,7 +153,7 @@ static int find_task_symbol(struct task_struct *task)
 	int err = 0;
 	struct task_sym *tsym;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+	for (i = 0; i < nr_test_symbols(); i++) {
 
 		tsym = find_task_sym(task, test_symbols[i].sym, NULL, NULL);
 
@@ -168,120 +174,12 @@ TEST(Symbol, find_task_symbol_list, 0)
 	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }
 
-TEST(Symbol, find_task_plt_symbol_value, 0)
+TEST(Symbol, find_task_symbol_value, 0)
 {
-	int ret = 0;
-	int status = 0;
-	pid_t pid;
-	int fd = -1, i, rslt;
-	bool is_pie = false;
-
-	struct task_wait waitqueue;
-
-	task_wait_init(&waitqueue, NULL);
-
-	pid = fork();
-	if (pid == 0) {
-		int ret;
-
-		char *_argv[] = {
-			(char*)ulpatch_test_path,
-			"--role", "listener",
-			"--listener-epoll",
-			NULL,
-		};
-		ret = execvp(_argv[0], _argv);
-		if (ret == -1) {
-			exit(1);
-		}
-
-	}
-
-	/* Parent */
-	/**
-	 * Wait for server init done. this method is not perfect.
-	 */
-	usleep(10000);
-
-	struct task_struct *task = open_task(pid, FTO_ULFTRACE);
-
-	dump_task_vmas(task, true);
-
-	is_pie = task_is_pie(task);
-
-	fd = listener_helper_create_test_client();
-
-	if (fd <= 0)
-		ret = -1;
-
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-		unsigned long addr, plt_addr;
-		struct task_sym *tsym, *alias_tsym = NULL;
-
-		plt_addr = bfd_elf_plt_sym_addr(task->exe_bfd,
-				     test_symbols[i].sym);
-
-		tsym = find_task_sym(task, test_symbols[i].sym, NULL, NULL);
-		if (!tsym) {
-			ulp_error("Could not find %s in pid %d vma.\n",
-				test_symbols[i].sym, task->pid);
-			ret = -EEXIST;
-			continue;
-		}
-
-		/* Only non static has alias symbol name, such as 'stdout' */
-		if (test_symbols[i].type == TST_NON_STATIC)
-			alias_tsym = find_task_sym(task, test_symbols[i].alias,
-						NULL, NULL);
-
-		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
-
-		/* TODO: i'm not sure this is a correct method to get symbol
-		 * address value. */
-		ulp_info("%-10s %s%s\n"
-			"%016lx(proc) %016lx(vma) %016lx(alias) %016lx(plt)\n",
-			test_symbols[i].sym,
-			test_symbols[i].alias ?: "",
-			test_symbols[i].alias ? "(alias)" : "",
-			addr,
-			tsym->addr,
-			alias_tsym ? alias_tsym->addr : 0,
-			plt_addr);
-
-		/* When relocate, we can use symbol's real virtual address in libc,
-		 * as the same time, we can use the @plt address in target elf file.
-		 */
-		if (addr == 0 || (addr != tsym->addr && addr != plt_addr)) {
-
-			/* Can't found the symbol address, try find with alias symbol
-			 * if have one. */
-			unsigned long alias_addr = 0;
-			if (alias_tsym && (alias_addr = alias_tsym->addr)) {
-				/* Couldn't found symbol in anyway. */
-			} else
-				ret = -1;
-		}
-		if (ret) {
-			ulp_error("Sym %s wrong addr %lx(plt), %lx(mem)\n",
-				test_symbols[i].sym, plt_addr, addr);
-		}
-	}
-
-	listener_helper_close(fd, &rslt);
-	listener_helper_close_test_client(fd);
-
-	waitpid(pid, &status, __WALL);
-	if (status != 0) {
-		ret = -EINVAL;
-	}
-	close_task(task);
-
-	task_wait_destroy(&waitqueue);
-
-	/**
-	 * FIXME: We should not use @plt in PIE, remove this test further, now,
-	 * let's return success anyway if PIE.
-	 */
-	return is_pie ? 0 : ret;
+	int i, ret = 0;
+	for (i = 0; i < nr_test_symbols(); i++)
+		ret += open_task_and_resolve_sym(test_symbols[i].addr,
+				   test_symbols[i].sym);
+	return ret;
 }
 

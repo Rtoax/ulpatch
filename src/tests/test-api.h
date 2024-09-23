@@ -121,33 +121,17 @@ struct task_wait {
 
 struct test_symbol {
 	char *sym;
-	/* store alias, for example:
-	 * 'stdout' is '_IO_2_1_stdout_' in libc. */
-	char *alias;
 	unsigned long addr;
 	enum {
-		TST_NON_STATIC,
-		TST_DYNSYM,
-		TST_SELF_SYM,
+		TYPE_TST_SYM_FUNC,
+		TYPE_TST_SYM_DATA,
 	} type;
 };
 
-static struct test_symbol __unused test_symbols[] = {
-#define TEST_SYM_NON_STATIC(s, a) { \
-		.sym = __stringify(s), \
-		.alias = __stringify(a), \
-		.addr = 0, \
-		.type = TST_NON_STATIC \
-	},
-#define TEST_DYNSYM(s) { __stringify(s), 0, .type = TST_DYNSYM},
-#define TEST_SYM_SELF(s) { __stringify(s), 0, .type = TST_SELF_SYM},
-#include <tests/test-symbols.h>
-#undef TEST_DYNSYM
-#undef TEST_SYM_SELF
-#undef TEST_SYM_NON_STATIC
-};
+extern struct test_symbol test_symbols[];
 
-struct test_symbol * find_test_symbol(const char *sym);
+struct test_symbol *find_test_symbol(const char *sym);
+size_t nr_test_symbols(void);
 
 
 struct clt_msg_hdr {

@@ -739,23 +739,45 @@ static void launch_mix(void)
 }
 
 
+struct test_symbol test_symbols[] = {
+#define TEST_FUNC_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_FUNC,},
+#define TEST_DATA_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_DATA,},
+# include <tests/test-symbols.h>
+#undef TEST_FUNC_SYM
+#undef TEST_DATA_SYM
+};
 
+size_t nr_test_symbols(void)
+{
+	return ARRAY_SIZE(test_symbols);
+}
+
+/**
+ * We need to assign a value to the symbol address after the process starts,
+ * because static assignment is not allowed.
+ */
 static void init_test_symbols(void)
 {
 	int i;
 #define TEST_SYM_FOR_EACH
 #define TEST_SYM_FOR_EACH_I i
-#define TEST_DYNSYM(s) \
-	if (!strcmp(#s, test_symbols[i].sym)) {	\
+#define TEST_SYM_ARRAY_NAME test_symbols
+#define TEST_FUNC_SYM(s) \
+	if (!strcmp(#s, test_symbols[i].sym) && test_symbols[i].type == TYPE_TST_SYM_FUNC) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
 		ulp_debug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
 	}
-#define TEST_SYM_NON_STATIC(s, a)	TEST_DYNSYM(s)
-#define TEST_SYM_SELF(s) TEST_DYNSYM(s)
-#include <tests/test-symbols.h>
-#undef TEST_DYNSYM
-#undef TEST_SYM_SELF
-#undef TEST_SYM_NON_STATIC
+/* DATA need '&' operater */
+#define TEST_DATA_SYM(s) \
+	if (!strcmp(#s, test_symbols[i].sym) && test_symbols[i].type == TYPE_TST_SYM_DATA) {	\
+		test_symbols[i].addr = (unsigned long)&s;	\
+		ulp_debug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
+	}
+# include <tests/test-symbols.h>
+#undef TEST_FUNC_SYM
+#undef TEST_DATA_SYM
+#undef TEST_SYM_FOR_EACH_I
+#undef TEST_SYM_ARRAY_NAME
 #undef TEST_SYM_FOR_EACH
 }
 
@@ -764,7 +786,7 @@ struct test_symbol *find_test_symbol(const char *sym)
 	int i;
 	struct test_symbol *s = NULL;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++)
+	for (i = 0; i < nr_test_symbols(); i++)
 		if (!strcmp(test_symbols[i].sym, sym))
 			s = &test_symbols[i];
 
@@ -776,7 +798,7 @@ static void print_test_symbol(void)
 	int i;
 	struct test_symbol *s = NULL;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+	for (i = 0; i < nr_test_symbols(); i++) {
 		s = &test_symbols[i];
 		fprintf(stdout, "%3d \t %-s\n", i + 1, s->sym);
 	}
@@ -1208,16 +1230,10 @@ TEST(ulpatch_test, listener, 0)
 {
 	int err = 0, i;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
-
-		/* skip non static symbols */
-		if (test_symbols[i].type == TST_NON_STATIC)
-			continue;
-
+	for (i = 0; i < nr_test_symbols(); i++)
 		err += test_listener_symbol(REQUEST_SYM_ADDR,
 					    test_symbols[i].sym,
 					    test_symbols[i].addr);
-	}
 
 	if (err)
 		errno = EINVAL;
@@ -1263,7 +1279,7 @@ TEST(ulpatch_test, listener_epoll, 0)
 	if (fd <= 0)
 		ret = -1;
 
-	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
+	for (i = 0; i < nr_test_symbols(); i++) {
 		unsigned long addr;
 
 		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
