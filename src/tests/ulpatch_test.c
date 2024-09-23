@@ -511,9 +511,8 @@ static int operate_test(struct test *test)
 		 * 1. high priority failed
 		 * 2. ordinary test failed, and set --error-exit argument
 		 */
-		if (test->prio < TEST_PRIO_MIDDLE || error_exit) {
+		if (test->prio < TEST_PRIO_MIDDLE || error_exit)
 			return -1;
-		}
 	}
 
 	return 0;
@@ -553,20 +552,18 @@ static void launch_tester(void)
 		/* for each test entry */
 		list_for_each_entry(test, &test_list[i], node) {
 			int ret;
+			if (should_filter_out(test))
+				continue;
 
 			if (just_list_tests) {
-				if (should_filter_out(test))
-					continue;
-				ret = show_test(test, false);
-			} else {
-				if (should_filter_out(test))
-					continue;
-				ret = operate_test(test);
-				/* if error */
-				if (ret != 0) {
-					goto print_stat;
-				}
+				show_test(test, false);
+				continue;
 			}
+
+			ret = operate_test(test);
+			/* if error */
+			if (ret != 0)
+				goto print_stat;
 		}
 	}
 
