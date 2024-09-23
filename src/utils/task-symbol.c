@@ -51,6 +51,8 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 	s->vma = vma;
 	s->list_addr.is_head = false;
 	list_init(&s->list_addr.head);
+	s->list_name.is_head = false;
+	list_init(&s->list_name.head);
 
 	return s;
 }
@@ -59,11 +61,19 @@ void free_task_sym(struct task_sym *s)
 {
 	if (s->list_addr.is_head) {
 		struct task_sym *node, *tmp;
-		list_for_each_entry_safe(node, tmp,
-		    &s->list_addr.head, list_addr.node)
+		list_for_each_entry_safe(node, tmp, &s->list_addr.head,
+			   list_addr.node)
 			list_del(&node->list_addr.node);
 	} else
 		list_del(&s->list_addr.node);
+
+	if (s->list_name.is_head) {
+		struct task_sym *node, *tmp;
+		list_for_each_entry_safe(node, tmp, &s->list_name.head,
+			   list_name.node)
+			list_del(&node->list_name.node);
+	} else
+		list_del(&s->list_name.node);
 
 	free(s->name);
 	free(s);
@@ -115,14 +125,43 @@ int link_task_sym(struct task_struct *task, struct task_sym *s)
 			ulp_debug("TADDR dup %lx %s\n", s->addr, s->name);
 		} else {
 			root = &task->tsyms.rb_addrs;
-			rb_insert_node(root, &s->sort_by_addr,
+			node = rb_insert_node(root, &s->sort_by_addr,
 					__cmp_task_addr, (unsigned long)s);
 			list_init(&s->list_addr.head);
 			s->list_addr.is_head = true;
 			ulp_debug("TADDR new %lx %s\n", s->addr, s->name);
 		}
+
+		s->list_name.is_head = true;
+	/**
+	 * If symbol string was already inserted into rb_syms, we should check
+	 * address exist or not first, if address not exist, insert it into
+	 * list_name linklist.
+	 */
+	} else {
+		struct task_sym *head;
+		struct task_sym *is, *tmp;
+		bool new_addr = true;
+
+		head = rb_entry(node, struct task_sym, sort_by_name);
+
+		if (head->addr == s->addr) {
+			new_addr = false;
+			goto done;
+		}
+
+		list_for_each_entry_safe(is, tmp, &head->list_name.head,
+			   list_name.node) {
+			if (is->addr == s->addr) {
+				new_addr = false;
+				break;
+			}
+		}
+		if (new_addr)
+			list_add(&s->list_name.node, &head->list_name.head);
 	}
 
+done:
 	return node ? -1 : 0;
 }
 

@@ -23,6 +23,14 @@ TEST(Task_sym, for_each, 0)
 	     tsym = next_task_sym(task, tsym))
 	{
 		ulp_info("TSYM: %s 0x%016lx\n", tsym->name, tsym->addr);
+		if (!list_empty(&tsym->list_name.head)) {
+			struct task_sym *s, *tmp;
+			list_for_each_entry_safe(s, tmp,
+			    &tsym->list_name.head, list_name.node) {
+				ulp_info("TSYM: SUB %s 0x%016lx\n", s->name,
+					 s->addr);
+			}
+		}
 	}
 
 	for (tsym = next_task_addr(task, NULL); tsym;

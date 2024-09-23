@@ -280,7 +280,19 @@ struct task_sym {
 	 *  task_sym::sort_by_addr             task_sym
 	 *            [list_addr::head]<-->[list_addr::node]<-->[...]
 	 */
-	list_addr;
+	list_addr,
+	/**
+	 * Why one symbol could has more than one addresses?
+	 * First of all, BFD will parse symbol from the execution and dynamic
+	 * library ELF file, @plt symbol will be parsed from execution ELF, and
+	 * real symbol address will be parsed from dynamic library. For
+	 * example: pthread_create has two address, one is @plt, another one is
+	 * in libc.
+	 *
+	 * FIXME: No matter if we use @plt or real symbol value, i think it's
+	 * same.
+	 */
+	list_name;
 };
 
 struct task_syms {
