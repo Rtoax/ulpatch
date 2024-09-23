@@ -406,7 +406,7 @@ static int munmap_an_vma(void)
 	return 0;
 }
 
-static void list_all_symbol(void)
+static void list_all_symbols(void)
 {
 	int max_name_len = 0, max_vma_len = 0;
 	struct task_sym *tsym;
@@ -422,13 +422,29 @@ static void list_all_symbol(void)
 		if (max_vma_len < len)
 			max_vma_len = len;
 	}
+
 	for (tsym = next_task_sym(task, NULL); tsym;
 	     tsym = next_task_sym(task, tsym))
 	{
-		printf("%-*s %-*s %#016lx\n",
-			max_vma_len, basename(tsym->vma->name_),
-			max_name_len, tsym->name,
-			tsym->addr);
+#define PRINT_TSYM(tasksym)	\
+		printf("%-*s %-*s %#016lx\n",	\
+			max_vma_len, basename(tasksym->vma->name_),	\
+			max_name_len, tasksym->name,	\
+			tasksym->addr);
+		PRINT_TSYM(tsym);
+
+		/**
+		 * If verbose, print symbol detail, there could more than one
+		 * addresses of one symbol.
+		 */
+		if (is_verbose()) {
+			struct task_sym *is, *tmp;
+			list_for_each_entry_safe(is, tmp,
+			    &tsym->list_name.head, list_name.node) {
+				PRINT_TSYM(is);
+			}
+		}
+#undef PRINT_TSYM
 	}
 }
 
@@ -486,7 +502,7 @@ int ultask(int argc, char *argv[])
 				       dump_size);
 
 	if (flag_list_symbols)
-		list_all_symbol();
+		list_all_symbols();
 
 	if (flag_print_threads)
 		dump_task_threads(target_task, is_verbose());
