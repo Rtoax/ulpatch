@@ -248,9 +248,12 @@ struct task_status {
 };
 
 struct task_sym {
+/* Public */
 	char *name;
 	unsigned long addr;
 	struct vm_area_struct *vma;
+
+/* Private */
 
 #define TS_REFCOUNT_NOT_USED	0
 	size_t refcount;
@@ -473,7 +476,10 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 				struct vm_area_struct *vma);
 void free_task_sym(struct task_sym *s);
 
-struct task_sym *find_task_sym(struct task_struct *task, const char *name);
+struct task_sym *find_task_sym(struct task_struct *task, const char *name,
+			       const struct task_sym ***extras,
+			       size_t *nr_extras);
+struct task_sym *find_task_addr(struct task_struct *task, unsigned long addr);
 
 int link_task_sym(struct task_struct *task, struct task_sym *s);
 

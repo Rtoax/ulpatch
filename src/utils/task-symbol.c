@@ -98,15 +98,53 @@ void free_task_sym(struct task_sym *s)
 	}
 }
 
-struct task_sym *find_task_sym(struct task_struct *task, const char *name)
+/**
+ * If there are mot than one symbols match the 'name', and extras is not NULL,
+ * extras[nr_extras] point to symbols in 'task', extras need to free(), and
+ * it's readonly.
+ *
+ * Usage:
+ *
+ *     const struct task_sym **extras = NULL;
+ *     addr = extras[idx]->addr;
+ *     free((void *)extras);
+ */
+struct task_sym *find_task_sym(struct task_struct *task, const char *name,
+			       const struct task_sym ***extras,
+			       size_t *nr_extras)
 {
 	struct rb_root *root;
 	struct rb_node *node;
+	struct task_sym *sym, *is, *itmp;
 	struct task_sym tmp = {
 		.name = (char *)name,
 	};
 	root = &task->tsyms.rb_syms;
 	node = rb_search_node(root, __cmp_task_sym, (unsigned long)&tmp);
+
+	if (nr_extras)
+		*nr_extras = 0;
+
+	if (node && extras && nr_extras) {
+		size_t nr = 0;
+		sym = rb_entry(node, struct task_sym, sort_by_name);
+
+		/* Get extra count */
+		list_for_each_entry_safe(is, itmp, &sym->list_name.head,
+			   list_name.node)
+			nr++;
+
+		/* Get the sym pointers */
+		if (nr) {
+			*extras = (void *)malloc(nr * sizeof(struct task_sym **));
+			*nr_extras = nr;
+			nr = 0;
+			list_for_each_entry_safe(is, itmp,
+			    &sym->list_name.head, list_name.node) {
+				(*extras)[nr++] = is;
+			}
+		}
+	}
 	return node ? rb_entry(node, struct task_sym, sort_by_name) : NULL;
 }
 
@@ -167,6 +205,7 @@ static int __link_task_sym_name(struct task_struct *task, struct task_sym *new)
 		list_add(&new->list_name.node, &head->list_name.head);
 		new->refcount++;
 		head->refcount++;
+		ulp_debug("TSYM dup %s, %lx\n", new->name, new->addr);
 	}
 
 done:
@@ -214,6 +253,7 @@ static int __link_task_sym_addr(struct task_struct *task, struct task_sym *new)
 		list_add(&new->list_addr.node, &head->list_addr.head);
 		new->refcount++;
 		head->refcount++;
+		ulp_debug("TADDR dup %s, %lx\n", new->name, new->addr);
 	}
 
 done:

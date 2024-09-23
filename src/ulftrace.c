@@ -178,7 +178,7 @@ int ulftrace(int argc, char *argv[])
 		return 1;
 	}
 
-	tsym = find_task_sym(target_task, target_func);
+	tsym = find_task_sym(target_task, target_func, NULL, NULL);
 	if (!tsym) {
 		fprintf(stderr, "couldn't found symbol '%s'\n", target_func);
 		errno = -ENOENT;

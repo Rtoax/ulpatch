@@ -28,12 +28,14 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 {
 	int ret = 0;
 	struct task_sym *tsym;
+	const struct task_sym **extras = NULL;
 	struct task_struct *task;
 	unsigned long addr;
+	size_t ie, nr_extras;
 
 	task = open_task(getpid(), FTO_VMA_ELF_FILE);
 
-	tsym = find_task_sym(task, name);
+	tsym = find_task_sym(task, name, &extras, &nr_extras);
 	if (!tsym) {
 		ulp_error("Not found %s.\n", name);
 		ret = -1;
@@ -41,11 +43,24 @@ static int open_task_and_resolve_sym(unsigned long real_addr, char *name)
 	}
 	addr = tsym->addr;
 
-	ulp_info("%s: find %lx, real %lx\n", name, addr, real_addr);
+	ulp_info("%s: find %lx, real %lx, extra %ld\n", name, addr, real_addr,
+		 nr_extras);
 
 	if (addr != real_addr) {
-		ulp_error("%s: find %lx, real %lx\n", name, addr, real_addr);
+		ulp_warning("%s: find %lx, real %lx\n", name, addr, real_addr);
 		ret = -1;
+	}
+
+	if (nr_extras > 0) {
+		for (ie = 0; ie < nr_extras; ie++) {
+			if (extras[ie]->addr == real_addr) {
+				ulp_warning("Match %s with extra symbol %s\n",
+					name, extras[ie]->name);
+				ret = 0;
+				break;
+			}
+		}
+		free((void *)extras);
 	}
 
 out:
@@ -134,7 +149,7 @@ static int find_task_symbol(struct task_struct *task)
 
 	for (i = 0; i < ARRAY_SIZE(test_symbols); i++) {
 
-		tsym = find_task_sym(task, test_symbols[i].sym);
+		tsym = find_task_sym(task, test_symbols[i].sym, NULL, NULL);
 
 		ulp_info("%s %-30s: 0x%lx\n",
 			tsym ? "Exist" : "NoExi",
@@ -206,7 +221,7 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 		plt_addr = bfd_elf_plt_sym_addr(task->exe_bfd,
 				     test_symbols[i].sym);
 
-		tsym = find_task_sym(task, test_symbols[i].sym);
+		tsym = find_task_sym(task, test_symbols[i].sym, NULL, NULL);
 		if (!tsym) {
 			ulp_error("Could not find %s in pid %d vma.\n",
 				test_symbols[i].sym, task->pid);
@@ -216,7 +231,8 @@ TEST(Symbol, find_task_plt_symbol_value, 0)
 
 		/* Only non static has alias symbol name, such as 'stdout' */
 		if (test_symbols[i].type == TST_NON_STATIC)
-			alias_tsym = find_task_sym(task, test_symbols[i].alias);
+			alias_tsym = find_task_sym(task, test_symbols[i].alias,
+						NULL, NULL);
 
 		listener_helper_symbol(fd, test_symbols[i].sym, &addr);
 

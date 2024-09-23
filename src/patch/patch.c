@@ -575,7 +575,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 		return 0;
 	}
 
-	tsym = find_task_sym((struct task_struct *)task, name);
+	tsym = find_task_sym((struct task_struct *)task, name, NULL, NULL);
 	if (tsym)
 		addr = tsym->addr;
 
@@ -719,7 +719,7 @@ static int solve_patch_symbols(struct load_info *info)
 	dst_func = info->ulp_strtab.dst_func;
 	src_func = info->ulp_strtab.src_func;
 
-	tsym = find_task_sym(task, dst_func);
+	tsym = find_task_sym(task, dst_func, NULL, NULL);
 	if (!tsym) {
 		ulp_error("Couldn't found %s in target process, maybe %s is stripped.\n",
 		       dst_func, task->exe);
