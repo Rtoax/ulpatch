@@ -251,9 +251,9 @@ struct task_sym {
 	char *name;
 	unsigned long addr;
 	struct vm_area_struct *vma;
-	/* root is struct task_syms.syms */
+	/* root is struct task_syms.rb_syms */
 	struct rb_node sort_by_name;
-	/* root is struct task_syms.addrs */
+	/* root is struct task_syms.rb_addrs */
 	struct rb_node sort_by_addr;
 	/**
 	 * Maybe more than one symbols have same address, if that, the first
@@ -278,17 +278,17 @@ struct task_sym {
 
 struct task_syms {
 	/**
-	 * syms:
+	 * rb_syms:
 	 * - node is struct task_sym.sort_by_name
-	 * addrs:
+	 * rb_addrs:
 	 * - node is struct task_sym.sort_by_addr
 	 */
-	struct rb_root syms, addrs;
+	struct rb_root rb_syms, rb_addrs;
 };
 
 static inline void task_syms_init(struct task_syms *tsyms) {
-	rb_init(&tsyms->syms);
-	rb_init(&tsyms->addrs);
+	rb_init(&tsyms->rb_syms);
+	rb_init(&tsyms->rb_addrs);
 }
 
 /**
