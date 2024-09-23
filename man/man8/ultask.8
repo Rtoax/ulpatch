@@ -1,9 +1,11 @@
 .TH ultask 8  "2022-10-01" "USER COMMANDS"
 .SH NAME
 ultask \- Dump userspace livepatch relate process information.
+
 .SH SYNOPSIS
 .B ultask
 [\fI\,OPTION\/\fR]... [\fI\,FILE\/\fR]...
+
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
@@ -15,58 +17,85 @@ This program is also a basic command of ULPatch.
 
 .SH REQUIREMENTS
 elfutils-libelf
+
 .SH ARGUMENTS
 .TP
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
 .TP
 \fB\-\-vmas\fR
-Dump process's VMA, see also /proc/PID/maps.
+Dump process's VMA, see also
+.IR /proc/ PID /maps .
+
 .TP
 \fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
-Dump process's VMA to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
+Dump process's VMA to file or stdout, see also
+.IR /proc/ PID /maps .
+the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
+
 .TP
 \fB\-\-dump-addr\fR[=\fI\,ADDR\/\fR]
-Dump process's address memory to file or stdout, see also /proc/PID/maps. the string may include a "0x" prefix. Need specify \fB--dump-size\fR too. Followed by the \fBADDR\fR format string.
+Dump process's address memory to file or stdout, see also
+.IR /proc/ PID /maps .
+the string may include a \fB0x\fR prefix. Need specify \fB--dump-size\fR too. Followed by the \fBADDR\fR format string.
+
 .TP
 \fB\-\-dump-size\fR[=\fI\,SIZE\/\fR]
-Dump process's address memory to file or stdout, see also /proc/PID/maps. Followed by the \fBSIZE\fR format string.
+Dump process's address memory to file or stdout, see also
+.IR /proc/ PID /maps .
+Followed by the \fBSIZE\fR format string.
+
 .TP
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry SRC address, must use with --jmp-to. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
+Specify a jump entry SRC address, must use with \fB--jmp-to\fR. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
+
 .TP
 \fB\-\-jmp-to\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry DST address, must use with --jmp-from. the string may include a "0x" prefix. Followed by the \fBADDR\fR format string.
+Specify a jump entry DST address, must use with --jmp-from. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
 .TP
 \fB\-\-threads\fR
-Dump process's Thread, see also /proc/PID/task/.
+Dump process's Thread, see also
+.IR /proc/ PID /task/ .
+
 .TP
 \fB\-\-fds\fR
-Dump process's File Descriptors, see also /proc/PID/fd/.
+Dump process's File Descriptors, see also
+.IR /proc/ PID /fd/.
+
 .TP
 \fB\-\-auxv\fR
-Print process's auxv, see also /proc/PID/auxv.
+Print process's auxv, see also
+.IR /proc/ PID /auxv .
+
 .TP
 \fB\-\-status\fR
-Print process's status, see also /proc/PID/status.
+Print process's status, see also
+.IR /proc/ PID /status .
+
 .TP
 \fB\-\-map-file\fR[=\fI\,FILE\/\fR]
 Map a file into target process.
+
 .TP
 \fB\-\-unmap-file\fR[=\fI\,ADDR\/\fR]
 Unmap a vma from target process. Followed by the \fBADDR\fR format string.
+
 .TP
 \fB\-\-symbols\fR
 List all symbols of target process.
+
 .TP
 \fB\-\-disasm-addr\fR[=\fI\,ADDR\/\fR]
 Disassemble a piece of code in a running process. Need specify \fB--disasm-size\fR too. Followed by the \fBADDR\fR format string.
+
 .TP
 \fB\-\-disasm-size\fR[=\fI\,SIZE\/\fR]
 Specify disassemble size. Followed by the \fBSIZE\fR format string.
+
 .TP
 \fB\-o\fR, \fB\-\-output\fR
 Specify output.
+
 .TP
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
 Specify a log level. The LEVEL could be number(see
@@ -74,24 +103,31 @@ Specify a log level. The LEVEL could be number(see
 ) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
 For example, if you want to set log level to LOG_ERR, just:
 .BR --lv=error .
+
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
+
 .TP
 \fB\-\-log-error\fR
 Set log level to ERROR.
+
 .TP
 \fB\-u\fR, \fB\-\-dry-run\fR
 Don't actually run.
+
 .TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Show verbose information.
+
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
+
 .TP
 \fB\-V\fR, \fB\-\-version\fR
 Show version information.
+
 .TP
 \fB\-\-info\fR
 Print detailed information about features supported by the kernel and the ULPatch build. It is necessary to display this information when you are submitting a MR/PR.
@@ -99,15 +135,18 @@ Print detailed information about features supported by the kernel and the ULPatc
 .SH FORMAT
 .TP
 \fBADDR\fR
-Address string may include a "0x" prefix or not.
+Address string may include a \fB0x\fR prefix or not.
 .TP
 \fBSIZE\fR
-Size string may include a "0x" prefix or not, and size string may include a "KB", "MB", "GB" suffix or not.
+Size string may include a \fB0x\fR prefix or not, and size string may include a \fBKB\fR, \fBMB\fR, \fBGB\fR suffix or not.
 .SH OS
 Linux
+
 .SH STABILITY
 Unstable - in development.
+
 .SH AUTHOR
 Written by Rong Tao
+
 .SH SEE ALSO
 ulpatch(8), ulpinfo(8), ulftrace(8), ulp-config(8)

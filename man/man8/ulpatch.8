@@ -1,26 +1,34 @@
 .TH ulpatch 8  "2022-10-01" "USER COMMANDS"
 .SH NAME
 ulpatch \- Userspace livepatch.
+
 .SH SYNOPSIS
 .B ulpatch
 [\fI\,OPTION\/\fR]...
+
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
-ulpatch Patching a running process
+ulpatch use to patching a running process with ulp.elf patch file.
 
 This program is also a basic command of ULPatch.
+
+.SH REQUIREMENTS
+bfd
 
 .SH ARGUMENTS
 .TP
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
+
 .TP
 \fB\-\-patch\fR [ULPATCH.ELF]
 Specify a ulpatch.elf file to patch to target process.
+
 .TP
 \fB\-\-unpatch\fR
 Unpatch a latest ulpatch from target process.
+
 .TP
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
 Specify a log level. The LEVEL could be number(see
@@ -32,21 +40,27 @@ For example, if you want to set log level to LOG_ERR, just:
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
+
 .TP
 \fB\-\-log-error\fR
 Set log level to ERROR.
+
 .TP
 \fB\-u\fR, \fB\-\-dry-run\fR
 Don't actually run.
+
 .TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Show verbose information.
+
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
+
 .TP
 \fB\-V\fR, \fB\-\-version\fR
 Show version information.
+
 .TP
 \fB\-\-info\fR
 Print detailed information about features supported by the kernel and the ULPatch build. It is necessary to display this information when you are submitting a MR/PR.
@@ -120,12 +134,16 @@ aarch64 relocations
 .RS 4
 \%https://github.com/ARM-software/abi-aa/releases
 \%https://docslib.org/doc/4448214/elf-for-the-arm-64-bit-architecture-aarch64
+
 .SH OS
 Linux
+
 .SH STABILITY
 Unstable - in development.
+
 .SH AUTHOR
 Written by Rong Tao
+
 .SH SEE ALSO
 .BR ulpinfo (8),
 .BR ulftrace (8),

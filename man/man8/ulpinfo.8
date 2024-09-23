@@ -1,9 +1,11 @@
 .TH ulpinfo 8  "2023-12-09" "USER COMMANDS"
 .SH NAME
 ulpinfo \- Userspace livepatch information.
+
 .SH SYNOPSIS
 .B ulpinfo
 [\fI\,OPTION\/\fR]...
+
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
@@ -15,9 +17,11 @@ This program is also a basic command of ULPatch.
 .TP
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
+
 .TP
 \fB\-i\fR, \fB\-\-patch\fR [ULPATCH.ELF]
 Show ulpatch.elf file information.
+
 .TP
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
 Specify a log level. The LEVEL could be number(see
@@ -25,34 +29,44 @@ Specify a log level. The LEVEL could be number(see
 ) or string(debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg).
 For example, if you want to set log level to LOG_ERR, just:
 .BR --lv=error .
+
 .TP
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
+
 .TP
 \fB\-\-log-error\fR
 Set log level to ERROR.
+
 .TP
 \fB\-u\fR, \fB\-\-dry-run\fR
 Don't actually run.
+
 .TP
 \fB\-v\fR, \fB\-\-verbose\fR
 Show verbose information.
+
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
+
 .TP
 \fB\-V\fR, \fB\-\-version\fR
 Show version information.
+
 .TP
 \fB\-\-info\fR
 Print detailed information about features supported by the kernel and the ULPatch build. It is necessary to display this information when you are submitting a MR/PR.
 
 .SH OS
 Linux
+
 .SH STABILITY
 Unstable - in development.
+
 .SH AUTHOR
 Written by Rong Tao
+
 .SH SEE ALSO
 .BR ulftrace (8),
 .BR ultask (8),
