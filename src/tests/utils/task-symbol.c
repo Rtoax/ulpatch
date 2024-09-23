@@ -29,10 +29,10 @@ TEST(Task_sym, for_each, 0)
 	     tsym = next_task_addr(task, tsym))
 	{
 		ulp_info("TADDR: 0x%016lx %s\n", tsym->addr, tsym->name);
-		if (!list_empty(&tsym->list_node_or_head)) {
+		if (!list_empty(&tsym->list_addr.head)) {
 			struct task_sym *s, *tmp;
 			list_for_each_entry_safe(s, tmp,
-			    &tsym->list_node_or_head, list_node_or_head) {
+			    &tsym->list_addr.head, list_addr.node) {
 				ulp_info("TADDR: SUB 0x%016lx %s\n", s->addr,
 					 s->name);
 			}

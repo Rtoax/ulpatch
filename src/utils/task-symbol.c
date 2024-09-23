@@ -49,21 +49,21 @@ struct task_sym *alloc_task_sym(const char *name, unsigned long addr,
 	s->name = strdup(name);
 	s->addr = addr;
 	s->vma = vma;
-	s->is_head = false;
-	list_init(&s->list_node_or_head);
+	s->list_addr.is_head = false;
+	list_init(&s->list_addr.head);
 
 	return s;
 }
 
 void free_task_sym(struct task_sym *s)
 {
-	if (s->is_head) {
+	if (s->list_addr.is_head) {
 		struct task_sym *node, *tmp;
 		list_for_each_entry_safe(node, tmp,
-		    &s->list_node_or_head, list_node_or_head)
-			list_del(&node->list_node_or_head);
+		    &s->list_addr.head, list_addr.node)
+			list_del(&node->list_addr.node);
 	} else
-		list_del(&s->list_node_or_head);
+		list_del(&s->list_addr.node);
 
 	free(s->name);
 	free(s);
@@ -111,14 +111,14 @@ int link_task_sym(struct task_struct *task, struct task_sym *s)
 		struct task_sym *head;
 		head = find_task_addr(task, s->addr);
 		if (head) {
-			list_add(&s->list_node_or_head, &head->list_node_or_head);
+			list_add(&s->list_addr.node, &head->list_addr.head);
 			ulp_debug("TADDR dup %lx %s\n", s->addr, s->name);
 		} else {
 			root = &task->tsyms.rb_addrs;
 			rb_insert_node(root, &s->sort_by_addr,
 					__cmp_task_addr, (unsigned long)s);
-			list_init(&s->list_node_or_head);
-			s->is_head = true;
+			list_init(&s->list_addr.head);
+			s->list_addr.is_head = true;
 			ulp_debug("TADDR new %lx %s\n", s->addr, s->name);
 		}
 	}

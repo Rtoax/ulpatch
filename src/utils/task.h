@@ -255,13 +255,21 @@ struct task_sym {
 	struct rb_node sort_by_name;
 	/* root is struct task_syms.rb_addrs */
 	struct rb_node sort_by_addr;
+
+	struct {
+		bool is_head;
+		union {
+			struct list_head head;
+			struct list_head node;
+		};
+	}
 	/**
 	 * Maybe more than one symbols have same address, if that, the first
 	 * symbol inserted to task_syms::addrs with node task_sym::sort_by_addr,
-	 * and task_sym::list_node_or_head initialized as list head. The
+	 * and task_sym::list_addr::head initialized as list head. The
 	 * following inserted symbol's task_sym::sort_by_addr was ignored, and
-	 * insert to first task_sym::list_node_or_head with node
-	 * task_sym::list_node_or_head.
+	 * insert to first task_sym::list_addr::head with node
+	 * task_sym::list_addr::node.
 	 *
 	 *                task_syms::addrs
 	 *                        ()
@@ -269,11 +277,10 @@ struct task_sym {
 	 *                       /  \
 	 *                      /   ...
 	 *                     ()
-	 *  task_sym::sort_by_addr               task_sym           task_sym
-	 *            [list_node_or_head]<-->[list_node_or_head]<-->[...]
+	 *  task_sym::sort_by_addr             task_sym
+	 *            [list_addr::head]<-->[list_addr::node]<-->[...]
 	 */
-	bool is_head;
-	struct list_head list_node_or_head;
+	list_addr;
 };
 
 struct task_syms {
