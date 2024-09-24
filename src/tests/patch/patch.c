@@ -8,6 +8,7 @@
 #include <utils/task.h>
 #include <utils/disasm.h>
 #include <elf/elf-api.h>
+#include <patch/asm.h>
 #include <patch/patch.h>
 
 #include <tests/test-api.h>
@@ -286,7 +287,8 @@ TEST(Patch, direct_jmp, 0)
 		ulp_error("failed to memcpy.\n");
 	}
 #elif defined(__aarch64__)
-	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr, AARCH64_INSN_BRANCH_NOLINK);
+	uint32_t new = aarch64_insn_gen_branch_imm(ip_pc, addr,
+					    AARCH64_INSN_BRANCH_NOLINK);
 
 	ulp_info("pc:%#0lx new addr:%#0x\n", ip_pc, new);
 
@@ -356,6 +358,91 @@ TEST(Patch, direct_jmp_table, 0)
 
 	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
+	close_task(task);
+	return test_ret;
+}
+
+static int static_asm_putchar(int c)
+{
+	char msg[] = {"Hello-\n"};
+	int len = 7;
+	ASM_WRITE(1, msg, len);
+	ASM_WRITE_HELLO();
+	return 0xdead;
+}
+
+static int static_asm_putchar_end(int c)
+{
+	/* Make sure not overflow */
+	char __unused buf[sizeof(struct jmp_table_entry)] = {"0xff"};
+	return 0;
+}
+
+typedef int (*putchar_fn)(int c);
+
+TEST(Patch, direct_jmp_far, 0)
+{
+	int test_ret = 0, ret;
+	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
+	struct task_struct *task = open_task(getpid(), flags);
+	unsigned long addr, map_len, ip_pc;
+	void *mem;
+	char orig_code[sizeof(struct jmp_table_entry)];
+	struct jmp_table_entry jmp_entry;
+	const char *new = NULL;
+	putchar_fn fn = NULL;
+
+	map_len = static_asm_putchar_end - static_asm_putchar;
+
+	addr = find_vma_span_area(task, map_len, MIN_ULP_START_VMA_ADDR);
+	if ((addr & 0x00000000FFFFFFFFUL) != addr) {
+		ulp_warning("Not found 4 bytes length address span area in memory space.\n"\
+			"please: cat /proc/%d/maps\n", task->pid);
+	}
+
+	mem = mmap((void *)addr, map_len, PROT_READ | PROT_WRITE | PROT_EXEC,
+		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (mem == MAP_FAILED) {
+		ulp_error("remote mmap failed.\n");
+		test_ret = -EFAULT;
+		goto close_ret;
+	}
+
+	memcpy(mem, static_asm_putchar, map_len);
+	mprotect(mem, map_len, PROT_READ | PROT_EXEC);
+
+	ulp_info("mmap mem %p, addr %lx\n", mem, addr);
+
+	fprint_file(stdout, "/proc/self/maps");
+
+	fdisasm_arch(stdout, addr, mem, map_len);
+
+	jmp_entry.jmp = arch_jmp_table_jmp();
+	jmp_entry.addr = (unsigned long)putchar;
+	new = (void *)&jmp_entry;
+
+	memcpy(orig_code, static_asm_putchar_end, sizeof(jmp_entry));
+
+	ip_pc = (unsigned long)static_asm_putchar_end;
+
+	ret = memcpy_to_task(task, ip_pc, (void *)new, sizeof(jmp_entry));
+	if (ret == -1 || ret < sizeof(jmp_entry)) {
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
+	}
+	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+
+	fn = (putchar_fn)mem;
+	fn('a');
+	static_asm_putchar_end('a');
+
+	ret = memcpy_to_task(task, ip_pc, orig_code, sizeof(jmp_entry));
+	if (ret == -1 || ret < sizeof(jmp_entry)) {
+		ulp_error("failed to memcpy, ret = %d.\n", ret);
+	}
+	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+
+close_ret:
+	munmap(mem, map_len);
 	close_task(task);
 	return test_ret;
 }
