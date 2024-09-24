@@ -357,3 +357,18 @@ int fmunmap(struct mmap_struct *mem)
 	return _munmap_file(mem);
 }
 
+int fprint_file(FILE *out, const char *file)
+{
+	int ret = 0;
+	char str[32] = {0};
+	FILE *fp = fopen(file, "r");
+
+	if (!fp)
+		return -1;
+
+	while (fgets(str, sizeof(str), fp))
+		ret += fprintf(out, "%s", str);
+
+	fclose(fp);
+	return ret;
+}

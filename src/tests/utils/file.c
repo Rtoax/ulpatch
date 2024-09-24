@@ -192,3 +192,9 @@ TEST(File, fcopy, 0)
 	return ret;
 }
 
+TEST(File, fprint_file, 0)
+{
+	fprint_file(stdout, "/etc/os-release");
+	fprint_file(stdout, "/proc/self/maps");
+	return 0;
+}
