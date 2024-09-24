@@ -37,7 +37,7 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned long base, unsigned char *code,
 	int ret = 0;
 	cs_arch arch;
 	cs_mode mode;
-
+	int max_bytes_per_insn = 0;
 
 	address = base ?: (unsigned long)code;
 
@@ -70,12 +70,24 @@ int fdisasm(FILE *fp, int disasm_arch, unsigned long base, unsigned char *code,
 		goto close;
 	}
 
-	fprintf(fp, "Disasm: code addr %p, size %ld, count %ld\n", code, size, count);
+	/* Get max bytes of every insn */
 	for (j = 0; j < count; j++)
-		fprintf(fp, "0x%" PRIx64 ":\t%s\t%s\n",
-			insn[j].address,
+		if (max_bytes_per_insn < insn[j].size)
+			max_bytes_per_insn = insn[j].size;
+	/* 1 byte equal to 3 char when print, like 'ff ' */
+	max_bytes_per_insn *= 3;
+
+	fprintf(fp, "Disasm: code addr %p, size %ld, count %ld\n", code, size, count);
+
+	for (j = 0; j < count; j++) {
+		int nbytes = 0;
+		fprintf(fp, "0x%" PRIx64 ": ", insn[j].address);
+		nbytes = print_bytes(fp, insn[j].bytes, insn[j].size);
+		fprintf(fp, "%-*s ", max_bytes_per_insn - nbytes, "");
+		fprintf(fp, "\t%s\t%s\n",
 			insn[j].mnemonic,
 			insn[j].op_str);
+	}
 	fprintf(fp, "0x%" PRIx64 ":\n", insn[j - 1].address + insn[j - 1].size);
 
 	cs_free(insn, count);
