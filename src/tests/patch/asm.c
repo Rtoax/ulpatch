@@ -9,6 +9,8 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(patch_asm);
+
 TEST(Asm, sleep, 0)
 {
 	ASM_SLEEP(1);

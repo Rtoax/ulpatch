@@ -8,6 +8,7 @@
 #include <utils/task.h>
 #include <tests/test-api.h>
 
+TEST_STUB(arch_mcount);
 
 TEST(Arch, mcount, 0)
 {

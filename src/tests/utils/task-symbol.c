@@ -13,6 +13,7 @@
 #include <utils/task.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_task_symbol);
 
 TEST(Task_sym, for_each, 0)
 {

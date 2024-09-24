@@ -11,6 +11,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(elf_core);
 
 TEST(Elf_Core, libc_object, 0)
 {

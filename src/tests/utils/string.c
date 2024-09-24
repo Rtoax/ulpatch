@@ -6,6 +6,7 @@
 #include <utils/list.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_string);
 
 static char docs[] = {
 	"This is a memshow() test.\n"

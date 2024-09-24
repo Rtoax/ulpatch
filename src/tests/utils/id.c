@@ -5,6 +5,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(utils_id);
 
 TEST(Id, is_root, 0)
 {

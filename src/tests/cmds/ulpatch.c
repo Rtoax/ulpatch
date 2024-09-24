@@ -5,6 +5,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(cmds_ulpatch);
 
 TEST(ulpatch, version, 0)
 {

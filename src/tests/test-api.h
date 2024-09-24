@@ -70,7 +70,7 @@ extern int nr_tests;
  * If Ret = TEST_SKIP_RET, the test will success anyway.
  */
 #define __TEST(Category, Name, Prio, Ret) \
-	int test_ ##Category ##_##Name(void);	\
+	extern int test_ ##Category ##_##Name(void);	\
 	static void __ctor(Prio) test_ctor_ ##Category ##_##Name(void) {	\
 		struct test __unused *test = \
 			create_test(#Category, #Name, \
@@ -89,6 +89,16 @@ extern int nr_tests;
 /* Lower prio TEST */
 #define TEST_LOWER(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_LOWER, Ret)
+
+/**
+ * ctors in test source code file will not be called by default if you define
+ * ctors in static static library, except the function in source code file be
+ * called in main() or some other where.
+ *
+ * FIXME: I don't known why, but it's works for me.
+ */
+#define TEST_STUB(name) void __test ##name(void) {}
+#define CALL_TEST_STUB(name) extern void __test ##name(void); __test ##name();
 
 extern struct list_head test_list[TEST_PRIO_NUM];
 

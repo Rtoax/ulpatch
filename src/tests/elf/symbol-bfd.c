@@ -10,6 +10,7 @@
 #include <utils/util.h>
 #include <tests/test-api.h>
 
+TEST_STUB(elf_symbol_bfd);
 
 static const char *test_files[] = {
 	"/usr/bin/ls",

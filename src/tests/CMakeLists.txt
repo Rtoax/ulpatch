@@ -1,6 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao
 #
+add_subdirectory(arch)
+add_subdirectory(cmds)
+add_subdirectory(elf)
+add_subdirectory(patch)
+add_subdirectory(utils)
+
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})
@@ -9,40 +15,7 @@ find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 add_executable(ulpatch_test
 	listener.c
 	test.c
-	arch/ftrace.c
-	arch/instruments.c
-	arch/mcount.c
-	cmds/ulftrace.c
-	cmds/ulpatch.c
-	cmds/ulpinfo.c
-	cmds/ultask.c
-	elf/core.c
-	elf/ehdr.c
-	elf/open.c
-	elf/relocs.c
-	elf/symbol.c
-	elf/symbol-bfd.c
-	patch/asm.c
-	patch/meta.c
-	patch/object.c
-	patch/object/hello/hello.c
-	patch/patch.c
-	patch/symbol.c
 	ulpatch_test.c
-	utils/ansi.c
-	utils/backtrace.c
-	utils/disasm.c
-	utils/file.c
-	utils/id.c
-	utils/init.c
-	utils/list.c
-	utils/log.c
-	utils/rbtree.c
-	utils/string.c
-	utils/task.c
-	utils/task-symbol.c
-	utils/utils.c
-	utils/version.c
 	${PROJECT_SOURCE_DIR}/src/ulftrace.c
 	${PROJECT_SOURCE_DIR}/src/ulpatch.c
 	${PROJECT_SOURCE_DIR}/src/ulpinfo.c
@@ -53,7 +26,7 @@ target_include_directories(ulpatch_test PRIVATE ..)
 
 target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})
 
-target_link_libraries(ulpatch_test
+target_link_libraries(ulpatch_test PRIVATE
 	${ELF} ${PTHREAD}
 	ulpatch_arch
 	ulpatch_elf
@@ -61,4 +34,9 @@ target_link_libraries(ulpatch_test
 	ulpatch_patch_obj_ftrace
 	ulpatch_patch_obj_hello
 	ulpatch_utils
+	ulpatch_test_arch
+	ulpatch_test_cmds
+	ulpatch_test_elf
+	ulpatch_test_patch
+	ulpatch_test_utils
 )

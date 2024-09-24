@@ -7,6 +7,7 @@
 #include <utils/list.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_version);
 
 TEST(Utils, ulpatch_version, 0)
 {

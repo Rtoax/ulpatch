@@ -11,6 +11,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(elf_symbol);
 
 struct symbol_t {
 	const char *s;

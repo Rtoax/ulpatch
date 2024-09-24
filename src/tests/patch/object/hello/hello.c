@@ -11,6 +11,8 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(patch_object_hello);
+
 /**
  * This is target function to patch, the patch object see
  * src/patch/objects/hello/

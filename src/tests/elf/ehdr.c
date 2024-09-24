@@ -8,6 +8,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(elf_ehdr);
 
 TEST(Elf_Ehdr, print, 0)
 {

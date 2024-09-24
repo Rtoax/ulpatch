@@ -5,6 +5,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(cmds_ulftrace);
 
 TEST(ulftrace, version, 0)
 {

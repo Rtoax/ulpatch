@@ -11,6 +11,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(elf_open);
 
 static const char *test_elfs[] = {
 	"/usr/bin/at",

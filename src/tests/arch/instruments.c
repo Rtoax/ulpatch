@@ -8,6 +8,7 @@
 #include <utils/task.h>
 #include <tests/test-api.h>
 
+TEST_STUB(arch_instruments);
 
 #if defined(__x86_64__)
 TEST(Insn, text_opcode_size, 0)

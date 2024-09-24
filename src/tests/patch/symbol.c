@@ -13,6 +13,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(patch_symbol);
 
 static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 {

@@ -11,6 +11,9 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(patch_meta);
+
+
 static __unused int patch_me(void)
 {
 	return 0;

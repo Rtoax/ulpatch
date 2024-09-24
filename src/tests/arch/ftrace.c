@@ -9,6 +9,7 @@
 #include <utils/task.h>
 #include <tests/test-api.h>
 
+TEST_STUB(arch_ftrace);
 
 #if defined(__x86_64__)
 TEST(Arch_ftrace, ftrace_call_replace, 0)

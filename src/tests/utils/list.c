@@ -6,6 +6,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(utils_list);
 
 struct test_data {
 	int v;

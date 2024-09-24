@@ -5,6 +5,8 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(cmds_ultask);
+
 
 TEST(ultask, version, 0)
 {

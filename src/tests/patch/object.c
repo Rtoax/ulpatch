@@ -11,6 +11,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(patch_object);
 
 /* see: root CMakeLists.txt */
 static const struct ulpatch_object {

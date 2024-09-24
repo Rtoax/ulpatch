@@ -13,6 +13,7 @@
 #include <utils/task.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_task);
 
 TEST(Task, get_proc_pid_exe, 0)
 {

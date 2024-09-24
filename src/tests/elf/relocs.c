@@ -11,6 +11,7 @@
 
 #include <tests/test-api.h>
 
+TEST_STUB(elf_relocs);
 
 TEST(Elf_Reloc, rela, 0)
 {

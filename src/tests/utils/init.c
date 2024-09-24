@@ -7,6 +7,7 @@
 #include <utils/list.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_init);
 
 TEST(Utils, dry_run, 0)
 {

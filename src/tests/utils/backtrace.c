@@ -6,6 +6,7 @@
 #include <utils/util.h>
 #include <tests/test-api.h>
 
+TEST_STUB(utils_backtrace);
 
 static void bar(void)
 {
