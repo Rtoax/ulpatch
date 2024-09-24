@@ -140,7 +140,7 @@ static void add_filter_fmt(const char *str, bool skip)
 	fmt = malloc(sizeof(struct filter_fmt));
 	fmt->fmt = strdup(str);
 	fmt->skip = skip;
-	fprintf(stderr, "Filter %s\n", str);
+	ulp_debug("Alloc filter %s, skip %d\n", str, skip);
 	list_add(&fmt->node, &filter_fmt_list);
 }
 
@@ -149,11 +149,38 @@ static inline int has_filter(void)
 	return !list_empty(&filter_fmt_list);
 }
 
+static inline int has_filter_match(void)
+{
+	struct filter_fmt *fmt;
+	list_for_each_entry(fmt, &filter_fmt_list, node)
+		if (!fmt->skip)
+			return true;
+	return false;
+}
+
+static inline int has_filter_skip(void)
+{
+	struct filter_fmt *fmt;
+	list_for_each_entry(fmt, &filter_fmt_list, node)
+		if (fmt->skip)
+			return true;
+	return false;
+}
+
 static int filter_matched(const char *category_name)
 {
 	struct filter_fmt *fmt;
 	list_for_each_entry(fmt, &filter_fmt_list, node)
-		if (strstr(category_name, fmt->fmt))
+		if (strstr(category_name, fmt->fmt) && !fmt->skip)
+			return true;
+	return false;
+}
+
+static inline int filter_matched_skip(const char *category_name)
+{
+	struct filter_fmt *fmt;
+	list_for_each_entry(fmt, &filter_fmt_list, node)
+		if (strstr(category_name, fmt->fmt) && fmt->skip)
 			return true;
 	return false;
 }
@@ -453,6 +480,8 @@ static int show_test(struct test *test, bool after_test)
 
 static bool should_skip(struct test *test)
 {
+	/* If specify nothing, test all tests by default */
+	bool skip = false;
 	char category_name[256];
 
 	/* Default: test all */
@@ -461,20 +490,21 @@ static bool should_skip(struct test *test)
 
 	snprintf(category_name, 256, "%s.%s", test->category, test->name);
 
-	if (filter_matched(category_name))
-		return false;
+	if (has_filter_match() && filter_matched(category_name))
+		skip = false;
+	else if (has_filter_match())
+		skip = true;
+
+	if (!skip && filter_matched_skip(category_name))
+		skip = true;
+
 	/**
 	 * If priority is too high, it couldn't be skipped.
 	 */
-	else if (test->prio < TEST_PRIO_HIGHER) {
-		if (just_list_tests)
-			return true;
-		else
-			return false;
-	} else
-		return true;
+	if (skip && test->prio < TEST_PRIO_HIGHER)
+		skip = false;
 
-	return false;
+	return skip;
 }
 
 static int operate_test(struct test *test)
