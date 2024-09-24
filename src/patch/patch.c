@@ -49,8 +49,10 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
-	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix, inf->orig_code[0], inf->orig_code[1]);
-	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time, ulp_info_strftime(inf));
+	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix,
+		inf->orig_code[0], inf->orig_code[1]);
+	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time,
+		ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
 	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->version);
 	fprintf(fp, "%sPad[4]     : [%d,%d,%d,%d]\n", prefix,
@@ -129,7 +131,8 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 
 	/* source object file must exist. */
 	if (!fexist(obj_from)) {
-		ulp_error("%s not exist, command 'make install' is needed.\n", obj_from);
+		ulp_error("%s not exist, command 'make install' is needed.\n",
+			  obj_from);
 		return -EEXIST;
 	}
 
@@ -215,8 +218,8 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 
 		/* skip undefined symbols */
 		if (is_undef_symbol(&sym[i])) {
-			ulp_debug("%s undef symbol: %s %lx\n", basename(vma->name_),
-				name, sym[i].st_value);
+			ulp_debug("%s undef symbol: %s %lx\n",
+				  basename(vma->name_), name, sym[i].st_value);
 			/* Skip undefined symbol */
 			continue;
 		}
@@ -240,11 +243,12 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 				      (unsigned long)newsym);
 		if (unlikely(node)) {
 			ulp_warning("%s: symbol %s already exist\n", task->comm,
-				 newsym->name);
+				    newsym->name);
 			free_symbol(newsym);
 		} else
-			ulp_debug("%s: add symbol %s addr %lx success.\n", task->comm,
-				newsym->name, newsym->sym.st_value);
+			ulp_debug("%s: add symbol %s addr %lx success.\n",
+				  task->comm, newsym->name,
+				  newsym->sym.st_value);
 	}
 
 	ulp->strtab = info->ulp_strtab;
@@ -256,7 +260,8 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 	return 0;
 }
 
-static int create_mmap_vma_file(struct task_struct *task, struct load_info *info)
+static int create_mmap_vma_file(struct task_struct *task,
+				struct load_info *info)
 {
 	int ret = 0;
 	ssize_t map_len = info->len;
@@ -316,7 +321,8 @@ close_ret:
 	return ret;
 }
 
-static void delete_mmap_vma_file(struct task_struct *task, struct load_info *info)
+static void delete_mmap_vma_file(struct task_struct *task,
+				 struct load_info *info)
 {
 	ulp_warning("munmap ulpatch.\n");
 	task_attach(task->pid);
@@ -395,8 +401,8 @@ int setup_load_info(struct load_info *info)
 
 	/* Check ULP file version, must match to ulpatch software version */
 	if (info->ulp_info->version != ULPATCH_FILE_VERSION) {
-		ulp_error("ULPatch version (%d) != %d\n", info->ulp_info->version,
-			ULPATCH_FILE_VERSION);
+		ulp_error("ULPatch version (%d) != %d\n",
+			  info->ulp_info->version, ULPATCH_FILE_VERSION);
 		return -EINVAL;
 	}
 
@@ -505,7 +511,8 @@ static int rewrite_section_headers(struct load_info *info)
 		 */
 		shdr->sh_addr = (size_t)info->target_hdr + shdr->sh_offset;
 
-		ulp_debug("Rewrite section hdr %s sh_addr %lx\n", name, shdr->sh_addr);
+		ulp_debug("Rewrite section hdr %s sh_addr %lx\n", name,
+			  shdr->sh_addr);
 	}
 
 	/* Track but don't keep info or other sections. */
@@ -543,10 +550,10 @@ static int rewrite_section_headers(struct load_info *info)
 unsigned long arch_jmp_table_jmp(void)
 {
 #if defined(__x86_64__)
-#define JMP_TABLE_JUMP_X86_64   0x90900000000225ff /* jmp [rip+2]; nop; nop */
+# define JMP_TABLE_JUMP_X86_64   0x90900000000225ff /* jmp [rip+2]; nop; nop */
 	return JMP_TABLE_JUMP_X86_64;
 #elif defined(__aarch64__)
-#define JMP_TABLE_JUMP_AARCH64  0xd61f022058000051 /*  ldr x17 #8; br x17 */
+# define JMP_TABLE_JUMP_AARCH64  0xd61f022058000051 /*  ldr x17 #8; br x17 */
 	return JMP_TABLE_JUMP_AARCH64;
 #else
 # error "Unsupport architecture"
@@ -721,8 +728,9 @@ static int solve_patch_symbols(struct load_info *info)
 
 	tsym = find_task_sym(task, dst_func, NULL, NULL);
 	if (!tsym) {
-		ulp_error("Couldn't found %s in target process, maybe %s is stripped.\n",
-		       dst_func, task->exe);
+		ulp_error("Couldn't found %s in target process, maybe %s is "
+			  "stripped, or you could load symbol-file.\n",
+			  dst_func, task->exe);
 		return -ENOENT;
 	}
 
@@ -739,7 +747,8 @@ static int solve_patch_symbols(struct load_info *info)
 	}
 
 	if (!sym_src_func) {
-		ulp_error("Couldn't found %s in %s.\n", src_func, info->ulp_name);
+		ulp_error("Couldn't found %s in %s.\n", src_func,
+			  info->ulp_name);
 		return -ENOENT;
 	}
 
@@ -751,8 +760,10 @@ static int solve_patch_symbols(struct load_info *info)
 
 	info->ulp_info->time = secs();
 
-	ulp_debug("Found %s symbol address %#016lx.\n", dst_func, info->ulp_info->target_func_addr);
-	ulp_debug("Found %s symbol address %#016lx.\n", src_func, info->ulp_info->patch_func_addr);
+	ulp_debug("Found %s symbol address %#016lx.\n", dst_func,
+		  info->ulp_info->target_func_addr);
+	ulp_debug("Found %s symbol address %#016lx.\n", src_func,
+		  info->ulp_info->patch_func_addr);
 	return 0;
 }
 
@@ -763,9 +774,9 @@ static int kick_target_process(const struct load_info *info)
 	struct task_struct *task = info->target_task;
 	unsigned long target_hdr = info->target_hdr;
 	size_t insn_sz = 0;
-
 	const char *new_insn = NULL;
 	struct jmp_table_entry jmp_entry;
+
 	jmp_entry.jmp = arch_jmp_table_jmp();
 	jmp_entry.addr = info->ulp_info->patch_func_addr;
 	new_insn = (void *)&jmp_entry;
@@ -785,7 +796,9 @@ static int kick_target_process(const struct load_info *info)
 		goto done;
 	}
 
-	ulp_debug("Backup original instructions from %lx.\n", info->ulp_info->virtual_addr);
+	ulp_debug("Backup original instructions from %lx.\n",
+		  info->ulp_info->virtual_addr);
+
 	n = memcpy_from_task(task, info->ulp_info->orig_code,
 				info->ulp_info->virtual_addr, insn_sz);
 	ulp_debug("memcpy return %d, expect %ld\n", n, insn_sz);
@@ -806,7 +819,8 @@ static int kick_target_process(const struct load_info *info)
 
 	task_attach(task->pid);
 
-	n = memcpy_to_task(task, info->ulp_info->virtual_addr, (void *)new_insn, insn_sz);
+	n = memcpy_to_task(task, info->ulp_info->virtual_addr,
+			   (void *)new_insn, insn_sz);
 	if (n == -1 || n < insn_sz) {
 		ulp_error("failed kick target process.\n");
 		err = -ENOEXEC;
