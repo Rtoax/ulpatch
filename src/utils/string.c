@@ -71,10 +71,18 @@ void print_string_hex(FILE *fp, const char *comment, unsigned char *str,
 		      size_t len)
 {
 	unsigned char *c;
-	fprintf(fp, "%s", comment);
+	if (comment)
+		fprintf(fp, "%s", comment);
 	for (c = str; c < str + len; c++)
 		fprintf(fp, "0x%02x ", *c & 0xff);
 	fprintf(fp, "\n");
+}
+
+void print_bytes(FILE *fp, void *mem, size_t len)
+{
+	unsigned char *c, *str = mem;
+	for (c = str; c < str + len; c++)
+		fprintf(fp, "%02x ", *c & 0xff);
 }
 
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */

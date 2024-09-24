@@ -22,7 +22,6 @@ static char docs[] = {
 
 TEST(Utils_str, memshow, 0)
 {
-
 #define TEST_DATA	"Hello World"
 	memshowinlog(LOG_INFO, TEST_DATA, sizeof(TEST_DATA));
 
@@ -31,6 +30,13 @@ TEST(Utils_str, memshow, 0)
 	/* print nothing */
 	memshow(NULL, docs, sizeof(docs));
 
+	return 0;
+}
+
+TEST(Utils_str, print, 0)
+{
+	print_string_hex(stdout, NULL, (void *)docs, sizeof(docs));
+	print_bytes(stdout, docs, sizeof(docs));
 	return 0;
 }
 
