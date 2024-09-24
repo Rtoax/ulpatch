@@ -72,9 +72,10 @@ static unsigned long total_spent_us = 0;
 
 /* For -l, --list-tests */
 static bool just_list_tests = false;
-/* For -f, --filter */
+/* For -f, --filter or --skip */
 struct filter_fmt {
 	const char *fmt;
+	bool skip;
 	struct list_head node; /* head is filter_fmt_list */
 };
 static LIST_HEAD(filter_fmt_list);
@@ -133,10 +134,12 @@ static void print_test_symbol(void);
 static const char *prog_name = "ulpatch_test";
 
 
-static void add_filter_fmt(const char *str)
+static void add_filter_fmt(const char *str, bool skip)
 {
-	struct filter_fmt *fmt = malloc(sizeof(struct filter_fmt));
+	struct filter_fmt *fmt;
+	fmt = malloc(sizeof(struct filter_fmt));
 	fmt->fmt = strdup(str);
+	fmt->skip = skip;
 	fprintf(stderr, "Filter %s\n", str);
 	list_add(&fmt->node, &filter_fmt_list);
 }
@@ -300,6 +303,8 @@ enum {
 	ARG_LISTENER_REQUEST_LIST,
 	ARG_LISTENER_NLOOP,
 	ARG_LISTENER_EPOLL,
+
+	ARG_SKIP,
 };
 
 static int parse_config(int argc, char *argv[])
@@ -307,6 +312,7 @@ static int parse_config(int argc, char *argv[])
 	struct option options[] = {
 		{ "list-tests",         no_argument,        0,  'l' },
 		{ "filter",             required_argument,  0,  'f' },
+		{ "skip",               required_argument,  0,  ARG_SKIP },
 		{ "role",               required_argument,  0,  'r' },
 		{ "usecond",            required_argument,  0,  's' },
 		{ "msgq",               required_argument,  0,  'm' },
@@ -336,7 +342,10 @@ static int parse_config(int argc, char *argv[])
 			just_list_tests = true;
 			break;
 		case 'f':
-			add_filter_fmt(optarg);
+			add_filter_fmt(optarg, false);
+			break;
+		case ARG_SKIP:
+			add_filter_fmt(optarg, true);
 			break;
 		case 'r':
 			role = who_am_i(optarg);
