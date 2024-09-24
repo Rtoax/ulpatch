@@ -247,6 +247,7 @@ char* fmktempfile(char *buf, int buf_len, char *seed);
 char* fmktempname(char *buf, int buf_len, char *seed);
 int fmemcpy(void *mem, int mem_len, const char *file);
 int fprint_file(FILE *fp, const char *file);
+int fprint_fd(FILE *fp, int fd);
 
 struct mmap_struct *fmmap_rdonly(const char *filepath);
 struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size);

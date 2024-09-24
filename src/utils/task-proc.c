@@ -33,21 +33,6 @@ int open_pid_maps(pid_t pid)
 	return mapsfd;
 }
 
-int fprint_pid_maps(FILE *fp, int mapsfd)
-{
-	char ch;
-	int cnt = 0;
-
-	if (fp == NULL)
-		fp = stdout;
-
-	while (read(mapsfd, &ch, 1) == 1) {
-		fputc(ch, fp);
-		cnt++;
-	}
-	return cnt;
-}
-
 int __open_pid_mem(pid_t pid, int flags)
 {
 	char mem[] = "/proc/1234567890/mem";

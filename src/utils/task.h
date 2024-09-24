@@ -380,7 +380,6 @@ struct task_struct {
 
 
 int open_pid_maps(pid_t pid);
-int fprint_pid_maps(FILE *fp, int mapsfd);
 int __open_pid_mem(pid_t pid, int flags);
 int open_pid_mem_ro(pid_t pid);
 int open_pid_mem_rw(pid_t pid);

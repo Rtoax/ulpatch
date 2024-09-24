@@ -29,7 +29,7 @@ TEST(Task, open_pid_maps, 0)
 {
 	int fd;
 	fd = open_pid_maps(getpid());
-	fprint_pid_maps(stdout, fd);
+	fprint_fd(stdout, fd);
 	close(fd);
 	return 0;
 }

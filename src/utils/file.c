@@ -372,3 +372,21 @@ int fprint_file(FILE *out, const char *file)
 	fclose(fp);
 	return ret;
 }
+
+int fprint_fd(FILE *fp, int fd)
+{
+	char ch;
+	int cnt = 0;
+
+	if (fp == NULL)
+		fp = stdout;
+
+	lseek(fd, 0, SEEK_SET);
+
+	while (read(fd, &ch, 1) == 1) {
+		fputc(ch, fp);
+		cnt++;
+	}
+	return cnt;
+}
+
