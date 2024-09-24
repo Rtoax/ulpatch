@@ -30,7 +30,7 @@ extern int try_to_wake_up(struct task_struct *task, int mode, int wake_flags);
  *    -> mcount_entry()
  */
 int mcount_entry(unsigned long *parent_loc, unsigned long child,
-			struct mcount_regs *regs)
+		 struct mcount_regs *regs)
 {
 #if defined(ULPATCH_TEST)
 
@@ -56,7 +56,7 @@ int mcount_entry(unsigned long *parent_loc, unsigned long child,
 
 #endif /* ULPATCH_TEST */
 
-	// TODO
+	/* TODO */
 	return 0;
 }
 
@@ -64,10 +64,9 @@ unsigned long mcount_exit(long *retval)
 {
 #if defined(ULPATCH_TEST)
 	printf("CALL mcount_exit.\n");
-
 #endif /* ULPATCH_TEST */
 
-	// TODO
+	/* TODO */
 	return 0;
 }
 

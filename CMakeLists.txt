@@ -13,6 +13,8 @@ endif()
 
 PROJECT(ulpatch)
 
+enable_language(C ASM)
+
 string(TIMESTAMP ULPATCH_COMPILE_TIME "%Y/%m/%d %H:%M:%S")
 message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
 

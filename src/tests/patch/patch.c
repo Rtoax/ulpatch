@@ -233,29 +233,27 @@ TEST(Patch, ftrace_direct, TTWU_FTRACE_RETURN)
 	return direct_patch_ftrace_test(&arg, TTWU_FTRACE_RETURN);
 }
 
+int mcount_entry(unsigned long *parent_loc, unsigned long child,
+		 struct mcount_regs *regs)
+{
+	/* TODO */
+	return 0;
+}
+
+unsigned long mcount_exit(long *retval)
+{
+	/* TODO */
+	return 0;
+}
+
 TEST(Patch, ftrace_object, 0)
 {
-/* FIXME:
-
-[100%] Linking C executable ulpatch_test
-/usr/bin/ld: patch/libulpatch_test_patch.a(patch.c.o): in function `test_Patch_ftrace_object':
-/home/rongtao/Git/ulpatch/src/tests/patch/patch.c:238:(.text+0x698): undefined reference to `_ftrace_mcount'
-collect2: error: ld returned 1 exit status
-make[2]: *** [src/tests/CMakeFiles/ulpatch_test.dir/build.make:462: src/tests/ulpatch_test] Error 1
-make[1]: *** [CMakeFiles/Makefile2:696: src/tests/CMakeFiles/ulpatch_test.dir/all] Error 2
-make: *** [Makefile:136: all] Error 2
-
- */
-#if 0
 	struct patch_test_arg arg = {
 		.custom_mcount = _ftrace_mcount,
 		.replace = REPLACE_MCOUNT,
 	};
 
 	return direct_patch_ftrace_test(&arg, 0);
-#else
-	return -1;
-#endif
 }
 
 #if defined(__x86_64__)
