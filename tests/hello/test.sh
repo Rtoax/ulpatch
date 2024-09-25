@@ -96,6 +96,10 @@ if [[ ${unpatch} ]]; then
 	ulpatch -p ${pid} --unpatch ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
 fi
 
+# Disasm print_hello
+print_hello_addr=$(ultask -p ${pid} --sym | grep -w print_hello | awk '{print $3}')
+ultask -p ${pid} --disasm-addr ${print_hello_addr} --disasm-size 16
+
 cat /proc/${pid}/maps
 ulpinfo -p ${pid} ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
 
