@@ -17,7 +17,6 @@ static void ulpatch_internal_print_hello(unsigned long ul)
 
 void ulp_print(unsigned long ul)
 {
-	ASM_SLEEP(30);
 	ulpatch_internal_print_hello(ul);
 }
 ULPATCH_INFO(ulp_print, print_hello, "Rong Tao");
