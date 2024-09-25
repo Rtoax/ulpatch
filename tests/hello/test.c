@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022-2024 Rong Tao */
 #include <stdio.h>
 
 #define ULP_SYM(f)	void ulp_##f(unsigned long ul);

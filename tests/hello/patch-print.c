@@ -1,4 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022-2024 Rong Tao */
 #include <stdio.h>
+#include <ulpatch/asm.h>
 #include <ulpatch/meta.h>
 
 
@@ -14,6 +17,7 @@ static void ulpatch_internal_print_hello(unsigned long ul)
 
 void ulp_print(unsigned long ul)
 {
+	ASM_SLEEP(30);
 	ulpatch_internal_print_hello(ul);
 }
 ULPATCH_INFO(ulp_print, print_hello, "Rong Tao");
