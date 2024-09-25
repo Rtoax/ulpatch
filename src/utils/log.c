@@ -29,10 +29,24 @@ static int log_level = LOG_ERR;
 static bool prefix_on = false;
 static FILE *log_fp = NULL;
 
+void init_syslog(void)
+{
+	setlogmask(LOG_UPTO(log_level));
+	openlog("ulpatch", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
+}
+
+static void close_syslog(void)
+{
+	closelog();
+}
 
 void set_log_level(int level)
 {
-	log_level = level;
+	if (log_level != level) {
+		log_level = level;
+		close_syslog();
+		init_syslog();
+	}
 }
 
 int get_log_level(void)
@@ -106,13 +120,7 @@ ulp_log(int level, bool has_prefix, const char *file, const char *func,
 	FILE *fp = get_log_fp();
 	va_list va;
 	int _en = errno;
-	static bool syslog_init = false;
 
-	if (unlikely(!syslog_init)) {
-		setlogmask(LOG_UPTO(LOG_ERR));
-		openlog("ulpatch", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
-		syslog_init = true;
-	}
 
 	/* syslog anyway */
 	va_start(va, fmt);

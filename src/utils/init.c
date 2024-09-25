@@ -78,8 +78,12 @@ static void __env_init(void)
 	}
 }
 
+extern void init_syslog(void);
+
 void ulpatch_init(void)
 {
+	init_syslog();
+
 	__check_and_exit();
 	__env_init();
 
