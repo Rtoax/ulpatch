@@ -129,6 +129,5 @@ TEST_FUNC_SYM(static_func1)
 
 #ifdef TEST_SYM_FOR_EACH
 }
-# undef TEST_SYM_FOR_EACH_I
 #endif
 
