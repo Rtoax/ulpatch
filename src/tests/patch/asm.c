@@ -11,13 +11,13 @@
 
 TEST_STUB(patch_asm);
 
-TEST(Asm, sleep, 0)
+TEST(Patch_asm, sleep, 0)
 {
 	ASM_SLEEP(1);
 	return 0;
 }
 
-TEST(Asm, write, 0)
+TEST(Patch_asm, write, 0)
 {
 	char msg[] = {"Hello-\n"};
 	int len = 7;
@@ -26,7 +26,7 @@ TEST(Asm, write, 0)
 	return 0;
 }
 
-TEST(Asm, exit, 0)
+TEST(Patch_asm, exit, 0)
 {
 	int pid, status;
 	int ret = 0;

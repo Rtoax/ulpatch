@@ -14,7 +14,7 @@ struct test_data {
 };
 
 
-TEST(List, list, 0)
+TEST(Utils_list, list, 0)
 {
 	LIST_HEAD(list1);
 	int ret = -1;

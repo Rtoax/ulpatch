@@ -7,7 +7,7 @@
 
 TEST_STUB(utils_id);
 
-TEST(Id, is_root, 0)
+TEST(Utils_id, is_root, 0)
 {
 	if (is_root("PROG"))
 		ulp_debug("Run with root.\n");

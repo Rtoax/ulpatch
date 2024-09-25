@@ -67,7 +67,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	return ret;
 }
 
-TEST(Symbol, init_patch, TEST_SKIP_RET)
+TEST(Patch_sym, init_patch, TEST_SKIP_RET)
 {
 	return test_task_patch(FTO_ULFTRACE, NULL);
 }
@@ -79,22 +79,18 @@ static int find_task_symbol(struct task_struct *task)
 	struct task_sym *tsym;
 
 	for (i = 0; i < nr_test_symbols(); i++) {
-
 		tsym = find_task_sym(task, test_symbols[i].sym, NULL, NULL);
-
 		ulp_info("%s %-30s: 0x%lx\n",
 			tsym ? "Exist" : "NoExi",
 			test_symbols[i].sym,
 			tsym ? tsym->addr : 0);
-
 		if (!tsym)
 			err = -1;
 	}
-
 	return err;
 }
 
-TEST(Symbol, find_task_symbol_list, 0)
+TEST(Patch_sym, find_task_symbol_list, 0)
 {
 	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }

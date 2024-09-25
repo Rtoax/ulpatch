@@ -24,7 +24,7 @@ static const struct ulpatch_object {
 };
 
 
-TEST(Object, check_object, 0)
+TEST(Patch_object, check, 0)
 {
 	int i, ret = 0;
 
