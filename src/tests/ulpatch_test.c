@@ -940,7 +940,6 @@ void never_called_stub(void)
 	CALL_TEST_STUB(patch_asm);
 	CALL_TEST_STUB(patch_meta);
 	CALL_TEST_STUB(patch_object);
-	CALL_TEST_STUB(patch_object_hello);
 	CALL_TEST_STUB(patch_patch);
 	CALL_TEST_STUB(patch_symbol);
 	CALL_TEST_STUB(utils_ansi);

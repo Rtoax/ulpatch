@@ -97,8 +97,9 @@ extern int nr_tests;
  *
  * FIXME: I don't known why, but it's works for me.
  */
-#define TEST_STUB(name) void __test ##name(void) {}
-#define CALL_TEST_STUB(name) extern void __test ##name(void); __test ##name();
+#define TEST_STUB(name) void __test_stub_ ##name(void) {}
+#define CALL_TEST_STUB(name) extern void __test_stub_ ##name(void); \
+		__test_stub_ ##name();
 
 extern struct list_head test_list[TEST_PRIO_NUM];
 

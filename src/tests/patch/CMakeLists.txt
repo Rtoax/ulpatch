@@ -11,7 +11,6 @@ add_library(ulpatch_test_patch STATIC
 	asm.c
 	meta.c
 	object.c
-	object/hello/hello.c
 	patch.c
 	symbol.c
 )
