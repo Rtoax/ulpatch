@@ -936,6 +936,7 @@ void never_called_stub(void)
 	CALL_TEST_STUB(elf_relocs);
 	CALL_TEST_STUB(elf_symbol);
 	CALL_TEST_STUB(elf_symbol_bfd);
+	CALL_TEST_STUB(ftrace_ftrace);
 	CALL_TEST_STUB(patch_asm);
 	CALL_TEST_STUB(patch_meta);
 	CALL_TEST_STUB(patch_object);

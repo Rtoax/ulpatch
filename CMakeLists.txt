@@ -75,7 +75,6 @@ endif()
 add_compile_options(-D_GNU_SOURCE)
 add_compile_options(-Wuninitialized)
 add_compile_options(-Wreturn-type)
-add_compile_options(-pg)
 
 if(BUILD_PIE_EXE)
 	message(STATUS "Turn on PIE")
