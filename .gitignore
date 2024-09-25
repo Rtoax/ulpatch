@@ -27,6 +27,7 @@ cmake_install.cmake
 *.ulpo
 *.ulp.*
 *.up
+ulp-*
 
 # Temp
 *~
