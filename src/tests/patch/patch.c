@@ -141,19 +141,19 @@ TEST(Patch, direct_jmp_table, 0)
 	return test_ret;
 }
 
-static int static_asm_putchar(int c)
+static int static_asm_putchar(int ret)
 {
 	char msg[] = {"Hello-\n"};
 	int len = 7;
 	ASM_WRITE(1, msg, len);
 	ASM_WRITE_HELLO();
-	return 0xdead;
+	return ret;
 }
 
-static int static_asm_putchar_end(int c)
+static int static_asm_putchar_end(int ret)
 {
-	/* Make sure not overflow */
-	char __unused buf[sizeof(struct jmp_table_entry)] = {"0xff"};
+	/* Make sure here could store a jmp_table_entry, ensure not overflow */
+	char __unused buf[sizeof(struct jmp_table_entry)];
 	return 0;
 }
 
@@ -161,7 +161,7 @@ typedef int (*putchar_fn)(int c);
 
 TEST(Patch, direct_jmp_far, 0)
 {
-	int test_ret = 0, ret;
+	int test_ret = 0, ret, expect_ret;
 	int flags = FTO_VMA_ELF_FILE | FTO_RDWR;
 	struct task_struct *task = open_task(getpid(), flags);
 	unsigned long addr, map_len, ip_pc;
@@ -197,7 +197,7 @@ TEST(Patch, direct_jmp_far, 0)
 	fdisasm_arch(stdout, addr, mem, map_len);
 
 	jmp_entry.jmp = arch_jmp_table_jmp();
-	jmp_entry.addr = (unsigned long)putchar;
+	jmp_entry.addr = (unsigned long)mem;
 	new = (void *)&jmp_entry;
 
 	memcpy(orig_code, static_asm_putchar_end, sizeof(jmp_entry));
@@ -211,8 +211,20 @@ TEST(Patch, direct_jmp_far, 0)
 	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	fn = (putchar_fn)mem;
-	fn('a');
-	static_asm_putchar_end('a');
+
+	expect_ret = 0xdead;
+
+	ret = fn(expect_ret);
+	if (ret != expect_ret) {
+		ulp_error("Copy mem failed. ret = %x\n", ret);
+		test_ret = -1;
+	}
+
+	ret = static_asm_putchar_end(expect_ret);
+	if (ret != expect_ret) {
+		ulp_error("Patch failed. ret = %x\n", ret);
+		test_ret = -1;
+	}
 
 	ret = memcpy_to_task(task, ip_pc, orig_code, sizeof(jmp_entry));
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
