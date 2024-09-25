@@ -953,8 +953,9 @@ void never_called_stub(void)
 	CALL_TEST_STUB(utils_log);
 	CALL_TEST_STUB(utils_rbtree);
 	CALL_TEST_STUB(utils_string);
-	CALL_TEST_STUB(utils_task_symbol);
 	CALL_TEST_STUB(utils_task);
+	CALL_TEST_STUB(utils_task_proc);
+	CALL_TEST_STUB(utils_task_symbol);
 	CALL_TEST_STUB(utils_utils);
 	CALL_TEST_STUB(utils_version);
 }

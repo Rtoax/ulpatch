@@ -9,7 +9,7 @@
 
 TEST_STUB(utils_ansi);
 
-TEST(UtilsAnsi, base, 0)
+TEST(Utils_ansi, base, 0)
 {
 	int i;
 

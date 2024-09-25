@@ -8,7 +8,7 @@
 
 TEST_STUB(utils_log);
 
-TEST(Log, log, 0)
+TEST(Utils_log, log, 0)
 {
 	ulp_debug("DEBUG\n");
 	ulp_info("INFO\n");
@@ -24,7 +24,7 @@ TEST(Log, log, 0)
 	return 0;
 }
 
-TEST(Log, set_log_level, 0)
+TEST(Utils_log, set_log_level, 0)
 {
 	set_log_level(LOG_CRIT);
 
@@ -42,7 +42,7 @@ TEST(Log, set_log_level, 0)
 	return 0;
 }
 
-TEST(Log, set_log_prefix, 0)
+TEST(Utils_log, set_log_prefix, 0)
 {
 	set_log_prefix(false);
 
@@ -69,16 +69,53 @@ TEST(Log, set_log_prefix, 0)
 	return 0;
 }
 
-TEST(Log, str2loglevel, 0)
+TEST(Utils_log, str2loglevel, 0)
 {
-	if (LOG_INFO != str2loglevel("info") || LOG_INFO != str2loglevel("INFO"))
+	if (LOG_DEBUG != str2loglevel("debug") ||
+            LOG_DEBUG != str2loglevel("DEBUG") ||
+            LOG_DEBUG != str2loglevel("DBG") ||
+            LOG_DEBUG != str2loglevel("dbg"))
 		return -1;
-	if (LOG_INFO != str2loglevel("inf"))
+
+	if (LOG_INFO != str2loglevel("info") ||
+            LOG_INFO != str2loglevel("INFO") ||
+            LOG_INFO != str2loglevel("INF") ||
+	    LOG_INFO != str2loglevel("inf"))
 		return -1;
-	if (LOG_DEBUG != str2loglevel("debug"))
+
+	if (LOG_NOTICE != str2loglevel("notice") ||
+            LOG_NOTICE != str2loglevel("NOTICE") ||
+            LOG_NOTICE != str2loglevel("NOTE") ||
+            LOG_NOTICE != str2loglevel("note"))
 		return -1;
-	if (LOG_DEBUG != str2loglevel("dbg"))
+
+	if (LOG_WARNING != str2loglevel("warning") ||
+            LOG_WARNING != str2loglevel("WARNING") ||
+            LOG_WARNING != str2loglevel("WARN") ||
+            LOG_WARNING != str2loglevel("warn"))
 		return -1;
+
+	if (LOG_ERR != str2loglevel("error") ||
+            LOG_ERR != str2loglevel("ERROR") ||
+            LOG_ERR != str2loglevel("ERR") ||
+            LOG_ERR != str2loglevel("err"))
+		return -1;
+
+	if (LOG_CRIT != str2loglevel("crit") ||
+            LOG_CRIT != str2loglevel("CRIT"))
+		return -1;
+
+	if (LOG_ALERT != str2loglevel("alert") ||
+            LOG_ALERT != str2loglevel("ALERT"))
+		return -1;
+
+	if (LOG_EMERG != str2loglevel("emerg") ||
+            LOG_EMERG != str2loglevel("EMERG") ||
+	    /* Fallback to LOG_EMERG */
+            LOG_EMERG != str2loglevel("Unknown-value") ||
+            LOG_EMERG != str2loglevel(NULL))
+		return -1;
+
 	return 0;
 }
 

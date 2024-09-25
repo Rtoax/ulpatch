@@ -2,6 +2,7 @@
 /* Copyright (C) 2024 Rong Tao */
 #pragma once
 #include <errno.h>
+#include <stdio.h>
 
 #include <utils/compiler.h>
 

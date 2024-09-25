@@ -18,7 +18,7 @@ static void foo(void)
 	bar();
 }
 
-TEST(Backtrace, base, 0)
+TEST(Utils_backtrace, base, 0)
 {
 	foo();
 	return 0;

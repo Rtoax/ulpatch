@@ -88,7 +88,7 @@ int str2loglevel(const char *str)
 	else if (!strcasecmp(str, "emerg"))
 		return LOG_EMERG;
 	else {
-		fprintf(stderr, "Unknown log level string %s\n", str);
+		ulp_error("Unknown log level string %s\n", str);
 		return LOG_EMERG;
 	}
 }

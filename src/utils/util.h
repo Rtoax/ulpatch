@@ -148,9 +148,9 @@
 
 
 #if defined(HAVE_LIBUNWIND_H)
-void do_backtrace(FILE *fp);
+int do_backtrace(FILE *fp);
 #else
-#define do_backtrace(fp) do {} while(0)
+# define do_backtrace(fp) ({-1;})
 #endif
 
 

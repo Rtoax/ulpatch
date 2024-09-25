@@ -9,7 +9,7 @@
 
 TEST_STUB(utils_init);
 
-TEST(Utils, dry_run, 0)
+TEST(Utils_init, dry_run, 0)
 {
 	int ret = 0;
 
@@ -19,7 +19,7 @@ TEST(Utils, dry_run, 0)
 	return ret;
 }
 
-TEST(Utils, verbose, 0)
+TEST(Utils_init, verbose, 0)
 {
 	int ret = 0;
 

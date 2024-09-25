@@ -15,6 +15,7 @@ TEST_STUB(elf_core);
 
 TEST(Elf_Core, libc_object, 0)
 {
+	/* Must has libc.so */
 	return libc_object() ? 0 : 1;
 }
 

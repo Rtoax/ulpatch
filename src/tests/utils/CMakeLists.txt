@@ -19,6 +19,7 @@ add_library(ulpatch_test_utils STATIC
 	rbtree.c
 	string.c
 	task.c
+	task-proc.c
 	task-symbol.c
 	utils.c
 	version.c

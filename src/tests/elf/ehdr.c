@@ -21,12 +21,12 @@ TEST(Elf_Ehdr, print, 0)
 		.e_version = EV_CURRENT,
 		.e_entry = 0xffff,
 	};
-	print_ehdr(NULL, &ehdr1);
-	return 0;
+	return print_ehdr(NULL, &ehdr1);
 }
 
 TEST(Elf_Ehdr, readelf, 0)
 {
+	int ret;
 	struct elf_file *elf;
 	elf = elf_file_open(ulpatch_test_path);
 	if (!elf) {
@@ -34,8 +34,8 @@ TEST(Elf_Ehdr, readelf, 0)
 		return -ENOENT;
 	}
 
-	print_ehdr(stdout, elf->ehdr);
+	ret = print_ehdr(stdout, elf->ehdr);
 
 	elf_file_close(ulpatch_test_path);
-	return 0;
+	return ret;
 }

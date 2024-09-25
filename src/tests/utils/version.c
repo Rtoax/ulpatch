@@ -9,7 +9,7 @@
 
 TEST_STUB(utils_version);
 
-TEST(Utils, ulpatch_version, 0)
+TEST(Utils_version, ulpatch_version, 0)
 {
 	int ret = 0;
 

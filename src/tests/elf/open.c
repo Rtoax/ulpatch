@@ -29,11 +29,11 @@ static const char *test_elfs[] = {
 };
 
 
-TEST(Elf_Open, open_close, 0)
+TEST(Elf_Open, open_find_close, 0)
 {
 	int i;
 	int ret = 0;
-	struct elf_file *e;
+	struct elf_file *e, *find;
 
 	for (i = 0; i < ARRAY_SIZE(test_elfs); i++) {
 		if (!fexist(test_elfs[i]))
@@ -45,12 +45,15 @@ TEST(Elf_Open, open_close, 0)
 			ret = -1;
 			break;
 		}
-		e = elf_file_find(test_elfs[i]);
-		if (!e) {
+		find = elf_file_find(test_elfs[i]);
+		if (!find) {
 			ulp_error("find %s failed.\n", test_elfs[i]);
 			ret = -1;
 			break;
 		}
+
+		if (e != find)
+			ret = -1;
 
 		elf_file_close(test_elfs[i]);
 	}

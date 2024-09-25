@@ -51,7 +51,7 @@ static int test_disasm(int arch, unsigned char *code, size_t size)
 	return fdisasm(stdout, arch, 0, code, size);
 }
 
-TEST(Disasm, base, 0)
+TEST(Utils_disasm, base, 0)
 {
 	int ret = 0;
 	unsigned char *code;
@@ -68,7 +68,7 @@ TEST(Disasm, base, 0)
 	return ret;
 }
 
-TEST(Disasm, base_arch, 0)
+TEST(Utils_disasm, base_arch, 0)
 {
 	unsigned char *code = (unsigned char *)test_disasm_stub1;
 	size_t size = (test_disasm_stub2 - test_disasm_stub1);

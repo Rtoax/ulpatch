@@ -22,17 +22,17 @@ static int cmp_data(struct rb_node *n1, unsigned long key)
 
 static __unused struct test_data *find_data(struct rb_root *tree, int v)
 {
-	struct rb_node *node = rb_search_node(tree,
-						cmp_data, (unsigned long)v);
-
-	return node?rb_entry(node, struct test_data, node):NULL;
+	struct rb_node *node;
+	node = rb_search_node(tree, cmp_data, (unsigned long)v);
+	return node ? rb_entry(node, struct test_data, node) : NULL;
 }
 
 static __unused int link_data(struct rb_root *tree, struct test_data *data)
 {
-	struct rb_node *node = rb_insert_node(tree, &data->node,
-						cmp_data, (unsigned long)data->v);
-	return node?0:-1;
+	struct rb_node *node;
+	node = rb_insert_node(tree, &data->node, cmp_data,
+		       (unsigned long)data->v);
+	return node ? 0 : -1;
 }
 
 static void free_data(struct rb_node *node)
@@ -41,7 +41,7 @@ static void free_data(struct rb_node *node)
 	/* maybe more */
 }
 
-TEST(Rbtree, rbtree, 0)
+TEST(Utils_rbtree, base, 0)
 {
 	int ret = -1;
 	int i;
@@ -84,7 +84,6 @@ TEST(Rbtree, rbtree, 0)
 
 	rbtree_postorder_for_each_entry_safe(t, tmp, &rb_tree, node) {
 		ulp_debug("value: %d\n", t->v);
-
 		sum += t->v;
 	}
 

@@ -61,7 +61,7 @@ static const char *R_X86_64_STRING(int r) {
 	_I(X86_64_GOTPCRELX)
 	_I(X86_64_REX_GOTPCRELX)
 	default:
-		errno = EINVAL;
+		errno = ENOENT;
 		return "Unknown-x86-64-Relo";
 	}
 #undef _I
@@ -211,7 +211,7 @@ static const char *R_AARCH64_STRING(int r) {
 	_I(AARCH64_TLSDESC)
 	_I(AARCH64_IRELATIVE)
 	default:
-		errno = EINVAL;
+		errno = ENOENT;
 		return "Unknown-aarch64-Relo";
 	}
 #undef _I
@@ -226,6 +226,7 @@ const char *r_aarch64_name(int r)
 /* GELF_R_TYPE (rel->r_info) */
 const char *rela_type_string(int r)
 {
+	errno = 0;
 #if defined(__x86_64__)
 	return r_x86_64_name(r);
 #elif defined(__aarch64__)
