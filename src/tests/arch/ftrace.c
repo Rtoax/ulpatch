@@ -22,7 +22,7 @@ TEST(Arch_ftrace, ftrace_call_replace, 0)
 	const char *new = ftrace_call_replace(&insn, -4, 0);
 
 	memshowinlog(LOG_INFO, new, sizeof(insn));
-	fdisasm_arch(stdout, 0, (void *)new, sizeof(insn));
+	fdisasm_arch(stdout, "ftrace", 0, (void *)new, sizeof(insn));
 
 	return memcmp((void *)new, expect, sizeof(insn));
 }

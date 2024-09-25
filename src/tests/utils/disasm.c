@@ -48,7 +48,7 @@ static int test_disasm_stub2(void)
 static int test_disasm(int arch, unsigned char *code, size_t size)
 {
 	print_string_hex(stdout, "Code:", code, size);
-	return fdisasm(stdout, arch, 0, code, size);
+	return fdisasm(stdout, "PFX: ", arch, 0, code, size);
 }
 
 TEST(Utils_disasm, base, 0)
@@ -74,5 +74,5 @@ TEST(Utils_disasm, base_arch, 0)
 	size_t size = (test_disasm_stub2 - test_disasm_stub1);
 
 	fprintf(stdout, "Disasm test_disasm_stub2:\n");
-	return fdisasm_arch(stdout, 0, code, size);
+	return fdisasm_arch(stdout, "PFX: ", 0, code, size);
 }

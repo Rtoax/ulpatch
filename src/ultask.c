@@ -547,7 +547,7 @@ int ultask(int argc, char *argv[])
 			fprintf(stderr, "Bad address 0x%lx\n", disasm_addr);
 		} else {
 			print_string_hex(stdout, "Hex: ", mem, disasm_size);
-			ret = fdisasm_arch(stdout, 0, mem, disasm_size);
+			ret = fdisasm_arch(stdout, NULL, 0, mem, disasm_size);
 			if (ret) {
 				fprintf(stderr, "Disasm failed\n");
 			}

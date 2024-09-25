@@ -107,7 +107,7 @@ TEST(Patch, direct_jmp_table, 0)
 	ulp_info("addr:%#0lx jmp:%#0lx\n", addr, ip_pc);
 
 	try_to_wake_up(task, 1, 1);
-	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, NULL, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	/* Store original code */
 	ret = memcpy_from_task(task, orig_code, ip_pc, sizeof(jmp_entry));
@@ -120,7 +120,7 @@ TEST(Patch, direct_jmp_table, 0)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, NULL, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	/* This will called patched function ulpatch_try_to_wake_up() */
 	ret = try_to_wake_up(task, 1, 1);
@@ -135,7 +135,7 @@ TEST(Patch, direct_jmp_table, 0)
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
 
-	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, NULL, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	close_task(task);
 	return test_ret;
@@ -194,7 +194,7 @@ TEST(Patch, direct_jmp_far, 0)
 
 	fprint_file(stdout, "/proc/self/maps");
 
-	fdisasm_arch(stdout, addr, mem, map_len);
+	fdisasm_arch(stdout, NULL, addr, mem, map_len);
 
 	jmp_entry.jmp = arch_jmp_table_jmp();
 	jmp_entry.addr = (unsigned long)mem;
@@ -208,7 +208,7 @@ TEST(Patch, direct_jmp_far, 0)
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
-	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, NULL, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 	fn = (putchar_fn)mem;
 
@@ -230,7 +230,7 @@ TEST(Patch, direct_jmp_far, 0)
 	if (ret == -1 || ret < sizeof(jmp_entry)) {
 		ulp_error("failed to memcpy, ret = %d.\n", ret);
 	}
-	fdisasm_arch(stdout, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
+	fdisasm_arch(stdout, NULL, ip_pc, (void *)ip_pc, sizeof(jmp_entry));
 
 close_ret:
 	munmap(mem, map_len);

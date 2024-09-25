@@ -12,6 +12,7 @@
 #include <time.h>
 
 #include <elf/elf-api.h>
+#include <utils/disasm.h>
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/task.h>
@@ -44,6 +45,7 @@ const char *ulp_info_strftime(struct ulpatch_info *inf)
 void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 {
 	const char *prefix = pfx ?: "";
+	char disasm_pfx[64];
 
 	fprintf(fp, "%sID         : %d\n", prefix, inf->ulp_id);
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
@@ -51,6 +53,9 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
 	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix,
 		inf->orig_code[0], inf->orig_code[1]);
+	snprintf(disasm_pfx, sizeof(disasm_pfx) - 1, "%s             ", prefix);
+	fdisasm_arch(fp, disasm_pfx, inf->target_func_addr,
+		     (void *)inf->orig_code, sizeof(inf->orig_code));
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time,
 		ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
