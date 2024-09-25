@@ -6,6 +6,7 @@ patch=
 unpatch=
 debug=
 error=
+verbose=
 
 __usage__() {
 	echo "
@@ -64,6 +65,7 @@ while true; do
 	-v|--verbose)
 		shift
 		set -x
+		verbose=yes
 		;;
 	-h|--help)
 		shift
@@ -90,10 +92,10 @@ fi
 make
 
 if [[ ${patch} ]]; then
-	ulpatch -p ${pid} --patch ${patch} ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
+	ulpatch -p ${pid} --patch ${patch} ${debug:+--lv=dbg} ${verbose:+-v} ${error:+--lv=err}
 fi
 if [[ ${unpatch} ]]; then
-	ulpatch -p ${pid} --unpatch ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
+	ulpatch -p ${pid} --unpatch ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-v}
 fi
 
 # Disasm print_hello
@@ -101,7 +103,7 @@ print_hello_addr=$(ultask -p ${pid} --sym | grep -w print_hello | awk '{print $3
 ultask -p ${pid} --disasm-addr ${print_hello_addr} --disasm-size 16
 
 cat /proc/${pid}/maps
-ulpinfo -p ${pid} ${debug:+--lv=dbg -v} ${error:+--lv=err -v}
+ulpinfo -p ${pid} ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-v}
 
 dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
