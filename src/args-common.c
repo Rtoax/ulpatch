@@ -37,7 +37,7 @@ static void print_usage_common(const char *progname)
 	LOG_ERR);
 	printf(
 	"  -u, --dry-run       don’t actually run\n"
-	"  -v, --verbose       set verbose\n"
+	"  -v[v...], --verbose set verbose, more v specified, more detail to display.\n"
 	"  -h, --help          display this help and exit\n"
 	"  -V, --version       output version information and exit\n"
 	"  --info              Print detailed information about features \n"
@@ -62,7 +62,7 @@ static void reset_getopt(void)
 	{ "dry-run",        no_argument,       0, 'u' },	\
 	{ "verbose",        no_argument,       0, 'v' },	\
 	{ "info",           no_argument,       0, ARG_LOG_INFO },
-#define COMMON_GETOPT_OPTSTRING "uVvh"
+#define COMMON_GETOPT_OPTSTRING "uVv::h"
 
 #define COMMON_GETOPT_CASES(progname, usage)	\
 	case 'V':	\
@@ -73,7 +73,7 @@ static void reset_getopt(void)
 		cmd_exit_success();	\
 		break;	\
 	case 'v':	\
-		enable_verbose();	\
+		enable_verbose(str2verbose(optarg) + 1);	\
 		set_log_prefix(true);	\
 		break;	\
 	case 'u':	\

@@ -25,7 +25,15 @@ TEST(ulpatch, help, 0)
 
 TEST(ulpatch, info, 0)
 {
+	int ret;
+	int verbose = get_verbose();
+
 	int argc = 2;
 	char *argv[] = {"ulpatch", "--info"};
-	return ulpatch(argc, argv);
+	int argc2 = 3;
+	char *argv2[] = {"ulpatch", "-vvvv", "--info"};
+	ret = ulpatch(argc, argv) + ulpatch(argc2, argv2);
+
+	enable_verbose(verbose);
+	return ret;
 }

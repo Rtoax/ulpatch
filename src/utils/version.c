@@ -88,4 +88,6 @@ void ulpatch_info(const char *progname)
 	printf("ULPatch\n");
 	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);
 	printf("\n");
+	printf("Run\n");
+	printf("  Verbose %d\n", get_verbose());
 }

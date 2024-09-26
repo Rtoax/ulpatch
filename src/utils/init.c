@@ -102,6 +102,7 @@ void ulpatch_init(void)
 	elf_core_init();
 }
 
+/* Dry run APIs */
 bool is_dry_run(void)
 {
 	return __dry_run;
@@ -112,12 +113,38 @@ void enable_dry_run(void)
 	__dry_run = true;
 }
 
+/* Verbose APIs */
 bool is_verbose(void)
+{
+	return !!__verbose;
+}
+
+int get_verbose(void)
 {
 	return __verbose;
 }
 
-void enable_verbose(void)
+int str2verbose(const char *str)
 {
-	__verbose = true;
+	int v, i;
+
+	if (!str || strlen(str) == 0)
+		return 0;
+
+	v = 0;
+	for (i = 0; i < strlen(str); i++) {
+		if (str[i] == 'v')
+			v++;
+	}
+	return v;
+}
+
+void enable_verbose(int verbose)
+{
+	__verbose = verbose;
+}
+
+void reset_verbose(void)
+{
+	enable_verbose(0);
 }

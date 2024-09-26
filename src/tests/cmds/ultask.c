@@ -26,7 +26,16 @@ TEST(ultask, help, 0)
 
 TEST(ultask, info, 0)
 {
+	int ret;
+	int verbose = get_verbose();
+
 	int argc = 2;
 	char *argv[] = {"ultask", "--info"};
-	return ultask(argc, argv);
+	int argc2 = 3;
+	char *argv2[] = {"ultask", "-vvvv", "--info"};
+
+	ret = ultask(argc, argv) + ultask(argc2, argv2);
+
+	enable_verbose(verbose);
+	return ret;
 }

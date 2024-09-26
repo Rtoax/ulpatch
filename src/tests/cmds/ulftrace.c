@@ -25,8 +25,17 @@ TEST(ulftrace, help, 0)
 
 TEST(ulftrace, info, 0)
 {
+	int ret = 0;
+	int verbose = get_verbose();
+
 	int argc = 2;
 	char *argv[] = {"ulftrace", "--info"};
-	return ulftrace(argc, argv);
+	int argc2 = 3;
+	char *argv2[] = {"ulftrace", "-vvvv", "--info"};
+	ret = ulftrace(argc, argv) + ulftrace(argc2, argv2);
+
+	enable_verbose(verbose);
+
+	return ret;
 }
 

@@ -25,7 +25,14 @@ TEST(ulpinfo, help, 0)
 
 TEST(ulpinfo, info, 0)
 {
+	int ret;
+	int verbose = get_verbose();
+
 	int argc = 2;
 	char *argv[] = {"ulpinfo", "--info"};
-	return ulpinfo(argc, argv);
+	int argc2 = 3;
+	char *argv2[] = {"ulpinfo", "-vvvv", "--info"};
+	ret = ulpinfo(argc, argv) + ulpinfo(argc2, argv2);
+	enable_verbose(verbose);
+	return ret;
 }
