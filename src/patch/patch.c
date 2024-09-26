@@ -787,33 +787,20 @@ static int kick_target_process(const struct load_info *info)
 	new_insn = (void *)&jmp_entry;
 	insn_sz = sizeof(struct jmp_table_entry);
 
-	ulp_debug("Jmp table: from %s(%lx) jump to %s(%lx)\n",
-		info->ulp_strtab.dst_func,
-		info->ulp_info->target_func_addr,
-		info->ulp_strtab.src_func,
-		info->ulp_info->patch_func_addr);
-
-	/**
-	 * The struct ulpatch_info.orig_code MUST store the original code.
-	 */
-	if (sizeof(info->ulp_info->orig_code) < insn_sz) {
-		ulp_error("No enough space in ulpatch_info::orig_code field.\n");
-		goto done;
-	}
-
-	ulp_debug("Backup original instructions from %lx.\n",
-		  info->ulp_info->virtual_addr);
-
 	n = memcpy_from_task(task, info->ulp_info->orig_code,
-				info->ulp_info->virtual_addr, insn_sz);
-	ulp_debug("memcpy return %d, expect %ld\n", n, insn_sz);
+			     info->ulp_info->virtual_addr, insn_sz);
 	if (n == -1 || n < insn_sz) {
 		ulp_error("Backup original instructions failed.\n");
 		err = -ENOEXEC;
 		goto done;
 	}
 
-	ulp_debug("Copy ulpatch to target process.\n");
+	ulp_debug("Copy ulpatch to target process. Jmp table: from %s(%lx) jump to %s(%lx)\n",
+		info->ulp_strtab.dst_func,
+		info->ulp_info->target_func_addr,
+		info->ulp_strtab.src_func,
+		info->ulp_info->patch_func_addr);
+
 	/* copy patch to target address space */
 	n = memcpy_to_task(task, target_hdr, info->hdr, info->len);
 	if (n == -1 || n < info->len) {
@@ -823,6 +810,10 @@ static int kick_target_process(const struct load_info *info)
 	}
 
 	task_attach(task->pid);
+
+	/**
+	 * FIXME: Make sure safety.
+	 */
 
 	n = memcpy_to_task(task, info->ulp_info->virtual_addr,
 			   (void *)new_insn, insn_sz);

@@ -15,6 +15,9 @@
 #include <utils/log.h>
 #include <utils/compiler.h>
 
+#include <patch/patch.h>
+#include <patch/meta.h>
+
 
 static int __dry_run = false;
 static int __verbose = 0;
@@ -43,9 +46,18 @@ int ulp_page_shift(void)
 static void __check_and_exit(void)
 {
 	/**
-	 * TODO
-	 * 1. check architecture
+	 * The struct ulpatch_info.orig_code MUST store the original code.
 	 */
+	if (sizeof(struct jmp_table_entry) > \
+	    sizeof(((struct ulpatch_info *)0)->orig_code)) {
+		ulp_error("ulpatch_info::orig_code overflow.\n");
+		goto error;
+	}
+	/* MORE */
+
+	return;
+error:
+	exit(1);
 }
 
 static void __env_init(void)
