@@ -46,6 +46,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 {
 	const char *prefix = pfx ?: "";
 	char disasm_pfx[64];
+	struct jmp_table_entry insn;
 
 	fprintf(fp, "%sID         : %d\n", prefix, inf->ulp_id);
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
@@ -54,8 +55,21 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix,
 		inf->orig_code[0], inf->orig_code[1]);
 	snprintf(disasm_pfx, sizeof(disasm_pfx) - 1, "%s             ", prefix);
+	fprintf(fp, "%s----- orig code ------\n", disasm_pfx);
 	fdisasm_arch(fp, disasm_pfx, inf->target_func_addr,
 		     (void *)inf->orig_code, sizeof(inf->orig_code));
+	/**
+	 * If target task is not NULL, disasm the patched function code.
+	 */
+	if (current) {
+		memcpy_from_task(current, (void *)&insn, inf->target_func_addr,
+				 sizeof(insn));
+		fprintf(fp, "%s----- jmp table ------\n", disasm_pfx);
+		fdisasm_arch(fp, disasm_pfx, inf->target_func_addr,
+			     (void *)&insn, sizeof(insn));
+		fprintf(fp, "%sjmp addr = 0x%lx\n", disasm_pfx, insn.addr);
+	}
+
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time,
 		ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
