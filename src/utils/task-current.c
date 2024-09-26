@@ -42,10 +42,17 @@ void reset_current_task(void)
 	current_task = NULL;
 }
 
+/**
+ * Use to check current is set or not.
+ */
+struct task_struct *const __zero_task(void)
+{
+	return &fallback_task;
+}
+
 struct task_struct *const get_current_task(void)
 {
 	if (!current_task) {
-		ulp_error("Not set current task.\n");
 		errno = ENOENT;
 		/**
 		 * To prevent segmentation errors, NULL cannot be returned.
