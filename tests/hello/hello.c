@@ -11,6 +11,7 @@
 #endif
 #include <limits.h>
 #include <unistd.h>
+#include <errno.h>
 
 static sig_atomic_t keep_running = true;
 static unsigned long count = 0;
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
 	PRINT_ADDR(sleep);
 	PRINT_ADDR(pthread_create);
 	PRINT_ADDR(internal_print_hello);
+	PRINT_ADDR(&errno);
 
 	for (i = 0; i < NR_THREADS; i++)
 		pthread_create(&threads[i], NULL, routine, NULL);
