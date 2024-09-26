@@ -7,6 +7,8 @@
 #define __ULP_DEV 1
 #include <patch/meta.h>
 
+#include <elf/elf-api.h>
+
 #include <utils/ansi.h>
 #include <utils/util.h>
 #include <utils/compiler.h>
@@ -64,7 +66,8 @@ void ulpatch_info(const char *progname)
 	printf("System\n");
 	printf("  OS: %s %s %s\n", name.sysname, name.release, name.version);
 	printf("  Arch: %s\n", name.machine);
-	printf("  Glibc: %s-%s\n", gnu_get_libc_version(), gnu_get_libc_release());
+	printf("  Glibc: %s-%s %s\n", gnu_get_libc_version(),
+		gnu_get_libc_release(), libc_object());
 	printf("\n");
 	printf("Build\n");
 	printf("  version: %s\n", ulpatch_version());
