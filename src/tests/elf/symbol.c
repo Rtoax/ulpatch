@@ -26,7 +26,7 @@ static void print_elf_symbol(struct elf_file *elf, struct symbol *sym,
 			     void *arg)
 {
 	static bool firstline = true;
-	fprint_symbol(stdout, sym, firstline);
+	fprint_symbol(stdout, "PFX: ", sym, firstline);
 	firstline = false;
 }
 

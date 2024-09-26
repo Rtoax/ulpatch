@@ -138,14 +138,18 @@ int show_task_patch_info(pid_t pid)
 	if (is_verbose())
 		printf(" %-41s", "Build ID");
 	printf("\033[m\n");
+
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vm_area_struct *vma = ulp->vma;
 		printf("%-4d %-4d %-20s %#016lx %-16s",
 			i, ulp->info.ulp_id, ulp_info_strftime(&ulp->info),
 			vma->vm_start, ulp->strtab.dst_func);
+
 		if (is_verbose())
 			printf(" %-41s", ulp->str_build_id);
+
 		printf("\n");
+
 		if (is_verbose()) {
 			fpansi_gray(stdout);
 			print_vma(stdout, false, vma, 0);
@@ -159,7 +163,7 @@ int show_task_patch_info(pid_t pid)
 			int firstline = 1;
 
 			rbtree_postorder_for_each_entry_safe(sym, tmp, root, node) {
-				fprint_symbol(stdout, sym, firstline);
+				fprint_symbol(stdout, "\t", sym, firstline);
 				firstline = 0;
 			}
 			fprintf(stdout, "\n");

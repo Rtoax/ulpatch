@@ -930,12 +930,12 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detai
 				GElf_Phdr *pphdr = &vma->vma_elf->phdrs[i];
 				if (pphdr->p_type != PT_LOAD)
 					continue;
-				print_phdr(fp, pphdr, first);
+				print_phdr(fp, NULL, pphdr, first);
 				first = false;
 			}
 		}
 		if (vma->is_matched_phdr)
-			print_phdr(fp, &vma->phdr, true);
+			print_phdr(fp, NULL, &vma->phdr, true);
 		/* Add more information here */
 		if (fp == stdout || fp == stderr)
 			fprintf(fp, "\033[0m");

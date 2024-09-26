@@ -75,16 +75,20 @@ const char *st_visibility_string(const GElf_Sym *sym)
  * symname = stderr
  * vername = GLIBC_2.2.5
  */
-int fprint_sym(FILE *fp, const GElf_Sym *sym, const char *symname,
-	       const char *vername, bool firstline)
+int fprint_sym(FILE *fp, const char *pfx, const GElf_Sym *sym,
+	       const char *symname, const char *vername, bool firstline)
 {
+	const char *prefix = pfx ?: "";
+
 	if (!fp)
 		fp = stdout;
 
 	if (firstline)
-		fprintf(fp, " %-18s %-7s %-8s %-8s %-12s %-4s %-8s\n",
+		fprintf(fp, "%s %-18s %-7s %-8s %-8s %-12s %-4s %-8s\n",
+			prefix,
 			"Value", "Size", "Type", "Bind", "Vis", "Ndx", "Name");
-	fprintf(fp, " %#018lx %-7ld %-8s %-8s %-12s %-4d %s%s%s\n",
+	fprintf(fp, "%s %#018lx %-7ld %-8s %-8s %-12s %-4d %s%s%s\n",
+		prefix,
 		sym->st_value,
 		sym->st_size,
 		st_type_string(sym),
@@ -505,18 +509,19 @@ void rb_free_symbol(struct rb_node *node)
 	free_symbol(s);
 }
 
-int fprint_symbol(FILE *fp, struct symbol *s, int firstline)
+int fprint_symbol(FILE *fp, const char *pfx, struct symbol *s, int firstline)
 {
 	int i;
+	const char *prefix = pfx ?: "";
 
-	fprintf(fp, "sym:%s symtype:%d nphdrs:%d\n", s->name, s->sym_type,
-		s->nphdrs);
+	fprintf(fp, "%ssym:%s symtype:%d nphdrs:%d\n", prefix, s->name,
+		s->sym_type, s->nphdrs);
 
 	if (s->nphdrs > 0) {
 		for (i = 0; i < s->nphdrs; i++)
-			print_phdr(stdout, &s->phdrs[i], i == 0);
+			print_phdr(stdout, prefix, &s->phdrs[i], i == 0);
 	}
 
-	return fprint_sym(fp, &s->sym, s->name, NULL, firstline);
+	return fprint_sym(fp, prefix, &s->sym, s->name, NULL, firstline);
 }
 

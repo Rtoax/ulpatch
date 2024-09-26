@@ -152,7 +152,7 @@ int print_ehdr(FILE *fp, const GElf_Ehdr *ehdr);
 
 /* ELF Phdr api */
 int handle_phdrs(struct elf_file *elf);
-int print_phdr(FILE *fp, GElf_Phdr *pphdr, bool first);
+int print_phdr(FILE *fp, const char *pfx, GElf_Phdr *pphdr, bool first);
 const char *phdr_flags_str_unsafe(GElf_Phdr *pphdr);
 const char *phdr_type_str(GElf_Phdr *pphdr);
 
@@ -185,17 +185,12 @@ int for_each_symbol(struct elf_file *elf, void (*handler)(struct elf_file *,
 							  void *),
 		    void *arg);
 int cmp_symbol_name(struct rb_node *n1, unsigned long key);
-int fprint_symbol(FILE *fp, struct symbol *s, int firstline);
+int fprint_symbol(FILE *fp, const char *pfx, struct symbol *s, int firstline);
 bool elf_support_ftrace(struct elf_file *elf);
 const char *elf_mcount_name(struct elf_file *elf);
 
-/**
- * stderr@GLIBC_2.2.5
- * symname = stderr
- * vername = GLIBC_2.2.5
- */
-int fprint_sym(FILE *fp, const GElf_Sym *sym, const char *symname,
-	       const char *vername, bool firstline);
+int fprint_sym(FILE *fp, const char *pfx, const GElf_Sym *sym,
+	       const char *symname, const char *vername, bool firstline);
 int is_undef_symbol(const GElf_Sym *sym);
 bool is_extern_symbol(const GElf_Sym *sym);
 bool is_ftrace_entry(char *func);
