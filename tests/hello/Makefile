@@ -42,7 +42,6 @@ CFLAGS_ULP += -O0
 # FIXME: This PIC option should move to ulp-config, just for test here.
 ifdef ULP_PIC
   CFLAGS_ULP += -fpic
-  CFLAGS_ULP += -fno-PIE
   CFLAGS_ULP += -fno-common
 endif
 ifdef NO_LIBC
