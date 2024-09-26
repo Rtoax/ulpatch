@@ -70,7 +70,11 @@ void print_hello(unsigned long ul)
 	internal_print_hello(ul);
 }
 
-void *routine(void *arg)
+/**
+ * What if there are lots of same symbols name, which one should we choise
+ * to as relocate resolve symbol.
+ */
+void *hello_routine(void *arg)
 {
 	unsigned long ul = 0xff;
 
@@ -108,7 +112,7 @@ int main(int argc, char *argv[])
 	PRINT_ADDR(&errno);
 
 	for (i = 0; i < NR_THREADS; i++)
-		pthread_create(&threads[i], NULL, routine, NULL);
+		pthread_create(&threads[i], NULL, hello_routine, NULL);
 
 	for (i = 0; i < NR_THREADS; i++)
 		pthread_join(threads[i], NULL);
