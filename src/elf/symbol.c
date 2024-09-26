@@ -323,7 +323,7 @@ int handle_symtab(struct elf_file *elf, Elf_Scn *scn)
 			if (is_ftrace_entry(symname)) {
 				elf->support_ftrace = true;
 				elf->mcount_name = strdup(symname);
-				ulp_warning("Found fentry %s\n", symname);
+				ulp_debug("Found fentry %s\n", symname);
 			}
 			break;
 		default:
@@ -460,7 +460,7 @@ int link_symbol(struct elf_file *elf, struct symbol *s)
 	GElf_Shdr *shdr = &elf->shdrs[sec];
 
 	if (is_undef_symbol(&s->sym)) {
-		ulp_warning("Symbol %s is undef.\n", s->name);
+		ulp_debug("Symbol %s is undef.\n", s->name);
 		goto insert;
 	}
 

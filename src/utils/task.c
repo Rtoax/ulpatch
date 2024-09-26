@@ -486,7 +486,7 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	case VMA_VVAR:
 	case VMA_STACK:
 	case VMA_VSYSCALL:
-		ulp_warning("skip %s\n", vma_type_name(vma->type));
+		ulp_debug("skip %s\n", vma_type_name(vma->type));
 		return 0;
 	case VMA_ULPATCH:
 		return vma_load_ulp(vma);
