@@ -57,7 +57,9 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	fprintf(fp, "%sVirtAddr   : %#016lx\n", prefix, inf->virtual_addr);
 	fprintf(fp, "%sOrigVal    : %#016lx,%#016lx\n", prefix,
 		inf->orig_code[0], inf->orig_code[1]);
+
 	snprintf(disasm_pfx, sizeof(disasm_pfx) - 1, "%s             ", prefix);
+
 	/**
 	 * If orig_code fill 0x00, no need to display.
 	 */
@@ -66,6 +68,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 		fdisasm_arch(fp, disasm_pfx, inf->target_func_addr,
 			     (void *)inf->orig_code, sizeof(inf->orig_code));
 	}
+
 	/**
 	 * If target task is not NULL, disasm the patched function code.
 	 * find_vma() use to ensure address is exist in target task address
@@ -89,6 +92,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 
 			memcpy_from_task(current, (void *)mem,
 					 insn.addr, sz);
+
 			fprintf(fp, "%s----- jmp to func ------\n", disasm_pfx);
 			fdisasm_arch(fp, disasm_pfx, insn.addr,
 				     (void *)mem, sz);
@@ -97,7 +101,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 		}
 	}
 
-	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time,
+	fprintf(fp, "%sInsertTime : %#016lx (%s)\n", prefix, inf->time,
 		ulp_info_strftime(inf));
 	fprintf(fp, "%sFlags      : %#08x\n",  prefix, inf->flags);
 	fprintf(fp, "%sVersion    : %#08x\n",  prefix, inf->version);
