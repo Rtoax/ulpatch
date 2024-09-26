@@ -48,6 +48,7 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 	char disasm_pfx[64];
 	struct jmp_table_entry insn;
 
+
 	fprintf(fp, "%sID         : %d\n", prefix, inf->ulp_id);
 	fprintf(fp, "%sTargetAddr : %#016lx\n", prefix, inf->target_func_addr);
 	fprintf(fp, "%sPatchAddr  : %#016lx\n", prefix, inf->patch_func_addr);
@@ -68,6 +69,23 @@ void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf)
 		fdisasm_arch(fp, disasm_pfx, inf->target_func_addr,
 			     (void *)&insn, sizeof(insn));
 		fprintf(fp, "%sjmp addr = 0x%lx\n", disasm_pfx, insn.addr);
+
+		/* If set -vv */
+		if (get_verbose() >= 2) {
+			char *mem;
+			size_t sz;
+
+			sz = 512;
+			mem = malloc(sz);
+
+			memcpy_from_task(current, (void *)mem,
+					 insn.addr, sz);
+			fprintf(fp, "%s----- jmp to func ------\n", disasm_pfx);
+			fdisasm_arch(fp, disasm_pfx, insn.addr,
+				     (void *)mem, sz);
+
+			free(mem);
+		}
 	}
 
 	fprintf(fp, "%sTime       : %#016lx (%s)\n", prefix, inf->time,

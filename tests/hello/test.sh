@@ -106,7 +106,7 @@ print_hello_addr=$(ultask -p ${pid} --sym | grep -w print_hello | awk '{print $3
 ultask -p ${pid} --disasm-addr ${print_hello_addr} --disasm-size 16
 
 cat /proc/${pid}/maps
-ulpinfo -p ${pid} ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-v}
+ulpinfo -p ${pid} ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-vvv}
 
 dump_all_process_ulpatch() {
 	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
