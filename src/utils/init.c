@@ -12,6 +12,7 @@
 
 #include <elf/elf-api.h>
 #include <utils/util.h>
+#include <utils/task.h>
 #include <utils/log.h>
 #include <utils/compiler.h>
 
@@ -94,6 +95,8 @@ extern void init_syslog(void);
 
 void ulpatch_init(void)
 {
+	reset_current_task();
+
 	init_syslog();
 
 	__check_and_exit();

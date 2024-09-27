@@ -39,7 +39,7 @@ int set_current_task(struct task_struct *task)
 
 void reset_current_task(void)
 {
-	current_task = NULL;
+	current_task = &fallback_task;
 }
 
 /**

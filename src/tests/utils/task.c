@@ -15,19 +15,6 @@
 
 TEST_STUB(utils_task);
 
-TEST(Utils_task, current_task, 0)
-{
-	struct task_struct *task = open_task(getpid(), FTO_NONE);
-
-	/* Test current */
-	ulp_info("Comm %s\n", current->comm);
-
-	/* Make sure we could write 'current' task */
-	current->exe_bfd = (void *)1;
-
-	return close_task(task);
-}
-
 TEST(Utils_task, fto_flags, 0)
 {
 	int ret = 0;
