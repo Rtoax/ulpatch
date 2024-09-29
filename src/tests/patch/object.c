@@ -17,10 +17,8 @@ TEST_STUB(patch_object);
 static const struct ulpatch_object {
 	char *path;
 } ulpatch_objs[] = {
-	/* /usr/share/ulpatch/ftrace-mcount.obj */
-	{ ULPATCH_FTRACE_OBJ_PATH },
-	/* /usr/share/ulpatch/hello.ulp */
-	{ ULP_HELLO_1_PATH },
+	{ ULPATCH_OBJ_FTRACE_MCOUNT_PATH },
+	{ ULPATCH_TEST_ULP_PRINTF_PATH },
 };
 
 

@@ -42,10 +42,10 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 
 	struct task_struct *task = open_task(pid, fto_flags);
 
-	ret = init_patch(task, ULPATCH_FTRACE_OBJ_PATH);
+	ret = init_patch(task, ULPATCH_OBJ_FTRACE_MCOUNT_PATH);
 	if (ret == -EEXIST) {
 		fprintf(stderr, "%s not exist. make install\n",
-			ULPATCH_FTRACE_OBJ_PATH);
+			ULPATCH_OBJ_FTRACE_MCOUNT_PATH);
 	}
 
 	if (cb)

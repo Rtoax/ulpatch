@@ -30,8 +30,8 @@ static const char *patch_object_file = NULL;
  *
  * see top level of CMakeLists.txt
  */
-#if !defined(ULPATCH_FTRACE_OBJ_PATH)
-# error "Need ULPATCH_FTRACE_OBJ_PATH"
+#if !defined(ULPATCH_OBJ_FTRACE_MCOUNT_PATH)
+# error "Need ULPATCH_OBJ_FTRACE_MCOUNT_PATH"
 #endif
 
 static const char *prog_name = "ulftrace";
@@ -62,7 +62,7 @@ static int print_help(void)
 	"                            relocatable object.\n"
 	"                            default: %s\n"
 	"\n",
-	ULPATCH_FTRACE_OBJ_PATH);
+	ULPATCH_OBJ_FTRACE_MCOUNT_PATH);
 	print_usage_common(prog_name);
 	cmd_exit_success();
 	return 0;
@@ -127,17 +127,17 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (!patch_object_file) {
-		if (!fexist(ULPATCH_FTRACE_OBJ_PATH)) {
+		if (!fexist(ULPATCH_OBJ_FTRACE_MCOUNT_PATH)) {
 			fprintf(stderr,
 				"Default ftrace relocatable object %s is not exist.\n"
 				"Make sure you install ulpatch correctly.\n",
-				ULPATCH_FTRACE_OBJ_PATH
+				ULPATCH_OBJ_FTRACE_MCOUNT_PATH
 			);
 			cmd_exit(1);
 		}
 		fprintf(stderr, "WARNING: use default %s.\n",
-			ULPATCH_FTRACE_OBJ_PATH);
-		patch_object_file = ULPATCH_FTRACE_OBJ_PATH;
+			ULPATCH_OBJ_FTRACE_MCOUNT_PATH);
+		patch_object_file = ULPATCH_OBJ_FTRACE_MCOUNT_PATH;
 	}
 
 	if (!fexist(patch_object_file)) {
@@ -186,7 +186,7 @@ int ulftrace(int argc, char *argv[])
 		goto done;
 	}
 
-	init_patch(target_task, ULPATCH_FTRACE_OBJ_PATH);
+	init_patch(target_task, ULPATCH_OBJ_FTRACE_MCOUNT_PATH);
 
 	// MORE
 
