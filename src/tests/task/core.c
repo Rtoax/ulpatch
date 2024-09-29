@@ -193,6 +193,7 @@ TEST(Task, mmap_malloc, 0)
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
 	ret = task_attach(pid);
+
 	addr = task_malloc(task, 64);
 	ulp_debug("task %p, addr = %lx\n", task, addr);
 
@@ -204,6 +205,8 @@ TEST(Task, mmap_malloc, 0)
 	/* memcpy failed */
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 		ret = -1;
+
+	task_free(task, addr, 64);
 
 	ret = task_detach(pid);
 	task_wait_trigger(&waitqueue);
@@ -416,6 +419,7 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
 	ret = task_attach(pid);
+
 	addr = task_malloc(task, 64);
 	ulp_debug("task %p, addr = %lx\n", task, addr);
 
@@ -423,19 +427,14 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 
 	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 
-	// Set thread name
-	// see:
-	// $ ps -ef | grep sleep
-	// $ top -Hp PID  ot top -Hp $(pidof sleep)
-	//     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-	//  150186 rongtao   20   0    5584    980    876 t   0.0   0.0   0:00.00 ABCDEFG
+	/* Set thread name */
 	ret = task_prctl(task, PR_SET_NAME, addr, 0, 0, 0);
 
-	ulp_debug("memcpy_from_task: %s\n", buf);
 	n = memcpy_from_task(task, buf, addr, strlen(data) + 1);
-	/* memcpy failed */
 	if (n == -1 || n != strlen(data) + 1 || strcmp(data, buf))
 		ret = -1;
+
+	task_free(task, addr, 64);
 
 	ret = task_detach(pid);
 
