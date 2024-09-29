@@ -219,12 +219,12 @@ DESTINATION ${ULPATCH_INCLUDE_DIR}
 )
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/objects/ftrace/ftrace-mcount.obj
+	${CMAKE_CURRENT_BINARY_DIR}/src/objects/ftrace/ftrace-mcount.obj
 DESTINATION ${ULPATCH_SHARE_FTRACE_DIR}
 )
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/tests/ulpatches/printf.ulp
+	${CMAKE_CURRENT_BINARY_DIR}/src/tests/ulpatches/printf.ulp
 DESTINATION ${ULPATCH_SHARE_ULPATCHES_DIR}
 )
 

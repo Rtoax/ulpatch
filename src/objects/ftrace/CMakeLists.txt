@@ -6,6 +6,7 @@ message(STATUS "Compile ftrace object ${make_include}")
 add_custom_command(
 	OUTPUT make-ftrace.log
 	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
+	COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR}
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/objects/ftrace
 )
 add_custom_target(object_ftrace ALL DEPENDS make-ftrace.log)

@@ -3,6 +3,8 @@
 #
 SHELL = bash
 
+DESTDIR := /usr/share/ulpatch/ftrace/
+
 ULP_CONFIG :=
 
 ifndef ULP_CONFIG
@@ -34,17 +36,21 @@ ALL: $(TARGETS)
 ftrace-mcount.obj: mcount.oc mcount.oS
 
 %.oS: %.S
-	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@echo -e "       CC(ASM)  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	@$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
 
 %.oc: %.c
-	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@echo -e "       CC(C)  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	@$(CC) $(CFLAGS) $(CFLAGS_$(*)) -o $(@) -c $(<)
 
 $(TARGETS): %:
-	@echo -e "Target   \033[1;32m$(@)\033[m"
+	@echo -e "       LD  \033[1;32m$(@)\033[m"
 	@$(LD) -o $(@) $(^) $(LDFLAGS)
 
+install:
+	@echo -e "       INSTALL  \033[1;32m$(TARGETS)\033[m"
+	@install -m 644 -vp ${TARGETS} ${DESTDIR}
+
 clean:
-	@echo -e "Clean   \033[1;32m$(@)\033[m"
+	@echo -e "       RM  \033[1;32m$(@)\033[m"
 	@rm -f ${TARGETS} *.oc *.oS

@@ -3,6 +3,8 @@
 #
 SHELL = bash
 
+DESTDIR := /usr/share/ulpatch/ftrace/
+
 ULP_CONFIG :=
 
 ifndef ULP_CONFIG
@@ -37,13 +39,17 @@ ALL: $(TARGETS)
 printf.ulp: printf.o
 
 %.o: %.c
-	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
+	@echo -e "       CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	@$(CC) $(CFLAGS) -o $(@) -c $(<)
 
 $(TARGETS): %:
-	@echo -e "Target   \033[1;32m$(@)\033[m"
+	@echo -e "       LD  \033[1;32m$(@)\033[m"
 	@ld ${LDFLAGS} -o $(@) $(<)
 
+install:
+	@echo -e "       INSTALL  \033[1;32m$(TARGETS)\033[m"
+	@install -m 644 -vp ${TARGETS} ${DESTDIR}
+
 clean:
-	@echo -e "Clean   \033[1;32m$(@)\033[m"
-	@rm -f ${TARGETS} *.oc *.oS *.o
+	@echo -e "       RM  \033[1;32m$(@)\033[m"
+	@rm -f ${TARGETS} *.o
