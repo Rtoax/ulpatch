@@ -120,6 +120,7 @@ popd
 
 %files tests
 %{_bindir}/ulpatch_test
+%{_datadir}/ulpatch/ulpatches/empty.ulp
 %{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog

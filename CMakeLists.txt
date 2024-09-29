@@ -224,6 +224,7 @@ DESTINATION ${ULPATCH_SHARE_FTRACE_DIR}
 )
 install(
 PROGRAMS
+	${CMAKE_CURRENT_BINARY_DIR}/src/tests/ulpatches/empty.ulp
 	${CMAKE_CURRENT_BINARY_DIR}/src/tests/ulpatches/printf.ulp
 DESTINATION ${ULPATCH_SHARE_ULPATCHES_DIR}
 )

@@ -14,7 +14,9 @@ ifndef ULP_CONFIG
   endif
 endif
 
-TARGETS = printf.ulp
+TARGETS :=
+TARGETS += empty.ulp
+TARGETS += printf.ulp
 
 CC = gcc
 
@@ -36,6 +38,7 @@ $(info ulp-config: ${ULP_CONFIG})
 
 ALL: $(TARGETS)
 
+empty.ulp: empty.o
 printf.ulp: printf.o
 
 %.o: %.c

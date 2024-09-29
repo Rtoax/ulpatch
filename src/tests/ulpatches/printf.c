@@ -7,9 +7,9 @@
 #include <patch/asm.h>
 #include <patch/meta.h>
 
-void new_hello_world(void)
+void printf_hello_world(void)
 {
 	printf("Hello World from ulpatch.\n");
 }
-ULPATCH_INFO(new_hello_world, hello_world, "Rong Tao");
+ULPATCH_INFO(printf_hello_world, hello_world, "Rong Tao");
 
