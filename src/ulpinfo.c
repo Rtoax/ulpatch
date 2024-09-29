@@ -132,12 +132,19 @@ int show_task_patch_info(pid_t pid)
 		goto free;
 	}
 
-	printf("\033[1;7m");
+	fpansi_bold(stdout);
+	printf("COMM: %s\n", task->exe);
+	printf("PID: %d\n", task->pid);
+	fpansi_reset(stdout);
+
+	fpansi_bold(stdout);
+	fpansi_reverse(stdout);
 	printf("%-4s %-4s %-20s %-16s %-16s", "NUM", "ID", "DATE", "VMA_START",
 	       "TARGET_FUNC");
 	if (is_verbose())
 		printf(" %-41s", "Build ID");
-	printf("\033[m\n");
+	fpansi_reset(stdout);
+	printf("\n");
 
 	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
 		struct vm_area_struct *vma = ulp->vma;
