@@ -109,14 +109,6 @@ struct vm_area_struct {
 	struct vma_elf_mem *vma_elf;
 
 	/**
-	 * If we found the vma is ELF format, open it when open task with PID,
-	 * and load all symbol, otherwise, it's NULL.
-	 *
-	 * FIXME: Use bfd instead, remove this field then.
-	 */
-	struct elf_file *elf_file;
-
-	/**
 	 * If VMA is ELF file, such as the leader of VMA_SELF, VMA_LIBC and
 	 * VMA_VDSO, open it as bfd.
 	 */

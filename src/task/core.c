@@ -469,11 +469,6 @@ static int vma_load_elf_file(struct vm_area_struct *vma)
 	 * "[vdso]" vma is elf, but file is not exist, could not open it.
 	 */
 	if (task->fto_flag & FTO_VMA_ELF_FILE && fexist(vma->name_)) {
-		vma->elf_file = elf_file_open(vma->name_);
-		if (!vma->elf_file) {
-			ulp_error("Open ELF %s failed.\n", vma->name_);
-			return -EINVAL;
-		}
 		vma->bfd_elf_file = bfd_elf_open(vma->name_);
 		if (!vma->bfd_elf_file) {
 			ulp_error("Open ELF bfd %s failed.\n", vma->name_);
@@ -1180,7 +1175,6 @@ int close_task(struct task_struct *task)
 
 	if (task->fto_flag & FTO_VMA_ELF_FILE) {
 		task_for_each_vma(tmp_vma, task) {
-			elf_file_close(tmp_vma->name_);
 			if (tmp_vma->is_elf)
 				bfd_elf_close(tmp_vma->bfd_elf_file);
 		}
