@@ -12,11 +12,7 @@ ifndef ULP_CONFIG
   endif
 endif
 
-ifdef ULP_HELLO_1
-  TARGETS = $(ULP_HELLO_1)
-else
-  TARGETS = hello.ulp
-endif
+TARGETS = hello.ulp
 
 CC = gcc
 
@@ -38,11 +34,13 @@ $(info ulp-config: ${ULP_CONFIG})
 
 ALL: $(TARGETS)
 
+hello.ulp: hello.o
+
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
 	@$(CC) $(CFLAGS) -o $(@) -c $(<)
 
-$(TARGETS): hello.o
+$(TARGETS): %:
 	@echo -e "Target   \033[1;32m$(@)\033[m"
 	@ld ${LDFLAGS} -o $(@) $(<)
 

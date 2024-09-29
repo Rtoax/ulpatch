@@ -32,13 +32,11 @@ target_compile_definitions(${FTRACE_OBJ_TARGET} PRIVATE
 set(ASM_OPTIONS "-x assembler-with-cpp")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
 
-set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
-
 set(make_include ${PROJECT_SOURCE_DIR}/src/)
 message(STATUS "Compile ftrace object ${make_include}")
 add_custom_command(
 	TARGET ${FTRACE_OBJ_TARGET}
-	COMMAND make INCS1="-I${make_include}" FTRACE_OBJ=${FTRACE_MCOUNT_OBJ} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
+	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace
 )
 

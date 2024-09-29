@@ -26,7 +26,7 @@ set(make_include ${PROJECT_SOURCE_DIR}/src/)
 message(STATUS "Compile ulpatch hello ulp ${make_include}")
 add_custom_command(
 	TARGET ${ULPATCH_OBJ_TARGET}
-	COMMAND make INCS1="-I${make_include}" ULP_HELLO_1=${ULP_HELLO_1} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
+	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/hello
 )
 
