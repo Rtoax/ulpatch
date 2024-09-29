@@ -395,8 +395,19 @@ struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct 
 #define task_for_each_vma(vma, task) \
 	for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
+struct vm_area_struct *alloc_vma(struct task_struct *task);
+void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
+		struct vm_area_struct *prev);
+void unlink_vma(struct task_struct *task, struct vm_area_struct *vma);
+void free_vma(struct vm_area_struct *vma);
+
 struct vm_area_struct *find_vma(const struct task_struct *task,
 				unsigned long vaddr);
+struct vm_area_struct *next_vma(struct task_struct *task,
+				struct vm_area_struct *prev);
+
+enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name);
+
 /* Find a span area between two vma */
 unsigned long find_vma_span_area(struct task_struct *task, size_t size,
 				 unsigned long base);
@@ -413,6 +424,11 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
 void dump_task_threads(struct task_struct *task, bool detail);
 void dump_task_fds(struct task_struct *task, bool detail);
+
+int __prot2flags(unsigned int prot);
+unsigned int __perms2prot(char *perms);
+
+bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 
 const char *vma_type_name(enum vma_type type);
 void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);

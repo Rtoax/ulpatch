@@ -946,6 +946,7 @@ void never_called_stub(void)
 	CALL_TEST_STUB(task_current);
 	CALL_TEST_STUB(task_proc);
 	CALL_TEST_STUB(task_symbol);
+	CALL_TEST_STUB(task_vma);
 	CALL_TEST_STUB(utils_ansi);
 	CALL_TEST_STUB(utils_backtrace);
 	CALL_TEST_STUB(utils_disasm);

@@ -28,6 +28,7 @@ add_library(ulpatch_task STATIC
 	proc.c
 	symbol.c
 	syscall.c
+	vma.c
 )
 
 target_compile_definitions(ulpatch_task PRIVATE ${UTILS_CFLAGS_MACROS})

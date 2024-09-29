@@ -12,6 +12,7 @@ add_library(ulpatch_test_task STATIC
 	current.c
 	proc.c
 	symbol.c
+	vma.c
 )
 
 target_compile_definitions(ulpatch_test_task PRIVATE ${UTILS_CFLAGS_MACROS})
