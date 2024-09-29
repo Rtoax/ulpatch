@@ -15,7 +15,7 @@
 
 TEST_STUB(task_symbol);
 
-TEST(Utils_task_sym, for_each, 0)
+TEST(Task_sym, for_each, 0)
 {
 	struct task_struct *task;
 	struct task_sym *tsym;
@@ -101,7 +101,7 @@ out:
 	return ret;
 }
 
-TEST(Utils_task_sym, find_task_symbol_value, 0)
+TEST(Task_sym, find_task_symbol_value, 0)
 {
 	int i, ret = 0;
 	struct task_struct *task;

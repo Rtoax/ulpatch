@@ -15,7 +15,7 @@
 
 TEST_STUB(task_proc);
 
-TEST(Utils_task_proc, get_proc_pid_exe, 0)
+TEST(Task_proc, get_proc_pid_exe, 0)
 {
 	char buf[256], *exe;
 
@@ -26,7 +26,7 @@ TEST(Utils_task_proc, get_proc_pid_exe, 0)
 	return -1;
 }
 
-TEST(Utils_task_proc, open_pid_maps, 0)
+TEST(Task_proc, open_pid_maps, 0)
 {
 	int fd;
 	fd = open_pid_maps(getpid());

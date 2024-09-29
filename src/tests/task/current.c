@@ -15,7 +15,7 @@
 
 TEST_STUB(task_current);
 
-TEST(Utils_task, current_task, 0)
+TEST(Task, current_task, 0)
 {
 	int ret = 0;
 	struct task_struct *task;

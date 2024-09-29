@@ -15,7 +15,14 @@
 
 TEST_STUB(task_vma);
 
-TEST(Utils_task, for_each_vma, 0)
+TEST(Task, dump_vma, 0)
+{
+	struct task_struct *task = open_task(getpid(), FTO_NONE);
+	dump_task_vmas(task, true);
+	return close_task(task);
+}
+
+TEST(Task, for_each_vma, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	struct vm_area_struct *vma;
@@ -29,7 +36,7 @@ TEST(Utils_task, for_each_vma, 0)
 	return close_task(task);
 }
 
-TEST(Utils_task, find_vma, 0)
+TEST(Task, find_vma, 0)
 {
 	int ret = 0;
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
@@ -52,7 +59,7 @@ failed:
 	return ret;
 }
 
-TEST(Utils_task, dump_task_vma_to_file, 0)
+TEST(Task, dump_task_vma_to_file, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	unsigned long addr;

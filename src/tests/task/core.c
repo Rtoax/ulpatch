@@ -15,7 +15,7 @@
 
 TEST_STUB(task_core);
 
-TEST(Utils_task, fto_flags, 0)
+TEST(Task, fto_flags, 0)
 {
 	int ret = 0;
 	char buffer[PATH_MAX];
@@ -53,7 +53,7 @@ TEST(Utils_task, fto_flags, 0)
 	return ret;
 }
 
-TEST(Utils_task, open_failed, -1)
+TEST(Task, open_failed, -1)
 {
 	/**
 	 * Try to open pid 0 (idle)
@@ -62,7 +62,7 @@ TEST(Utils_task, open_failed, -1)
 	return task ? 0 : -1;
 }
 
-TEST(Utils_task, open_non_exist, -1)
+TEST(Task, open_non_exist, -1)
 {
 	/**
 	 * Try to open pid -1 (non exist)
@@ -71,7 +71,7 @@ TEST(Utils_task, open_non_exist, -1)
 	return task ? 0 : -1;
 }
 
-TEST(Utils_task, dump, 0)
+TEST(Task, dump, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
@@ -83,7 +83,7 @@ TEST(Utils_task, dump, 0)
 	return close_task(task);
 }
 
-TEST(Utils_task, attach_detach, 0)
+TEST(Task, attach_detach, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -123,7 +123,7 @@ TEST(Utils_task, attach_detach, 0)
 	return ret;
 }
 
-TEST(Utils_task, copy_from_task, 0)
+TEST(Task, copy_from_task, 0)
 {
 	char data[] = "ABCDEFGH";
 	char buf[64] = "XXXXXXXX";
@@ -142,7 +142,7 @@ TEST(Utils_task, copy_from_task, 0)
 	return ret;
 }
 
-TEST(Utils_task, copy_to_task, 0)
+TEST(Task, copy_to_task, 0)
 {
 	char data[] = "ABCDEFG";
 	char buf[64] = "XXXXXX";
@@ -161,7 +161,7 @@ TEST(Utils_task, copy_to_task, 0)
 	return ret;
 }
 
-TEST(Utils_task, mmap_malloc, 0)
+TEST(Task, mmap_malloc, 0)
 {
 	int ret = -1;
 	int status = 0;
@@ -217,7 +217,7 @@ TEST(Utils_task, mmap_malloc, 0)
 	return ret;
 }
 
-TEST(Utils_task, fstat, 0)
+TEST(Task, fstat, 0)
 {
 	int ret = 0;
 	int status = 0;
@@ -373,17 +373,17 @@ static int task_mmap_file(int prot)
 	return ret;
 }
 
-TEST(Utils_task, mmap_file_rw, 0)
+TEST(Task, mmap_file_rw, 0)
 {
 	return task_mmap_file(PROT_READ | PROT_WRITE);
 }
 
-TEST(Utils_task, mmap_file_rwx, 0)
+TEST(Task, mmap_file_rwx, 0)
 {
 	return task_mmap_file(PROT_READ | PROT_WRITE | PROT_EXEC);
 }
 
-TEST(Utils_task, prctl_PR_SET_NAME, 0)
+TEST(Task, prctl_PR_SET_NAME, 0)
 {
 	int ret = -1;
 	int status = 0;
