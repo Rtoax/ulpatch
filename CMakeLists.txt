@@ -215,8 +215,8 @@ DESTINATION ${ULPATCH_INCLUDE_DIR}
 )
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/ftrace-mcount.obj
-	${PROJECT_SOURCE_DIR}/src/patch/objects/hello/hello.ulp
+	${PROJECT_SOURCE_DIR}/src/objects/ftrace/ftrace-mcount.obj
+	${PROJECT_SOURCE_DIR}/src/objects/hello/hello.ulp
 DESTINATION ${ULPATCH_SHARE_DIR}
 )
 

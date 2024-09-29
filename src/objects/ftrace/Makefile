@@ -22,7 +22,7 @@ CFLAGS += -O0
 ifdef INCS1
   CFLAGS += $(INCS1)
 else
-  CFLAGS += -I ../../../
+  CFLAGS += -I../../
 endif
 
 CFLAGS += $(shell ${ULP_CONFIG} --cflags)

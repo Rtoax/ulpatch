@@ -3,6 +3,7 @@
 #
 add_subdirectory(arch)
 add_subdirectory(elf)
+add_subdirectory(objects)
 add_subdirectory(patch)
 add_subdirectory(task)
 add_subdirectory(utils)

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao
 #
-include_directories(../../../)
+include_directories(../../)
 
 set(ULPATCH_OBJ_TARGET ulpatch_patch_obj_hello)
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
@@ -27,6 +27,6 @@ message(STATUS "Compile ulpatch hello ulp ${make_include}")
 add_custom_command(
 	TARGET ${ULPATCH_OBJ_TARGET}
 	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/hello
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/objects/hello
 )
 

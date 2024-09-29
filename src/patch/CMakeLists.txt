@@ -3,8 +3,6 @@
 #
 include_directories(..)
 
-add_subdirectory(objects)
-
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})

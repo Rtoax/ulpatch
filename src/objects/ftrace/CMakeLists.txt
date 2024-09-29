@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao
 #
-include_directories(../../../)
+include_directories(../../)
 
 enable_language(C ASM)
 
@@ -37,6 +37,6 @@ message(STATUS "Compile ftrace object ${make_include}")
 add_custom_command(
 	TARGET ${FTRACE_OBJ_TARGET}
 	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace
+	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/objects/ftrace
 )
 
