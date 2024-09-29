@@ -18,6 +18,7 @@ static const struct ulpatch_object {
 	char *path;
 } ulpatch_objs[] = {
 	{ ULPATCH_OBJ_FTRACE_MCOUNT_PATH },
+	{ ULPATCH_TEST_ULP_EMPTY_PATH },
 	{ ULPATCH_TEST_ULP_PRINTF_PATH },
 };
 
@@ -34,7 +35,9 @@ TEST(Patch_object, check, 0)
 		if (!fexist(obj)) {
 			ret = -EEXIST;
 			ulp_error("\n%s is not exist, maybe: make install\n", obj);
+			break;
 		}
+
 		ret = alloc_patch_file(obj, tmpfile, &info);
 		if (ret) {
 			ulp_error("Parse %s failed.\n", obj);
@@ -58,6 +61,8 @@ TEST(Patch_object, check, 0)
 			ulp_error("Get wrong pad 0-3.\n");
 			ret++;
 		}
+
+		release_load_info(&info);
 	}
 
 	return ret;
