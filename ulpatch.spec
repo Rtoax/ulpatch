@@ -110,7 +110,7 @@ popd
 %{_mandir}/man8/ulpinfo.8.gz
 %{_mandir}/man8/ultask.8.gz
 %{_datadir}/ulpatch/ftrace-mcount.obj
-%{_datadir}/ulpatch/hello.obj
+%{_datadir}/ulpatch/hello.ulp
 %license LICENSE
 
 %files devel

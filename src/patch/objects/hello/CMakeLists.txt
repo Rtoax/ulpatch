@@ -22,13 +22,11 @@ target_compile_definitions(${ULPATCH_OBJ_TARGET} PRIVATE
 	ULPATCH_TEST
 )
 
-set(ULPATCH_HELLO_OBJ hello.obj)
-
 set(make_include ${PROJECT_SOURCE_DIR}/src/)
-message(STATUS "Compile ulpatch hello object ${make_include}")
+message(STATUS "Compile ulpatch hello ulp ${make_include}")
 add_custom_command(
 	TARGET ${ULPATCH_OBJ_TARGET}
-	COMMAND make INCS1="-I${make_include}" FTRACE_OBJ=${ULPATCH_HELLO_OBJ} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
+	COMMAND make INCS1="-I${make_include}" ULP_HELLO_1=${ULP_HELLO_1} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/patch/objects/hello
 )
 

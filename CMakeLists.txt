@@ -59,7 +59,7 @@ set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
 # see src/patch/objects/ftrace/CMakeLists.txt
 set(FTRACE_MCOUNT_OBJ ftrace-mcount.obj)
 # see src/patch/objects/hello/CMakeLists.txt
-set(ULPATCH_HELLO_OBJ hello.obj)
+set(ULP_HELLO_1 hello.ulp)
 
 add_definitions("-DULPATCH_VERSION_MAJOR=${ULPATCH_VERSION_MAJOR}")
 add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
@@ -184,8 +184,8 @@ endif()
 
 # macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example
 set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_DIR}${FTRACE_MCOUNT_OBJ}")
-# macro ULPATCH_HELLO_OBJ_PATH="/usr/share/ulpatch/hello.obj" for example
-set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULPATCH_HELLO_OBJ_PATH="${ULPATCH_SHARE_DIR}${ULPATCH_HELLO_OBJ}")
+# macro ULP_HELLO_1_PATH="/usr/share/ulpatch/hello.ulp" for example
+set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULP_HELLO_1_PATH="${ULPATCH_SHARE_DIR}${ULP_HELLO_1}")
 
 add_subdirectory(src)
 
@@ -220,7 +220,7 @@ DESTINATION ${ULPATCH_INCLUDE_DIR}
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/patch/objects/ftrace/${FTRACE_MCOUNT_OBJ}
-	${PROJECT_SOURCE_DIR}/src/patch/objects/hello/${ULPATCH_HELLO_OBJ}
+	${PROJECT_SOURCE_DIR}/src/patch/objects/hello/${ULP_HELLO_1}
 DESTINATION ${ULPATCH_SHARE_DIR}
 )
 

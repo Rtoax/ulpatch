@@ -12,10 +12,10 @@ ifndef ULP_CONFIG
   endif
 endif
 
-ifdef ULPATCH_HELLO_OBJ
-TARGETS = $(ULPATCH_HELLO_OBJ)
+ifdef ULP_HELLO_1
+  TARGETS = $(ULP_HELLO_1)
 else
-TARGETS = hello.obj
+  TARGETS = hello.ulp
 endif
 
 CC = gcc
@@ -29,9 +29,9 @@ CFLAGS += $(shell ${ULP_CONFIG} --cflags)
 LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
 
 ifdef INCS1
-CFLAGS += $(INCS1)
+  CFLAGS += $(INCS1)
 else
-CFLAGS += -I../../../
+  CFLAGS += -I../../../
 endif
 
 $(info ulp-config: ${ULP_CONFIG})
