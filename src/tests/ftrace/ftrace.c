@@ -69,8 +69,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	int ret = 0, test_ret;
 	int flags;
 	struct task_struct *task;
-	struct symbol *rel_s = NULL;
-	struct symbol *libc_s = NULL;
+	struct task_sym *rel_s = NULL;
 	unsigned long restore_addr, disasm_addr;
 	size_t restore_size, disasm_size;
 
@@ -87,35 +86,15 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 	 *
 	 * AArch64: bl <_mcount> is 0x94000000 before relocation
 	 */
-	rel_s = find_symbol(task->exe_elf, mcount_str, STT_FUNC);
+	rel_s = find_task_sym(task, mcount_str, NULL, NULL);
 	if (!rel_s) {
-		ulp_warning("Not found %s symbol in %s\n", mcount_str, task->exe);
-		/**
-		 * Symbol mcount() in SELF elf is undef
-		 */
-		rel_s = find_undef_symbol(task->exe_elf, mcount_str, STT_FUNC);
-		if (!rel_s) {
-			ulp_error("Not found %s symbol in %s\n", mcount_str, task->exe);
-			return -1;
-		}
-	}
-
-	/**
-	 * Try to find mcount in libc.so, some time, libc.so's symbols is very
-	 * useful when you try to patch a running process or ftrace it. thus,
-	 * this is a test.
-	 */
-	libc_s = find_symbol(task->libc_elf, mcount_str, STT_FUNC);
-	if (!libc_s) {
-		ulp_error("Not found mcount in %s\n", task->libc_elf->filepath);
+		ulp_error("Not found %s symbol in %s\n", mcount_str, task->exe);
 		return -1;
 	}
 
 	dump_task(task, true);
-	ulp_info("SELF: _mcount: st_value: %lx %lx\n", rel_s->sym.st_value,
-		mcount_addr);
-	ulp_info("LIBC: _mcount: st_value: %lx %lx\n", libc_s->sym.st_value,
-		mcount_addr);
+
+	ulp_info("mcount() addr %lx %lx\n", rel_s->addr, mcount_addr);
 
 	ftrace_try_to_wake_up(task, 0, 0);
 

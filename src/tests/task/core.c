@@ -22,10 +22,6 @@ TEST(Task, fto_flags, 0)
 
 	struct task_struct *task = open_task(getpid(), FTO_ALL);
 
-	if (!task->exe_elf) {
-		ret = -1;
-	}
-
 	/* ULP_PROC_ROOT_DIR/PID */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 	if (!fexist(buffer)) {

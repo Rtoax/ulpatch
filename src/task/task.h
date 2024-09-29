@@ -337,11 +337,6 @@ struct task_struct {
 	struct task_struct_auxv auxv;
 	struct task_status status;
 
-	/* If set FTO_VMA_ELF_FILE, point to self::vma->elf_file */
-	struct elf_file *exe_elf;
-	/* If set FTO_VMA_ELF_FILE, point to libc.so::vma->elf_file */
-	struct elf_file *libc_elf;
-
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
