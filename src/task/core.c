@@ -135,7 +135,6 @@ int alloc_ulp(struct vm_area_struct *vma)
 	ulp->elf_mem = mem;
 	ulp->vma = vma;
 	ulp->str_build_id = NULL;
-	rb_init(&ulp->ulp_symbols);
 
 	/* Copy VMA from target task memory space */
 	ret = memcpy_from_task(task, ulp->elf_mem, vma->vm_start, elf_mem_len);
@@ -162,9 +161,6 @@ void free_ulp(struct vm_area_struct *vma)
 	list_del(&ulp->node);
 	if (ulp->str_build_id)
 		free(ulp->str_build_id);
-
-	/* Destroy symbols rb tree */
-	rb_destroy(&ulp->ulp_symbols, rb_free_symbol);
 
 	free(ulp->elf_mem);
 	free(ulp);

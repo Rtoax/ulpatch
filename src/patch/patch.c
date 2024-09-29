@@ -260,11 +260,7 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
 
 	for (i = 0; i < symsec->sh_size / sizeof(GElf_Sym); i++) {
-		struct symbol *newsym;
-		struct rb_node *node;
-		const char *name = info->strtab + sym[i].st_name;
-
-		ulp_debug("ULP Sym: %s, %lx\n", name, sym[i].st_value);
+		char *name = info->strtab + sym[i].st_name;
 
 		/* skip undefined symbols */
 		if (is_undef_symbol(&sym[i])) {
@@ -277,28 +273,9 @@ int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
 		/**
 		 * Record ULP symbols
 		 */
-
-		/* allocate a symbol, and add it to task struct */
-		newsym = alloc_symbol(name, &sym[i]);
-		if (!newsym) {
-			ulp_error("Alloc symbol failed, %s\n", name);
-			return -ENOMEM;
-		}
-
-		newsym->vma = vma;
-		newsym->type = GELF_ST_TYPE(sym[i].st_info);
-
-		node = rb_insert_node(&ulp->ulp_symbols, &newsym->node,
-				      cmp_symbol_name,
-				      (unsigned long)newsym);
-		if (unlikely(node)) {
-			ulp_warning("%s: symbol %s already exist\n", task->comm,
-				    newsym->name);
-			free_symbol(newsym);
-		} else
-			ulp_debug("%s: add symbol %s addr %lx success.\n",
-				  task->comm, newsym->name,
-				  newsym->sym.st_value);
+		struct task_sym *tsym;
+		tsym = alloc_task_sym(name, sym[i].st_value, vma);
+		link_task_sym(task, tsym);
 	}
 
 	ulp->strtab = info->ulp_strtab;

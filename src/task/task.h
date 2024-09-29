@@ -67,9 +67,6 @@ struct vma_ulp {
 
 	/* struct task_struct.ulp_list */
 	struct list_head node;
-
-	/* struct symbol.node */
-	struct rb_root ulp_symbols;
 };
 
 struct vm_area_struct {
