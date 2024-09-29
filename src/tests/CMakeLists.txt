@@ -35,8 +35,6 @@ target_link_libraries(ulpatch_test PRIVATE
 	ulpatch_arch
 	ulpatch_elf
 	ulpatch_patch
-	ulpatch_patch_obj_ftrace
-	ulpatch_patch_obj_hello
 	ulpatch_utils
 	ulpatch_test_arch
 	ulpatch_test_cmds

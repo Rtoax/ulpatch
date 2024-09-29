@@ -1,42 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2022-2024 Rong Tao
 #
-include_directories(../../)
-
-enable_language(C ASM)
-
-set(FTRACE_OBJ_TARGET ulpatch_patch_obj_ftrace)
-set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
-
-find_library(ELF elf HINTS ${SEARCH_PATH})
-
-link_libraries(${ELF}
-	ulpatch_utils
-	ulpatch_elf
-)
-
-aux_source_directory(. LIB_SOURCES)
-
-# Need to explicitly add assembly files
-file(GLOB_RECURSE LIB_ASM_SOURCES
-	mcount.S
-)
-
-add_library(${FTRACE_OBJ_TARGET} STATIC ${LIB_SOURCES} ${LIB_ASM_SOURCES})
-
-target_compile_definitions(${FTRACE_OBJ_TARGET} PRIVATE
-	${UTILS_CFLAGS_MACROS}
-	ULPATCH_TEST
-)
-
-set(ASM_OPTIONS "-x assembler-with-cpp")
-set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} ${ASM_OPTIONS}")
-
 set(make_include ${PROJECT_SOURCE_DIR}/src/)
 message(STATUS "Compile ftrace object ${make_include}")
 add_custom_command(
-	TARGET ${FTRACE_OBJ_TARGET}
+	OUTPUT make-ftrace.log
 	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulp-config
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/objects/ftrace
 )
-
+add_custom_target(object_ftrace ALL DEPENDS make-ftrace.log)
