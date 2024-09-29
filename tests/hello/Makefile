@@ -60,6 +60,10 @@ ifdef STATIC
   CFLAGS += -static
 endif
 
+ifdef STACK
+  CFLAGS += -DSTACK=1
+endif
+
 LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ldflags)
 
 $(info CFLAGS = ${CFLAGS})
@@ -77,6 +81,7 @@ CFLAGS_hello := ${CFLAGS_hello_common} -no-pie
 CFLAGS_hello-pie := ${CFLAGS_hello_common} -fpie
 LDFLAGS_hello-pie := -pie
 CFLAGS_test := $(CFLAGS_ULP)
+
 
 %.o: %.c
 	@echo -e " CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
