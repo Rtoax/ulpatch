@@ -152,9 +152,30 @@ TEST(Task, copy_to_task, 0)
 	struct task_struct *task = open_task(getpid(), FTO_RDWR);
 
 	n = memcpy_to_task(task, (unsigned long)buf, data, strlen(data) + 1);
-	ulp_debug("memcpy_to_task: %s\n", buf);
 
 	if (n != strlen(data) + 1 || strcmp(data, buf))
+		ret = -1;
+
+	close_task(task);
+	return ret;
+}
+
+TEST(Task, task_strcpy, 0)
+{
+	char data[] = "ABCDEFGH\0";
+	char buf[64] = "XXXXXXXX";
+	char buf2[64] = "XXXXXXXX";
+	int ret = 0;
+	char *s = NULL;
+
+	struct task_struct *task = open_task(getpid(), FTO_RDWR);
+
+	s = strcpy_to_task(task, (unsigned long)buf, data);
+	if (s != data || strcmp(data, buf))
+		ret = -1;
+
+	s = strcpy_from_task(task, buf2, (unsigned long)data);
+	if (s != buf2 || strcmp(data, buf2))
 		ret = -1;
 
 	close_task(task);

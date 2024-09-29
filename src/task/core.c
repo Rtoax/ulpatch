@@ -1350,3 +1350,23 @@ int memcpy_to_task(struct task_struct *task, unsigned long task_dst, void *src,
 	return ret;
 }
 
+#define MAX_STR_LEN	1024
+
+char *strcpy_from_task(struct task_struct *task, char *dst,
+		       unsigned long task_src)
+{
+	int i;
+	for (i = 0;; i++) {
+		memcpy_from_task(task, &dst[i], task_src + i, 1);
+		if (dst[i] == '\0' || i >= MAX_STR_LEN)
+			break;
+	}
+	return dst;
+}
+
+char *strcpy_to_task(struct task_struct *task, unsigned long task_dst,
+		     char *src)
+{
+	memcpy_to_task(task, task_dst, src, strlen(src) + 1);
+	return src;
+}
