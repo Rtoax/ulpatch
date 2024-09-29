@@ -7,6 +7,7 @@ add_subdirectory(elf)
 add_subdirectory(ftrace)
 add_subdirectory(patch)
 add_subdirectory(task)
+add_subdirectory(ulpatches)
 add_subdirectory(utils)
 
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")

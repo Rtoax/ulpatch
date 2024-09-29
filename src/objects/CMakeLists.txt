@@ -2,5 +2,4 @@
 # Copyright (C) 2022-2024 Rong Tao
 #
 add_subdirectory(ftrace)
-add_subdirectory(hello)
 

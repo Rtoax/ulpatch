@@ -27,7 +27,7 @@ LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
 ifdef INCS1
   CFLAGS += $(INCS1)
 else
-  CFLAGS += -I../../../
+  CFLAGS += -I../../
 endif
 
 $(info ulp-config: ${ULP_CONFIG})

@@ -54,8 +54,10 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-set(ULPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/ulpatch/)
-set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch/)
+set(ULPATCH_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/ulpatch)
+set(ULPATCH_SHARE_DIR ${CMAKE_INSTALL_PREFIX}/share/ulpatch)
+set(ULPATCH_SHARE_FTRACE_DIR ${ULPATCH_SHARE_DIR}/ftrace)
+set(ULPATCH_SHARE_ULPATCHES_DIR ${ULPATCH_SHARE_DIR}/ulpatches)
 
 add_definitions("-DULPATCH_VERSION_MAJOR=${ULPATCH_VERSION_MAJOR}")
 add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
@@ -179,9 +181,9 @@ if(KERNEL_HEADERS_CONST_H)
 endif()
 
 # macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example
-set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_DIR}/ftrace-mcount.obj")
-# ULP_HELLO_1_PATH="/usr/share/ulpatch/hello.ulp" for example
-set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULP_HELLO_1_PATH="${ULPATCH_SHARE_DIR}/hello.ulp")
+set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_FTRACE_DIR}/ftrace-mcount.obj")
+# ULP_HELLO_1_PATH="/usr/share/ulpatch/ulpatches/hello.ulp" for example
+set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULP_HELLO_1_PATH="${ULPATCH_SHARE_ULPATCHES_DIR}/hello.ulp")
 
 add_subdirectory(src)
 
@@ -206,6 +208,8 @@ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 # install object file
 # see src/patch/objects/ftrace/CMakeLists.txt file to modify object file's name
 install(DIRECTORY DESTINATION ${ULPATCH_SHARE_DIR})
+install(DIRECTORY DESTINATION ${ULPATCH_SHARE_FTRACE_DIR})
+install(DIRECTORY DESTINATION ${ULPATCH_SHARE_ULPATCHES_DIR})
 install(DIRECTORY DESTINATION ${ULPATCH_INCLUDE_DIR})
 install(
 FILES
@@ -216,8 +220,12 @@ DESTINATION ${ULPATCH_INCLUDE_DIR}
 install(
 PROGRAMS
 	${PROJECT_SOURCE_DIR}/src/objects/ftrace/ftrace-mcount.obj
-	${PROJECT_SOURCE_DIR}/src/objects/hello/hello.ulp
-DESTINATION ${ULPATCH_SHARE_DIR}
+DESTINATION ${ULPATCH_SHARE_FTRACE_DIR}
+)
+install(
+PROGRAMS
+	${PROJECT_SOURCE_DIR}/src/tests/ulpatches/hello.ulp
+DESTINATION ${ULPATCH_SHARE_ULPATCHES_DIR}
 )
 
 if (BUILD_MAN)

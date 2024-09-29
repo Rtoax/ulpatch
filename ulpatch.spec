@@ -109,8 +109,7 @@ popd
 %{_mandir}/man8/ulpatch.8.gz
 %{_mandir}/man8/ulpinfo.8.gz
 %{_mandir}/man8/ultask.8.gz
-%{_datadir}/ulpatch/ftrace-mcount.obj
-%{_datadir}/ulpatch/hello.ulp
+%{_datadir}/ulpatch/ftrace/ftrace-mcount.obj
 %license LICENSE
 
 %files devel
@@ -121,6 +120,7 @@ popd
 
 %files tests
 %{_bindir}/ulpatch_test
+%{_datadir}/ulpatch/ulpatches/hello.ulp
 
 %changelog
 * Fri Sep 20 2024 Rong Tao <rtoax@foxmail.com> - 0.5.9-0
