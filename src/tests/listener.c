@@ -135,10 +135,10 @@ struct test_client {
 static LIST_HEAD(test_client_list);
 static unsigned int test_nr_clients = 0;
 
-static void handle_msg_symbol(struct test_client *client, struct clt_msg *msg)
+static void handle_msg_symbol(struct test_client *client, struct ctrl_msg *msg)
 {
 	int ret;
-	struct clt_msg ack;
+	struct ctrl_msg ack;
 	const char *s = msg->body.symbol_request.s;
 	struct test_symbol *sym = find_test_symbol(s);
 
@@ -155,7 +155,7 @@ static void handle_msg_symbol(struct test_client *client, struct clt_msg *msg)
 int listener_helper_close(int fd, int *rslt)
 {
 	int ret;
-	struct clt_msg req, rsp;
+	struct ctrl_msg req, rsp;
 
 	req.hdr.type = TEST_MT_REQUEST;
 	req.hdr.code = TEST_MC_CLOSE;
@@ -177,7 +177,7 @@ int listener_helper_close(int fd, int *rslt)
 int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
 {
 	int ret;
-	struct clt_msg req, rsp;
+	struct ctrl_msg req, rsp;
 
 	req.hdr.type = TEST_MT_REQUEST;
 	req.hdr.code = TEST_MC_SYMBOL;
@@ -206,7 +206,7 @@ static void recv_test_client_msg(struct test_client *client)
 {
 	int ret;
 	size_t nbytes;
-	struct clt_msg msg, ack;
+	struct ctrl_msg msg, ack;
 
 	nbytes = read(client->connfd, &msg, sizeof(msg));
 	if (nbytes <= 0) {

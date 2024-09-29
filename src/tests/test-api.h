@@ -133,7 +133,7 @@ struct test_symbol *find_test_symbol(const char *sym);
 size_t nr_test_symbols(void);
 
 
-struct clt_msg_hdr {
+struct ctrl_msg_hdr {
 	enum {
 		TEST_MT_REQUEST,
 		TEST_MT_RESPONSE,
@@ -148,8 +148,8 @@ struct clt_msg_hdr {
 /**
  * Message between server and client, when ulpatch_test is ROLE_LISTENER
  */
-struct clt_msg {
-	struct clt_msg_hdr hdr;
+struct ctrl_msg {
+	struct ctrl_msg_hdr hdr;
 	union {
 		struct {
 			char s[128];
