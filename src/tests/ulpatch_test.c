@@ -723,6 +723,7 @@ int printer_print_hello(int nloop, const char *content)
 			__stringify(puts), puts,
 			__stringify(printer_print_hello), printer_print_hello,
 			__stringify(static_func1), static_func1);
+	hello_world();
 	return 0;
 }
 

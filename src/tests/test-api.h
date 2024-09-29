@@ -188,3 +188,7 @@ int task_wait_response(struct task_wait *task_wait,
 		       int (*makemsg)(char request, struct msgbuf *buf,
 				      size_t buf_len));
 
+/**
+ * Test target functions.
+ */
+void hello_world(void);
