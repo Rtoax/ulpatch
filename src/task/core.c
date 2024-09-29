@@ -117,7 +117,7 @@ int alloc_ulp(struct vm_area_struct *vma)
 	int ret;
 	void *mem;
 	struct vma_ulp *ulp;
-	size_t elf_mem_len = vma->vm_end - vma->vm_start;
+	size_t ulp_size = vma->vm_end - vma->vm_start;
 	struct task_struct *task = vma->task;
 
 	ulp = malloc(sizeof(struct vma_ulp));
@@ -125,7 +125,8 @@ int alloc_ulp(struct vm_area_struct *vma)
 		ulp_error("malloc failed.\n");
 		return -ENOMEM;
 	}
-	mem = malloc(elf_mem_len);
+
+	mem = malloc(ulp_size);
 	if (!mem) {
 		ulp_error("malloc failed.\n");
 		return -ENOMEM;
@@ -137,14 +138,13 @@ int alloc_ulp(struct vm_area_struct *vma)
 	ulp->str_build_id = NULL;
 
 	/* Copy VMA from target task memory space */
-	ret = memcpy_from_task(task, ulp->elf_mem, vma->vm_start, elf_mem_len);
-	if (ret == -1 || ret < elf_mem_len) {
-		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+	ret = memcpy_from_task(task, ulp->elf_mem, vma->vm_start, ulp_size);
+	if (ret == -1 || ret < ulp_size) {
+		ulp_error("Failed read %lx:%s\n", vma->vm_start, vma->name_);
 		free_ulp(vma);
 		return -EAGAIN;
 	}
 
-	ulp_debug("Add %s to ulpatch list.\n", vma->name_);
 	list_add(&ulp->node, &task->ulp_list);
 	return 0;
 }
@@ -192,7 +192,8 @@ int vma_load_ulp(struct vm_area_struct *vma)
 
 	vma->is_elf = true;
 	alloc_ulp(vma);
-	vma_load_ulp_info(vma, &info);
+
+	load_ulp_info_from_vma(vma, &info);
 
 	if (task->max_ulp_id < info.ulp_info->ulp_id)
 		task->max_ulp_id = info.ulp_info->ulp_id;

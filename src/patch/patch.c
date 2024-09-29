@@ -233,7 +233,7 @@ free_out:
 /**
  * Get load_info from ULPatch vma
  */
-int vma_load_ulp_info(struct vm_area_struct *vma, struct load_info *info)
+int load_ulp_info_from_vma(struct vm_area_struct *vma, struct load_info *info)
 {
 	int ret;
 	struct vma_ulp *ulp;
