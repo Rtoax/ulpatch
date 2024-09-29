@@ -28,13 +28,13 @@
 
 
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wuninitialized"
-#pragma clang diagnostic ignored "-Wmaybe-uninitialized"
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wuninitialized"
+# pragma clang diagnostic ignored "-Wmaybe-uninitialized"
 #elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wuninitialized"
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 static void copy_regs(struct user_regs_struct *dst,
 		      struct user_regs_struct *src)
@@ -83,9 +83,9 @@ static void copy_regs(struct user_regs_struct *dst,
 #undef COPY_REG
 }
 #if defined(__clang__)
-#pragma clang diagnostic pop
+# pragma clang diagnostic pop
 #elif defined(__GNUC__)
-#pragma GCC diagnostic pop
+# pragma GCC diagnostic pop
 #endif
 
 int wait_for_stop(struct task_struct *task)
