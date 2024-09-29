@@ -12,7 +12,7 @@ ifndef ULP_CONFIG
   endif
 endif
 
-TARGETS = hello.ulp
+TARGETS = printf.ulp
 
 CC = gcc
 
@@ -34,7 +34,7 @@ $(info ulp-config: ${ULP_CONFIG})
 
 ALL: $(TARGETS)
 
-hello.ulp: hello.o
+printf.ulp: printf.o
 
 %.o: %.c
 	@echo -e "Compile  \033[1m$(<)\033[m to \033[1m$(@)\033[m"

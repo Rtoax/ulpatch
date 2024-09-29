@@ -120,7 +120,7 @@ popd
 
 %files tests
 %{_bindir}/ulpatch_test
-%{_datadir}/ulpatch/ulpatches/hello.ulp
+%{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog
 * Fri Sep 20 2024 Rong Tao <rtoax@foxmail.com> - 0.5.9-0

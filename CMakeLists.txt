@@ -182,8 +182,8 @@ endif()
 
 # macro ULPATCH_FTRACE_OBJ_PATH="/usr/share/ulpatch/ftrace-mcount.obj" for example
 set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULPATCH_FTRACE_OBJ_PATH="${ULPATCH_SHARE_FTRACE_DIR}/ftrace-mcount.obj")
-# ULP_HELLO_1_PATH="/usr/share/ulpatch/ulpatches/hello.ulp" for example
-set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULP_HELLO_1_PATH="${ULPATCH_SHARE_ULPATCHES_DIR}/hello.ulp")
+# ULP_HELLO_1_PATH="/usr/share/ulpatch/ulpatches/printf.ulp" for example
+set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" ULP_HELLO_1_PATH="${ULPATCH_SHARE_ULPATCHES_DIR}/printf.ulp")
 
 add_subdirectory(src)
 
@@ -224,7 +224,7 @@ DESTINATION ${ULPATCH_SHARE_FTRACE_DIR}
 )
 install(
 PROGRAMS
-	${PROJECT_SOURCE_DIR}/src/tests/ulpatches/hello.ulp
+	${PROJECT_SOURCE_DIR}/src/tests/ulpatches/printf.ulp
 DESTINATION ${ULPATCH_SHARE_ULPATCHES_DIR}
 )
 
