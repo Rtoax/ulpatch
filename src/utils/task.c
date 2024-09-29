@@ -1734,8 +1734,8 @@ static __unused int pid_read(int pid, void *dst, const void *src, size_t len)
 	return len;
 }
 
-int memcpy_from_task(struct task_struct *task, void *dst, unsigned long task_src,
-		     ssize_t size)
+int memcpy_from_task(struct task_struct *task, void *dst,
+		     unsigned long task_src, ssize_t size)
 {
 	int ret = -1;
 	ret = pread(task->proc_mem_fd, dst, size, task_src);
@@ -1754,8 +1754,8 @@ int memcpy_to_task(struct task_struct *task, unsigned long task_dst, void *src,
 	int ret = -1;
 	ret = pwrite(task->proc_mem_fd, src, size, task_dst);
 	if (ret == -1) {
-		ulp_error("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %s\n",
-			task->proc_mem_fd, src, size, task_dst, ret, strerror(errno));
+		ulp_error("pwrite(%d, %p, %ld, 0x%lx)=%d failed, %m\n",
+			task->proc_mem_fd, src, size, task_dst, ret);
 		do_backtrace(stdout);
 	}
 	/* pwrite(2) will return -1 if failed, keep it that way. */
