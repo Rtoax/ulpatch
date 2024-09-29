@@ -108,10 +108,16 @@ TEST(Task_sym, find_task_symbol_value, 0)
 
 	task = open_task(getpid(), FTO_VMA_ELF_FILE);
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 	for (i = 0; i < nr_test_symbols(); i++)
 		ret += __task_resolve_sym(task, test_symbols[i].addr,
 				   test_symbols[i].sym);
-
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 	close_task(task);
 	return ret;
 }

@@ -780,8 +780,8 @@ static void launch_mix(void)
 
 
 struct test_symbol test_symbols[] = {
-#define TEST_FUNC_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_FUNC,},
-#define TEST_DATA_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_DATA,},
+#define TEST_FUNC_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_FUNC, },
+#define TEST_DATA_SYM(s) { __stringify(s), 0, TYPE_TST_SYM_DATA, },
 # include <tests/test-symbols.h>
 #undef TEST_FUNC_SYM
 #undef TEST_DATA_SYM
