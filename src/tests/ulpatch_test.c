@@ -16,7 +16,7 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <utils/cmds.h>
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
@@ -942,6 +942,10 @@ void never_called_stub(void)
 	CALL_TEST_STUB(patch_object);
 	CALL_TEST_STUB(patch_patch);
 	CALL_TEST_STUB(patch_symbol);
+	CALL_TEST_STUB(task_core);
+	CALL_TEST_STUB(task_current);
+	CALL_TEST_STUB(task_proc);
+	CALL_TEST_STUB(task_symbol);
 	CALL_TEST_STUB(utils_ansi);
 	CALL_TEST_STUB(utils_backtrace);
 	CALL_TEST_STUB(utils_disasm);
@@ -952,10 +956,6 @@ void never_called_stub(void)
 	CALL_TEST_STUB(utils_log);
 	CALL_TEST_STUB(utils_rbtree);
 	CALL_TEST_STUB(utils_string);
-	CALL_TEST_STUB(utils_task);
-	CALL_TEST_STUB(utils_task_current);
-	CALL_TEST_STUB(utils_task_proc);
-	CALL_TEST_STUB(utils_task_symbol);
 	CALL_TEST_STUB(utils_utils);
 	CALL_TEST_STUB(utils_version);
 }

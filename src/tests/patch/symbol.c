@@ -7,7 +7,7 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/util.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <elf/elf-api.h>
 #include <patch/patch.h>
 

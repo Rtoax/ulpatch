@@ -7,7 +7,7 @@
 #include <utils/disasm.h>
 #include <utils/log.h>
 #include <utils/list.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <tests/test-api.h>
 
 TEST_STUB(arch_ftrace);

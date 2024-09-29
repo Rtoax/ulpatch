@@ -4,6 +4,7 @@
 add_subdirectory(arch)
 add_subdirectory(elf)
 add_subdirectory(patch)
+add_subdirectory(task)
 add_subdirectory(utils)
 
 include_directories(.)
@@ -16,6 +17,7 @@ find_library(RT rt HINTS ${SEARCH_PATH})
 link_libraries(${ELF} ${RT}
 	ulpatch_elf
 	ulpatch_patch
+	ulpatch_task
 	ulpatch_utils
 )
 

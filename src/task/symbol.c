@@ -16,7 +16,7 @@
 #include <elf/elf-api.h>
 
 #include <utils/log.h>
-#include <utils/task.h>
+#include <task/task.h>
 
 
 static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)

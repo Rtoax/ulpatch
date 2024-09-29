@@ -12,7 +12,7 @@
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <utils/cmds.h>
 
 #include <patch/patch.h>

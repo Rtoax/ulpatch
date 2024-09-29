@@ -16,7 +16,7 @@
 #include <elf/elf-api.h>
 
 #include <utils/log.h>
-#include <utils/task.h>
+#include <task/task.h>
 
 #if defined(__x86_64__)
 #include <arch/x86_64/regs.h>

@@ -10,10 +10,10 @@
 
 #include <utils/log.h>
 #include <utils/list.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_task_proc);
+TEST_STUB(task_proc);
 
 TEST(Utils_task_proc, get_proc_pid_exe, 0)
 {

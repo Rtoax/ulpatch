@@ -16,7 +16,7 @@
  */
 #if defined(ULPATCH_TEST)
 
-#include <utils/task.h>
+#include <task/task.h>
 #include <utils/log.h>
 
 extern int try_to_wake_up(struct task_struct *task, int mode, int wake_flags);

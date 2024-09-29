@@ -4,7 +4,7 @@
 
 #include <utils/util.h>
 #include <utils/log.h>
-#include <utils/task.h>
+#include <task/task.h>
 
 #include <arch/aarch64/instruments.h>
 #include <arch/aarch64/debug-monitors.h>

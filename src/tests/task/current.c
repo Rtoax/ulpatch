@@ -10,10 +10,10 @@
 
 #include <utils/log.h>
 #include <utils/list.h>
-#include <utils/task.h>
+#include <task/task.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_task_current);
+TEST_STUB(task_current);
 
 TEST(Utils_task, current_task, 0)
 {

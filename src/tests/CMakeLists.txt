@@ -6,6 +6,7 @@ add_subdirectory(cmds)
 add_subdirectory(elf)
 add_subdirectory(ftrace)
 add_subdirectory(patch)
+add_subdirectory(task)
 add_subdirectory(utils)
 
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
@@ -41,5 +42,6 @@ target_link_libraries(ulpatch_test PRIVATE
 	ulpatch_test_elf
 	ulpatch_test_ftrace
 	ulpatch_test_patch
+	ulpatch_test_task
 	ulpatch_test_utils
 )
