@@ -20,6 +20,7 @@ enum {
 
 static void args_common_reset(void)
 {
+	reset_verbose();
 	log_level = LOG_ERR;
 	force = false;
 }
