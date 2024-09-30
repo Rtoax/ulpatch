@@ -112,12 +112,6 @@ struct test *create_test(char *category, char *name, test_prio prio,
 			 int (*cb)(void), int expect_ret);
 void release_tests(void);
 
-/* Add wait api */
-struct task_wait {
-	int msqid;
-	char tmpfile[64];
-};
-
 struct test_symbol {
 	char *sym;
 	unsigned long addr;
@@ -177,6 +171,12 @@ int listener_helper_symbol(int fd, const char *sym, unsigned long *addr);
 
 extern void mcount(void);
 extern void _mcount(void);
+
+/* wait */
+struct task_wait {
+	int msqid;
+	char tmpfile[64];
+};
 
 int task_wait_init(struct task_wait *task_wait, char *tmpfile);
 int task_wait_destroy(struct task_wait *task_wait);
