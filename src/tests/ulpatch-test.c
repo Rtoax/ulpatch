@@ -510,6 +510,7 @@ static bool should_skip(struct test *test)
 static int operate_test(struct test *test)
 {
 	bool failed = false;
+	int verbose;
 
 	errno = 0;
 
@@ -524,7 +525,9 @@ static int operate_test(struct test *test)
 	gettimeofday(&test->start, NULL);
 
 	/* Exe test entry */
+	verbose = get_verbose();
 	test->real_ret = test->test_cb();
+	enable_verbose(verbose);
 	if (test->real_ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
 		stat_count[STAT_IDX_SUCCESS]++;
 	} else {
