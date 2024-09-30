@@ -18,19 +18,6 @@ enum {
 	ARG_COMMON_MAX,
 };
 
-static void args_common_reset(void)
-{
-	reset_verbose();
-	log_level = LOG_ERR;
-	force = false;
-}
-
-static void reset_getopt(void)
-{
-	optarg = NULL;
-	optind = opterr = optopt = 0;
-}
-
 static void print_usage_common(const char *progname)
 {
 	printf(
@@ -110,7 +97,20 @@ static void print_usage_common(const char *progname)
 		fprintf(stderr, "ERROR: Unknown option or %s missing argument.\n", argv[optind - 1]);	\
 		cmd_exit(1);
 
-#define COMMON_RESET(cmd_args_reset_fn) do {	\
+static void args_common_reset(void)
+{
+	reset_verbose();
+	log_level = LOG_ERR;
+	force = false;
+}
+
+static void reset_getopt(void)
+{
+	optarg = NULL;
+	optind = opterr = optopt = 0;
+}
+
+#define COMMON_RESET_BEFORE_PARSE_ARGS(cmd_args_reset_fn) do {	\
 		cmd_args_reset_fn();	\
 		args_common_reset();	\
 		reset_getopt();	\

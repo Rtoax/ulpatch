@@ -971,7 +971,7 @@ static void ulpatch_test_args_reset_stub(void)
 
 int main(int argc, char *argv[])
 {
-	COMMON_RESET(ulpatch_test_args_reset_stub);
+	COMMON_RESET_BEFORE_PARSE_ARGS(ulpatch_test_args_reset_stub);
 
 	static char ulpatch_test_path_buf[PATH_MAX];
 

@@ -188,7 +188,7 @@ int ulpatch(int argc, char *argv[])
 {
 	int ret;
 
-	COMMON_RESET(ulpatch_args_reset);
+	COMMON_RESET_BEFORE_PARSE_ARGS(ulpatch_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

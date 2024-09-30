@@ -595,7 +595,7 @@ int ultask(int argc, char *argv[])
 	int ret = 0;
 	int flags = FTO_ALL;
 
-	COMMON_RESET(ultask_args_reset);
+	COMMON_RESET_BEFORE_PARSE_ARGS(ultask_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

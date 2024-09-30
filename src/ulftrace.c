@@ -165,7 +165,7 @@ int ulftrace(int argc, char *argv[])
 	int ret = 0;
 	struct task_sym *tsym;
 
-	COMMON_RESET(ulftrace_args_reset);
+	COMMON_RESET_BEFORE_PARSE_ARGS(ulftrace_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

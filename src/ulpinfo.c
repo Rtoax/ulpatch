@@ -185,7 +185,7 @@ int ulpinfo(int argc, char *argv[])
 {
 	int ret;
 
-	COMMON_RESET(ulpinfo_args_reset);
+	COMMON_RESET_BEFORE_PARSE_ARGS(ulpinfo_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)
