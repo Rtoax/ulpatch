@@ -224,6 +224,10 @@ while true; do
 	esac
 done
 
+# Check CC and LD
+set_cc ${CC}
+set_ld ${LD}
+
 if [[ -z ${already_run} ]]; then
 	__usage__ 1
 else
