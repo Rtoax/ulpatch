@@ -339,7 +339,7 @@ static int parse_config(int argc, char *argv[])
 		cmd_exit(1);
 	}
 
-	if (output_file && fexist(output_file)) {
+	if (output_file && !force && fexist(output_file)) {
 		fprintf(stderr, "%s is already exist.\n", output_file);
 		cmd_exit(1);
 	}

@@ -8,6 +8,7 @@
  */
 
 static int log_level = LOG_ERR;
+static bool __unused force = false;
 
 enum {
 	ARG_LOG_LEVEL = 139,
@@ -40,6 +41,7 @@ static void print_usage_common(const char *progname)
 	"  -v[v...], --verbose set verbose, more v specified, more detail to display.\n"
 	"  -h, --help          display this help and exit\n"
 	"  -V, --version       output version information and exit\n"
+	"  -F, --force         force, such as overwirte exist file\n"
 	"  --info              Print detailed information about features \n"
 	"                      supported by the kernel and the ulpatch build.\n"
 	"\n");
@@ -61,8 +63,9 @@ static void reset_getopt(void)
 	{ "log-error",      no_argument,       0, ARG_LOG_ERR },	\
 	{ "dry-run",        no_argument,       0, 'u' },	\
 	{ "verbose",        no_argument,       0, 'v' },	\
-	{ "info",           no_argument,       0, ARG_LOG_INFO },
-#define COMMON_GETOPT_OPTSTRING "uVv::h"
+	{ "info",           no_argument,       0, ARG_LOG_INFO },	\
+	{ "force",          no_argument,       0, 'F' },
+#define COMMON_GETOPT_OPTSTRING "uVv::hF"
 
 #define COMMON_GETOPT_CASES(progname, usage)	\
 	case 'V':	\
@@ -93,6 +96,9 @@ static void reset_getopt(void)
 	case ARG_LOG_INFO:	\
 		ulpatch_info(progname);	\
 		cmd_exit_success();	\
+	case 'F':	\
+		force = true;	\
+		break;	\
 	case '?':	\
 		fprintf(stderr, "Unknown option or option missing argument.\n");	\
 		cmd_exit(1);
