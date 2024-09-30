@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2024 Rong Tao */
+#include <sys/wait.h>
+
 #include <utils/log.h>
 #include <utils/cmds.h>
 
@@ -252,7 +254,7 @@ TEST(ultask, misc, 0)
 	memset(s_pid, 0x0, sizeof(s_pid));
 	sprintf(s_pid, "%d", getpid());
 
-	int argc = 4;
+	int argc = 7;
 	char *argv[] = {
 		"ultask",
 		"--pid", s_pid,
@@ -267,4 +269,88 @@ TEST(ultask, misc, 0)
 	ret += close_task(task);
 
 	return ret;
+}
+
+TEST(ultask, map, 0)
+{
+	int err = 0;
+	char buffer[PATH_MAX];
+	char *f_name;
+	char s_pid[64], s_map[PATH_MAX], s_maps[PATH_MAX];
+	char s_tcwd[PATH_MAX], *tcwd;
+	char s_tmfile[PATH_MAX];
+	int status = 0;
+	struct task_wait waitqueue;
+
+	task_wait_init(&waitqueue, NULL);
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		int ret = -1;
+		char *argv[] = {
+			(char*)ulpatch_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", waitqueue.tmpfile,
+			NULL
+		};
+
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	}
+
+	/* Parent */
+
+	/* Create tmp file */
+	tcwd = get_proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
+	snprintf(s_tmfile, PATH_MAX, "%s/ultask-map-XXXXXX", tcwd);
+	f_name = fmktempname(buffer, PATH_MAX, s_tmfile);
+	if (!f_name)
+		return -1;
+
+	if (ftouch(f_name, 64))
+		return -1;
+
+	printf("fmktempfile: %s\n", f_name);
+
+	if (!fexist(f_name)) {
+		err = -EEXIST;
+		goto done;
+	}
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", pid);
+
+	memset(s_map, 0x0, sizeof(s_map));
+	sprintf(s_map, "file=%s", f_name);
+
+	task_wait_wait(&waitqueue);
+
+	int argc = 6;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--map", s_map,
+		"--verbose",
+	};
+
+	fprintf(stdout, "ultask --pid %s --map %s\n", s_pid, s_map);
+	err += ultask(argc, argv);
+
+	sprintf(s_maps, "/proc/%d/maps", pid);
+	fprint_file(stdout, s_maps);
+
+	task_wait_trigger(&waitqueue);
+
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		err = -EINVAL;
+	}
+
+	task_wait_destroy(&waitqueue);
+
+done:
+	unlink(f_name);
+	return err;
 }

@@ -84,6 +84,7 @@ int fremove(const char *filepath)
 	return ret;
 }
 
+/* Create a regular file, if file is exist, ignore size. */
 int ftouch(const char *filepath, size_t size)
 {
 	struct stat st;
@@ -257,7 +258,7 @@ int fcopy(const char *srcpath, const char *dstpath)
 	return ret;
 }
 
-char* fmktempfile(char *buf, int buf_len, char *seed)
+char *fmktempfile(char *buf, int buf_len, char *seed)
 {
 	int fd;
 	const char *_seed = seed ?: "/tmp/temp-XXXXXX";
@@ -274,7 +275,7 @@ char* fmktempfile(char *buf, int buf_len, char *seed)
 	return buf;
 }
 
-char* fmktempname(char *buf, int buf_len, char *seed)
+char *fmktempname(char *buf, int buf_len, char *seed)
 {
 	char *file = fmktempfile(buf, buf_len, seed);
 	unlink(file);
