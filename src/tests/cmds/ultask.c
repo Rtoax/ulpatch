@@ -174,3 +174,28 @@ TEST(ultask, jmp, 0)
 
 	return ret;
 }
+
+TEST(ultask, symbols, 0)
+{
+	int ret = 0;
+	struct task_struct *task;
+	char s_pid[64];
+
+	task = open_task(getpid(), FTO_NONE);
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", getpid());
+
+	int argc = 4;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--symbols"
+	};
+
+	ret += ultask(argc, argv);
+
+	ret += close_task(task);
+
+	return ret;
+}
