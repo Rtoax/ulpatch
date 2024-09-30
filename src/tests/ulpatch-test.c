@@ -355,12 +355,11 @@ static int parse_config(int argc, char *argv[])
 		{ NULL }
 	};
 
-	reset_getopt();
-
 	while (1) {
 		int c;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "lf:r:s:m:"COMMON_GETOPT_OPTSTRING, options, &option_index);
+		c = getopt_long(argc, argv, "lf:r:s:m:"COMMON_GETOPT_OPTSTRING,
+				options, &option_index);
 		if (c < 0) {
 			break;
 		}
@@ -966,9 +965,13 @@ void never_called_stub(void)
 	CALL_TEST_STUB(utils_version);
 }
 
+static void ulpatch_test_args_reset_stub(void)
+{
+}
+
 int main(int argc, char *argv[])
 {
-	COMMON_RESET();
+	COMMON_RESET(ulpatch_test_args_reset_stub);
 
 	static char ulpatch_test_path_buf[PATH_MAX];
 

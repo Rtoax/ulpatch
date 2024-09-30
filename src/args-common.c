@@ -25,6 +25,12 @@ static void args_common_reset(void)
 	force = false;
 }
 
+static void reset_getopt(void)
+{
+	optarg = NULL;
+	optind = opterr = optopt = 0;
+}
+
 static void print_usage_common(const char *progname)
 {
 	printf(
@@ -53,12 +59,6 @@ static void print_usage_common(const char *progname)
 	"                      supported by the kernel and the ulpatch build.\n"
 	"\n");
 	printf(" %s %s\n", progname, ulpatch_version());
-}
-
-static void reset_getopt(void)
-{
-	optarg = NULL;
-	optind = opterr = optopt = 0;
 }
 
 #define COMMON_OPTIONS	\
@@ -110,8 +110,10 @@ static void reset_getopt(void)
 		fprintf(stderr, "ERROR: Unknown option or %s missing argument.\n", argv[optind - 1]);	\
 		cmd_exit(1);
 
-#define COMMON_RESET() do {	\
+#define COMMON_RESET(cmd_args_reset_fn) do {	\
+		cmd_args_reset_fn();	\
 		args_common_reset();	\
+		reset_getopt();	\
 	} while (0)
 
 #define COMMON_IN_MAIN() do {	\

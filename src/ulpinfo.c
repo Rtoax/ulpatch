@@ -26,7 +26,7 @@ static const char *prog_name = "ulpinfo";
 static char *patch_file = NULL;
 static pid_t pid = 0;
 
-static void args_reset(void)
+static void ulpinfo_args_reset(void)
 {
 	patch_file = NULL;
 	pid = 0;
@@ -61,8 +61,6 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
-
-	reset_getopt();
 
 	while (1) {
 		int c;
@@ -187,8 +185,7 @@ int ulpinfo(int argc, char *argv[])
 {
 	int ret;
 
-	args_reset();
-	COMMON_RESET();
+	COMMON_RESET(ulpinfo_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

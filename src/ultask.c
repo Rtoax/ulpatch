@@ -111,7 +111,7 @@ static struct task_struct *target_task = NULL;
 
 static const char *prog_name = "ultask";
 
-static void args_reset(void)
+static void ultask_args_reset(void)
 {
 	target_pid = -1;
 	flag_print_task = true;
@@ -223,8 +223,6 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
-
-	reset_getopt();
 
 	while (1) {
 		int c;
@@ -597,8 +595,7 @@ int ultask(int argc, char *argv[])
 	int ret = 0;
 	int flags = FTO_ALL;
 
-	args_reset();
-	COMMON_RESET();
+	COMMON_RESET(ultask_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

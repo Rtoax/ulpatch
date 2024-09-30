@@ -36,7 +36,7 @@ static const char *patch_object_file = NULL;
 
 static const char *prog_name = "ulftrace";
 
-static void args_reset(void)
+static void ulftrace_args_reset(void)
 {
 	target_pid = -1;
 	target_func = NULL;
@@ -84,8 +84,6 @@ static int parse_config(int argc, char *argv[])
 		COMMON_OPTIONS
 		{ NULL }
 	};
-
-	reset_getopt();
 
 	while (1) {
 		int c;
@@ -167,8 +165,7 @@ int ulftrace(int argc, char *argv[])
 	int ret = 0;
 	struct task_sym *tsym;
 
-	args_reset();
-	COMMON_RESET();
+	COMMON_RESET(ulftrace_args_reset);
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)
