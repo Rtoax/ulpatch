@@ -45,12 +45,11 @@ If \fITYPE\fR=\fBvma\fR, dump process's VMA to file.
 If \fITYPE\fR=\fBdisasm\fR, disassemble a piece of code of target process.
 
 .SS
-\fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry SRC address, must use with \fB--jmp-to\fR. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
+\fB\-\-jmp\fR [from=\fI\,ADDR\/\fR,to=\fI\,ADDR\/\fR]
+Specify a jump entry SRC and DST address. Followed by the \fBADDR\fR format string.
+You better know what you're doing.
+This action cannot be undone.
 
-.SS
-\fB\-\-jmp-to\fR[=\fI\,ADDR\/\fR]
-Specify a jump entry DST address, must use with --jmp-from. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
 .SS
 \fB\-\-threads\fR
 Dump process's Thread, see also

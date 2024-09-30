@@ -26,8 +26,7 @@
 
 enum {
 	ARG_MIN = ARG_COMMON_MAX,
-	ARG_JMP_FROM_ADDR,
-	ARG_JMP_TO_ADDR,
+	ARG_JMP,
 	ARG_VMAS,
 	ARG_DUMP,
 	ARG_FILE_MAP_TO_VMA,
@@ -44,7 +43,7 @@ enum {
 	DISASM_OPTION,
 	ADDR_OPTION,
 	SIZE_OPTION,
-	END_OPTION,
+	END_DUMP_OPTION,
 };
 
 char *const dump_opts[] = {
@@ -52,7 +51,19 @@ char *const dump_opts[] = {
 	[DISASM_OPTION] = "disasm",
 	[ADDR_OPTION] = "addr",
 	[SIZE_OPTION] = "size",
-	[END_OPTION] = NULL,
+	[END_DUMP_OPTION] = NULL,
+};
+
+enum {
+	JMP_FROM_OPTION,
+	JMP_TO_OPTION,
+	END_JMP_OPTION,
+};
+
+char *const jmp_opts[] = {
+	[JMP_FROM_OPTION] = "from",
+	[JMP_TO_OPTION] = "to",
+	[END_JMP_OPTION] = NULL,
 };
 
 static pid_t target_pid = -1;
@@ -141,8 +152,8 @@ static int print_help(void)
 	"      TYPE=disasm\n"
 	"                      disassemble a piece of code of target process.\n"
 	"\n"
-	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
-	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
+	"  --jmp [from=ADDR,to=ADDR]\n"
+	"                      specify a jump entry SRC and DST address\n"
 	"                      you better ensure what you are doing.\n"
 	"\n"
 	"  --threads           dump threads\n"
@@ -180,8 +191,7 @@ static int parse_config(int argc, char *argv[])
 		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "status",         no_argument,       0, ARG_STATUS },
 		{ "dump",           required_argument, 0, ARG_DUMP },
-		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
-		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
+		{ "jmp",            required_argument, 0, ARG_JMP },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
@@ -256,19 +266,25 @@ static int parse_config(int argc, char *argv[])
 				flag_dump_addr = true;
 			}
 			break;
-		case ARG_JMP_FROM_ADDR:
-			flag_rdonly = false;
-			jmp_addr_from = str2addr(optarg);
-			if (jmp_addr_from == 0) {
-				fprintf(stderr, "Wrong address for --jmp-from.\n");
-				cmd_exit(1);
+		case ARG_JMP:
+			subopts = optarg;
+			while (*subopts != '\0') {
+				switch (getsubopt(&subopts, jmp_opts, &value)) {
+				case JMP_FROM_OPTION:
+					jmp_addr_from = str2addr(value);
+					break;
+				case JMP_TO_OPTION:
+					jmp_addr_to = str2addr(value);
+					break;
+				default:
+					fprintf(stderr, "unknown option %s of --jmp\n", value);
+					cmd_exit(1);
+					break;
+				}
 			}
-			break;
-		case ARG_JMP_TO_ADDR:
 			flag_rdonly = false;
-			jmp_addr_to = str2addr(optarg);
-			if (jmp_addr_to == 0) {
-				fprintf(stderr, "Wrong address for --jmp-to.\n");
+			if (jmp_addr_from == 0 || jmp_addr_to == 0) {
+				fprintf(stderr, "jmp need from= and to=\n");
 				cmd_exit(1);
 			}
 			break;
@@ -334,12 +350,8 @@ static int parse_config(int argc, char *argv[])
 		!flag_print_status &&
 		!flag_print_threads &&
 		!flag_disasm &&
-		!flag_print_fds) {
-		if ((!jmp_addr_from && jmp_addr_to) || \
-			(jmp_addr_from && !jmp_addr_to)) {
-			fprintf(stderr, "must specify --jmp-from and --jmp-to at the same time.\n");
-			cmd_exit(1);
-		}
+		!flag_print_fds)
+	{
 		fprintf(stderr, "nothing to do, -h, --help.\n");
 	} else {
 		/**

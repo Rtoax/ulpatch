@@ -53,6 +53,11 @@ void sig_handler(int sig)
 	}
 }
 
+void patch_hello2(unsigned long ul)
+{
+	printf("Hello World. %ld, %ld, patched\n", count, ul);
+}
+
 void internal_print_hello(unsigned long ul)
 {
 #ifdef WITH_DLOPEN_TEST
@@ -105,6 +110,7 @@ int main(int argc, char *argv[])
 
 #define PRINT_ADDR(a)	printf("%-32s: %#016lx\n", #a, (unsigned long)a);
 	PRINT_ADDR(print_hello);
+	PRINT_ADDR(patch_hello2);
 	PRINT_ADDR(puts);
 	PRINT_ADDR(sleep);
 	PRINT_ADDR(pthread_create);
