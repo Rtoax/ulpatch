@@ -964,6 +964,8 @@ void never_called_stub(void)
 
 int main(int argc, char *argv[])
 {
+	COMMON_RESET();
+
 	static char ulpatch_test_path_buf[PATH_MAX];
 
 	ulpatch_test_path = get_proc_pid_exe(getpid(), ulpatch_test_path_buf,

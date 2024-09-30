@@ -41,6 +41,12 @@ static const char *prog_name = "ulpatch";
 
 int check_patch_file(const char *file);
 
+static void args_reset(void)
+{
+	target_pid = -1;
+	target_task = NULL;
+	patch_file = NULL;
+}
 
 static int print_help(void)
 {
@@ -183,6 +189,9 @@ static int command_unpatch(void)
 int ulpatch(int argc, char *argv[])
 {
 	int ret;
+
+	args_reset();
+	COMMON_RESET();
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

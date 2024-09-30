@@ -8,7 +8,7 @@
  */
 
 static int log_level = LOG_ERR;
-static bool __unused force = false;
+static bool force = false;
 
 enum {
 	ARG_LOG_LEVEL = 139,
@@ -17,6 +17,12 @@ enum {
 	ARG_LOG_INFO,
 	ARG_COMMON_MAX,
 };
+
+static void args_common_reset(void)
+{
+	log_level = LOG_ERR;
+	force = false;
+}
 
 static void print_usage_common(const char *progname)
 {
@@ -102,6 +108,10 @@ static void reset_getopt(void)
 	case '?':	\
 		fprintf(stderr, "Unknown option or option missing argument.\n");	\
 		cmd_exit(1);
+
+#define COMMON_RESET() do {	\
+		args_common_reset();	\
+	} while (0)
 
 #define COMMON_IN_MAIN() do {	\
 		set_log_level(log_level);	\

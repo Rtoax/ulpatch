@@ -36,6 +36,13 @@ static const char *patch_object_file = NULL;
 
 static const char *prog_name = "ulftrace";
 
+static void args_reset(void)
+{
+	target_pid = -1;
+	target_func = NULL;
+	target_task = NULL;
+	patch_object_file = NULL;
+}
 
 static int print_help(void)
 {
@@ -159,6 +166,9 @@ int ulftrace(int argc, char *argv[])
 {
 	int ret = 0;
 	struct task_sym *tsym;
+
+	args_reset();
+	COMMON_RESET();
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

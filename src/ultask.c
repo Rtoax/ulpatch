@@ -84,6 +84,32 @@ static struct task_struct *target_task = NULL;
 
 static const char *prog_name = "ultask";
 
+static void args_reset(void)
+{
+	target_pid = -1;
+	flag_print_task = true;
+	flag_print_vmas = false;
+	flag_dump_vma = false;
+	flag_dump_addr = false;
+	flag_unmap_vma = false;
+	map_file = NULL;
+	vma_addr = 0;
+	dump_addr = 0;
+	dump_size = 0;
+	jmp_addr_from = 0;
+	jmp_addr_to = 0;
+	flag_list_symbols = false;
+	flag_print_threads = false;
+	flag_print_fds = false;
+	flag_print_auxv = false;
+	flag_print_status = false;
+	flag_disasm = false;
+	disasm_addr = 0;
+	disasm_size = 0;
+	output_file = NULL;
+	flag_rdonly = true;
+	target_task = NULL;
+}
 
 static int print_help(void)
 {
@@ -461,6 +487,9 @@ int ultask(int argc, char *argv[])
 {
 	int ret = 0;
 	int flags = FTO_ALL;
+
+	args_reset();
+	COMMON_RESET();
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)

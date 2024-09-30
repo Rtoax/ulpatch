@@ -26,6 +26,12 @@ static const char *prog_name = "ulpinfo";
 static char *patch_file = NULL;
 static pid_t pid = 0;
 
+static void args_reset(void)
+{
+	patch_file = NULL;
+	pid = 0;
+}
+
 static int print_help(void)
 {
 	printf(
@@ -176,6 +182,9 @@ free:
 int ulpinfo(int argc, char *argv[])
 {
 	int ret;
+
+	args_reset();
+	COMMON_RESET();
 
 	ret = parse_config(argc, argv);
 #if !defined(ULP_CMD_MAIN)
