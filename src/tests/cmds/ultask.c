@@ -206,3 +206,65 @@ TEST(ultask, symbols, 0)
 
 	return ret;
 }
+
+TEST(ultask, vma, 0)
+{
+	int ret = 0;
+	struct task_struct *task;
+	char s_pid[64];
+
+	task = open_task(getpid(), FTO_NONE);
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", getpid());
+
+	int argc = 4;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--vmas"
+	};
+
+	int argc2 = 5;
+	char *argv2[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--vmas",
+		"--verbose",
+	};
+
+	ret += ultask(argc, argv);
+	ret += ultask(argc2, argv2);
+
+	ret += close_task(task);
+
+	return ret;
+}
+
+TEST(ultask, misc, 0)
+{
+	int ret = 0;
+	struct task_struct *task;
+	char s_pid[64];
+
+	task = open_task(getpid(), FTO_NONE);
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", getpid());
+
+	int argc = 4;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--fds",
+		"--threads",
+		"--auxv",
+		"--status",
+	};
+
+	ret += ultask(argc, argv);
+
+	ret += close_task(task);
+
+	return ret;
+}
