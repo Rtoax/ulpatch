@@ -106,7 +106,7 @@ static int parse_config(int argc, char *argv[])
 		case ARG_UNPATCH:
 			command_type = CMD_UNPATCH;
 			break;
-		COMMON_GETOPT_CASES(prog_name, print_help)
+		COMMON_GETOPT_CASES(prog_name, print_help, argv)
 		default:
 			print_help();
 			cmd_exit(1);

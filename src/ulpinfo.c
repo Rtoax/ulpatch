@@ -79,7 +79,7 @@ static int parse_config(int argc, char *argv[])
 		case 'p':
 			pid = atoi(optarg);
 			break;
-		COMMON_GETOPT_CASES(prog_name, print_help)
+		COMMON_GETOPT_CASES(prog_name, print_help, argv)
 		default:
 			print_help();
 			cmd_exit(1);

@@ -74,7 +74,7 @@ static void reset_getopt(void)
 	{ "force",          no_argument,       0, 'F' },
 #define COMMON_GETOPT_OPTSTRING "uVv::hF"
 
-#define COMMON_GETOPT_CASES(progname, usage)	\
+#define COMMON_GETOPT_CASES(progname, usage, argv)	\
 	case 'V':	\
 		printf("%s %s\n", progname, ulpatch_version());	\
 		cmd_exit_success();	\
@@ -107,7 +107,7 @@ static void reset_getopt(void)
 		force = true;	\
 		break;	\
 	case '?':	\
-		fprintf(stderr, "Unknown option or option missing argument.\n");	\
+		fprintf(stderr, "ERROR: Unknown option or %s missing argument.\n", argv[optind - 1]);	\
 		cmd_exit(1);
 
 #define COMMON_RESET() do {	\
