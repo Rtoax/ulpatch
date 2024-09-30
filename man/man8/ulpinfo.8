@@ -14,15 +14,15 @@ ulpinfo Check patched running process status and livepatch information.
 This program is also a basic command of ULPatch.
 
 .SH ARGUMENTS
-.TP
+.SS
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
 
-.TP
+.SS
 \fB\-i\fR, \fB\-\-patch\fR [ULPATCH.ELF]
 Show ulpatch.elf file information.
 
-.TP
+.SS
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
 Specify a log level. The LEVEL could be number(see
 .BR syslog (3)
@@ -30,19 +30,19 @@ Specify a log level. The LEVEL could be number(see
 For example, if you want to set log level to LOG_ERR, just:
 .BR --lv=error .
 
-.TP
+.SS
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
 
-.TP
+.SS
 \fB\-\-log-error\fR
 Set log level to ERROR.
 
-.TP
+.SS
 \fB\-u\fR, \fB\-\-dry-run\fR
 Don't actually run.
 
-.TP
+.SS
 \fB\-v\fR[vvv...], \fB\-\-verbose\fR
 Show verbose information.
 You can set more \fBv\fR values to increase the verbose level and display more details.
@@ -50,15 +50,15 @@ For example, \fB-vvvvv\fR will set the verbose value to \fB4\fR, because there a
 
 If \fBverbose=1\fR, ulpinfo will display ulp-information, if \fBverbose>=2\fR, ulp disasm will display.
 
-.TP
+.SS
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
 
-.TP
+.SS
 \fB\-V\fR, \fB\-\-version\fR
 Show version information.
 
-.TP
+.SS
 \fB\-\-info\fR
 Print detailed information about features supported by the kernel and the ULPatch build. It is necessary to display this information when you are submitting a MR/PR.
 

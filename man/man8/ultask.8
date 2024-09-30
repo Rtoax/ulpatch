@@ -19,78 +19,80 @@ This program is also a basic command of ULPatch.
 elfutils-libelf
 
 .SH ARGUMENTS
-.TP
+.SS
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
-.TP
+.SS
 \fB\-\-vmas\fR
 Dump process's VMA, see also
 .IR /proc/ PID /maps .
 
-.TP
-\fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
-Dump process's VMA to file or stdout, see also
+.SS
+\fB\-\-dump\fR=[\fI\,TYPE\/\fR,addr=\fI\,ADDR\/\fR,size=\fI\,SIZE\/\fR]
+Dump something to file, \fBaddr\fR followed by the \fIADDR\fR format string. \fBsize\fR followed by the \fISIZE\fR format string.
+See also
 .IR /proc/ PID /maps .
-Followed by the \fIADDR\fR format string.
-
+.sp
+The \-\-dump option has 2 sub options:
 .TP
-\fB\-\-dump-addr\fR [addr=\fI\,ADDR\/\fR,size=\fI\,SIZE\/\fR]
-Dump process's address memory to file or stdout, see also
-.IR /proc/ PID /maps .
-\fBaddr\fR followed by the \fIADDR\fR format string. \fBsize\fR followed by the \fISIZE\fR format string.
-
+.B \-\-dump addr=ADDR,size=SIZE
+If not specify \fITYPE\fR, dump process's address memory to file.
 .TP
+.B \-\-dump vma,addr=ADDR
+If \fITYPE\fR=\fBvma\fR, dump process's VMA to file.
+
+.SS
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
 Specify a jump entry SRC address, must use with \fB--jmp-to\fR. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
 
-.TP
+.SS
 \fB\-\-jmp-to\fR[=\fI\,ADDR\/\fR]
 Specify a jump entry DST address, must use with --jmp-from. the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
-.TP
+.SS
 \fB\-\-threads\fR
 Dump process's Thread, see also
 .IR /proc/ PID /task/ .
 
-.TP
+.SS
 \fB\-\-fds\fR
 Dump process's File Descriptors, see also
 .IR /proc/ PID /fd/.
 
-.TP
+.SS
 \fB\-\-auxv\fR
 Print process's auxv, see also
 .IR /proc/ PID /auxv .
 
-.TP
+.SS
 \fB\-\-status\fR
 Print process's status, see also
 .IR /proc/ PID /status .
 
-.TP
+.SS
 \fB\-\-map-file\fR[=\fI\,FILE\/\fR]
 Map a file into target process.
 
-.TP
+.SS
 \fB\-\-unmap-file\fR[=\fI\,ADDR\/\fR]
 Unmap a vma from target process. Followed by the \fBADDR\fR format string.
 
-.TP
+.SS
 \fB\-\-symbols\fR
 List all symbols of target process.
 
-.TP
+.SS
 \fB\-\-disasm-addr\fR[=\fI\,ADDR\/\fR]
 Disassemble a piece of code in a running process. Need specify \fB--disasm-size\fR too. Followed by the \fBADDR\fR format string.
 
-.TP
+.SS
 \fB\-\-disasm-size\fR[=\fI\,SIZE\/\fR]
 Specify disassemble size. Followed by the \fBSIZE\fR format string.
 
-.TP
+.SS
 \fB\-o\fR, \fB\-\-output\fR
 Specify output.
 
-.TP
+.SS
 \fB\-\-log-level\fR[=\fI\,LEVEL\/\fR], \fB\-\-lv\fR[=\fI\,LEVEL\/\fR]
 Specify a log level. The LEVEL could be number(see
 .BR syslog (3)
@@ -98,41 +100,41 @@ Specify a log level. The LEVEL could be number(see
 For example, if you want to set log level to LOG_ERR, just:
 .BR --lv=error .
 
-.TP
+.SS
 \fB\-\-log-debug\fR
 Set log level to DEBUG.
 
-.TP
+.SS
 \fB\-\-log-error\fR
 Set log level to ERROR.
 
-.TP
+.SS
 \fB\-u\fR, \fB\-\-dry-run\fR
 Don't actually run.
 
-.TP
+.SS
 \fB\-v\fR[vvv...], \fB\-\-verbose\fR
 Show verbose information.
 You can set more \fBv\fR values to increase the verbose level and display more details.
 For example, \fB-vvvvv\fR will set the verbose value to \fB4\fR, because there are 4 \fBv\fR's.
 
-.TP
+.SS
 \fB\-h\fR, \fB\-\-help\fR
 Show help information.
 
-.TP
+.SS
 \fB\-V\fR, \fB\-\-version\fR
 Show version information.
 
-.TP
+.SS
 \fB\-\-info\fR
 Print detailed information about features supported by the kernel and the ULPatch build. It is necessary to display this information when you are submitting a MR/PR.
 
 .SH FORMAT
-.TP
+.SS
 \fBADDR\fR
 Address string may include a \fB0x\fR prefix or not.
-.TP
+.SS
 \fBSIZE\fR
 Size string may include a \fB0x\fR prefix or not, and size string may include a \fBKB\fR, \fBMB\fR, \fBGB\fR suffix or not.
 .SH OS

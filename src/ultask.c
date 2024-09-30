@@ -29,8 +29,7 @@ enum {
 	ARG_JMP_FROM_ADDR,
 	ARG_JMP_TO_ADDR,
 	ARG_VMAS,
-	ARG_DUMP_VMA,
-	ARG_DUMP_ADDR,
+	ARG_DUMP,
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
@@ -43,12 +42,14 @@ enum {
 };
 
 enum {
+	VMA_OPTION,
 	ADDR_OPTION,
 	SIZE_OPTION,
 	END_OPTION,
 };
 
 char *const dump_opts[] = {
+	[VMA_OPTION] = "vma",
 	[ADDR_OPTION] = "addr",
 	[SIZE_OPTION] = "size",
 	[END_OPTION] = NULL,
@@ -100,13 +101,16 @@ static int print_help(void)
 	"\n"
 	"  --vmas              print all vmas\n"
 	"                      show detail if specify verbose argument.\n"
-	"  --dump-vma [ADDR]   save VMA address space to console or to a file,\n"
+	"\n"
+	"  --dump [TYPE,addr=ADDR,size=SIZE]\n"
+	"\n"
+	"      TYPE=           dump address memory to file\n"
+	"\n"
+	"      TYPE=vma\n"
+	"                      save VMA address space to console or to a file,\n"
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
-	"\n"
-	"  --dump-addr [addr=ADDR,size=SIZE]\n"
-	"                      dump address memory to file\n"
 	"\n"
 	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
 	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
@@ -151,8 +155,7 @@ static int parse_config(int argc, char *argv[])
 		{ "fds",            no_argument,       0, ARG_FDS },
 		{ "auxv",           no_argument,       0, ARG_AUXV },
 		{ "status",         no_argument,       0, ARG_STATUS },
-		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
-		{ "dump-addr",      required_argument, 0, ARG_DUMP_ADDR },
+		{ "dump",           required_argument, 0, ARG_DUMP },
 		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
 		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
@@ -184,19 +187,13 @@ static int parse_config(int argc, char *argv[])
 		case ARG_VMAS:
 			flag_print_vmas = true;
 			break;
-		case ARG_DUMP_VMA:
-			flag_dump_vma = true;
-			vma_addr = str2addr(optarg);
-			if (vma_addr == 0) {
-				fprintf(stderr, "Wrong address for --dump-vma.\n");
-				cmd_exit(1);
-			}
-			break;
-		case ARG_DUMP_ADDR:
-			flag_dump_addr = true;
+		case ARG_DUMP:
 			subopts = optarg;
 			while (*subopts != '\0') {
 				switch (getsubopt(&subopts, dump_opts, &value)) {
+				case VMA_OPTION:
+					flag_dump_vma = true;
+					break;
 				case ADDR_OPTION:
 					dump_addr = str2addr(value);
 					break;
@@ -204,14 +201,24 @@ static int parse_config(int argc, char *argv[])
 					dump_size = str2size(value);
 					break;
 				default:
-					fprintf(stderr, "Unknown --dump-addr %s\n", value);
+					fprintf(stderr, "unknown option %s of --dump\n", value);
 					cmd_exit(1);
 					break;
 				}
 			}
-			if (dump_addr == 0 || dump_size == 0) {
-				fprintf(stderr, "Wrong format for --dump-addr.\n");
-				cmd_exit(1);
+
+			if (flag_dump_vma) {
+				if (dump_addr == 0) {
+					fprintf(stderr, "dump vma need addr=.\n");
+					cmd_exit(1);
+				}
+				vma_addr = dump_addr;
+			} else {
+				if (dump_addr == 0 || dump_size == 0) {
+					fprintf(stderr, "dump memory need addr= and size=\n");
+					cmd_exit(1);
+				}
+				flag_dump_addr = true;
 			}
 			break;
 		case ARG_JMP_FROM_ADDR:
@@ -324,17 +331,17 @@ static int parse_config(int argc, char *argv[])
 	}
 
 	if (flag_dump_vma && !output_file) {
-		fprintf(stderr, "--dump-vma need output file(-o).\n");
+		fprintf(stderr, "--dump vma need output file(-o).\n");
 		cmd_exit(1);
 	}
 
 	if (flag_dump_addr && !output_file) {
-		fprintf(stderr, "--dump-addr need output file(-o).\n");
+		fprintf(stderr, "--dump need output file(-o).\n");
 		cmd_exit(1);
 	}
 
 	if (flag_dump_addr && (!dump_addr || !dump_size)) {
-		fprintf(stderr, "--dump-addr need --dump-size.\n");
+		fprintf(stderr, "--dump need --dump-size.\n");
 		cmd_exit(1);
 	}
 
