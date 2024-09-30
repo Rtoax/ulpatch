@@ -69,12 +69,14 @@ char *const jmp_opts[] = {
 enum {
 	MAP_FILE_OPTION,
 	MAP_RO_OPTION,
+	MAP_NO_EXEC_OPTION,
 	END_MAP_OPTION,
 };
 
 char *const map_opts[] = {
 	[MAP_FILE_OPTION] = "file",
 	[MAP_RO_OPTION] = "ro",
+	[MAP_NO_EXEC_OPTION] = "noexec",
 	[END_MAP_OPTION] = NULL,
 };
 
@@ -87,6 +89,7 @@ static bool flag_dump_addr = false;
 static bool flag_unmap_vma = false;
 static char *map_file = NULL;
 static bool map_ro = false;
+static bool map_noexec = false;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -118,6 +121,7 @@ static void args_reset(void)
 	flag_unmap_vma = false;
 	map_file = NULL;
 	map_ro = false;
+	map_noexec = false;
 	vma_addr = 0;
 	dump_addr = 0;
 	dump_size = 0;
@@ -175,9 +179,10 @@ static int print_help(void)
 	"  --auxv              print auxv of task\n"
 	"  --status            print status of task\n"
 	"\n"
-	"  --map [file=FILE,ro]\n"
+	"  --map [file=FILE,ro,noexec]\n"
 	"                      mmap a exist file into target process address space\n"
-	"                      option 'ro' means readonly\n"
+	"                      option 'ro' means readonly, default rw\n"
+	"                      option 'noexec' means no PROT_EXEC, default has it\n"
 	"\n"
 	"  --unmap [=ADDR]     munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by --map.\n"
@@ -316,6 +321,9 @@ static int parse_config(int argc, char *argv[])
 					break;
 				case MAP_RO_OPTION:
 					map_ro = true;
+					break;
+				case MAP_NO_EXEC_OPTION:
+					map_noexec = true;
 					break;
 				default:
 					fprintf(stderr, "unknown option %s of --map\n", value);
@@ -497,6 +505,9 @@ static int mmap_a_file(void)
 
 	if (map_ro)
 		prot &= ~PROT_WRITE;
+
+	if (map_noexec)
+		prot &= ~PROT_EXEC;
 
 	map_v = task_mmap(task, 0UL, map_len, prot, MAP_PRIVATE, map_fd, 0);
 	if (!map_v) {
