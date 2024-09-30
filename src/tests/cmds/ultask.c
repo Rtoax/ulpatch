@@ -193,7 +193,14 @@ TEST(ultask, symbols, 0)
 		"--symbols"
 	};
 
+	char *argv2[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--syms"
+	};
+
 	ret += ultask(argc, argv);
+	ret += ultask(argc, argv2);
 
 	ret += close_task(task);
 

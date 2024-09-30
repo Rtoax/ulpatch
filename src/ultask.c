@@ -166,6 +166,7 @@ static int print_help(void)
 	"                      and witch is mmapped by --map-file.\n"
 	"                      check with --vmas and --map-file.\n"
 	"\n"
+	"  --syms\n"
 	"  --symbols           list all symbols\n"
 	"\n"
 	"  -o, --output        specify output filename.\n"
@@ -195,6 +196,7 @@ static int parse_config(int argc, char *argv[])
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
+		{ "syms",           no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
 		COMMON_OPTIONS
 		{ NULL }
