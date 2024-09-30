@@ -71,11 +71,14 @@ Print process's status, see also
 .IR /proc/ PID /status .
 
 .SS
-\fB\-\-map-file\fR[=\fI\,FILE\/\fR]
-Map a file into target process.
+\fB\-\-map\fR [file=\fI\,FILE\/\fR]
+Map a file into target process. The \fI\,FILE\/\fR should under target process \fBcwd\fR,
+see
+.IR /proc/ PID /cwd .
+you'd better \fB--map file=$PWD/FILE\fR.
 
 .SS
-\fB\-\-unmap-file\fR[=\fI\,ADDR\/\fR]
+\fB\-\-unmap\fR[=\fI\,ADDR\/\fR]
 Unmap a vma from target process. Followed by the \fBADDR\fR format string.
 
 .SS

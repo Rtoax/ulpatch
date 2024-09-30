@@ -159,6 +159,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	if (ret == -1) {
 		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
 			task->pid, strerror(errno));
+		if (is_verbose())
+			do_backtrace(stdout);
 		return -errno;
 	}
 

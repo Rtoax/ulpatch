@@ -29,7 +29,7 @@ enum {
 	ARG_JMP,
 	ARG_VMAS,
 	ARG_DUMP,
-	ARG_FILE_MAP_TO_VMA,
+	ARG_MAP,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
 	ARG_FDS,
@@ -64,6 +64,16 @@ char *const jmp_opts[] = {
 	[JMP_FROM_OPTION] = "from",
 	[JMP_TO_OPTION] = "to",
 	[END_JMP_OPTION] = NULL,
+};
+
+enum {
+	MAP_FILE_OPTION,
+	END_MAP_OPTION,
+};
+
+char *const map_opts[] = {
+	[MAP_FILE_OPTION] = "file",
+	[END_MAP_OPTION] = NULL,
 };
 
 static pid_t target_pid = -1;
@@ -161,10 +171,10 @@ static int print_help(void)
 	"  --auxv              print auxv of task\n"
 	"  --status            print status of task\n"
 	"\n"
-	"  --map-file [FILE]   mmap a exist file into target process address space\n"
-	"  --unmap-file        munmap a exist VMA, the argument need input vma address.\n"
-	"                      and witch is mmapped by --map-file.\n"
-	"                      check with --vmas and --map-file.\n"
+	"  --map [file=FILE]   mmap a exist file into target process address space\n"
+	"  --unmap [=ADDR]     munmap a exist VMA, the argument need input vma address.\n"
+	"                      and witch is mmapped by --map.\n"
+	"                      check with --vmas and --map.\n"
 	"\n"
 	"  --syms\n"
 	"  --symbols           list all symbols\n"
@@ -193,8 +203,8 @@ static int parse_config(int argc, char *argv[])
 		{ "status",         no_argument,       0, ARG_STATUS },
 		{ "dump",           required_argument, 0, ARG_DUMP },
 		{ "jmp",            required_argument, 0, ARG_JMP },
-		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
-		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
+		{ "map",            required_argument, 0, ARG_MAP },
+		{ "unmap",          required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "syms",           no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "output",         required_argument, 0, 'o' },
@@ -290,9 +300,24 @@ static int parse_config(int argc, char *argv[])
 				cmd_exit(1);
 			}
 			break;
-		case ARG_FILE_MAP_TO_VMA:
-			map_file = optarg;
+		case ARG_MAP:
+			subopts = optarg;
+			while (*subopts != '\0') {
+				switch (getsubopt(&subopts, map_opts, &value)) {
+				case MAP_FILE_OPTION:
+					map_file = value;
+					break;
+				default:
+					fprintf(stderr, "unknown option %s of --map\n", value);
+					cmd_exit(1);
+					break;
+				}
+			}
 			flag_rdonly = false;
+			if (!map_file) {
+				fprintf(stderr, "map need file=\n");
+				cmd_exit(1);
+			}
 			break;
 		case ARG_FILE_UNMAP_FROM_VMA:
 			flag_unmap_vma = true;
@@ -391,8 +416,8 @@ static int mmap_a_file(void)
 {
 	int ret = 0;
 	ssize_t map_len = fsize(map_file);
-	unsigned long __unused map_v;
-	int __unused map_fd;
+	unsigned long map_v;
+	int map_fd;
 	const char *filename = map_file;
 
 	struct task_struct *task = target_task;
@@ -419,12 +444,11 @@ static int mmap_a_file(void)
 		goto close_ret;
 	}
 
+close_ret:
+	task_close(task, map_fd);
 	task_detach(task->pid);
 
 	update_task_vmas_ulp(task);
-
-close_ret:
-	task_close(task, map_fd);
 
 	return ret;
 }
