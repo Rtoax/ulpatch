@@ -278,9 +278,9 @@ TEST(ultask, map, 0)
 	char s_tcwd[PATH_MAX], *tcwd;
 	char s_tmfile[PATH_MAX];
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
@@ -288,7 +288,7 @@ TEST(ultask, map, 0)
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 
@@ -323,7 +323,7 @@ TEST(ultask, map, 0)
 	memset(s_map, 0x0, sizeof(s_map));
 	sprintf(s_map, "file=%s", f_name);
 
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	int argc = 6;
 	char *argv[] = {
@@ -339,14 +339,14 @@ TEST(ultask, map, 0)
 	sprintf(s_maps, "/proc/%d/maps", pid);
 	fprint_file(stdout, s_maps);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 
 	waitpid(pid, &status, __WALL);
 	if (status != 0) {
 		err = -EINVAL;
 	}
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 done:
 	unlink(f_name);

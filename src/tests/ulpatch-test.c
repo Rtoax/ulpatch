@@ -685,34 +685,34 @@ static void launch_sleeper(void)
 
 static void launch_waiting(void)
 {
-	struct task_wait wait_here;
+	struct task_notify wait_here;
 
 	if (!msgq_file) {
 		fprintf(stderr, "Need a ftok(3) file input with -m.\n");
 		exit(1);
 	}
 
-	task_wait_init(&wait_here, msgq_file);
+	task_notify_init(&wait_here, msgq_file);
 	ulp_debug("CHILD: wait msg.\n");
-	task_wait_wait(&wait_here);
+	task_notify_wait(&wait_here);
 	ulp_debug("CHILD: return.\n");
-	// task_wait_destroy(&wait_here);
+	// task_notify_destroy(&wait_here);
 }
 
 static void launch_trigger(void)
 {
-	struct task_wait wait_here;
+	struct task_notify wait_here;
 
 	if (!msgq_file) {
 		fprintf(stderr, "Need a ftok(3) file input with -m.\n");
 		exit(1);
 	}
 
-	task_wait_init(&wait_here, msgq_file);
+	task_notify_init(&wait_here, msgq_file);
 	ulp_debug("CHILD: send msg.\n");
-	task_wait_trigger(&wait_here);
+	task_notify_trigger(&wait_here);
 	ulp_debug("CHILD: return.\n");
-	// task_wait_destroy(&wait_here);
+	// task_notify_destroy(&wait_here);
 }
 
 static void static_func1(void)
@@ -882,17 +882,17 @@ static int listener_rspmsg(char request, struct msgbuf *buf, size_t buf_len)
 
 static void launch_listener_once(void)
 {
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
 	ulp_debug("LAUNCH: %s %s\n", role_string[ROLE_LISTENER], listener_request);
 
-	task_wait_init(&waitqueue, msgq_file);
+	task_notify_init(&notify, msgq_file);
 
 	while (listener_nloop--) {
-		task_wait_response(&waitqueue, listener_rspmsg);
+		task_notify_response(&notify, listener_rspmsg);
 	}
 
-	// task_wait_destroy(&waitqueue);
+	// task_notify_destroy(&notify);
 }
 
 static void launch_listener(void)
@@ -1052,9 +1052,9 @@ TEST(ulpatch_test, wait, 0)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1063,7 +1063,7 @@ TEST(ulpatch_test, wait, 0)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL,
 		};
 		ulp_debug("PARENT: fork one.\n");
@@ -1075,13 +1075,13 @@ TEST(ulpatch_test, wait, 0)
 
 	/* do something */
 	ulp_debug("PARENT: msgsnd to child.\n");
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 	ulp_debug("PARENT: send done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1092,9 +1092,9 @@ TEST(ulpatch_test, trigger, 0)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1103,7 +1103,7 @@ TEST(ulpatch_test, trigger, 0)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "trigger",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL,
 		};
 		ulp_debug("PARENT: fork one.\n");
@@ -1116,13 +1116,13 @@ TEST(ulpatch_test, trigger, 0)
 
 	/* do something */
 	ulp_debug("PARENT: waiting.\n");
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 	ulp_debug("PARENT: get msg.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1133,9 +1133,9 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1144,7 +1144,7 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "wait,sleeper,wait,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL,
 		};
 		ulp_debug("PARENT: fork one.\n");
@@ -1157,15 +1157,15 @@ TEST(ulpatch_test, wait_wait_wait, 0)
 
 	/* do something */
 	ulp_debug("PARENT: msgsnd to child.\n");
-	task_wait_trigger(&waitqueue);
-	task_wait_trigger(&waitqueue);
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
+	task_notify_trigger(&notify);
+	task_notify_trigger(&notify);
 	ulp_debug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1176,9 +1176,9 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1187,7 +1187,7 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "trigger,sleeper,trigger,sleeper,trigger",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL,
 		};
 		ulp_debug("PARENT: fork one.\n");
@@ -1200,16 +1200,16 @@ TEST(ulpatch_test, trigger_trigger_trigger, 0)
 
 	/* do something */
 	ulp_debug("PARENT: wait child.\n");
-	task_wait_wait(&waitqueue);
-	task_wait_wait(&waitqueue);
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
+	task_notify_wait(&notify);
+	task_notify_wait(&notify);
 
 	ulp_debug("PARENT: get msgs from child.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1220,9 +1220,9 @@ TEST(ulpatch_test, wait_trigger, 0)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1231,7 +1231,7 @@ TEST(ulpatch_test, wait_trigger, 0)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "wait,trigger,wait,trigger",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL,
 		};
 		ulp_debug("PARENT: fork one.\n");
@@ -1244,17 +1244,17 @@ TEST(ulpatch_test, wait_trigger, 0)
 
 	/* do something */
 	ulp_debug("PARENT: do some thing.\n");
-	task_wait_trigger(&waitqueue);
-	task_wait_wait(&waitqueue);
-	task_wait_trigger(&waitqueue);
-	task_wait_wait(&waitqueue);
+	task_notify_trigger(&notify);
+	task_notify_wait(&notify);
+	task_notify_trigger(&notify);
+	task_notify_wait(&notify);
 
 	ulp_debug("PARENT: done.\n");
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1265,9 +1265,9 @@ static int test_listener_symbol(char request, char *sym)
 	int status = 0;
 	pid_t pid;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1277,7 +1277,7 @@ static int test_listener_symbol(char request, char *sym)
 		char *_argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "listener",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			"--listener-request", sym,
 			"--log-level", lv,
 			NULL,
@@ -1292,7 +1292,7 @@ static int test_listener_symbol(char request, char *sym)
 	char buffer[BUFFER_SIZE];
 	struct msgbuf *rx_buf = (void *)buffer;
 
-	task_wait_request(&waitqueue, REQUEST_SYM_ADDR, rx_buf, BUFFER_SIZE);
+	task_notify_request(&notify, REQUEST_SYM_ADDR, rx_buf, BUFFER_SIZE);
 
 	unsigned long addr = *(unsigned long *)&rx_buf->mtext[1];
 
@@ -1302,7 +1302,7 @@ static int test_listener_symbol(char request, char *sym)
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -1322,9 +1322,9 @@ TEST(ulpatch_test, listener_epoll, 0)
 	pid_t pid;
 	int fd = -1, i, rslt;
 
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid = fork();
 	if (pid == 0) {
@@ -1368,7 +1368,7 @@ TEST(ulpatch_test, listener_epoll, 0)
 	if (status != 0)
 		ret = -EINVAL;
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }

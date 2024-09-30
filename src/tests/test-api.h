@@ -173,18 +173,18 @@ extern void mcount(void);
 extern void _mcount(void);
 
 /* wait */
-struct task_wait {
+struct task_notify {
 	int msqid;
-	char tmpfile[64];
+	char tmpfile[PATH_MAX];
 };
 
-int task_wait_init(struct task_wait *task_wait, char *tmpfile);
-int task_wait_destroy(struct task_wait *task_wait);
-int task_wait_wait(struct task_wait *task_wait);
-int task_wait_trigger(struct task_wait *task_wait);
-int task_wait_request(struct task_wait *task_wait, char request,
+int task_notify_init(struct task_notify *task_notify, char *tmpfile);
+int task_notify_destroy(struct task_notify *task_notify);
+int task_notify_wait(struct task_notify *task_notify);
+int task_notify_trigger(struct task_notify *task_notify);
+int task_notify_request(struct task_notify *task_notify, char request,
 		      struct msgbuf *rx_buf, size_t rx_buf_size);
-int task_wait_response(struct task_wait *task_wait,
+int task_notify_response(struct task_notify *task_notify,
 		       int (*makemsg)(char request, struct msgbuf *buf,
 				      size_t buf_len));
 

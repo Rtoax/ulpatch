@@ -83,16 +83,16 @@ TEST(Task, attach_detach, 0)
 {
 	int ret = -1;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -102,19 +102,19 @@ TEST(Task, attach_detach, 0)
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	ret = task_attach(pid);
 	ret = task_detach(pid);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 
 	waitpid(pid, &status, __WALL);
 	if (status != 0) {
 		ret = -EINVAL;
 	}
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -182,20 +182,20 @@ TEST(Task, mmap_malloc, 0)
 {
 	int ret = -1;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 	char data[] = "ABCDEFG";
 	char buf[64] = "XXXXXX";
 	int n;
 	unsigned long addr;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -205,7 +205,7 @@ TEST(Task, mmap_malloc, 0)
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
@@ -226,13 +226,13 @@ TEST(Task, mmap_malloc, 0)
 	task_free(task, addr, 64);
 
 	ret = task_detach(pid);
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 	close_task(task);
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -241,19 +241,19 @@ TEST(Task, fstat, 0)
 {
 	int ret = 0;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 	int remote_fd, local_fd;
 	struct stat stat = {};
 	struct stat statbuf = {};
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -263,7 +263,7 @@ TEST(Task, fstat, 0)
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 	char *filename = "/usr/bin/ls";
@@ -294,14 +294,14 @@ TEST(Task, fstat, 0)
 	task_close(task, remote_fd);
 	task_detach(pid);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 	waitpid(pid, &status, __WALL);
 	if (status != 0) {
 		ret = -EINVAL;
 	}
 	close_task(task);
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	ulp_debug("ret = %d\n", ret);
 
@@ -351,16 +351,16 @@ static int task_mmap_file(int prot)
 {
 	int ret = -1;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -370,7 +370,7 @@ static int task_mmap_file(int prot)
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
@@ -381,14 +381,14 @@ static int task_mmap_file(int prot)
 
 	task_detach(pid);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 	waitpid(pid, &status, __WALL);
 	if (status != 0) {
 		ret = -EINVAL;
 	}
 	close_task(task);
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }
@@ -407,21 +407,21 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 {
 	int ret = -1;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 	char data[] = "ABCDEFG";
 	char buf[64] = "XXXXXX";
 	int n;
 	unsigned long addr;
 
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -431,7 +431,7 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
@@ -455,13 +455,13 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 
 	ret = task_detach(pid);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 	waitpid(pid, &status, __WALL);
 	if (status != 0)
 		ret = -EINVAL;
 	close_task(task);
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 
 	return ret;
 }

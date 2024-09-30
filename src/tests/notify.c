@@ -37,28 +37,28 @@ static int create_msqid(const char *file)
 }
 
 /* key: ftok(2) open/create a tmp file */
-int task_wait_init(struct task_wait *task_wait, char *tmpfile)
+int task_notify_init(struct task_notify *task_notify, char *tmpfile)
 {
 	if (tmpfile)
-		snprintf(task_wait->tmpfile, sizeof(task_wait->tmpfile), "%s",
+		snprintf(task_notify->tmpfile, sizeof(task_notify->tmpfile), "%s",
 			 tmpfile);
 	else
-		fmktempfile(task_wait->tmpfile, sizeof(task_wait->tmpfile),
+		fmktempfile(task_notify->tmpfile, sizeof(task_notify->tmpfile),
 			    NULL);
 	return 0;
 }
 
-int task_wait_destroy(struct task_wait *task_wait)
+int task_notify_destroy(struct task_notify *task_notify)
 {
-	msgctl(task_wait->msqid, IPC_RMID, NULL);
-	unlink(task_wait->tmpfile);
+	msgctl(task_notify->msqid, IPC_RMID, NULL);
+	unlink(task_notify->tmpfile);
 	return 0;
 }
 
-int task_wait_wait(struct task_wait *task_wait)
+int task_notify_wait(struct task_notify *task_notify)
 {
 	int ret;
-	int msqid = create_msqid(task_wait->tmpfile);
+	int msqid = create_msqid(task_notify->tmpfile);
 
 	struct msgbuf msg;
 
@@ -80,10 +80,10 @@ recv:
 	return 0;
 }
 
-int task_wait_trigger(struct task_wait *task_wait)
+int task_notify_trigger(struct task_notify *task_notify)
 {
 	int ret = 0;
-	int msqid = create_msqid(task_wait->tmpfile);
+	int msqid = create_msqid(task_notify->tmpfile);
 
 	struct msgbuf msg = {
 		.mtype = MSG_TYPE_WAIT_TRIGGER,
@@ -97,7 +97,7 @@ int task_wait_trigger(struct task_wait *task_wait)
 		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
 			ret, msqid, strerror(errno));
 	}
-	/* SAME as usleep() in task_wait_wait() */
+	/* SAME as usleep() in task_notify_wait() */
 	usleep(10000);
 
 	return 0;
@@ -108,11 +108,11 @@ int task_wait_trigger(struct task_wait *task_wait)
 #define ulp_debug(...)
 #endif
 
-int task_wait_request(struct task_wait *task_wait, char request,
+int task_notify_request(struct task_notify *task_notify, char request,
 		      struct msgbuf *rx_buf, size_t rx_buf_size)
 {
 	int ret;
-	int msqid = create_msqid(task_wait->tmpfile);
+	int msqid = create_msqid(task_notify->tmpfile);
 
 	struct msgbuf msg = {
 		.mtype = MSG_TYPE_REQUEST,
@@ -146,12 +146,12 @@ recv:
 /*
  * @makemsg create msgbuf, return msg text length
  */
-int task_wait_response(struct task_wait *task_wait,
+int task_notify_response(struct task_notify *task_notify,
 		       int (*makemsg)(char request, struct msgbuf *buf,
 			size_t buf_len))
 {
 	int ret, len;
-	int msqid = create_msqid(task_wait->tmpfile);
+	int msqid = create_msqid(task_notify->tmpfile);
 	char buffer[BUFFER_SIZE];
 	struct msgbuf msg, *pmsg;
 

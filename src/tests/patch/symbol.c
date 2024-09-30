@@ -19,16 +19,16 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 {
 	int ret = -1;
 	int status = 0;
-	struct task_wait waitqueue;
+	struct task_notify notify;
 
-	task_wait_init(&waitqueue, NULL);
+	task_notify_init(&notify, NULL);
 
 	pid_t pid = fork();
 	if (pid == 0) {
 		char *argv[] = {
 			(char*)ulpatch_test_path,
 			"--role", "sleeper,trigger,sleeper,wait",
-			"--msgq", waitqueue.tmpfile,
+			"--msgq", notify.tmpfile,
 			NULL
 		};
 		ret = execvp(argv[0], argv);
@@ -38,7 +38,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	}
 
 	/* Parent */
-	task_wait_wait(&waitqueue);
+	task_notify_wait(&notify);
 
 	struct task_struct *task = open_task(pid, fto_flags);
 
@@ -55,7 +55,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 
 	delete_patch(task);
 
-	task_wait_trigger(&waitqueue);
+	task_notify_trigger(&notify);
 
 	waitpid(pid, &status, __WALL);
 	if (status != 0) {
@@ -63,7 +63,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	}
 	close_task(task);
 
-	task_wait_destroy(&waitqueue);
+	task_notify_destroy(&notify);
 	return ret;
 }
 

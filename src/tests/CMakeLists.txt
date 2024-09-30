@@ -17,13 +17,13 @@ find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
 add_executable(ulpatch_test
 	listener.c
+	notify.c
 	test.c
 	ulpatch-test.c
 	# When testing ulpatches, the target functions are specified in the
 	# patch, and we need to implement these functions in the test program
 	# to test them.
 	ulpatches-target.c
-	wait.c
 	${PROJECT_SOURCE_DIR}/src/ulftrace.c
 	${PROJECT_SOURCE_DIR}/src/ulpatch.c
 	${PROJECT_SOURCE_DIR}/src/ulpinfo.c
