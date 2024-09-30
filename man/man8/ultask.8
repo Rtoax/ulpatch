@@ -45,7 +45,7 @@ If \fITYPE\fR=\fBvma\fR, dump process's VMA to file.
 If \fITYPE\fR=\fBdisasm\fR, disassemble a piece of code of target process.
 
 .SS
-\fB\-\-jmp\fR [from=\fI\,ADDR\/\fR,to=\fI\,ADDR\/\fR]
+\fB\-\-jmp\fR=[from=\fI\,ADDR\/\fR,to=\fI\,ADDR\/\fR]
 Specify a jump entry SRC and DST address. Followed by the \fBADDR\fR format string.
 You better know what you're doing.
 This action cannot be undone.
@@ -71,11 +71,12 @@ Print process's status, see also
 .IR /proc/ PID /status .
 
 .SS
-\fB\-\-map\fR [file=\fI\,FILE\/\fR]
+\fB\-\-map\fR [file=\fI\,FILE\/\fR,ro]
 Map a file into target process. The \fI\,FILE\/\fR should under target process \fBcwd\fR,
 see
 .IR /proc/ PID /cwd .
 you'd better \fB--map file=$PWD/FILE\fR.
+If you want to map a read-only file, set the \fBro\fR option.
 
 .SS
 \fB\-\-unmap\fR[=\fI\,ADDR\/\fR]

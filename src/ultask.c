@@ -68,11 +68,13 @@ char *const jmp_opts[] = {
 
 enum {
 	MAP_FILE_OPTION,
+	MAP_RO_OPTION,
 	END_MAP_OPTION,
 };
 
 char *const map_opts[] = {
 	[MAP_FILE_OPTION] = "file",
+	[MAP_RO_OPTION] = "ro",
 	[END_MAP_OPTION] = NULL,
 };
 
@@ -84,6 +86,7 @@ static bool flag_dump_vma = false;
 static bool flag_dump_addr = false;
 static bool flag_unmap_vma = false;
 static char *map_file = NULL;
+static bool map_ro = false;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -114,6 +117,7 @@ static void args_reset(void)
 	flag_dump_addr = false;
 	flag_unmap_vma = false;
 	map_file = NULL;
+	map_ro = false;
 	vma_addr = 0;
 	dump_addr = 0;
 	dump_size = 0;
@@ -171,7 +175,10 @@ static int print_help(void)
 	"  --auxv              print auxv of task\n"
 	"  --status            print status of task\n"
 	"\n"
-	"  --map [file=FILE]   mmap a exist file into target process address space\n"
+	"  --map [file=FILE,ro]\n"
+	"                      mmap a exist file into target process address space\n"
+	"                      option 'ro' means readonly\n"
+	"\n"
 	"  --unmap [=ADDR]     munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by --map.\n"
 	"                      check with --vmas and --map.\n"
@@ -307,6 +314,9 @@ static int parse_config(int argc, char *argv[])
 				case MAP_FILE_OPTION:
 					map_file = value;
 					break;
+				case MAP_RO_OPTION:
+					map_ro = true;
+					break;
 				default:
 					fprintf(stderr, "unknown option %s of --map\n", value);
 					cmd_exit(1);
@@ -432,6 +442,19 @@ static int parse_config(int argc, char *argv[])
 				real_map_file);
 			cmd_exit(ENOENT);
 		}
+
+		/**
+		 * Although mmap(2) will fail for an empty file, I still want
+		 * to determine whether it is an empty file in advance. If it
+		 * is an empty file, I can directly report an error when
+		 * testing ultask(). After all, an empty file is also an
+		 * illegal input.
+		 */
+		if (fsize(real_map_file) == 0) {
+			fprintf(stderr, "%s is empty.\n", real_map_file);
+			cmd_exit(EINVAL);
+		}
+
 		map_file = malloc(PATH_MAX);
 
 		strcpy(map_file, real_map_file);
@@ -452,12 +475,13 @@ static int mmap_a_file(void)
 	unsigned long map_v;
 	int map_fd;
 	const char *filename = map_file;
+	int prot;
 
 	struct task_struct *task = target_task;
 
 	task_attach(task->pid);
 
-	map_fd = task_open(task, (char *)filename, O_RDWR, 0644);
+	map_fd = task_open2(task, (char *)filename, O_RDWR);
 	if (map_fd <= 0) {
 		fprintf(stderr, "ERROR: remote open failed.\n");
 		return -1;
@@ -469,9 +493,12 @@ static int mmap_a_file(void)
 		goto close_ret;
 	}
 
-	map_v = task_mmap(task, 0UL, map_len,
-			  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE,
-			  map_fd, 0);
+	prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+
+	if (map_ro)
+		prot &= ~PROT_WRITE;
+
+	map_v = task_mmap(task, 0UL, map_len, prot, MAP_PRIVATE, map_fd, 0);
 	if (!map_v) {
 		fprintf(stderr, "ERROR: remote mmap failed.\n");
 		goto close_ret;

@@ -326,6 +326,11 @@ int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode)
 	return result;
 }
 
+int task_open2(struct task_struct *task, char *pathname, int flags)
+{
+	return task_open(task, pathname, flags, 0);
+}
+
 /* There are some file descriptors we should never close them. */
 static bool __should_skip_remote_fd(int remote_fd)
 {
