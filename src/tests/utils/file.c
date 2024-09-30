@@ -15,6 +15,10 @@ static const char *test_files[] = {
 	"/etc/os-release",
 };
 
+static const char *test_files_regular[] = {
+	USR_BIN_LS,
+};
+
 
 TEST(Utils_file, fexist, 0)
 {
@@ -33,8 +37,8 @@ TEST(Utils_file, fregular, 0)
 {
 	int ret = 0, i;
 
-	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
-		if (!fregular(test_files[i])) {
+	for (i = 0; i < ARRAY_SIZE(test_files_regular); i++) {
+		if (!fregular(test_files_regular[i])) {
 			ret = -1;
 		}
 	}
@@ -70,12 +74,12 @@ TEST(Utils_file, ftouch_remove, 0)
 	};
 
 	for (i = 0; i < ARRAY_SIZE(files); i++) {
-		ret |= ftouch(files[i]);
+		ret |= ftouch(files[i], 0);
 		ret |= fremove(files[i]);
 	}
 
 	for (i = 0; i < ARRAY_SIZE(files); i++) {
-		ret |= ftouch(files[i]);
+		ret |= ftouch(files[i], 0);
 		ret |= fremove_recursive(files[i]);
 	}
 

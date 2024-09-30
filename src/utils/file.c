@@ -84,7 +84,7 @@ int fremove(const char *filepath)
 	return ret;
 }
 
-int ftouch(const char *filepath)
+int ftouch(const char *filepath, size_t size)
 {
 	struct stat st;
 	int fd;
@@ -103,6 +103,14 @@ int ftouch(const char *filepath)
 	if (fd <= 0) {
 		ulp_debug("touch %s failed\n", filepath);
 		return -errno;
+	}
+
+	/* Not empty file */
+	if (size) {
+		int i;
+		unsigned char ch = 0xff;
+		for (i = 0; i < size; i++)
+			write(fd, &ch, 1);
 	}
 	close(fd);
 	return 0;
@@ -234,14 +242,11 @@ int fcopy(const char *srcpath, const char *dstpath)
 {
 	int err, ret = 0;
 
-	if (!srcpath || !dstpath) {
-		ulp_error("NULL pointer.\n");
+	if (!srcpath || !dstpath)
 		return -EINVAL;
-	}
-	if (!fexist(srcpath) || fexist(dstpath)) {
-		ulp_error("src not exist or dst exist\n");
+
+	if (!fexist(srcpath) || fexist(dstpath))
 		return -EEXIST;
-	}
 
 	err = _file_copy(srcpath, dstpath);
 	if (err <= 0) {

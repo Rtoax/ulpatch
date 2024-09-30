@@ -245,7 +245,7 @@ struct mmap_struct {
 int fsize(const char *filepath);
 bool fexist(const char *filepath);
 bool fregular(const char *filepath);
-int ftouch(const char *filepath);
+int ftouch(const char *filepath, size_t size);
 int fremove(const char *filepath);
 int fremove_recursive(const char *filepath);
 file_type ftype(const char *filepath);
