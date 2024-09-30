@@ -29,12 +29,12 @@ int fsize(const char *filepath)
 
 	fd = open(filepath, O_RDONLY);
 	if (fd <= 0) {
-		ulp_error("open %s failed %s.\n", filepath, strerror(errno));
+		ulp_error("open %s failed %m.\n", filepath);
 		return -1;
 	}
 	ret = fstat(fd, &statbuf);
 	if (ret != 0) {
-		ulp_error("fstat %s failed %s.\n", filepath, strerror(errno));
+		ulp_error("fstat %s failed %m.\n", filepath);
 		return -1;
 	}
 	close(fd);
@@ -267,7 +267,7 @@ char *fmktempfile(char *buf, int buf_len, char *seed)
 
 	fd = mkstemp(buf);
 	if (fd <= 0) {
-		fprintf(stderr, "mkstemp: %s\n", strerror(errno));
+		ulp_error("mkstemp: %m\n");
 		return NULL;
 	}
 	close(fd);
@@ -324,14 +324,14 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 
 	mem->fd = open(filepath, o_flags, 0644);
 	if (mem->fd <= 0) {
-		ulp_error("open %s failed, %s\n", filepath, strerror(errno));
+		ulp_error("open %s failed, %m\n", filepath);
 		goto free_mem;
 	}
 
 	if (truncate_size) {
 		ret = ftruncate(mem->fd, truncate_size);
 		if (ret != 0) {
-			fprintf(stderr, "ftruncate: %s\n", strerror(errno));
+			ulp_error("ftruncate: %m\n");
 			return NULL;
 		}
 	}
@@ -339,7 +339,7 @@ static struct mmap_struct *_mmap_file(const char *filepath, int o_flags,
 	mem->size = truncate_size ?: fsize(filepath);
 	mem->mem = mmap(NULL, mem->size, prot, m_flags, mem->fd, 0);
 	if (mem->mem == MAP_FAILED) {
-		ulp_error("mmap %s failed, %s\n", filepath, strerror(errno));
+		ulp_error("mmap %s failed, %m\n", filepath);
 		goto free_mem;
 	}
 

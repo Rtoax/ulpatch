@@ -184,7 +184,7 @@ int ulftrace(int argc, char *argv[])
 
 	target_task = open_task(target_pid, FTO_ULFTRACE);
 	if (!target_task) {
-		fprintf(stderr, "open %d failed. %s\n", target_pid, strerror(errno));
+		fprintf(stderr, "open %d failed. %m\n", target_pid);
 		return 1;
 	}
 

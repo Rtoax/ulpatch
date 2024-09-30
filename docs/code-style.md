@@ -26,3 +26,8 @@ As you can see from manual of `dos2unix(1)`
 
 You may often see the special character `^M` under Unix like system if code is **DOS or Mac format**.
 
+
+## Programming Standards
+
+- Never use `%s`+`strerror(errno)` display string describing error number in log, use `%m` instead.
+

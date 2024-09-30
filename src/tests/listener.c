@@ -42,20 +42,17 @@ int init_listener(void)
 	epollfd = epoll_create(1);
 	assert(epollfd != -1 && "epoll_create failed.\n");
 
-	/* Create unix domain socket */
 	listenfd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (listenfd < 0) {
 		ret = -errno;
-		ulp_error("create listening socket error, %s\n", strerror(errno));
+		ulp_error("create listening socket error, %m\n");
 		return ret;
 	}
 	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, NULL, 0);
 
 	if (fexist(TEST_UNIX_PATH) && (ret = unlink(TEST_UNIX_PATH))) {
-		ulp_error("unlink(%s) failed, %s\n", TEST_UNIX_PATH, strerror(errno));
-		close(epollfd);
-		close(listenfd);
-		return -errno;
+		ulp_error("unlink(%s) failed, %m\n", TEST_UNIX_PATH);
+		goto error;
 	}
 
 	srv_addr.sun_family = AF_UNIX;
@@ -63,11 +60,8 @@ int init_listener(void)
 	ret = bind(listenfd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
 	if (ret == -1) {
 		ret = -errno;
-		ulp_error("cannot bind server socket, %s\n", strerror(errno));
-		close(epollfd);
-		close(listenfd);
-		unlink(TEST_UNIX_PATH);
-		return ret;
+		ulp_error("cannot bind server socket, %m\n");
+		goto error;
 	}
 	ret = listen(listenfd, 1);
 
@@ -76,14 +70,17 @@ int init_listener(void)
 	ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &event);
 	if (ret == -1) {
 		ret = -errno;
-		ulp_error("cannot add listendfd to epoll, %s\n", strerror(errno));
-		close(epollfd);
-		close(listenfd);
-		unlink(TEST_UNIX_PATH);
-		return ret;
+		ulp_error("cannot add listendfd to epoll, %m\n");
+		goto error;
 	}
 
 	return 0;
+
+error:
+	close(epollfd);
+	close(listenfd);
+	unlink(TEST_UNIX_PATH);
+	return ret;
 }
 
 void close_listener(void)
@@ -100,7 +97,7 @@ int listener_helper_create_test_client(void)
 
 	connect_fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (connect_fd < 0) {
-		ulp_error("create socket error: %s\n", strerror(errno));
+		ulp_error("create socket error: %m\n");
 		return -EINVAL;
 	}
 
@@ -109,7 +106,7 @@ int listener_helper_create_test_client(void)
 
 	ret = connect(connect_fd, (struct sockaddr *)&srv_addr, sizeof(srv_addr));
 	if (ret == -1) {
-		ulp_error("connect error: %s, %s\n", strerror(errno), TEST_UNIX_PATH);
+		ulp_error("connect error: %m, %s\n", TEST_UNIX_PATH);
 		close(connect_fd);
 		exit(1);
 	}
@@ -148,7 +145,7 @@ static void handle_msg_symbol(struct test_client *client, struct ctrl_msg *msg)
 
 	ret = write(client->connfd, &ack, sizeof(ack));
 	if (ret != sizeof(ack)) {
-		ulp_error("write(2): %s\n", strerror(errno));
+		ulp_error("write(2): %m\n");
 	}
 }
 
@@ -162,11 +159,11 @@ int listener_helper_close(int fd, int *rslt)
 
 	ret = write(fd, &req, sizeof(req));
 	if (ret != sizeof(req)) {
-		ulp_error("write(2): %s\n", strerror(errno));
+		ulp_error("write(2): %m\n");
 	}
 	ret = read(fd, &rsp, sizeof(rsp));
 	if (ret != sizeof(rsp)) {
-		ulp_error("read(2): %s\n", strerror(errno));
+		ulp_error("read(2): %m\n");
 	}
 
 	*rslt = rsp.body.close_response.rslt;
@@ -187,11 +184,11 @@ int listener_helper_symbol(int fd, const char *sym, unsigned long *addr)
 
 	ret = write(fd, &req, sizeof(req));
 	if (ret != sizeof(req)) {
-		ulp_error("write(2): %s\n", strerror(errno));
+		ulp_error("write(2): %m\n");
 	}
 	ret = read(fd, &rsp, sizeof(rsp));
 	if (ret != sizeof(rsp)) {
-		ulp_error("read(2): %s\n", strerror(errno));
+		ulp_error("read(2): %m\n");
 	}
 
 	*addr = rsp.body.symbol_response.addr;
@@ -210,7 +207,7 @@ static void recv_test_client_msg(struct test_client *client)
 
 	nbytes = read(client->connfd, &msg, sizeof(msg));
 	if (nbytes <= 0) {
-		ulp_error("read(2): %s\n", strerror(errno));
+		ulp_error("read(2): %m\n");
 		return;
 	}
 
@@ -234,7 +231,7 @@ static void recv_test_client_msg(struct test_client *client)
 
 		ret = write(client->connfd, &ack, sizeof(ack));
 		if (ret != sizeof(ack)) {
-			ulp_error("write(2): %s\n", strerror(errno));
+			ulp_error("write(2): %m\n");
 		}
 
 		break;
@@ -259,7 +256,7 @@ void listener_main_loop(void *arg)
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		if (nfds == -1) {
-			ulp_error("epoll_wait: %s\n", strerror(errno));
+			ulp_error("epoll_wait: %m\n");
 			continue;
 		}
 		for (i = 0; i < nfds; i++) {
@@ -283,7 +280,7 @@ void listener_main_loop(void *arg)
 				ret = epoll_ctl(epollfd, EPOLL_CTL_ADD,
 							client->connfd, &event);
 				if (ret == -1) {
-					ulp_error("cannot add fd to epoll, %s\n", strerror(errno));
+					ulp_error("cannot add fd to epoll, %m\n");
 					free(client);
 					continue;
 				}

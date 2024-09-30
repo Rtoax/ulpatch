@@ -97,8 +97,7 @@ int wait_for_stop(struct task_struct *task)
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
 			print_vma(stderr, true, task->libc_vma, false);
-			ulp_error("ptrace(PTRACE_CONT, %d, ...) %s\n",
-				pid, strerror(ESRCH));
+			ulp_error("ptrace(PTRACE_CONT, %d, ...) %m\n", pid);
 			return -1;
 		}
 
@@ -157,8 +156,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
-			task->pid, strerror(errno));
+		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %m\n",
+			task->pid);
 		if (is_verbose())
 			do_backtrace(stdout);
 		return -errno;
@@ -183,8 +182,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
-			task->pid, strerror(errno));
+		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %m\n",
+			task->pid);
 		ret = -errno;
 		goto poke_back;
 	}
@@ -204,8 +203,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %s\n",
-			task->pid, strerror(errno));
+		ulp_error("ptrace(PTRACE_GETREGS, %d, ...) failed, %m\n",
+			task->pid);
 		ret = -errno;
 		goto poke_back;
 	}
@@ -219,8 +218,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 # error "Unsupport architecture"
 #endif
 	if (ret == -1) {
-		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %s\n",
-			task->pid, strerror(errno));
+		ulp_error("ptrace(PTRACE_SETREGS, %d, ...) failed, %m\n",
+			task->pid);
 		ret = -errno;
 		goto poke_back;
 	}

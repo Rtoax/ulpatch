@@ -94,8 +94,7 @@ int task_notify_trigger(struct task_notify *task_notify)
 
 	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
 	if (ret < 0) {
-		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
-			ret, msqid, strerror(errno));
+		ulp_error("%d = msgsnd(%d) failed, %m.\n", ret, msqid);
 	}
 	/* SAME as usleep() in task_notify_wait() */
 	usleep(10000);
@@ -122,8 +121,7 @@ int task_notify_request(struct task_notify *task_notify, char request,
 
 	ret = msgsnd(msqid, &msg, sizeof(msg.mtext), 0);
 	if (ret < 0) {
-		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
-			ret, msqid, strerror(errno));
+		ulp_error("%d = msgsnd(%d) failed, %m.\n", ret, msqid);
 	}
 
 	ulp_debug("TX request: %d\n", request);
@@ -176,8 +174,7 @@ recv:
 
 	ret = msgsnd(msqid, pmsg, len, 0);
 	if (ret < 0) {
-		fprintf(stderr, "%d = msgsnd(%d) failed, %s.\n",
-			ret, msqid, strerror(errno));
+		ulp_error("%d = msgsnd(%d) failed, %m.\n", ret, msqid);
 	}
 	ulp_debug("TX response: %d\n", msg.mtext[0]);
 

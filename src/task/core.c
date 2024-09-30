@@ -564,7 +564,7 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 	if (ofile) {
 		fd = open(ofile, O_CREAT | O_RDWR, 0664);
 		if (fd <= 0) {
-			ulp_error("open %s: %s\n", ofile, strerror(errno));
+			ulp_error("open %s: %m\n", ofile);
 			return -1;
 		}
 	}
@@ -581,7 +581,7 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 	/* write to file or stdout */
 	nbytes = write(fd, mem, size);
 	if (nbytes != size) {
-		ulp_error("write failed, %s.\n", strerror(errno));
+		ulp_error("write failed, %m.\n");
 		free(mem);
 		return -1;
 	}
@@ -671,7 +671,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
 	ret = readlink(path, buf, bufsz);
 	if (ret < 0) {
-		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %m\n", path);
 		return NULL;
 	}
 	return buf;
@@ -686,7 +686,7 @@ char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
 	snprintf(path, sizeof(path), "/proc/%d/cwd", pid);
 	ret = readlink(path, buf, bufsz);
 	if (ret < 0) {
-		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %m\n", path);
 		return NULL;
 	}
 	return buf;
@@ -700,7 +700,7 @@ static int __get_comm(struct task_struct *task)
 
 	ret = snprintf(path, sizeof(path), "/proc/%d/comm", task->pid);
 	if (ret < 0) {
-		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %m\n", path);
 		return -errno;
 	}
 
@@ -725,7 +725,7 @@ static int __get_exe(struct task_struct *task)
 	snprintf(path, sizeof(path), "/proc/%d/exe", task->pid);
 	ret = readlink(path, realpath, sizeof(realpath));
 	if (ret < 0) {
-		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
+		ulp_error("readlink %s failed, %m\n", path);
 		return -errno;
 	}
 	realpath[ret] = '\0';
@@ -750,7 +750,7 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
 	fd = open(buf, O_RDONLY);
 	if (fd == -1) {
-		ulp_error("Open %s failed, %s\n", buf, strerror(errno));
+		ulp_error("Open %s failed, %m\n", buf);
 		ret = -errno;
 		goto close_exit;
 	}
@@ -846,7 +846,7 @@ int load_task_status(pid_t pid, struct task_status *status)
 	fd = open(buf, O_RDONLY);
 	fp = fdopen(fd, "r");
 	if (fd == -1 || !fd) {
-		ulp_error("Open %s failed, %s\n", buf, strerror(errno));
+		ulp_error("Open %s failed, %m\n", buf);
 		ret = -errno;
 		goto close_exit;
 	}
@@ -1132,8 +1132,8 @@ static void __clean_task_proc(struct task_struct *task)
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM,
 		 task->pid);
 	if (unlink(buffer) != 0)
-		ulp_error("unlink(%s) for %d:%s failed, %s.\n",
-			buffer, task->pid, task->exe, strerror(errno));
+		ulp_error("unlink(%s) for %d:%s failed, %m.\n",
+			buffer, task->pid, task->exe);
 
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_MAP_FILES */
 	snprintf(buffer, PATH_MAX - 1,
@@ -1143,14 +1143,14 @@ static void __clean_task_proc(struct task_struct *task)
 	 * and rmdir can't remove the directory has file in it.
 	 */
 	if (rmdir(buffer) != 0)
-		ulp_error("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
-			task->exe, strerror(errno));
+		ulp_error("rmdir(%s) for %d:%s failed, %m.\n", buffer,
+			task->pid, task->exe);
 
 	/* ULP_PROC_ROOT_DIR/PID */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
 	if (rmdir(buffer) != 0)
-		ulp_error("rmdir(%s) for %d:%s failed, %s.\n", buffer, task->pid,
-			task->exe, strerror(errno));
+		ulp_error("rmdir(%s) for %d:%s failed, %m.\n", buffer,
+			task->pid, task->exe);
 }
 
 static void __check_and_free_task_proc(struct task_struct *task)
@@ -1229,7 +1229,7 @@ int task_attach(pid_t pid)
 
 	ret = ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 	if (ret != 0) {
-		ulp_error("Attach %d failed. %s\n", pid, strerror(errno));
+		ulp_error("Attach %d failed. %m\n", pid);
 		return -errno;
 	}
 	do {
@@ -1268,7 +1268,7 @@ int task_detach(pid_t pid)
 	long rv;
 	rv = ptrace(PTRACE_DETACH, pid, NULL, NULL);
 	if (rv != 0) {
-		ulp_error("Detach %d failed. %s\n", pid, strerror(errno));
+		ulp_error("Detach %d failed. %m\n", pid);
 		return -errno;
 	}
 
