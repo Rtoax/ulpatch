@@ -7,14 +7,6 @@
 
 TEST_STUB(cmds_ulpinfo);
 
-TEST(ulpinfo, version, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ulpinfo", "--version"};
-	char *argv2[] = {"ulpinfo", "-V"};
-	return ulpinfo(argc, argv) + ulpinfo(argc, argv2);
-}
-
 TEST(ulpinfo, help, 0)
 {
 	int argc = 2;

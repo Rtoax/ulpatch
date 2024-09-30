@@ -7,14 +7,6 @@
 
 TEST_STUB(cmds_ulftrace);
 
-TEST(ulftrace, version, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ulftrace", "--version"};
-	char *argv2[] = {"ulftrace", "-V"};
-	return ulftrace(argc, argv) + ulftrace(argc, argv2);
-}
-
 TEST(ulftrace, help, 0)
 {
 	int argc = 2;

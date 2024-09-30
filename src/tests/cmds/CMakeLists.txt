@@ -8,6 +8,7 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
 add_library(ulpatch_test_cmds STATIC
+	common.c
 	ulftrace.c
 	ulpatch.c
 	ulpinfo.c

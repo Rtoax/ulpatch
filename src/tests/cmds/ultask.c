@@ -12,15 +12,6 @@
 
 TEST_STUB(cmds_ultask);
 
-
-TEST(ultask, version, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ultask", "--version"};
-	char *argv2[] = {"ultask", "-V"};
-	return ultask(argc, argv) + ultask(argc, argv2);
-}
-
 TEST(ultask, help, 0)
 {
 	int argc = 2;

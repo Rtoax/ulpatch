@@ -930,6 +930,7 @@ void never_called_stub(void)
 	CALL_TEST_STUB(arch_ftrace);
 	CALL_TEST_STUB(arch_instruments);
 	CALL_TEST_STUB(arch_mcount);
+	CALL_TEST_STUB(cmds_common);
 	CALL_TEST_STUB(cmds_ulftrace);
 	CALL_TEST_STUB(cmds_ulpatch);
 	CALL_TEST_STUB(cmds_ulpinfo);

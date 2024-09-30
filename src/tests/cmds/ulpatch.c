@@ -7,14 +7,6 @@
 
 TEST_STUB(cmds_ulpatch);
 
-TEST(ulpatch, version, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ulpatch", "--version"};
-	char *argv2[] = {"ulpatch", "-V"};
-	return ulpatch(argc, argv) + ulpatch(argc, argv2);
-}
-
 TEST(ulpatch, help, 0)
 {
 	int argc = 2;
