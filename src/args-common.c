@@ -97,6 +97,10 @@ static void print_usage_common(const char *progname)
 		fprintf(stderr, "ERROR: Unknown option or %s missing argument.\n", argv[optind - 1]);	\
 		cmd_exit(1);
 
+/**
+ * Because ulpatch(), ultask() and other functions will be called many times
+ * in unit test cases, some common global parameters should be reset.
+ */
 static void args_common_reset(void)
 {
 	reset_verbose();
@@ -104,18 +108,32 @@ static void args_common_reset(void)
 	force = false;
 }
 
+/**
+ * Because functions such as ulpatch() and ultask() will be called many times
+ * in unit test cases, the global variables in getopt() need to be reset,
+ * otherwise the getopt() parsing will fail.
+ */
 static void reset_getopt(void)
 {
 	optarg = NULL;
 	optind = opterr = optopt = 0;
 }
 
+/**
+ * As mentioned above, before parsing parameters, the global parameters need
+ * to be reset.
+ */
 #define COMMON_RESET_BEFORE_PARSE_ARGS(cmd_args_reset_fn) do {	\
 		cmd_args_reset_fn();	\
 		args_common_reset();	\
 		reset_getopt();	\
 	} while (0)
 
+/**
+ * This needs to be executed after calling getopt() to parse the parameters,
+ * because the following configuration parameters are set during getopt(),
+ * such as the log level.
+ */
 #define COMMON_IN_MAIN_AFTER_PARSE_ARGS() do {	\
 		set_log_level(log_level);	\
 	} while (0)
