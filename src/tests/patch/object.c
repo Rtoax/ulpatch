@@ -13,21 +13,11 @@
 
 TEST_STUB(patch_object);
 
-/* see: root CMakeLists.txt */
-static const struct ulpatch_object {
-	char *path;
-} ulpatch_objs[] = {
-	{ ULPATCH_OBJ_FTRACE_MCOUNT_PATH },
-	{ ULPATCH_TEST_ULP_EMPTY_PATH },
-	{ ULPATCH_TEST_ULP_PRINTF_PATH },
-};
-
-
 TEST(Patch_object, check, 0)
 {
 	int i, ret = 0;
 
-	for (i = 0; i < ARRAY_SIZE(ulpatch_objs); i++) {
+	for (i = 0; i < nr_ulpatch_objs(); i++) {
 		struct load_info info = {};
 		char *obj = ulpatch_objs[i].path;
 		char *tmpfile = "copy.obj";

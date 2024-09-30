@@ -18,6 +18,7 @@ find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 add_executable(ulpatch_test
 	listener.c
 	notify.c
+	objects.c
 	test.c
 	ulpatch-test.c
 	# When testing ulpatches, the target functions are specified in the

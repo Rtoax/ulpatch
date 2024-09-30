@@ -188,6 +188,15 @@ int task_notify_response(struct task_notify *task_notify,
 		       int (*makemsg)(char request, struct msgbuf *buf,
 				      size_t buf_len));
 
+struct ulpatch_object {
+#define ULPATCH_OBJ_TYPE_FTRACE	1
+#define ULPATCH_OBJ_TYPE_ULP	2
+	int type;
+	char *path;
+};
+extern const struct ulpatch_object ulpatch_objs[];
+int nr_ulpatch_objs(void);
+
 /**
  * Test target functions.
  */
