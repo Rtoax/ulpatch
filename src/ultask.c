@@ -83,7 +83,7 @@ static bool flag_print_vmas = false;
 static bool flag_dump_vma = false;
 static bool flag_dump_addr = false;
 static bool flag_unmap_vma = false;
-static const char *map_file = NULL;
+static char *map_file = NULL;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -399,9 +399,42 @@ static int parse_config(int argc, char *argv[])
 		cmd_exit(1);
 	}
 
-	if (map_file && !fexist(map_file)) {
-		fprintf(stderr, "%s is not exist.\n", map_file);
-		cmd_exit(1);
+	if (map_file) {
+		const char *real_map_file = NULL;
+		char cwd_file[PATH_MAX];
+
+		/* Absolute path */
+		if (map_file[0] == '/') {
+			if (!fexist(map_file)) {
+				fprintf(stderr, "%s is not exist.\n", map_file);
+				cmd_exit(EEXIST);
+			}
+			real_map_file = map_file;
+
+		/* Otherwise, file must in target process cwd. */
+		} else {
+			char buf_tcwd[PATH_MAX], *tcwd;
+
+			tcwd = get_proc_pid_cwd(target_pid, buf_tcwd,
+				sizeof(buf_tcwd));
+
+			snprintf(cwd_file, PATH_MAX, "%s/%s", tcwd, map_file);
+			if (!fexist(cwd_file)) {
+				fprintf(stderr, "%s is not exist under target cwd %s.\n",
+					map_file, tcwd);
+				cmd_exit(EEXIST);
+			}
+			real_map_file = cwd_file;
+		}
+
+		if (!fregular(real_map_file)) {
+			fprintf(stderr, "%s is not regular file.\n",
+				real_map_file);
+			cmd_exit(ENOENT);
+		}
+		map_file = malloc(PATH_MAX);
+
+		strcpy(map_file, real_map_file);
 	}
 
 	if (output_file && !force && fexist(output_file)) {
