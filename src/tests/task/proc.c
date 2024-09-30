@@ -21,10 +21,10 @@ TEST(Task_proc, get_proc_pid_exe, 0)
 	char buf[256], *exe;
 
 	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) == NULL) {
-		ulp_debug("exe: <%s>\n", exe);
+		ulp_error("get pid %d exe failed.\n", getpid());
 		ret = -1;
-	}
-	fprintf(stdout, "exe = %s\n", exe);
+	} else
+		fprintf(stdout, "exe = %s\n", exe);
 
 	return ret;
 }
