@@ -25,6 +25,10 @@ You can view unfinished development tasks in [TODO-List](./TODO.md), and you nee
 
 Macro `CONFIG_CAPSTONE` defined and set to `1` by default if found capstone, you can turn it off, see [INSTALL](./INSTALL.md).
 
+#### BUILD_PIE_EXE
+
+Macro `BUILD_PIE_EXE` determines whether the compiled ULPatch executable is a PIE program.
+
 
 ### C Macros
 
