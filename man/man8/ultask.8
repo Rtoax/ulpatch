@@ -33,13 +33,16 @@ Dump something to file, \fBaddr\fR followed by the \fIADDR\fR format string. \fB
 See also
 .IR /proc/ PID /maps .
 .sp
-The \-\-dump option has 2 sub options:
+The \-\-dump option has 3 sub options:
 .TP
 .B \-\-dump addr=ADDR,size=SIZE
 If not specify \fITYPE\fR, dump process's address memory to file.
 .TP
 .B \-\-dump vma,addr=ADDR
 If \fITYPE\fR=\fBvma\fR, dump process's VMA to file.
+.TP
+.B \-\-dump disasm,addr=ADDR,size=SIZE
+If \fITYPE\fR=\fBdisasm\fR, disassemble a piece of code of target process.
 
 .SS
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]
@@ -79,14 +82,6 @@ Unmap a vma from target process. Followed by the \fBADDR\fR format string.
 .SS
 \fB\-\-symbols\fR
 List all symbols of target process.
-
-.SS
-\fB\-\-disasm-addr\fR[=\fI\,ADDR\/\fR]
-Disassemble a piece of code in a running process. Need specify \fB--disasm-size\fR too. Followed by the \fBADDR\fR format string.
-
-.SS
-\fB\-\-disasm-size\fR[=\fI\,SIZE\/\fR]
-Specify disassemble size. Followed by the \fBSIZE\fR format string.
 
 .SS
 \fB\-o\fR, \fB\-\-output\fR

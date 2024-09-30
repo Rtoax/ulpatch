@@ -37,12 +37,11 @@ enum {
 	ARG_AUXV,
 	ARG_STATUS,
 	ARG_LIST_SYMBOLS,
-	ARG_DISASM_ADDR,
-	ARG_DISASM_SIZE,
 };
 
 enum {
 	VMA_OPTION,
+	DISASM_OPTION,
 	ADDR_OPTION,
 	SIZE_OPTION,
 	END_OPTION,
@@ -50,6 +49,7 @@ enum {
 
 char *const dump_opts[] = {
 	[VMA_OPTION] = "vma",
+	[DISASM_OPTION] = "disasm",
 	[ADDR_OPTION] = "addr",
 	[SIZE_OPTION] = "size",
 	[END_OPTION] = NULL,
@@ -112,6 +112,9 @@ static int print_help(void)
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"\n"
+	"      TYPE=disasm\n"
+	"                      disassemble a piece of code of target process.\n"
+	"\n"
 	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
 	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
 	"                      you better ensure what you are doing.\n"
@@ -127,11 +130,6 @@ static int print_help(void)
 	"                      check with --vmas and --map-file.\n"
 	"\n"
 	"  --symbols           list all symbols\n"
-	"\n"
-	"  --disasm-addr [ADDR]\n"
-	"                      disassemble a piece of code in a running process.\n"
-	"  --disasm-size [SIZE]\n"
-	"                      specify disassemble size.\n"
 	"\n"
 	"  -o, --output        specify output filename.\n"
 	"\n");
@@ -161,8 +159,6 @@ static int parse_config(int argc, char *argv[])
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
 		{ "unmap-file",     required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
-		{ "disasm-addr",    required_argument, 0, ARG_DISASM_ADDR },
-		{ "disasm-size",    required_argument, 0, ARG_DISASM_SIZE },
 		{ "output",         required_argument, 0, 'o' },
 		COMMON_OPTIONS
 		{ NULL }
@@ -194,6 +190,9 @@ static int parse_config(int argc, char *argv[])
 				case VMA_OPTION:
 					flag_dump_vma = true;
 					break;
+				case DISASM_OPTION:
+					flag_disasm = true;
+					break;
 				case ADDR_OPTION:
 					dump_addr = str2addr(value);
 					break;
@@ -207,12 +206,22 @@ static int parse_config(int argc, char *argv[])
 				}
 			}
 
-			if (flag_dump_vma) {
+			if (flag_dump_vma && flag_disasm) {
+				fprintf(stderr, "only vma or disasm.\n");
+				cmd_exit(1);
+			} else if (flag_dump_vma) {
 				if (dump_addr == 0) {
 					fprintf(stderr, "dump vma need addr=.\n");
 					cmd_exit(1);
 				}
 				vma_addr = dump_addr;
+			} else if (flag_disasm) {
+				if (dump_addr == 0 || dump_size == 0) {
+					fprintf(stderr, "disasm need addr= and size=\n");
+					cmd_exit(1);
+				}
+				disasm_addr = dump_addr;
+				disasm_size = dump_size;
 			} else {
 				if (dump_addr == 0 || dump_size == 0) {
 					fprintf(stderr, "dump memory need addr= and size=\n");
@@ -260,21 +269,6 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_STATUS:
 			flag_print_status = true;
-			break;
-		case ARG_DISASM_ADDR:
-			flag_disasm = true;
-			disasm_addr = str2addr(optarg);
-			if (disasm_addr == 0) {
-				fprintf(stderr, "Invalid --disasm-addr argument.\n");
-				cmd_exit(1);
-			}
-			break;
-		case ARG_DISASM_SIZE:
-			disasm_size = str2size(optarg);
-			if (disasm_size == 0) {
-				fprintf(stderr, "Wrong value for --disasm-size.\n");
-				cmd_exit(1);
-			}
 			break;
 		case 'o':
 			output_file = optarg;
@@ -337,16 +331,6 @@ static int parse_config(int argc, char *argv[])
 
 	if (flag_dump_addr && !output_file) {
 		fprintf(stderr, "--dump need output file(-o).\n");
-		cmd_exit(1);
-	}
-
-	if (flag_dump_addr && (!dump_addr || !dump_size)) {
-		fprintf(stderr, "--dump need --dump-size.\n");
-		cmd_exit(1);
-	}
-
-	if (flag_disasm && disasm_addr && !disasm_size) {
-		fprintf(stderr, "need --disasm-size if disassemble\n");
 		cmd_exit(1);
 	}
 
