@@ -667,7 +667,23 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	ssize_t ret = 0;
 	char path[PATH_MAX];
 
+	memset(buf, 0x0, bufsz);
 	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
+	ret = readlink(path, buf, bufsz);
+	if (ret < 0) {
+		ulp_error("readlink %s failed, %s\n", path, strerror(errno));
+		return NULL;
+	}
+	return buf;
+}
+
+char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
+{
+	ssize_t ret = 0;
+	char path[PATH_MAX];
+
+	memset(buf, 0x0, bufsz);
+	snprintf(path, sizeof(path), "/proc/%d/cwd", pid);
 	ret = readlink(path, buf, bufsz);
 	if (ret < 0) {
 		ulp_error("readlink %s failed, %s\n", path, strerror(errno));

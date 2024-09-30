@@ -370,6 +370,7 @@ int open_pid_mem_rw(pid_t pid);
 
 bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
+char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
 
 struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct *prev);
 

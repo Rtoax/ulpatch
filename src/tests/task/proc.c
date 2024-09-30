@@ -17,13 +17,30 @@ TEST_STUB(task_proc);
 
 TEST(Task_proc, get_proc_pid_exe, 0)
 {
+	int ret = 0;
 	char buf[256], *exe;
 
-	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) != NULL) {
+	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) == NULL) {
 		ulp_debug("exe: <%s>\n", exe);
-		return 0;
+		ret = -1;
 	}
-	return -1;
+	fprintf(stdout, "exe = %s\n", exe);
+
+	return ret;
+}
+
+TEST(Task_proc, get_proc_pid_cwd, 0)
+{
+	char buf[256], *cwd;
+	char buf2[256], *cwd2;
+
+	cwd = get_proc_pid_cwd(getpid(), buf, sizeof(buf));
+	cwd2 = getcwd(buf2, sizeof(buf2));
+
+	fprintf(stdout, "cwd = %s\n", cwd);
+	fprintf(stdout, "cwd2 = %s\n", cwd2);
+
+	return strcmp(cwd, cwd2);
 }
 
 TEST(Task_proc, open_pid_maps, 0)
