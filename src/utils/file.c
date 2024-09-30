@@ -108,10 +108,12 @@ int ftouch(const char *filepath, size_t size)
 
 	/* Not empty file */
 	if (size) {
-		int i;
+		int i, cnt = 0;
 		unsigned char ch = 0xff;
 		for (i = 0; i < size; i++)
-			write(fd, &ch, 1);
+			cnt += write(fd, &ch, 1);
+		if (cnt != size)
+			ulp_error("%s was truncated\n", filepath);
 	}
 	close(fd);
 	return 0;
