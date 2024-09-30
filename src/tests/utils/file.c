@@ -29,6 +29,19 @@ TEST(Utils_file, fexist, 0)
 	return ret;
 }
 
+TEST(Utils_file, fregular, 0)
+{
+	int ret = 0, i;
+
+	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
+		if (!fregular(test_files[i])) {
+			ret = -1;
+		}
+	}
+
+	return ret;
+}
+
 TEST(Utils_file, fsize, 0)
 {
 	int ret = 0, i;

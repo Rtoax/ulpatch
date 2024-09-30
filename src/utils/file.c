@@ -51,6 +51,19 @@ bool fexist(const char *filepath)
 	return access(filepath, F_OK) == 0 ? true : false;
 }
 
+/* Check file is regular file */
+bool fregular(const char *filepath)
+{
+	struct stat stat;
+
+	if (!fexist(filepath))
+		return false;
+
+	lstat(filepath, &stat);
+
+	return (stat.st_mode & S_IFMT) == S_IFREG;
+}
+
 int fremove(const char *filepath)
 {
 	int ret = 0;
