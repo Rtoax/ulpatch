@@ -140,7 +140,7 @@ TEST(Utils_file, fmktempfile, 0)
 
 	unlink(name);
 
-	/* Create /tmp/patch-xxx file */
+	/* Create patch-xxx file */
 	name = fmktempfile(buffer, PATH_MAX, "patch-XXXXXX");
 	if (!name)
 		err = -1;
