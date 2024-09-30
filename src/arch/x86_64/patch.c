@@ -137,8 +137,9 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 			break;
 
 		/**
-		 * FIXME: Newest kernel already remove {GOTTPOFF, GOTPCREL,
-		 * REX_GOTPCRELX, GOTPCRELX} cases
+		 * Newest kernel already remove {GOTTPOFF, GOTPCREL,
+		 * REX_GOTPCRELX, GOTPCRELX} cases, because kernel module ko
+		 * is not PIC, and kernel address smaller than 0xffffffff.
 		 */
 		case R_X86_64_GOTTPOFF:
 		case R_X86_64_GOTPCREL:
