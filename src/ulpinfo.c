@@ -94,6 +94,7 @@ int show_patch_info(void)
 {
 	int err;
 	struct load_info info;
+	char *tmp_ulp = "temp.ulp";
 
 	if (!patch_file) {
 		fprintf(stderr, "Must specify --patch\n");
@@ -104,7 +105,7 @@ int show_patch_info(void)
 		cmd_exit(1);
 	}
 
-	err = alloc_patch_file(patch_file, "temp.up", &info);
+	err = alloc_patch_file(patch_file, tmp_ulp, &info);
 	if (err) {
 		ulp_error("Parse %s failed.\n", patch_file);
 		return err;
@@ -112,11 +113,14 @@ int show_patch_info(void)
 
 	setup_load_info(&info);
 
+	fprintf(stdout, "\tFile: %s\n", patch_file);
 	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
 	print_ulp_info(stdout, "\t", info.ulp_info);
 	fprintf(stdout, "\tBuildID    : %s\n", info.str_build_id);
 
 	release_load_info(&info);
+
+	fremove(tmp_ulp);
 
 	return 0;
 }
