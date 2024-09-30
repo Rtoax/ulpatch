@@ -4,6 +4,8 @@
 #include <utils/cmds.h>
 
 #include <task/task.h>
+#include <utils/disasm.h>
+
 #include <tests/test-api.h>
 
 TEST_STUB(cmds_ultask);
@@ -103,6 +105,70 @@ TEST(ultask, dump, 0)
 	};
 
 	ret += ultask(argc, argv_disasm);
+
+	ret += close_task(task);
+
+	return ret;
+}
+
+static int jmp_src_func(void)
+{
+	/* Store jmp table entry */
+	char __unused buf[sizeof(struct jmp_table_entry)] = {0};
+#define JMP_SRC_RET	-1
+	return JMP_SRC_RET;
+}
+
+static int jmp_dst_func(void)
+{
+	char buf[] = {"Hello, ULPatch\n"};
+	puts(buf);
+#define JMP_DST_RET	-1
+	return JMP_DST_RET;
+}
+
+TEST(ultask, jmp, 0)
+{
+	int ret = 0, test_ret;
+	struct task_struct *task;
+	char s_pid[64], s_jmp[128];
+	int argc;
+
+	task = open_task(getpid(), FTO_NONE);
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", getpid());
+
+	memset(s_jmp, 0x0, sizeof(s_jmp));
+	sprintf(s_jmp, "from=0x%lx,to=0x%lx", (unsigned long)jmp_src_func,
+			(unsigned long)jmp_dst_func);
+
+	fprintf(stdout, "--jmp %s\n", s_jmp);
+
+	argc = 5;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--jmp", s_jmp,
+	};
+
+	test_ret = jmp_src_func();
+	if (test_ret != JMP_SRC_RET)
+		ret++;
+
+	fdisasm_arch(stdout, "jmp_src_func: ", 0, (void *)jmp_src_func,
+	      (unsigned long)(jmp_dst_func - jmp_src_func));
+	fdisasm_arch(stdout, "jmp_dst_func: ", 0, (void *)jmp_dst_func, 32);
+
+	ret += ultask(argc, argv);
+
+	fdisasm_arch(stdout, "jmp_src_func: ", 0, (void *)jmp_src_func,
+	      (unsigned long)(jmp_dst_func - jmp_src_func));
+	fdisasm_arch(stdout, "jmp_dst_func: ", 0, (void *)jmp_dst_func, 32);
+
+	test_ret = jmp_src_func();
+	if (test_ret != JMP_DST_RET)
+		ret++;
 
 	ret += close_task(task);
 
