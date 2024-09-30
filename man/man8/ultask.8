@@ -31,19 +31,13 @@ Dump process's VMA, see also
 \fB\-\-dump-vma\fR[=\fI\,ADDR\/\fR]
 Dump process's VMA to file or stdout, see also
 .IR /proc/ PID /maps .
-the string may include a \fB0x\fR prefix. Followed by the \fBADDR\fR format string.
+Followed by the \fIADDR\fR format string.
 
 .TP
-\fB\-\-dump-addr\fR[=\fI\,ADDR\/\fR]
+\fB\-\-dump-addr\fR [addr=\fI\,ADDR\/\fR,size=\fI\,SIZE\/\fR]
 Dump process's address memory to file or stdout, see also
 .IR /proc/ PID /maps .
-the string may include a \fB0x\fR prefix. Need specify \fB--dump-size\fR too. Followed by the \fBADDR\fR format string.
-
-.TP
-\fB\-\-dump-size\fR[=\fI\,SIZE\/\fR]
-Dump process's address memory to file or stdout, see also
-.IR /proc/ PID /maps .
-Followed by the \fBSIZE\fR format string.
+\fBaddr\fR followed by the \fIADDR\fR format string. \fBsize\fR followed by the \fISIZE\fR format string.
 
 .TP
 \fB\-\-jmp-from\fR[=\fI\,ADDR\/\fR]

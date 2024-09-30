@@ -31,7 +31,6 @@ enum {
 	ARG_VMAS,
 	ARG_DUMP_VMA,
 	ARG_DUMP_ADDR,
-	ARG_DUMP_SIZE,
 	ARG_FILE_MAP_TO_VMA,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
@@ -41,6 +40,18 @@ enum {
 	ARG_LIST_SYMBOLS,
 	ARG_DISASM_ADDR,
 	ARG_DISASM_SIZE,
+};
+
+enum {
+	ADDR_OPTION,
+	SIZE_OPTION,
+	END_OPTION,
+};
+
+char *const dump_opts[] = {
+	[ADDR_OPTION] = "addr",
+	[SIZE_OPTION] = "size",
+	[END_OPTION] = NULL,
 };
 
 static pid_t target_pid = -1;
@@ -94,9 +105,8 @@ static int print_help(void)
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
 	"\n"
-	"  --dump-addr [ADDR]  dump address memory to file, need --dump-size\n"
-	"\n"
-	"  --dump-size [SIZE]  dump size\n"
+	"  --dump-addr [addr=ADDR,size=SIZE]\n"
+	"                      dump address memory to file\n"
 	"\n"
 	"  --jmp-from [ADDR]   specify a jump entry SRC address\n"
 	"  --jmp-to   [ADDR]   specify a jump entry DST address\n"
@@ -143,7 +153,6 @@ static int parse_config(int argc, char *argv[])
 		{ "status",         no_argument,       0, ARG_STATUS },
 		{ "dump-vma",       required_argument, 0, ARG_DUMP_VMA },
 		{ "dump-addr",      required_argument, 0, ARG_DUMP_ADDR },
-		{ "dump-size",      required_argument, 0, ARG_DUMP_SIZE },
 		{ "jmp-from",       required_argument, 0, ARG_JMP_FROM_ADDR },
 		{ "jmp-to",         required_argument, 0, ARG_JMP_TO_ADDR },
 		{ "map-file",       required_argument, 0, ARG_FILE_MAP_TO_VMA },
@@ -161,6 +170,8 @@ static int parse_config(int argc, char *argv[])
 	while (1) {
 		int c;
 		int option_index = 0;
+		char *subopts, *value;
+
 		c = getopt_long(argc, argv, "p:o:"COMMON_GETOPT_OPTSTRING,
 				options, &option_index);
 		if (c < 0)
@@ -183,16 +194,23 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_DUMP_ADDR:
 			flag_dump_addr = true;
-			dump_addr = str2addr(optarg);
-			if (dump_addr == 0) {
-				fprintf(stderr, "Wrong address for --dump-addr.\n");
-				cmd_exit(1);
+			subopts = optarg;
+			while (*subopts != '\0') {
+				switch (getsubopt(&subopts, dump_opts, &value)) {
+				case ADDR_OPTION:
+					dump_addr = str2addr(value);
+					break;
+				case SIZE_OPTION:
+					dump_size = str2size(value);
+					break;
+				default:
+					fprintf(stderr, "Unknown --dump-addr %s\n", value);
+					cmd_exit(1);
+					break;
+				}
 			}
-			break;
-		case ARG_DUMP_SIZE:
-			dump_size = str2size(optarg);
-			if (dump_size == 0) {
-				fprintf(stderr, "Wrong value for --dump-size.\n");
+			if (dump_addr == 0 || dump_size == 0) {
+				fprintf(stderr, "Wrong format for --dump-addr.\n");
 				cmd_exit(1);
 			}
 			break;
