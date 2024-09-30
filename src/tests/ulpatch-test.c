@@ -988,7 +988,7 @@ int main(int argc, char *argv[])
 
 	parse_config(argc, argv);
 
-	COMMON_IN_MAIN();
+	COMMON_IN_MAIN_AFTER_PARSE_ARGS();
 
 	init_test_symbols();
 

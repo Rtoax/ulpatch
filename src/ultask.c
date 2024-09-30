@@ -605,7 +605,7 @@ int ultask(int argc, char *argv[])
 	if (ret)
 		return ret;
 
-	COMMON_IN_MAIN();
+	COMMON_IN_MAIN_AFTER_PARSE_ARGS();
 
 	ulpatch_init();
 

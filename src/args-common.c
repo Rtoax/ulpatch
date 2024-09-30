@@ -116,7 +116,7 @@ static void print_usage_common(const char *progname)
 		reset_getopt();	\
 	} while (0)
 
-#define COMMON_IN_MAIN() do {	\
+#define COMMON_IN_MAIN_AFTER_PARSE_ARGS() do {	\
 		set_log_level(log_level);	\
 	} while (0)
 
