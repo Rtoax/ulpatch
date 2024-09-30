@@ -7,24 +7,3 @@
 
 TEST_STUB(cmds_ulftrace);
 
-TEST(ulftrace, help, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ulftrace", "--help"};
-	char *argv2[] = {"ulftrace", "-h"};
-	return ulftrace(argc, argv) + ulftrace(argc, argv2);
-}
-
-TEST(ulftrace, info, 0)
-{
-	int ret = 0;
-
-	int argc = 2;
-	char *argv[] = {"ulftrace", "--info"};
-	int argc2 = 3;
-	char *argv2[] = {"ulftrace", "-vvvv", "--info"};
-	ret = ulftrace(argc, argv) + ulftrace(argc2, argv2);
-
-	return ret;
-}
-

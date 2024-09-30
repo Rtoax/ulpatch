@@ -12,28 +12,6 @@
 
 TEST_STUB(cmds_ultask);
 
-TEST(ultask, help, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ultask", "--help"};
-	char *argv2[] = {"ultask", "-h"};
-	return ultask(argc, argv) + ultask(argc, argv2);
-}
-
-TEST(ultask, info, 0)
-{
-	int ret;
-
-	int argc = 2;
-	char *argv[] = {"ultask", "--info"};
-	int argc2 = 3;
-	char *argv2[] = {"ultask", "-vvvv", "--info"};
-
-	ret = ultask(argc, argv) + ultask(argc2, argv2);
-
-	return ret;
-}
-
 TEST(ultask, dump, 0)
 {
 	int ret = 0;

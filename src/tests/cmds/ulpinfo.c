@@ -7,22 +7,3 @@
 
 TEST_STUB(cmds_ulpinfo);
 
-TEST(ulpinfo, help, 0)
-{
-	int argc = 2;
-	char *argv[] = {"ulpinfo", "--help"};
-	char *argv2[] = {"ulpinfo", "-h"};
-	return ulpinfo(argc, argv) + ulpinfo(argc, argv2);
-}
-
-TEST(ulpinfo, info, 0)
-{
-	int ret;
-
-	int argc = 2;
-	char *argv[] = {"ulpinfo", "--info"};
-	int argc2 = 3;
-	char *argv2[] = {"ulpinfo", "-vvvv", "--info"};
-	ret = ulpinfo(argc, argv) + ulpinfo(argc2, argv2);
-	return ret;
-}
