@@ -61,6 +61,7 @@ failed:
 
 TEST(Task, dump_task_vma_to_file, 0)
 {
+	int ret = 0;
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	unsigned long addr;
 	struct vm_area_struct *vma;
@@ -72,10 +73,17 @@ TEST(Task, dump_task_vma_to_file, 0)
 		/* Only VDSO code is tested here, there is no need to test them
 		 * all, right! Note that this test will overwrite vdso.so files
 		 * in the current directory */
-		if (!strcmp(vma->name_, "[vdso]"))
-			dump_task_vma_to_file("vdso.so", task, addr);
+		char *vdso = "vdso.so";
+
+		if (!strcmp(vma->name_, "[vdso]")) {
+			dump_task_vma_to_file(vdso, task, addr);
+			if (!fexist(vdso))
+				ret++;
+			fremove(vdso);
+		}
 	}
 
-	return close_task(task);
+	ret += close_task(task);
+	return ret;
 }
 

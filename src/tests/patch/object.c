@@ -63,6 +63,7 @@ TEST(Patch_object, check, 0)
 		}
 
 		release_load_info(&info);
+		fremove(tmpfile);
 	}
 
 	return ret;

@@ -72,6 +72,7 @@ TEST(ultask, dump, 0)
 	};
 
 	ret += ultask(argc, argv_mem);
+	fremove(s_ofile);
 
 	/**
 	 * Dump vma to file
@@ -90,6 +91,7 @@ TEST(ultask, dump, 0)
 	};
 
 	ret += ultask(argc, argv_vma);
+	fremove(s_ofile);
 
 	/**
 	 * Disasm text
