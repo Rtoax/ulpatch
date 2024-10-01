@@ -259,6 +259,19 @@ int task_munmap(struct task_struct *task, unsigned long addr, size_t size)
 	return result;
 }
 
+int task_mprotect(struct task_struct *task, unsigned long addr, size_t len,
+		  int prot)
+{
+	int ret;
+	unsigned long result;
+
+	ret = task_syscall(task, __NR_mprotect, addr, len, prot, 0, 0, 0,
+			   &result);
+	if (ret < 0)
+		return -1;
+	return result;
+}
+
 int task_msync(struct task_struct *task, unsigned long addr, size_t length,
 	       int flags)
 {

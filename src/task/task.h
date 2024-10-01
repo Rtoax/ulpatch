@@ -459,6 +459,8 @@ unsigned long task_mmap(struct task_struct *task, unsigned long addr,
 			size_t length, int prot, int flags, int fd,
 			off_t offset);
 int task_munmap(struct task_struct *task, unsigned long addr, size_t size);
+int task_mprotect(struct task_struct *task, unsigned long addr, size_t len,
+		  int prot);
 int task_msync(struct task_struct *task, unsigned long addr, size_t length,
 	       int flags);
 int task_msync_sync(struct task_struct *task, unsigned long addr, size_t length);
