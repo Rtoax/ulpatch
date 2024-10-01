@@ -93,6 +93,7 @@ static char *map_file = NULL;
 static bool map_ro = false;
 static bool map_noexec = false;
 static unsigned long map_addr = 0;
+static unsigned long unmap_addr = 0;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -126,6 +127,7 @@ static void ultask_args_reset(void)
 	map_ro = false;
 	map_noexec = false;
 	map_addr = 0;
+	unmap_addr = 0;
 	vma_addr = 0;
 	dump_addr = 0;
 	dump_size = 0;
@@ -350,7 +352,7 @@ static int parse_config(int argc, char *argv[])
 		case ARG_FILE_UNMAP_FROM_VMA:
 			flag_unmap_vma = true;
 			flag_rdonly = false;
-			vma_addr = str2addr(optarg);
+			unmap_addr = str2addr(optarg);
 			break;
 		case ARG_LIST_SYMBOLS:
 			flag_list_symbols = true;
@@ -556,7 +558,7 @@ static int munmap_an_vma(void)
 	struct task_struct *task = target_task;
 	unsigned long addr = 0;
 
-	struct vm_area_struct *vma = find_vma(task, vma_addr);
+	struct vm_area_struct *vma = find_vma(task, unmap_addr);
 	if (!vma) {
 		fprintf(stderr, "vma not exist.\n");
 		return -1;
