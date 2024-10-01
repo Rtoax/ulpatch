@@ -578,18 +578,19 @@ static int mmap_a_file(void)
 	/**
 	 * Check address first, if map_addr is invalid, just return instead of
 	 * attach task.
+	 *
+	 * NOTE: map_addr equal to 0 also is a valid value.
 	 */
-	if (!map_addr)
-		return -EINVAL;
-
-	if (find_vma(task, map_addr) ||
-	    find_vma(task, map_addr + map_len))
-	{
-		fprintf(stderr, "address 0x%lx already in use.\n",
-			map_addr);
-		return -EINVAL;
+	if (map_addr) {
+		if (find_vma(task, map_addr) ||
+		    find_vma(task, map_addr + map_len))
+		{
+			fprintf(stderr, "address 0x%lx already in use.\n",
+				map_addr);
+			return -EINVAL;
+		}
+		addr = map_addr;
 	}
-	addr = map_addr;
 
 	task_attach(task->pid);
 
