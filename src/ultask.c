@@ -30,6 +30,7 @@ enum {
 	ARG_VMAS,
 	ARG_DUMP,
 	ARG_MAP,
+	ARG_MPROTECT,
 	ARG_FILE_UNMAP_FROM_VMA,
 	ARG_THREADS,
 	ARG_FDS,
@@ -82,6 +83,26 @@ char *const map_opts[] = {
 	[END_MAP_OPTION] = NULL,
 };
 
+enum {
+	MPROT_ADDR_OPTION,
+	MPROT_LEN_OPTION,
+	MPROT_NONE_OPTION,
+	MPROT_READ_OPTION,
+	MPROT_WRITE_OPTION,
+	MPROT_EXEC_OPTION,
+	END_MPROT_OPTION,
+};
+
+char *const mprotect_opts[] = {
+	[MPROT_ADDR_OPTION] = "addr",
+	[MPROT_LEN_OPTION] = "len",
+	[MPROT_NONE_OPTION] = "none",
+	[MPROT_READ_OPTION] = "read",
+	[MPROT_WRITE_OPTION] = "write",
+	[MPROT_EXEC_OPTION] = "exec",
+	[END_MPROT_OPTION] = NULL,
+};
+
 static pid_t target_pid = -1;
 
 static bool flag_print_task = true;
@@ -94,6 +115,9 @@ static bool map_ro = false;
 static bool map_noexec = false;
 static unsigned long map_addr = 0;
 static unsigned long unmap_addr = 0;
+static unsigned long mprotect_addr = 0;
+static unsigned long mprotect_len = 0;
+static unsigned long mprotect_prot = PROT_NONE | PROT_READ | PROT_WRITE | PROT_EXEC;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -128,6 +152,9 @@ static void ultask_args_reset(void)
 	map_noexec = false;
 	map_addr = 0;
 	unmap_addr = 0;
+	mprotect_addr = 0;
+	mprotect_len = 0;
+	mprotect_prot = PROT_NONE | PROT_READ | PROT_WRITE | PROT_EXEC;
 	vma_addr = 0;
 	dump_addr = 0;
 	dump_size = 0;
@@ -195,6 +222,11 @@ static int print_help(void)
 	"                      and witch is mmapped by --map.\n"
 	"                      check with --vmas and --map.\n"
 	"\n"
+	"  --mprotect [addr=ADDR,len=SIZE,none,read,write,exec]\n"
+	"                      like mprotect(2), set protection on a region of\n"
+	"                      target task memory. none=PROT_NONE, read=PROT_READ,\n"
+	"                      write=PROT_WRITE,exec=PROT_EXEC\n"
+	"\n"
 	"  --syms\n"
 	"  --symbols           list all symbols\n"
 	"\n"
@@ -223,6 +255,7 @@ static int parse_config(int argc, char *argv[])
 		{ "dump",           required_argument, 0, ARG_DUMP },
 		{ "jmp",            required_argument, 0, ARG_JMP },
 		{ "map",            required_argument, 0, ARG_MAP },
+		{ "mprotect",       required_argument, 0, ARG_MPROTECT },
 		{ "unmap",          required_argument, 0, ARG_FILE_UNMAP_FROM_VMA },
 		{ "symbols",        no_argument,       0, ARG_LIST_SYMBOLS },
 		{ "syms",           no_argument,       0, ARG_LIST_SYMBOLS },
@@ -354,6 +387,47 @@ static int parse_config(int argc, char *argv[])
 			flag_rdonly = false;
 			unmap_addr = str2addr(optarg);
 			break;
+		case ARG_MPROTECT:
+			subopts = optarg;
+			mprotect_prot = PROT_NONE;
+			bool flag_prot_none = false;
+			while (*subopts != '\0') {
+				switch (getsubopt(&subopts, mprotect_opts,
+					&value)) {
+				case MPROT_ADDR_OPTION:
+					mprotect_addr = str2addr(value);
+					break;
+				case MPROT_LEN_OPTION:
+					mprotect_len = str2addr(value);
+					break;
+				case MPROT_NONE_OPTION:
+					flag_prot_none = true;
+					break;
+				case MPROT_READ_OPTION:
+					mprotect_prot |= PROT_READ;
+					break;
+				case MPROT_WRITE_OPTION:
+					mprotect_prot |= PROT_WRITE;
+					break;
+				case MPROT_EXEC_OPTION:
+					mprotect_prot |= PROT_EXEC;
+					break;
+				default:
+					fprintf(stderr, "unknown option %s of --mprotect\n", value);
+					cmd_exit(1);
+					break;
+				}
+			}
+			if (flag_prot_none && mprotect_prot != PROT_NONE) {
+				fprintf(stderr, "mprotect: can't set none and read|write|exec at the same time.\n");
+				cmd_exit(EINVAL);
+			}
+			flag_rdonly = false;
+			if (!mprotect_addr || !mprotect_len) {
+				fprintf(stderr, "--mprotect addr or len error\n");
+				cmd_exit(1);
+			}
+			break;
 		case ARG_LIST_SYMBOLS:
 			flag_list_symbols = true;
 			break;
@@ -400,6 +474,7 @@ static int parse_config(int argc, char *argv[])
 		!flag_dump_vma &&
 		!flag_dump_addr &&
 		!map_file &&
+		!mprotect_addr &&
 		(!jmp_addr_from || !jmp_addr_to) &&
 		!flag_unmap_vma &&
 		!flag_list_symbols &&
@@ -504,16 +579,17 @@ static int mmap_a_file(void)
 	 * Check address first, if map_addr is invalid, just return instead of
 	 * attach task.
 	 */
-	if (map_addr) {
-		if (find_vma(task, map_addr) ||
-		    find_vma(task, map_addr + map_len))
-		{
-			fprintf(stderr, "address 0x%lx already in use.\n",
-				map_addr);
-			return -EINVAL;
-		}
-		addr = map_addr;
+	if (!map_addr)
+		return -EINVAL;
+
+	if (find_vma(task, map_addr) ||
+	    find_vma(task, map_addr + map_len))
+	{
+		fprintf(stderr, "address 0x%lx already in use.\n",
+			map_addr);
+		return -EINVAL;
 	}
+	addr = map_addr;
 
 	task_attach(task->pid);
 
@@ -549,6 +625,36 @@ close_ret:
 
 	update_task_vmas_ulp(task);
 
+	return ret;
+}
+
+static int mprotect_a_region(void)
+{
+	int ret = 0;
+	struct task_struct *task = target_task;
+
+	/**
+	 * Check address first, if address is invalid, just return instead of
+	 * attach task.
+	 */
+	if (!mprotect_addr || !mprotect_len)
+		return -EINVAL;
+
+	if (!find_vma(task, mprotect_addr) ||
+	    !find_vma(task, mprotect_addr + mprotect_len))
+	{
+		fprintf(stderr, "address 0x%lx-0x%lx not exist.\n",
+			mprotect_addr, mprotect_addr + mprotect_len);
+		return -EINVAL;
+	}
+
+	task_attach(task->pid);
+
+	ret = task_mprotect(task, mprotect_addr, mprotect_len, mprotect_prot);
+	if (ret)
+		fprintf(stderr, "ERROR: remote mprotect failed.\n");
+
+	task_detach(task->pid);
 	return ret;
 }
 
@@ -650,6 +756,9 @@ int ultask(int argc, char *argv[])
 
 	if (flag_print_task)
 		print_task(stdout, target_task, is_verbose());
+
+	if (mprotect_addr)
+		mprotect_a_region();
 
 	if (map_file)
 		mmap_a_file();

@@ -240,7 +240,7 @@ TEST(ultask, misc, 0)
 	return ret;
 }
 
-TEST(ultask, map, 0)
+TEST(ultask, mmap, 0)
 {
 	int err = 0;
 	char buffer[PATH_MAX];
@@ -325,6 +325,148 @@ TEST(ultask, map, 0)
 	sprintf(s_map, "file=%s,ro,noexec,addr=0x10000", f_name);
 	fprintf(stdout, "ultask --pid %s --map %s\n", s_pid, s_map);
 	err += ultask(argc, argv);
+
+	sprintf(s_maps, "/proc/%d/maps", pid);
+	fprint_file(stdout, s_maps);
+
+	task_notify_trigger(&notify);
+
+	waitpid(pid, &status, __WALL);
+	if (status != 0) {
+		err = -EINVAL;
+	}
+
+	task_notify_destroy(&notify);
+
+done:
+	unlink(f_name);
+	return err;
+}
+
+TEST(ultask, mprotect, 0)
+{
+	int err = 0;
+	char buffer[PATH_MAX];
+	char *f_name;
+	char s_pid[64], s_map[PATH_MAX], s_mprotect[PATH_MAX], s_maps[PATH_MAX];
+	char s_tcwd[PATH_MAX], *tcwd;
+	char s_tmfile[PATH_MAX];
+	int status = 0;
+	struct task_notify notify;
+
+	task_notify_init(&notify, NULL);
+
+	pid_t pid = fork();
+	if (pid == 0) {
+		int ret = -1;
+		char *argv[] = {
+			(char*)ulpatch_test_path,
+			"--role", "sleeper,trigger,sleeper,wait",
+			"--msgq", notify.tmpfile,
+			NULL
+		};
+
+		ret = execvp(argv[0], argv);
+		if (ret == -1) {
+			exit(1);
+		}
+	}
+
+	/* Parent */
+
+	/* Create tmp file */
+	tcwd = get_proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
+	snprintf(s_tmfile, PATH_MAX, "%s/ultask-mprotect-XXXXXX", tcwd);
+	f_name = fmktempname(buffer, PATH_MAX, s_tmfile);
+	if (!f_name)
+		return -1;
+
+	unsigned long addr = 0x100000;
+	/**
+	 * FIXME: If too much pages, this test will stuck, i don't know why.
+	 */
+	unsigned long len = ulp_page_size() * 2;
+
+	/* Need two page at least */
+	if (ftouch(f_name, len))
+		return -1;
+
+	printf("fmktempfile: %s\n", f_name);
+
+	if (!fexist(f_name)) {
+		err = -EEXIST;
+		goto done;
+	}
+
+	task_notify_wait(&notify);
+
+	memset(s_pid, 0x0, sizeof(s_pid));
+	sprintf(s_pid, "%d", pid);
+
+	memset(s_map, 0x0, sizeof(s_map));
+	sprintf(s_map, "file=%s,addr=0x%lx", f_name, addr);
+
+	/* mmap a new region to test mprotect */
+	{
+		int argc = 6;
+		char *argv[] = {
+			"ultask",
+			"--pid", s_pid,
+			"--map", s_map,
+			"--verbose",
+		};
+
+		fprintf(stdout, "ultask --pid %s --map %s\n", s_pid, s_map);
+		err += ultask(argc, argv);
+	}
+
+	/* default prot is none */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x", addr, ulp_page_size());
+
+	int argc = 6;
+	char *argv[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--mprotect", s_mprotect,
+		"--verbose",
+	};
+
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
+
+/**
+ * FIXME: Should test these, see FIXME above, too much pages will cause stuck.
+ */
+#if 0
+	/* read */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	addr += ulp_page_size();
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,read", addr, ulp_page_size());
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
+
+	/* write */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	addr += ulp_page_size();
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,write", addr, ulp_page_size());
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
+
+	/* exec */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	addr += ulp_page_size();
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,exec", addr, ulp_page_size());
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
+
+	/* read,write,exec */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	addr += ulp_page_size();
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,read,write,exec", addr, ulp_page_size());
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
+#endif
 
 	sprintf(s_maps, "/proc/%d/maps", pid);
 	fprint_file(stdout, s_maps);

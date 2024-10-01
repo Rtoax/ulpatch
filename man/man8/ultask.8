@@ -1,19 +1,17 @@
 .TH ultask 8  "2022-10-01" "USER COMMANDS"
 .SH NAME
-ultask \- Dump userspace livepatch relate process information.
+ultask \- Userspace live target task check and monitor.
 
 .SH SYNOPSIS
 .B ultask
-[\fI\,OPTION\/\fR]... [\fI\,FILE\/\fR]...
+-p \fIPID\fR [\fI\,OPTION\/\fR]...
 
 .SH DESCRIPTION
 .\" Add any additional description here
 .PP
-ultask Dump process information.
+ultask is a basic command of ULPatch.
 
 If no command line arguments are specified, some task information will be printed by default, but if command line arguments are specified, it will not be printed.
-
-This program is also a basic command of ULPatch.
 
 .SH REQUIREMENTS
 elfutils-libelf
@@ -88,6 +86,12 @@ If you want to map to special address, set the \fBaddr\fR option, 0 by default.
 Unmap a vma from target process. Followed by the \fBADDR\fR format string.
 
 .SS
+\fB\-\-mprotect\fR [addr=\fI\,ADDR\/\fR,len=\fISIZE\fR,read,write,exec,none]
+Set protection on a region of target task's memory. \fBaddr\fR must be aligned to a page boundary. \fBnone\fR if default, \fBread\fR,\fBwrite\fR,\fBexec\fR could combine, and conflict with \fBnone\fR.
+see also
+.BR mprotect (2).
+
+.SS
 \fB\-\-syms\fR
 .SS
 \fB\-\-symbols\fR
@@ -156,4 +160,7 @@ Unstable - in development.
 Written by Rong Tao
 
 .SH SEE ALSO
-ulpatch(8), ulpinfo(8), ulftrace(8), ulp-config(8)
+.BR ulpatch (8),
+.BR ulpinfo (8),
+.BR ulftrace (8),
+.BR ulp-config (8)
