@@ -71,7 +71,7 @@ Print process's status, see also
 .IR /proc/ PID /status .
 
 .SS
-\fB\-\-map\fR [file=\fI\,FILE\/\fR,ro,noexec]
+\fB\-\-map\fR [file=\fI\,FILE\/\fR,ro,noexec,addr=\fIADDR\fR]
 Map a file into target process. The \fI\,FILE\/\fR should under target process \fBcwd\fR,
 see
 .IR /proc/ PID /cwd .
@@ -80,6 +80,8 @@ you'd better \fB--map file=$PWD/FILE\fR.
 If you want to map a read-only file, set the \fBro\fR option, default rw.
 
 If you want to remove PROT_EXEC, set the \fBnoexec\fR option, PROT_EXEC is set by default.
+
+If you want to map to special address, set the \fBaddr\fR option, 0 by default.
 
 .SS
 \fB\-\-unmap\fR[=\fI\,ADDR\/\fR]

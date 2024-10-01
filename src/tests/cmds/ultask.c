@@ -319,6 +319,13 @@ TEST(ultask, map, 0)
 	fprintf(stdout, "ultask --pid %s --map %s\n", s_pid, s_map);
 	err += ultask(argc, argv);
 
+	/* Test addr */
+	memset(s_map, 0x0, sizeof(s_map));
+	/* hope addr 0x10000 is not in use */
+	sprintf(s_map, "file=%s,ro,noexec,addr=0x10000", f_name);
+	fprintf(stdout, "ultask --pid %s --map %s\n", s_pid, s_map);
+	err += ultask(argc, argv);
+
 	sprintf(s_maps, "/proc/%d/maps", pid);
 	fprint_file(stdout, s_maps);
 

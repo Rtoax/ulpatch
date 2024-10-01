@@ -70,6 +70,7 @@ enum {
 	MAP_FILE_OPTION,
 	MAP_RO_OPTION,
 	MAP_NO_EXEC_OPTION,
+	MAP_ADDR_OPTION,
 	END_MAP_OPTION,
 };
 
@@ -77,6 +78,7 @@ char *const map_opts[] = {
 	[MAP_FILE_OPTION] = "file",
 	[MAP_RO_OPTION] = "ro",
 	[MAP_NO_EXEC_OPTION] = "noexec",
+	[MAP_ADDR_OPTION] = "addr",
 	[END_MAP_OPTION] = NULL,
 };
 
@@ -90,6 +92,7 @@ static bool flag_unmap_vma = false;
 static char *map_file = NULL;
 static bool map_ro = false;
 static bool map_noexec = false;
+static unsigned long map_addr = 0;
 static unsigned long vma_addr = 0;
 static unsigned long dump_addr = 0;
 static unsigned long dump_size = 0;
@@ -122,6 +125,7 @@ static void ultask_args_reset(void)
 	map_file = NULL;
 	map_ro = false;
 	map_noexec = false;
+	map_addr = 0;
 	vma_addr = 0;
 	dump_addr = 0;
 	dump_size = 0;
@@ -179,10 +183,11 @@ static int print_help(void)
 	"  --auxv              print auxv of task\n"
 	"  --status            print status of task\n"
 	"\n"
-	"  --map [file=FILE,ro,noexec]\n"
+	"  --map [file=FILE,ro,noexec,addr=ADDR]\n"
 	"                      mmap a exist file into target process address space\n"
 	"                      option 'ro' means readonly, default rw\n"
 	"                      option 'noexec' means no PROT_EXEC, default has it\n"
+	"                      option 'addr' specify mmap address\n"
 	"\n"
 	"  --unmap [=ADDR]     munmap a exist VMA, the argument need input vma address.\n"
 	"                      and witch is mmapped by --map.\n"
@@ -322,6 +327,13 @@ static int parse_config(int argc, char *argv[])
 					break;
 				case MAP_NO_EXEC_OPTION:
 					map_noexec = true;
+					break;
+				case MAP_ADDR_OPTION:
+					map_addr = str2addr(value);
+					if (map_addr == 0) {
+						fprintf(stderr, "invalid map addr.\n");
+						cmd_exit(EINVAL);
+					}
 					break;
 				default:
 					fprintf(stderr, "unknown option %s of --map\n", value);
@@ -482,8 +494,24 @@ static int mmap_a_file(void)
 	int map_fd;
 	const char *filename = map_file;
 	int prot;
+	unsigned long addr = 0UL;
 
 	struct task_struct *task = target_task;
+
+	/**
+	 * Check address first, if map_addr is invalid, just return instead of
+	 * attach task.
+	 */
+	if (map_addr) {
+		if (find_vma(task, map_addr) ||
+		    find_vma(task, map_addr + map_len))
+		{
+			fprintf(stderr, "address 0x%lx already in use.\n",
+				map_addr);
+			return -EINVAL;
+		}
+		addr = map_addr;
+	}
 
 	task_attach(task->pid);
 
@@ -507,7 +535,7 @@ static int mmap_a_file(void)
 	if (map_noexec)
 		prot &= ~PROT_EXEC;
 
-	map_v = task_mmap(task, 0UL, map_len, prot, MAP_PRIVATE, map_fd, 0);
+	map_v = task_mmap(task, addr, map_len, prot, MAP_PRIVATE, map_fd, 0);
 	if (!map_v) {
 		fprintf(stderr, "ERROR: remote mmap failed.\n");
 		goto close_ret;
