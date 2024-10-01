@@ -381,11 +381,10 @@ TEST(ultask, mprotect, 0)
 	if (!f_name)
 		return -1;
 
+	task_notify_wait(&notify);
+
 	unsigned long addr = 0x100000;
-	/**
-	 * FIXME: If too much pages, this test will stuck, i don't know why.
-	 */
-	unsigned long len = ulp_page_size() * 2;
+	unsigned long len = ulp_page_size() * 10;
 
 	/* Need two page at least */
 	if (ftouch(f_name, len))
@@ -397,8 +396,6 @@ TEST(ultask, mprotect, 0)
 		err = -EEXIST;
 		goto done;
 	}
-
-	task_notify_wait(&notify);
 
 	memset(s_pid, 0x0, sizeof(s_pid));
 	sprintf(s_pid, "%d", pid);
@@ -435,10 +432,6 @@ TEST(ultask, mprotect, 0)
 	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
 	err += ultask(argc, argv);
 
-/**
- * FIXME: Should test these, see FIXME above, too much pages will cause stuck.
- */
-#if 0
 	/* read */
 	memset(s_mprotect, 0x0, sizeof(s_mprotect));
 	addr += ulp_page_size();
@@ -466,7 +459,13 @@ TEST(ultask, mprotect, 0)
 	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,read,write,exec", addr, ulp_page_size());
 	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
 	err += ultask(argc, argv);
-#endif
+
+	/* write,exec */
+	memset(s_mprotect, 0x0, sizeof(s_mprotect));
+	addr += ulp_page_size();
+	sprintf(s_mprotect, "addr=0x%lx,len=0x%x,write,exec", addr, ulp_page_size());
+	fprintf(stdout, "ultask --pid %s --mprotect %s\n", s_pid, s_mprotect);
+	err += ultask(argc, argv);
 
 	sprintf(s_maps, "/proc/%d/maps", pid);
 	fprint_file(stdout, s_maps);
