@@ -770,13 +770,13 @@ int ultask(int argc, char *argv[])
 		print_task(stdout, target_task, is_verbose());
 
 	if (mprotect_addr)
-		mprotect_a_region();
+		ret += mprotect_a_region();
 
 	if (map_file)
-		mmap_a_file();
+		ret += mmap_a_file();
 
 	if (flag_unmap_vma)
-		munmap_an_vma();
+		ret += munmap_an_vma();
 
 	if (flag_print_auxv)
 		print_task_auxv(stdout, target_task);
