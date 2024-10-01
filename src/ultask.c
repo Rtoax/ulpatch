@@ -427,6 +427,17 @@ static int parse_config(int argc, char *argv[])
 				fprintf(stderr, "--mprotect addr or len error\n");
 				cmd_exit(1);
 			}
+			/**
+			 * mprotect(2) addr must be aligned to a page boundary.
+			 * mprotect(2) will automatically handle page alignment
+			 * of the LEN parameter, but we still check here.
+			 */
+			if ((mprotect_addr % ulp_page_size()) ||
+			    (mprotect_len % ulp_page_size())) {
+				fprintf(stderr, "mprotect must align page 0x%x\n",
+					ulp_page_size());
+				cmd_exit(1);
+			}
 			break;
 		case ARG_LIST_SYMBOLS:
 			flag_list_symbols = true;
