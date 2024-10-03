@@ -15,7 +15,7 @@
 Name:		ulpatch
 # The version number must be consistent with the CMakeLists.txt in the
 # top-level directory.
-Version:	0.5.9
+Version:	0.5.10
 Release:	0%{?dist}
 Summary:	Userspace Live Patch
 
@@ -124,6 +124,6 @@ popd
 %{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog
-* Fri Sep 20 2024 Rong Tao <rtoax@foxmail.com> - 0.5.9-0
+* Thu Oct 03 2024 Rong Tao <rtoax@foxmail.com> - 0.5.10-0
 - First release version.
 
