@@ -50,6 +50,7 @@ TODO
 ## Links
 
 - GitHub: [Application Binary Interface for the Arm® Architecture](https://github.com/ARM-software/abi-aa/releases)
+	- [aarch64 ELF64](https://github.com/ARM-software/abi-aa/blob/main/aaelf64/aaelf64.rst)
 - https://refspecs.linuxbase.org/: [Relocation](https://refspecs.linuxbase.org/elf/gabi4+/ch4.reloc.html)
 - [Relocations: fantastic symbols, but where to find them?](https://gotplt.org/posts/relocations-fantastic-symbols-but-where-to-find-them.html)
 - PDF: [ELF for the ARM® 64-bit Architecture (AArch64)](https://docslib.org/doc/4448214/elf-for-the-arm-64-bit-architecture-aarch64)
