@@ -237,3 +237,13 @@ const char *bfd_strbid(const struct bfd_build_id *bid, char *buf, int blen);
 
 int bfd_elf_destroy(void);
 
+/**
+ * Store BFD function wrapper here
+ */
+#ifdef BINUTILS_HAVE_BFD_SECTION_NAME
+# define ulp_bfd_section_name(sec)	bfd_section_name(sec)
+#elif defined(BINUTILS_HAVE_BFD_SECTION_NAME2)
+# define ulp_bfd_section_name(sec)	bfd_section_name(bfd, sec)
+#else
+# define ulp_bfd_section_name(sec)	sec->name
+#endif

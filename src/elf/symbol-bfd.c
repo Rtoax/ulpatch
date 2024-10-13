@@ -155,7 +155,7 @@ static bool asymbol_is_text(asymbol *sym)
 #else
 	flags = asect->flags;
 #endif
-	return (flags & SEC_CODE) || !strcmp(bfd_section_name(asect), ".text");
+	return (flags & SEC_CODE) || !strcmp(ulp_bfd_section_name(asect), ".text");
 }
 
 struct bfd_sym *bfd_next_text_sym(struct bfd_elf_file *file,
@@ -224,9 +224,9 @@ static bool asymbol_is_data(asymbol *sym)
 	flags = asect->flags;
 #endif
 	return (flags & SEC_DATA) ||
-		!strcmp(bfd_section_name(asect), ".data") ||
-		!strcmp(bfd_section_name(asect), ".data.rel.ro") ||
-		!strcmp(bfd_section_name(asect), ".bss");
+		!strcmp(ulp_bfd_section_name(asect), ".data") ||
+		!strcmp(ulp_bfd_section_name(asect), ".data.rel.ro") ||
+		!strcmp(ulp_bfd_section_name(asect), ".bss");
 }
 
 struct bfd_sym *bfd_next_data_sym(struct bfd_elf_file *file,

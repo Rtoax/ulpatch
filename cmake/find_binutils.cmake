@@ -10,6 +10,8 @@
 #  BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY - support bfd_elf_bfd_from_remote_memory()
 #  BINUTILS_HAVE_BFD_ASYMBOL_SECTION - support bfd_asymbol_section()
 #  BINUTILS_HAVE_BFD_SECTION_FLAGS - support bfd_section_flags()
+#  BINUTILS_HAVE_BFD_SECTION_NAME - support bfd_section_name(asect)
+#  BINUTILS_HAVE_BFD_SECTION_NAME2 - support bfd_section_name(abfd, asect)
 
 find_path(BINUTILS_INCLUDE_DIRS
 	NAMES bfd.h
@@ -44,17 +46,33 @@ int main(void) {
 	return 0;
 }" BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY)
 CHECK_C_SOURCE_COMPILES("
+#include <stddef.h>
 #include <bfd.h>
 int main(void) {
 	bfd_asymbol_section(NULL);
 	return 0;
 }" BINUTILS_HAVE_BFD_ASYMBOL_SECTION)
 CHECK_C_SOURCE_COMPILES("
+#include <stddef.h>
 #include <bfd.h>
 int main(void) {
 	flagword fw = bfd_section_flags((asection *)NULL);
 	return 0;
 }" BINUTILS_HAVE_BFD_SECTION_FLAGS)
+CHECK_C_SOURCE_COMPILES("
+#include <stddef.h>
+#include <bfd.h>
+int main(void) {
+	(void)bfd_section_name((asection *)NULL);
+	return 0;
+}" BINUTILS_HAVE_BFD_SECTION_NAME)
+CHECK_C_SOURCE_COMPILES("
+#include <stddef.h>
+#include <bfd.h>
+int main(void) {
+	(void)bfd_section_name((struct bfd *)NULL, (asection *)NULL);
+	return 0;
+}" BINUTILS_HAVE_BFD_SECTION_NAME2)
 SET(CMAKE_REQUIRED_LIBRARIES)
 
 mark_as_advanced(
@@ -64,5 +82,7 @@ mark_as_advanced(
 	BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY
 	BINUTILS_HAVE_BFD_ASYMBOL_SECTION
 	BINUTILS_HAVE_BFD_SECTION_FLAGS
+	BINUTILS_HAVE_BFD_SECTION_NAME
+	BINUTILS_HAVE_BFD_SECTION_NAME2
 )
 
