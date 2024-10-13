@@ -202,6 +202,9 @@ enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 
 	if (!strcmp(name, exe)) {
 		type = VMA_SELF;
+	/**
+	 * FIXME: What if has libc-just-test.so dynamic library?
+	 */
 	} else if (!strncmp(basename((char*)name), "libc.so", 7) ||
 		   !strncmp(basename((char*)name), "libssp", 6) ||
 		   !strncmp(basename((char*)name), "libc-", 5)) {
