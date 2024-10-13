@@ -52,7 +52,7 @@ int main(void) {
 CHECK_C_SOURCE_COMPILES("
 #include <bfd.h>
 int main(void) {
-	bfd_section_flags(NULL);
+	flagword fw = bfd_section_flags((asection *)NULL);
 	return 0;
 }" BINUTILS_HAVE_BFD_SECTION_FLAGS)
 SET(CMAKE_REQUIRED_LIBRARIES)
