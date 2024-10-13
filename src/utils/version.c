@@ -74,16 +74,21 @@ void ulpatch_info(const char *progname)
 	printf("  version: %s\n", ulpatch_version());
 	printf("  build time: %s\n", ULPATCH_COMPILE_TIME);
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-	printf("  Support:");
-#if defined(CONFIG_LIBUNWIND)
-		printf(" libunwind");
-#endif
+	printf("  Support:\n");
 #if defined(HAVE_BINUTILS_BFD_H)
-		printf(" bfd");
+		printf("       bfd yes\n");
+#else
+# error "Not found bfd on your system"
 #endif
-		printf("\n");
+#if defined(CONFIG_LIBUNWIND)
+		printf("       libunwind yes, version %s\n", libunwind_version());
+#else
+		printf("       libunwind no\n");
+#endif
 #if defined(CONFIG_CAPSTONE)
-		printf("       capstone %s\n", capstone_version());
+		printf("       capstone yes, version %s\n", capstone_version());
+#else
+		printf("       capstone no\n");
 #endif
 	printf("\n");
 	printf("ULPatch\n");

@@ -31,3 +31,14 @@ int do_backtrace(FILE *fp)
 	return 0;
 }
 
+const char *libunwind_version(void)
+{
+	static bool init = false;
+	static char buf[64];
+	if (!init) {
+		snprintf(buf, sizeof(buf), "%d.%d.%d", UNW_VERSION_MAJOR,
+			UNW_VERSION_MINOR, UNW_VERSION_EXTRA);
+		init = true;
+	}
+	return buf;
+}

@@ -34,6 +34,6 @@ static int __unused fdisasm(FILE *fp, const char *pfx, int disasm_arch,
 	errno = ENOTSUPP;
 	return -ENOTSUPP;
 }
-#define capstone_version()	"Not Support Capstone"
+# define capstone_version()	"Not Support Capstone"
 #endif
 

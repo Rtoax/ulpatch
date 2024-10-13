@@ -149,8 +149,10 @@
 
 #if defined(HAVE_LIBUNWIND_H)
 int do_backtrace(FILE *fp);
+const char *libunwind_version(void);
 #else
 # define do_backtrace(fp) ({-1;})
+# define libunwind_version()	"Not support libunwind"
 #endif
 
 
