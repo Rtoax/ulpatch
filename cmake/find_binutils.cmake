@@ -9,6 +9,7 @@
 #  BINUTILS_BFD_H - the binutils has bfd.h header
 #  BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY - support bfd_elf_bfd_from_remote_memory()
 #  BINUTILS_HAVE_BFD_ASYMBOL_SECTION - support bfd_asymbol_section()
+#  BINUTILS_HAVE_BFD_SECTION_FLAGS - support bfd_section_flags()
 
 find_path(BINUTILS_INCLUDE_DIRS
 	NAMES bfd.h
@@ -48,6 +49,12 @@ int main(void) {
 	bfd_asymbol_section(NULL);
 	return 0;
 }" BINUTILS_HAVE_BFD_ASYMBOL_SECTION)
+CHECK_C_SOURCE_COMPILES("
+#include <bfd.h>
+int main(void) {
+	bfd_section_flags(NULL);
+	return 0;
+}" BINUTILS_HAVE_BFD_SECTION_FLAGS)
 SET(CMAKE_REQUIRED_LIBRARIES)
 
 mark_as_advanced(
@@ -56,5 +63,6 @@ mark_as_advanced(
 	BINUTILS_BFD_H
 	BINUTILS_HAVE_BFD_ELF_BFD_FROM_REMOTE_MEMORY
 	BINUTILS_HAVE_BFD_ASYMBOL_SECTION
+	BINUTILS_HAVE_BFD_SECTION_FLAGS
 )
 
