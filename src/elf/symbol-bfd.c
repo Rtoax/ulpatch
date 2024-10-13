@@ -145,7 +145,11 @@ static bool asymbol_is_text(asymbol *sym)
 {
 	asection *asect;
 	flagword flags;
+#ifdef BINUTILS_HAVE_BFD_ASYMBOL_SECTION
 	asect = bfd_asymbol_section(sym);
+#else
+	asect = sym->section;
+#endif
 	flags = bfd_section_flags(asect);
 	return (flags & SEC_CODE) || !strcmp(bfd_section_name(asect), ".text");
 }
@@ -205,7 +209,11 @@ static bool asymbol_is_data(asymbol *sym)
 {
 	asection *asect;
 	flagword flags;
+#ifdef BINUTILS_HAVE_BFD_ASYMBOL_SECTION
 	asect = bfd_asymbol_section(sym);
+#else
+	asect = sym->section;
+#endif
 	flags = bfd_section_flags(asect);
 	return (flags & SEC_DATA) ||
 		!strcmp(bfd_section_name(asect), ".data") ||
