@@ -17,6 +17,7 @@ int fdisasm_arch(FILE *fp, const char *pfx, unsigned long base,
 		 unsigned char *code, size_t size);
 int fdisasm(FILE *fp, const char *pfx, int disasm_arch, unsigned long base,
 	    unsigned char *code, size_t size);
+const char *capstone_version(void);
 #else
 static int __unused fdisasm_arch(FILE *fp, const char *pfx, unsigned long base,
 				 unsigned char *code, size_t size)
@@ -33,5 +34,6 @@ static int __unused fdisasm(FILE *fp, const char *pfx, int disasm_arch,
 	errno = ENOTSUPP;
 	return -ENOTSUPP;
 }
+#define capstone_version()	"Not Support Capstone"
 #endif
 

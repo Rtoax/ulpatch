@@ -100,3 +100,14 @@ close:
 	return ret;
 }
 
+const char *capstone_version(void)
+{
+	static bool init = false;
+	static char buf[64];
+	if (!init) {
+		snprintf(buf, sizeof(buf), "%d.%d.%d", CS_VERSION_MAJOR,
+			CS_VERSION_MINOR, CS_VERSION_EXTRA);
+		init = true;
+	}
+	return buf;
+}

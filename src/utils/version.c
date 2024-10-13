@@ -10,6 +10,7 @@
 #include <elf/elf-api.h>
 
 #include <utils/ansi.h>
+#include <utils/disasm.h>
 #include <utils/util.h>
 #include <utils/compiler.h>
 
@@ -74,9 +75,6 @@ void ulpatch_info(const char *progname)
 	printf("  build time: %s\n", ULPATCH_COMPILE_TIME);
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printf("  Support:");
-#if defined(CONFIG_CAPSTONE)
-		printf(" capstone");
-#endif
 #if defined(CONFIG_LIBUNWIND)
 		printf(" libunwind");
 #endif
@@ -84,6 +82,9 @@ void ulpatch_info(const char *progname)
 		printf(" bfd");
 #endif
 		printf("\n");
+#if defined(CONFIG_CAPSTONE)
+		printf("       capstone %s\n", capstone_version());
+#endif
 	printf("\n");
 	printf("ULPatch\n");
 	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);
