@@ -19,7 +19,7 @@ In my opinion, if you want to develop and participate in the development of this
 You can view unfinished development tasks in [TODO-List](./TODO.md), and you need to obey the [Coding Style](./code-style.md) and [Contributing](./CONTRIBUTING.md) rules.
 
 
-### C Compile Macros
+### CMake Compile Macros
 
 #### CONFIG_CAPSTONE
 

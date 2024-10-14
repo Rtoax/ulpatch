@@ -13,11 +13,12 @@ https://github.com/Rtoax/ulpatch/blob/master/CONTRIBUTING.md
 **Describe the bug (Required)**
 A clear and concise description of what the bug is.
 
-- **Software Environment (Required)**:
+**Software Environment (Required)**:
 -- OS platform and distribution (e.g., Linux Ubuntu 16.04):
 -- GLibc Version (e.g., ldconfig (GNU libc) 2.38) :
 -- GCC/Compiler version (e.g., gcc (GCC) 13.2.1 20231205 (Red Hat 13.2.1-6)) :
--- You can directly use the --info parameter to view system and ULPatch related information:
+-- Or, you could use the `--info` parameter directly to display above and ULPatch information:
+   such as **ulpatch --info**
 
 **To Reproduce (Required)**
 Steps to reproduce the behavior:
