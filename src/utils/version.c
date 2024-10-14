@@ -77,7 +77,7 @@ void ulpatch_info(const char *progname)
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printf("  GNU(GLibc): %d.%d\n", __GLIBC__, __GLIBC_MINOR__);
 	printf("\n");
-	printf("Support:\n");
+	printf("Support\n");
 #if defined(HAVE_BINUTILS_BFD_H)
 	printf("  bfd yes\n");
 #else
@@ -96,6 +96,26 @@ void ulpatch_info(const char *progname)
 	printf("\n");
 	printf("ULPatch\n");
 	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);
+#ifdef BUILD_ULFTRACE
+	printf("  ulftrace yes\n");
+#else
+	printf("  ulftrace no\n");
+#endif
+#ifdef BUILD_ULTASK
+	printf("  ultask yes\n");
+#else
+	printf("  ultask no\n");
+#endif
+#ifdef BUILD_TESTING
+	printf("  testing yes\n");
+#else
+	printf("  testing no\n");
+#endif
+#ifdef BUILD_MAN
+	printf("  man yes\n");
+#else
+	printf("  man no\n");
+#endif
 	printf("\n");
 	printf("Run\n");
 	printf("  Verbose %d\n", get_verbose());
