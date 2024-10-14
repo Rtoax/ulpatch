@@ -73,6 +73,7 @@ void ulpatch_info(const char *progname)
 	printf("Build\n");
 	printf("  version: %s\n", ulpatch_version());
 	printf("  build time: %s\n", ULPATCH_COMPILE_TIME);
+	printf("  OS: %s\n", OS_PRETTY_NAME);
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printf("  GNU(GLibc): %d.%d\n", __GLIBC__, __GLIBC_MINOR__);
 	printf("  Support:\n");

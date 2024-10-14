@@ -40,6 +40,8 @@ if(NOT "${version_retcode}" STREQUAL "0")
 endif()
 
 execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+cmake_host_system_information(RESULT OS_NAME QUERY OS_NAME)
+cmake_host_system_information(RESULT OS_PRETTY_NAME QUERY DISTRIB_PRETTY_NAME)
 
 set(WARNINGS_AS_ERRORS ON CACHE BOOL "Build with -Werror")
 # If you modify, update docs/INSTALL.md
@@ -65,6 +67,7 @@ add_definitions("-DULPATCH_VERSION_MINOR=${ULPATCH_VERSION_MINOR}")
 add_definitions("-DULPATCH_VERSION_PATCH=${ULPATCH_VERSION_PATCH}")
 add_definitions("-DULPATCH_VERSION=\"${ULPATCH_VERSION}\"")
 add_definitions("-DULPATCH_COMPILE_TIME=\"${ULPATCH_COMPILE_TIME}\"")
+add_definitions("-DOS_PRETTY_NAME=\"${OS_PRETTY_NAME}\"")
 
 add_compile_options(-MD)
 add_compile_options(-Wall)
@@ -107,6 +110,9 @@ message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
+message(STATUS "OS Name: ${OS_NAME}")
+message(STATUS "OS Pretty Name: ${OS_PRETTY_NAME}")
+
 
 # This variable store utils CFLAGS's macros(-D of compiler)
 set(UTILS_CFLAGS_MACROS)
