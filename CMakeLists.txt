@@ -30,16 +30,17 @@ execute_process(
 	OUTPUT_VARIABLE ULPATCH_VERSION
 	ERROR_VARIABLE GIT_DESCRIBE_ERROR
 	OUTPUT_STRIP_TRAILING_WHITESPACE
-	RESULT_VARIABLE retcode
+	RESULT_VARIABLE version_retcode
 )
 
 # If the build is not done from a git repo, get the version information from
 # the version variables in main CMakeLists.txt
-if(NOT "${retcode}" STREQUAL "0")
-set(ULPATCH_VERSION "v${ULPATCH_VERSION_MAJOR}.${ULPATCH_VERSION_MINOR}.${ULPATCH_VERSION_PATCH}")
+if(NOT "${version_retcode}" STREQUAL "0")
+	set(ULPATCH_VERSION "v${ULPATCH_VERSION_MAJOR}.${ULPATCH_VERSION_MINOR}.${ULPATCH_VERSION_PATCH}")
 endif()
 
-EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
+
 set(WARNINGS_AS_ERRORS ON CACHE BOOL "Build with -Werror")
 # If you modify, update docs/INSTALL.md
 set(BUILD_TESTING ON CACHE BOOL "Build test suite")
