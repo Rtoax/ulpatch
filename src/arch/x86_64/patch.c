@@ -159,6 +159,8 @@ int arch_apply_relocate_add(const struct load_info *info, GElf_Shdr *sechdrs,
 
 		case R_X86_64_PC32:
 			ulp_warning("Handle R_X86_64_PC32\n");
+			FALLTHROUGH;
+
 		case R_X86_64_PLT32:
 			ulp_warning("Handle R_X86_64_PLT32\n");
 			if (*(uint32_t *)loc != 0)
