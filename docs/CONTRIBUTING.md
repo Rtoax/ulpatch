@@ -40,3 +40,10 @@ If you are proposing a feature:
 * Keep the scope as narrow as possible, to make it easier to implement.
 * Remember that this is a volunteer-driven project, and that contributions are welcome :)
 
+
+## ULPatch Politics
+
+Recently, [Several Russian developers lose kernel maintainership status](https://lwn.net/Articles/995186/), [Greg Kroah-Hartman Remove some entries due to various compliance requirements](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6e90b675cf94).
+
+I hope ULPatch will never get involved in political issues, and I love China, My Homeland.
+
