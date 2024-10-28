@@ -12,7 +12,7 @@ hide:
 On **RHEL** like linux distrobution, manage packages with [rpm](https://github.com/rpm-software-management) and [dnf/yum](https://github.com/rpm-software-management/dnf).
 
 ```bash
-# RHEL/AlmaLinux need this, Fedora don't.
+# RHEL like distributions need epel-release, Fedora don't.
 $ sudo dnf install -y epel-release
 $ sudo dnf groupinstall -y "Development Tools" "Development Libraries"
 $ sudo dnf install -y \
