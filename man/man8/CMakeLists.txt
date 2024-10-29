@@ -1,10 +1,15 @@
 find_program(GZIP gzip REQUIRED)
 set(MAN_DOCS)
-set(MAN_DOCS ${MAN_DOCS} ulpatch.8 ulpinfo.8 ultask.8 ulp-config.8)
+set(MAN_DOCS ${MAN_DOCS} ulpatch.8 ulpinfo.8 ulp-config.8)
 if (BUILD_ULFTRACE)
 	set(MAN_DOCS ${MAN_DOCS} ulftrace.8)
 endif()
+if (BUILD_ULTASK)
+	set(MAN_DOCS ${MAN_DOCS} ultask.8)
+endif()
+
 file(GLOB FILES ${MAN_DOCS})
+
 set(GZFILES "")
 foreach(FIL ${FILES})
 	get_filename_component(NAME ${FIL} NAME)
