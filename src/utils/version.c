@@ -84,12 +84,13 @@ void ulpatch_info(const char *progname)
 # error "Not found bfd on your system"
 #endif
 #if defined(CONFIG_LIBUNWIND)
-	printf("  libunwind yes (build version %s)\n", libunwind_version());
+	printf("  libunwind yes (buildtime version %s)\n", libunwind_version());
 #else
 	printf("  libunwind no\n");
 #endif
 #if defined(CONFIG_CAPSTONE)
-	printf("  capstone yes (build version %s)\n", capstone_version());
+	printf("  capstone yes (buildtime version %s, runtime version %s)\n",
+		capstone_buildtime_version(), capstone_runtime_version());
 #else
 	printf("  capstone no\n");
 #endif
