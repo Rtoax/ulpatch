@@ -41,7 +41,12 @@ endif()
 
 execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE)
 cmake_host_system_information(RESULT OS_NAME QUERY OS_NAME)
-cmake_host_system_information(RESULT OS_PRETTY_NAME QUERY DISTRIB_PRETTY_NAME)
+cmake_host_system_information(RESULT OS_RELEASE QUERY OS_RELEASE)
+if(${CMAKE_VERSION} VERSION_EQUAL 3.22 OR ${CMAKE_VERSION} VERSION_GREATER 3.22)
+	cmake_host_system_information(RESULT OS_PRETTY_NAME QUERY DISTRIB_PRETTY_NAME)
+else()
+	set(OS_PRETTY_NAME "${OS_NAME} ${OS_RELEASE}")
+endif()
 
 set(WARNINGS_AS_ERRORS ON CACHE BOOL "Build with -Werror")
 # If you modify, update docs/INSTALL.md
@@ -123,6 +128,7 @@ message(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Architecture: ${ARCHITECTURE}")
 message(STATUS "OS Name: ${OS_NAME}")
+message(STATUS "OS Release: ${OS_RELEASE}")
 message(STATUS "OS Pretty Name: ${OS_PRETTY_NAME}")
 
 
