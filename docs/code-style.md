@@ -3,6 +3,15 @@
 
 Please refer to [Linux kernel coding style](https://www.kernel.org/doc/html/latest/process/coding-style.html) for the coding style of C language. There may be some differences in specific Linux kernel versions, such as [Linux 4.19](https://www.kernel.org/doc/html/v4.10/process/coding-style.html), but overall it won't change much.
 
+You could use `indent` modify your source code:
+
+```bash
+# Output to stdout
+$ indent --linux-style -st main.c
+# Or override main.c
+$ indent --linux-style main.c
+```
+
 
 ## VIM Config
 
