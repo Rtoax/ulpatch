@@ -37,13 +37,13 @@ The `unpatch` operation is the reverse operation of `patch`, but without the rel
 
 ## ULTask
 
-It's an useful tool to modify target process, I call it **Program Modifier**. `BUILD_ULTASK` decides whether to compile `ultask`. Check manual `ultask(8)` to see more.
+It's an useful tool to modify target process, I call it **Program Modifier**. `CONFIG_BUILD_ULTASK` decides whether to compile `ultask`. Check manual `ultask(8)` to see more.
 
 TODO
 
 
 ## ULFtrace
 
-Same as [linux ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html), need gcc `-pg` compile option. `BUILD_ULFTRACE` decides whether to compile `ulftrace`. Check manual `ulftrace(8)` to see more.
+Same as [linux ftrace](https://www.kernel.org/doc/html/latest/trace/ftrace.html), need gcc `-pg` compile option. `CONFIG_BUILD_ULFTRACE` decides whether to compile `ulftrace`. Check manual `ulftrace(8)` to see more.
 
 TODO

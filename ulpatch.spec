@@ -78,7 +78,7 @@ mkdir build
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release \
 %if !%{with_ulftrace}
-	-DBUILD_ULFTRACE=OFF \
+	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
 %if !%{with_capstone}
 	-DBUILD_WITH_CAPSTONE=OFF \

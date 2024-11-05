@@ -23,13 +23,13 @@ link_libraries(${ELF} ${RT}
 )
 
 # Target: ultask
-if (BUILD_ULTASK)
+if (CONFIG_BUILD_ULTASK)
 	add_executable(ultask ultask.c)
 	target_compile_definitions(ultask PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 endif()
 
 # Target: ulftrace
-if (BUILD_ULFTRACE)
+if (CONFIG_BUILD_ULFTRACE)
 	add_executable(ulftrace ulftrace.c)
 	target_compile_definitions(ulftrace PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 endif()
@@ -54,6 +54,6 @@ add_custom_command(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
 )
 
-if(BUILD_TESTING)
+if(CONFIG_BUILD_TESTING)
 	add_subdirectory(tests)
 endif()

@@ -97,22 +97,22 @@ void ulpatch_info(const char *progname)
 	printf("\n");
 	printf("ULPatch\n");
 	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);
-#ifdef BUILD_ULFTRACE
+#ifdef CONFIG_BUILD_ULFTRACE
 	printf("  ulftrace yes\n");
 #else
 	printf("  ulftrace no\n");
 #endif
-#ifdef BUILD_ULTASK
+#ifdef CONFIG_BUILD_ULTASK
 	printf("  ultask yes\n");
 #else
 	printf("  ultask no\n");
 #endif
-#ifdef BUILD_TESTING
+#ifdef CONFIG_BUILD_TESTING
 	printf("  testing yes\n");
 #else
 	printf("  testing no\n");
 #endif
-#ifdef BUILD_MAN
+#ifdef CONFIG_BUILD_MAN
 	printf("  man yes\n");
 #else
 	printf("  man no\n");
