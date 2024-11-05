@@ -57,6 +57,7 @@ set(CONFIG_BUILD_MAN ON CACHE BOOL "Build man pages")
 set(CONFIG_BUILD_PIE_EXE OFF CACHE BOOL "Build all Executions as PIE")
 
 set(CONFIG_CAPSTONE ON CACHE BOOL "Build with capstone for disasm")
+set(CONFIG_LIBUNWIND ON CACHE BOOL "Build with libunwind for unwind")
 
 set(CMAKE_INSTALL_PREFIX /usr)
 if(NOT CMAKE_BUILD_TYPE)
@@ -185,10 +186,17 @@ else()
 endif()
 
 # Libunwind provides a C ABI to determine the call-chain of a program.
-if(LIBUNWIND_LIBUNWIND_H)
+if(CONFIG_LIBUNWIND)
 	message(STATUS "Found libunwind headers")
-	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_LIBUNWIND_H)
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_LIBUNWIND=1)
+	if(LIBUNWIND_LIBUNWIND_H)
+		message(STATUS "Found libunwind headers")
+		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_LIBUNWIND_HEADERS)
+	else()
+		message(FATAL_ERROR "Not found capstone headers")
+	endif()
+else()
+	message(STATUS "Build without libunwind support")
 endif()
 
 # Capstone Disassembler Engine

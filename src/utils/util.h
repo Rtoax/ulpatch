@@ -147,7 +147,7 @@
 #define __stringify(x...)	__stringify_1(x)
 
 
-#if defined(HAVE_LIBUNWIND_H)
+#if defined(CONFIG_LIBUNWIND) && defined(CONFIG_LIBUNWIND)
 int do_backtrace(FILE *fp);
 const char *libunwind_version(void);
 #else

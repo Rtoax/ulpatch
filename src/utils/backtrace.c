@@ -7,6 +7,9 @@
 #include <utils/log.h>
 #include <utils/util.h>
 
+#if !defined(CONFIG_LIBUNWIND)
+# error "No CONFIG_LIBUNWIND found"
+#endif
 
 int do_backtrace(FILE *fp)
 {
