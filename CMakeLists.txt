@@ -55,7 +55,8 @@ set(CONFIG_BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(CONFIG_BUILD_ULTASK ON CACHE BOOL "Build ultask")
 set(CONFIG_BUILD_MAN ON CACHE BOOL "Build man pages")
 set(CONFIG_BUILD_PIE_EXE OFF CACHE BOOL "Build all Executions as PIE")
-set(BUILD_WITH_CAPSTONE ON CACHE BOOL "Build with capstone for disasm")
+
+set(CONFIG_CAPSTONE ON CACHE BOOL "Build with capstone for disasm")
 
 set(CMAKE_INSTALL_PREFIX /usr)
 if(NOT CMAKE_BUILD_TYPE)
@@ -193,20 +194,14 @@ endif()
 # Capstone Disassembler Engine
 # Capstone is a disassembly framework with the target of becoming the ultimate
 # disasm engine for binary analysis and reversing in the security community.
-if(BUILD_WITH_CAPSTONE)
+if(CONFIG_CAPSTONE)
 	message(STATUS "Build with capstone support")
 	set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_CAPSTONE=1)
-	if(CAPSTONE_INCLUDE_DIRS)
+	if(CAPSTONE_CAPSTONE_H)
 		message(STATUS "Found capstone headers")
-		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_DEVEL)
+		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" CONFIG_CAPSTONE_HEADERS)
 	else()
 		message(FATAL_ERROR "Not found capstone headers")
-	endif()
-
-	if(CAPSTONE_CAPSTONE_H)
-		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" HAVE_CAPSTONE_CAPSTONE_H)
-	else()
-		message(FATAL_ERROR "Not found capstone/capstone.h")
 	endif()
 else()
 	message(STATUS "Build without capstone support")

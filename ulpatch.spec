@@ -81,7 +81,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
 %if !%{with_capstone}
-	-DBUILD_WITH_CAPSTONE=OFF \
+	-DCONFIG_CAPSTONE=OFF \
 %endif
 	..
 make %{?_smp_mflags}

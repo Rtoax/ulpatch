@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2024 Rong Tao */
 #include <errno.h>
-#if defined(HAVE_CAPSTONE_CAPSTONE_H)
+#if defined(CONFIG_CAPSTONE_HEADERS)
 # include <capstone/platform.h>
 # include <capstone/capstone.h>
 #endif

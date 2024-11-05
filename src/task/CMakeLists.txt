@@ -14,7 +14,7 @@ endif()
 set(disasm)
 set(CAPSTONE)
 
-if(BUILD_WITH_CAPSTONE)
+if(CONFIG_CAPSTONE)
 	message(STATUS "UTILS Support capstone")
 	if(CAPSTONE_LIBRARIES)
 		find_library(CAPSTONE capstone HINTS ${SEARCH_PATH})
