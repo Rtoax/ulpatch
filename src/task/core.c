@@ -90,7 +90,7 @@ static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 	(void)off;
 
 	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
-		((phdr->p_flags & (PF_R | PF_W | PF_X)) == __prot2flags(vma->prot));
+		((phdr->p_flags & (PF_R | PF_W | PF_X)) == vma_prot2flags(vma->prot));
 
 	ulp_debug("MatchPhdr: %lx-%lx vs %lx-%lx "PROT_FMT" ret=%d\n",
 		addr, addr + size, vma->vm_start, vma->vm_end,

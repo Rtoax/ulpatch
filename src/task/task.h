@@ -410,8 +410,8 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 void dump_task_threads(struct task_struct *task, bool detail);
 void dump_task_fds(struct task_struct *task, bool detail);
 
-int __prot2flags(unsigned int prot);
-unsigned int __perms2prot(char *perms);
+int vma_prot2flags(unsigned int prot);
+unsigned int vma_perms2prot(char *perms);
 
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 

@@ -166,7 +166,7 @@ unsigned long find_vma_span_area(struct task_struct *task, size_t size,
 	return 0;
 }
 
-unsigned int __perms2prot(char *perms)
+unsigned int vma_perms2prot(char *perms)
 {
 	unsigned int prot = PROT_NONE;
 
@@ -180,7 +180,7 @@ unsigned int __perms2prot(char *perms)
 	return prot;
 }
 
-int __prot2flags(unsigned int prot)
+int vma_prot2flags(unsigned int prot)
 {
 	unsigned int flags = 0;
 
@@ -354,7 +354,7 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		vma->vm_start = start;
 		vma->vm_end = end;
 		memcpy(vma->perms, perms, sizeof(vma->perms));
-		vma->prot = __perms2prot(perms);
+		vma->prot = vma_perms2prot(perms);
 		vma->vm_pgoff = (off >> PAGE_SHIFT);
 		vma->major = major;
 		vma->minor = minor;
