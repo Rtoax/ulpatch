@@ -7,10 +7,10 @@
 # ulpatch.spec.
 
 # Default disable ulftrace, beacuse it's is unimplemented.
-%global with_ulftrace	0
+%define with_ulftrace	0
 # By default, the capstone disassembly function is supported, which is helpful
 # for debugging.
-%global with_capstone	1
+%define with_capstone	0%{?!_without_capstone:1}
 
 Name:		ulpatch
 # The version number must be consistent with the CMakeLists.txt in the
@@ -30,7 +30,7 @@ BuildRequires:	elfutils-devel
 BuildRequires:	elfutils-libelf-devel
 BuildRequires:	glibc-devel
 BuildRequires:  libunwind-devel
-%if %{with_capstone}
+%if 0%{?with_capstone}
 BuildRequires:  capstone-devel
 %endif
 
@@ -77,10 +77,10 @@ pushd %{_builddir}/ulpatch-v%{version}
 mkdir build
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release \
-%if !%{with_ulftrace}
+%if !%{?with_ulftrace}
 	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
-%if !%{with_capstone}
+%if !%{?with_capstone}
 	-DCONFIG_CAPSTONE=OFF \
 %endif
 	..
@@ -98,12 +98,12 @@ popd
 
 %files
 %{_bindir}/ulpatch
-%if %{with_ulftrace}
+%if 0%{?with_ulftrace}
 %{_bindir}/ulftrace
 %endif
 %{_bindir}/ulpinfo
 %{_bindir}/ultask
-%if %{with_ulftrace}
+%if 0%{?with_ulftrace}
 %{_mandir}/man8/ulftrace.8.gz
 %endif
 %{_mandir}/man8/ulpatch.8.gz
