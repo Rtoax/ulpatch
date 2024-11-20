@@ -112,7 +112,8 @@ int wait_for_stop(struct task_struct *task)
 				break;
 			}
 			if (WSTOPSIG(status) == SIGSEGV) {
-				ulp_error("Child process %d segment fault.\n", pid);
+				ulp_error("Child process %d segment fault.\n",
+					  pid);
 				return -1;
 			}
 			status = WSTOPSIG(status);
@@ -143,7 +144,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	regs_iov.iov_len = sizeof(regs);
 #endif
 
-	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5, arg6);
+	SYSCALL_REGS_PREPARE(syscall_regs, nr, arg1, arg2, arg3, arg4, arg5,
+		      arg6);
 
 	errno = 0;
 
@@ -399,7 +401,8 @@ int task_fstat(struct task_struct *task, int remote_fd, struct stat *statbuf)
 	if (ret_fstat < 0)
 		ulp_error("fstat failed, ret %d, %ld\n", ret_fstat, result);
 
-	ret = memcpy_from_task(task, statbuf, remote_statbuf, sizeof(struct stat));
+	ret = memcpy_from_task(task, statbuf, remote_statbuf,
+			sizeof(struct stat));
 	if (ret == -1 || ret != sizeof(struct stat))
 		ulp_error("failed copy struct stat.\n");
 

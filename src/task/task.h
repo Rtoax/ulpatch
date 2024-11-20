@@ -372,7 +372,8 @@ bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
 char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
 
-struct vm_area_struct *next_vma(struct task_struct *task, struct vm_area_struct *prev);
+struct vm_area_struct *next_vma(struct task_struct *task,
+				struct vm_area_struct *prev);
 
 /* Get task's first vma in rbtree */
 #define first_vma(task) next_vma(task, NULL)
@@ -416,7 +417,8 @@ unsigned int vma_perms2prot(char *perms);
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 
 const char *vma_type_name(enum vma_type type);
-void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail);
+void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma,
+	       bool detail);
 void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);
 
@@ -463,8 +465,10 @@ int task_mprotect(struct task_struct *task, unsigned long addr, size_t len,
 		  int prot);
 int task_msync(struct task_struct *task, unsigned long addr, size_t length,
 	       int flags);
-int task_msync_sync(struct task_struct *task, unsigned long addr, size_t length);
-int task_msync_async(struct task_struct *task, unsigned long addr, size_t length);
+int task_msync_sync(struct task_struct *task, unsigned long addr,
+		    size_t length);
+int task_msync_async(struct task_struct *task, unsigned long addr,
+		     size_t length);
 unsigned long task_malloc(struct task_struct *task, size_t length);
 int task_free(struct task_struct *task, unsigned long addr, size_t length);
 int task_open(struct task_struct *task, char *pathname, int flags, mode_t mode);

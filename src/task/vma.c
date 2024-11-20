@@ -231,7 +231,8 @@ enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 	 * /tmp/ulpatch/20298/map_files/ulp-GLpgJM
 	 *              ^^^^^           ^^^^
 	 */
-	} else if (strstr(name, PATCH_VMA_TEMP_PREFIX) && strstr(name, s_pid)) {
+	} else if (strstr(name, PATCH_VMA_TEMP_PREFIX) &&
+		   strstr(name, s_pid)) {
 		type = VMA_ULPATCH;
 	} else {
 		type = VMA_NONE;
@@ -276,7 +277,9 @@ bool elf_vma_is_interp_exception(struct vm_area_struct *vma)
 	    !strncmp(name + strlen(name) - 3, ".so", 3))
 		return true;
 
-	/* some times, libc-xxx.so(like libssp.so.0) is linked to libssp.so.xx  */
+	/**
+	 * some times, libc-xxx.so(like libssp.so.0) is linked to libssp.so.xx
+	 */
 	if (!strncmp(name, "libssp", 6)) {
 		return true;
 	}
@@ -384,7 +387,8 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 	return 0;
 }
 
-void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma, bool detail)
+void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma,
+	       bool detail)
 {
 	int i;
 

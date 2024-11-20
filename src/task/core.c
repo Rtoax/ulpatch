@@ -90,7 +90,8 @@ static int match_vma_phdr(struct vm_area_struct *vma, GElf_Phdr *phdr,
 	(void)off;
 
 	ret = (addr == vma->vm_start) && (addr + size == vma->vm_end) &&
-		((phdr->p_flags & (PF_R | PF_W | PF_X)) == vma_prot2flags(vma->prot));
+		((phdr->p_flags & (PF_R | PF_W | PF_X)) ==
+			vma_prot2flags(vma->prot));
 
 	ulp_debug("MatchPhdr: %lx-%lx vs %lx-%lx "PROT_FMT" ret=%d\n",
 		addr, addr + size, vma->vm_start, vma->vm_end,
@@ -180,13 +181,14 @@ int vma_load_ulp(struct vm_area_struct *vma)
 
 	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret == -1 || ret < sizeof(ehdr)) {
-		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+		ulp_error("Failed read from %lx:%s\n", vma->vm_start,
+			  vma->name_);
 		return -EAGAIN;
 	}
 
 	if (!ehdr_magic_ok(&ehdr)) {
-		ulp_error("VMA %s(%lx) is considered as ULPATCH, but it isn't ELF.",
-			vma->name_, vma->vm_start);
+		ulp_error("VMA %s(%lx) is ULPATCH, but it's not ELF.",
+			  vma->name_, vma->vm_start);
 		return -ENOENT;
 	}
 
@@ -249,7 +251,8 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	 */
 	ret = memcpy_from_task(task, &ehdr, vma->vm_start, sizeof(ehdr));
 	if (ret < sizeof(ehdr)) {
-		ulp_error("Failed read from %lx:%s\n", vma->vm_start, vma->name_);
+		ulp_error("Failed read from %lx:%s\n", vma->vm_start,
+			  vma->name_);
 		return -EAGAIN;
 	}
 
@@ -915,8 +918,10 @@ int print_task_status(FILE *fp, const struct task_struct *task)
 	if (!fp)
 		fp = stdout;
 
-	fprintf(fp, "Uid:\t%d\t%d\t%d\t%d\n", ps->uid, ps->euid, ps->suid, ps->fsuid);
-	fprintf(fp, "Gid:\t%d\t%d\t%d\t%d\n", ps->gid, ps->egid, ps->sgid, ps->fsgid);
+	fprintf(fp, "Uid:\t%d\t%d\t%d\t%d\n", ps->uid, ps->euid, ps->suid,
+		ps->fsuid);
+	fprintf(fp, "Gid:\t%d\t%d\t%d\t%d\n", ps->gid, ps->egid, ps->sgid,
+		ps->fsgid);
 	return 0;
 }
 
@@ -1043,7 +1048,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 			goto free_task;
 		}
 		while ((entry = readdir(dir)) != NULL) {
-			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
+			if (!strcmp(entry->d_name , ".") ||
+			    !strcmp(entry->d_name, ".."))
 				continue;
 			ulp_debug("Thread %s\n", entry->d_name);
 			child = atoi(entry->d_name);
@@ -1083,7 +1089,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 			goto free_task;
 		}
 		while ((entry = readdir(dir)) != NULL) {
-			if (!strcmp(entry->d_name , ".") || !strcmp(entry->d_name, ".."))
+			if (!strcmp(entry->d_name , ".") ||
+			    !strcmp(entry->d_name, ".."))
 				continue;
 			ulp_debug("FD %s\n", entry->d_name);
 			ifd = atoi(entry->d_name);
@@ -1201,16 +1208,15 @@ int close_task(struct task_struct *task)
 
 	if (task->fto_flag & FTO_THREADS) {
 		struct thread *thread, *tmpthread;
-		list_for_each_entry_safe(thread, tmpthread, &task->threads_list, node) {
+		list_for_each_entry_safe(thread, tmpthread, &task->threads_list,
+			   node)
 			free(thread);
-		}
 	}
 
 	if (task->fto_flag & FTO_FD) {
 		struct fd *fd, *tmpfd;
-		list_for_each_entry_safe(fd, tmpfd, &task->fds_list, node) {
+		list_for_each_entry_safe(fd, tmpfd, &task->fds_list, node)
 			free(fd);
-		}
 	}
 
 	free_task_vmas(task);
