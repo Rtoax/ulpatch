@@ -59,7 +59,7 @@ static int __task_resolve_sym(struct task_struct *task,
 	int ret = 0;
 	struct task_sym *tsym;
 	const struct task_sym **extras = NULL;
-	unsigned long addr, extra_addr1 = 0;
+	unsigned long addr = 0, extra_addr1 = 0;
 	size_t ie, nr_extras;
 
 
