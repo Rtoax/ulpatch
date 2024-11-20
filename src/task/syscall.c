@@ -135,6 +135,8 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	unsigned char orig_code[sizeof(__syscall)];
 	unsigned long libc_base = task->libc_vma->vm_start;
 
+	memset(&syscall_regs, 0x0, sizeof(syscall_regs));
+
 #if defined(__aarch64__)
 	struct iovec orig_regs_iov, regs_iov;
 
