@@ -95,6 +95,9 @@ make install DESTDIR="%{buildroot}"
 popd
 
 %check
+echo "Check"
+%{_bindir}/ulpatch_test --version
+%{_bindir}/ulpatch_test
 
 %files
 %{_bindir}/ulpatch
