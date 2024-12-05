@@ -2,9 +2,8 @@
 /* Copyright (C) 2022-2024 Rong Tao */
 #pragma once
 
-/* ulp-config --cflags will provides this macro. */
 #ifndef __ULP_DEV
-# error "Must define __ULP_DEV, and ensure what are you doing."
+# error "Must define __ULP_DEV, maybe use 'ulp-config --cflags'."
 #endif
 
 /**
@@ -101,5 +100,5 @@ struct ulpatch_info {
 	unsigned int version;
 
 	char pad[4];
-}  __attribute__((packed));
+} __attribute__((packed));
 
