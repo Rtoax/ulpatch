@@ -1,9 +1,11 @@
-
+# Build the ULPatch documentation on github
 name: docs
 on:
   push:
     paths:
       - 'docs/**'
+      - 'docs/en/**'
+      - 'docs/zh/**'
       - 'docs/images/**'
       - mkdocs.yml
     branches:
@@ -11,6 +13,8 @@ on:
   pull_request:
     paths:
       - 'docs/**'
+      - 'docs/en/**'
+      - 'docs/zh/**'
       - 'docs/images/**'
       - mkdocs.yml
 
