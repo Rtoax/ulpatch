@@ -15,12 +15,12 @@ hide:
 
 </div>
 
-## Description
+## ULPatch Description
 
 [ULPatch](https://github.com/Rtoax/ulpatch) is open source user space live patch tool, under [GPL-2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) or [later](https://www.gnu.org/licenses/gpl-3.0.html) license.
 
 
-### Logo
+### ULPatch Logo
 
 I drew the ULPatch logo shown above using [drawio](https://github.com/jgraph/drawio-desktop/releases). The meaning of this logo is obvious, the penguin means that ULPatch supports Linux, and he looks different from [Linux Tux](https://www.techrepublic.com/article/tux-a-brief-history-of-the-linux-mascot/). And at the same time, you can see that the penguin is made up of patches and that he is alive.
 
@@ -53,7 +53,7 @@ I think I should detail the inspiration of ULPatch from these open source projec
 
 ## Author's Monologue
 
-**I don't like to get involved in the License wars**, so please forgive me if I misquote open source code. After all, this is not a commercial project.
+**I don't want to get involved in the License wars**, so please forgive me if the project misquote open source code. After all, this is not a commercial project.
 
 My native language is Chinese, not English, so please excuse my poor English grammar.
 

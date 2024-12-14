@@ -15,12 +15,12 @@ hide:
 
 </div>
 
-## 描述
+## ULPatch 描述
 
 [ULPatch](https://github.com/Rtoax/ulpatch) 是开源的用户空间热补丁工具，采用 [GPL-2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html) 或 [更高版本](https://www.gnu.org/licenses/gpl-3.0.html) 许可证。
 
 
-### Logo
+### ULPatch Logo
 
 我使用 [drawio](https://github.com/jgraph/drawio-desktop/releases) 绘制了上面所示的 ULPatch LOGO。这个标志的含义很明显，企鹅的意思是 ULPatch 支持 Linux，它看起来与 [Linux Tux](https://www.techrepublic.com/article/tux-a-brief-history-of-the-linux-mascot/) 不同。同时，你可以看到企鹅是由补丁组成的，而且他还活着。
 
@@ -53,7 +53,7 @@ ULPatch 借鉴了 [cloudlinux/libcare](https://github.com/cloudlinux/libcare) �
 
 ## 作者独白
 
-**我不喜欢卷入许可证大战**，所以，如果我错误地引用了开源代码，请原谅我。毕竟，这不是一个商业项目。
+**我不希望卷入许可证之战**，所以，如果本项目错误地引用了开源代码，请原谅我。毕竟，这不是一个商业项目。
 
 我使用 [drawio](https://github.com/jgraph/drawio-desktop/releases) 绘制了 ULPatch 中显示的所有logo和矢量图。
 
