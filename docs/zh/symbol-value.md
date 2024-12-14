@@ -1,19 +1,19 @@
 
-## Abbreviations
+## 缩略词
 
 - PIE: Position-Independent-Executable
 
 
-## Introductions
+## 介绍
 
-**How to resolve symbol addresses?**
+**如何解析 symbol 地址？**
 
-GDB's implementation of symbol parsing, [binutils-gdb](https://sourceware.org/git/binutils-gdb) is helpful, we should use `BFD` for resolve symbols and relocations.
+GDB 的符号解析实现 [binutils-gdb](https://sourceware.org/git/binutils-gdb) 很有帮助，我们应该使用 'BFD' 来解析符号和重定位。
 
 
-## Linux Kernel ELF File Map
+## Linux内核对ELF文件的内存映射
 
-See kernel `load_elf_binary()` function, it will load all `PT_LOAD` section to memory, the location is what we care about.
+参见内核 `load_elf_binary()` 函数，它会将所有 `PT_LOAD` 部分加载到内存中，位置就是我们关心的。
 
 ```
 load_bias = 0
@@ -33,13 +33,13 @@ elf_map(file, load_bias + vaddr, ...) {
 ```
 
 
-## Process's VMAs
+## 进程的 VMAs
 
-In `/proc/PID/maps`, we could see the process's VMAs, kernel will load `PT_LOAD` into memory, and `linker`(for example `/lib64/ld-linux-x86-64.so.2` on `x86_64` fedora40) will seperate some vma. for example:
+在 `/proc/PID/maps` 中，我们可以看到进程的 VMA，内核会将 `PT_LOAD` 加载到内存中，而 `linker`（例如在 `x86_64` fedora40 上 `/lib64/ld-linux-x86-64.so.2`）将分离一些 vma。例如：
 
-non-PIE hello's `PT_LOAD`
+非PIE hello的 `PT_LOAD`
 
-```
+```bash
 Program Headers:
   Type           Offset             VirtAddr           PhysAddr
                  FileSiz            MemSiz              Flags  Align
@@ -53,7 +53,7 @@ Program Headers:
                  0x0000000000000248 0x0000000000000260  RW     0x1000
 ```
 
-we just start the `hello` with gdb, and `break` on linker's `_dl_start()`:
+我们用 gdb 启动 `hello`，然后在链接器的 `_dl_start()` 上 `break` 开始：
 
 ```
 $ gdb ./hello
@@ -63,7 +63,7 @@ Breakpoint 1, _dl_start (arg=0x7fffffffd830) at rtld.c:517
 517	{
 ```
 
-Then, check VMAs:
+然后查看VMA：
 
 ```
 $ cat /proc/$(pidof hello)/maps
@@ -73,13 +73,13 @@ $ cat /proc/$(pidof hello)/maps
 00403000-00405000 rw-p 00002000 08:10 3115204 /ulpatch/tests/hello/hello
 ```
 
-Then, `continue` run process:
+然后，`continue`继续运行：
 
 ```
 (gdb) continue
 ```
 
-Check VMAs again:
+发现VMA发生变化：
 
 ```
 $ cat /proc/$(pidof hello)/maps
@@ -90,7 +90,7 @@ $ cat /proc/$(pidof hello)/maps
 00404000-00405000 rw-p 00003000 08:10 3115204 /ulpatch/tests/hello/hello
 ```
 
-Why linker split vma `00403000-00405000 rw-p 00002000` to two different vmas `00403000-00404000 r--p 00002000` and `00404000-00405000 rw-p 00003000`? Let's see the linker's call stack in [glibc](https://sourceware.org/git/glibc) source code(my version `glibc-2.40.9000-13-g22958014ab`).
+为什么链接器将 vma`00403000-00405000 rw-p 00002000`拆分为两个不同的 vma`00403000-00404000 r--p 00002000`和`00404000-00405000 rw-p 00003000`？让我们看看 [glibc](https://sourceware.org/git/glibc) 源代码（我的版本 `glibc-2.40.9000-13-g22958014ab`）中链接器的调用堆栈。
 
 ```
 _dl_start() {
@@ -113,7 +113,7 @@ _dl_start() {
 }
 ```
 
-Let's see the PIE program.
+让我们看看 PIE 程序。
 
 ```
 555555554000-555555555000 r--p 00000000 08:10 3115207 /ulpatch/tests/hello/hello-pie
@@ -122,7 +122,7 @@ Let's see the PIE program.
 555555557000-555555559000 rw-p 00002000 08:10 3115207 /ulpatch/tests/hello/hello-pie
 ```
 
-Tracing `mprotect(2)`:
+跟踪 `mprotect(2)`：
 
 ```
 mprotect(0x555555557000, 0x4096, PROT_READ);
@@ -136,9 +136,9 @@ mprotect(0x555555557000, 0x4096, PROT_READ);
 555555558000-555555559000 rw-p 00003000 08:10 3115207 /ulpatch/tests/hello/hello-pie
 ```
 
-We should know why linker modify `addr=0x555555557000,len=0x4096` memory to readonly.
+我们应该知道为什么 linker 将 `addr=0x555555557000，len=0x4096` 内存修改为只读。
 
-As we can see in `readelf -l /bin/bash` output, the `.data.rel.ro` in the last `PT_LOAD` program header and `PT_GNU_RELRO` program header, kernel will load all `PT_LOAD` into memory, then, GNU Linker will set the `.data.rel.ro` to readonly permission by `mprotect(2)` syscall, see the linker pseudocode show above. Thus, the vma `555555557000-555555559000 rw-p 00002000` will splited to two different vma `555555557000-555555558000 r--p 00002000` and `555555558000-555555559000 rw-p 00003000`.
+正如我们在 `readelf -l /bin/bash` 输出中看到的，最后一个 `PT_LOAD` 程序头和 `PT_GNU_RELRO` 程序头中的 `.data.rel.ro` ，内核会将所有 `PT_LOAD` 加载到内存中，然后，GNU 链接器将通过 `mprotect(2)` 系统调用将 `.data.rel.ro` 设置为**只读**权限，参见上面显示的链接器伪代码。因此，虚拟机 `555555557000-5555555559000 rw-p 00002000` 将拆分为两个不同的虚拟机 `55555557000-5555555558000 r--p 00002000` 和 `5555555558000-5555555559000 rw-p 00003000`。
 
 
 ## Links
