@@ -24,18 +24,41 @@ set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
 set(ULPATCH_VERSION_PATCH 11)
 
-execute_process(
-	COMMAND git describe --abbrev=4 --dirty --tags
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	OUTPUT_VARIABLE ULPATCH_VERSION
-	ERROR_VARIABLE GIT_DESCRIBE_ERROR
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	RESULT_VARIABLE version_retcode
-)
+# Only .git/ exist running this.
+if(EXISTS ${CMAKE_SOURCE_DIR}/.git/)
+	# Get version from git-tags
+	execute_process(
+		COMMAND git describe --abbrev=4 --dirty --tags
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE ULPATCH_VERSION
+		ERROR_VARIABLE GIT_DESCRIBE_ERROR
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		RESULT_VARIABLE git_version_retcode
+	)
+
+	execute_process(
+		COMMAND git config core.hooksPath
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		OUTPUT_VARIABLE GIT_HOOKS_DIR
+		ERROR_VARIABLE GIT_HOOKS_ERROR
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+		RESULT_VARIABLE hooks_retcode
+	)
+	# If you do not add the git-hooks configuration, configura automatically
+	if(NOT "${GIT_HOOKS_DIR}" STREQUAL "scripts/git/hooks/")
+		message(STATUS "WARNING: You're in git-repo but not config!!!")
+		message(STATUS "Auto-run ${CMAKE_SOURCE_DIR}/scripts/git/config.sh!!!")
+		execute_process(
+			COMMAND ${CMAKE_SOURCE_DIR}/scripts/git/config.sh
+			OUTPUT_VARIABLE GIT_HOOKS_DIR
+		)
+		message(STATUS "GIT_HOOKS_DIR ${GIT_HOOKS_DIR}!!!")
+	endif()
+endif()
 
 # If the build is not done from a git repo, get the version information from
 # the version variables in main CMakeLists.txt
-if(NOT "${version_retcode}" STREQUAL "0")
+if(NOT "${git_version_retcode}" STREQUAL "0")
 	set(ULPATCH_VERSION "v${ULPATCH_VERSION_MAJOR}.${ULPATCH_VERSION_MINOR}.${ULPATCH_VERSION_PATCH}")
 endif()
 
