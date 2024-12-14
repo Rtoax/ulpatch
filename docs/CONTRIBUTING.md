@@ -17,7 +17,7 @@ If you are reporting a bug, please include:
 
 ### Fix Bugs
 
-Look through the GitHub issues for bugs. Anything tagged with "bug" and "help wanted" is open to whoever wants to implement it.
+Look through the [GitHub issues](https://github.com/Rtoax/ulpatch/issues) for bugs. Anything tagged with "bug" and "help wanted" is open to whoever wants to implement it.
 
 
 ### Implement Features
@@ -32,7 +32,7 @@ ULPatch could always use more documentation, whether as part of the official ULP
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues).
+The best way to send feedback is to fill an issue at [https://github.com/Rtoax/ulpatch/issues](https://github.com/Rtoax/ulpatch/issues).
 
 If you are proposing a feature:
 
