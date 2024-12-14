@@ -1,9 +1,9 @@
 
-## ELF Relocations
+## ELF 重定位
 
-Relocation is the process of connecting symbolic references with symbolic definitions. For example, when a program calls a function, the associated call instruction must transfer control to the proper destination address at execution.
+重定位是将符号引用与符号定义连接起来的过程。例如，当程序调用函数时，关联的调用指令必须在执行时将控制权转移到正确的目标地址。
 
-Relocatable files must have `relocation entries` which are necessary because they contain information that describes how to modify their section contents, thus allowing executable and shared object files to hold the right information for a process's program image.
+可重定位文件必须具有必要的**重定位条目**，因为它们包含描述如何修改其节内容的信息，从而允许可执行和共享目标文件保存进程程序映像的正确信息。
 
 ```c
 typedef struct {
@@ -30,24 +30,24 @@ typedef struct {
 ```
 
 
-## Dynamic Relocations
+## 动态重定位
 
 TODO
 
 
-## Live Process Relocation
+## 运行进程重定位
 
 TODO
 
 
-## PIE Relocation
+## PIE 重定位
 
 > PIE: Position-Independent-Executable
 
 TODO
 
 
-## Links
+## 链接
 
 - GitHub: [Application Binary Interface for the Arm® Architecture](https://github.com/ARM-software/abi-aa/releases)
 	- [aarch64 ELF64](https://github.com/ARM-software/abi-aa/blob/main/aaelf64/aaelf64.rst)
