@@ -10,9 +10,9 @@
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/Rtoax/ulpatch/pulls)
 [![docs](https://img.shields.io/badge/docs-latest-blue)](https://rtoax.github.io/ulpatch/)
 
-[📝Documentation](https://rtoax.github.io/ulpatch/) |
-[🚀Installation](https://rtoax.github.io/ulpatch/INSTALL/) |
-[🎉Update News](https://rtoax.github.io/ulpatch/RELEASE/) |
+[📝Documentation](https://rtoax.github.io/ulpatch/)/[zh](https://rtoax.github.io/ulpatch/) |
+[🚀Installation](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) |
+[🎉Update News](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) |
 [🐛Reporting Issues](https://github.com/Rtoax/ulpatch/issues/new/choose)
 
 </div>

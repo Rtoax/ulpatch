@@ -65,6 +65,6 @@ I'm a Linux Newbie, little student.
 ## Links
 
 - [GitHub ULPatch](https://github.com/Rtoax/ulpatch)
-- [ULPatch Documents](https://rtoax.github.io/ulpatch/)
+- [ULPatch Documents](https://rtoax.github.io/ulpatch/) / [zh](https://rtoax.github.io/ulpatch/zh/)
 - [Gitee ULPatch (mirror)](https://gitee.com/rtoax/ulpatch)
 
