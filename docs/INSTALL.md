@@ -95,8 +95,7 @@ This cmake option is helpful if you want to test the PIE elf.
 
 #### CONFIG_BUILD_TESTING
 
-You can specify `CONFIG_BUILD_TESTING` to determine compile `ulpatch_test` or not, default `ON`.
-If you want to turn it off, such as:
+You can specify `CONFIG_BUILD_TESTING` to determine compile `ulpatch_test` or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_BUILD_TESTING=0 ..
@@ -104,8 +103,7 @@ $ cmake -DCONFIG_BUILD_TESTING=0 ..
 
 #### CONFIG_BUILD_ULFTRACE
 
-You can specify `CONFIG_BUILD_ULFTRACE` to determine compile `ulftrace` or not, default `ON`.
-If you want to turn it off, such as:
+You can specify `CONFIG_BUILD_ULFTRACE` to determine compile `ulftrace` or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_BUILD_ULFTRACE=0 ..
@@ -113,8 +111,7 @@ $ cmake -DCONFIG_BUILD_ULFTRACE=0 ..
 
 #### CONFIG_BUILD_ULTASK
 
-You can specify `CONFIG_BUILD_ULTASK` to determine compile `ultask` or not, default `ON`.
-If you want to turn it off, such as:
+You can specify `CONFIG_BUILD_ULTASK` to determine compile `ultask` or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_BUILD_ULTASK=0 ..
@@ -122,8 +119,7 @@ $ cmake -DCONFIG_BUILD_ULTASK=0 ..
 
 #### CONFIG_BUILD_MAN
 
-You can specify `CONFIG_BUILD_MAN` to determine compile manual pages of ULPatch or not, default `ON`.
-If you want to turn it off, such as:
+You can specify `CONFIG_BUILD_MAN` to determine compile manual pages of ULPatch or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_BUILD_MAN=0 ..
@@ -131,8 +127,7 @@ $ cmake -DCONFIG_BUILD_MAN=0 ..
 
 #### CONFIG_CAPSTONE
 
-CMake `CONFIG_CAPSTONE` determine compile with capstone or not, default `ON`.
-If you want to turn it off, such as:
+CMake `CONFIG_CAPSTONE` determine compile with capstone or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_CAPSTONE=OFF ..
@@ -140,8 +135,7 @@ $ cmake -DCONFIG_CAPSTONE=OFF ..
 
 #### CONFIG_LIBUNWIND
 
-CMake `CONFIG_LIBUNWIND` determine compile with libunwind or not, default `ON`.
-If you want to turn it off, such as:
+CMake `CONFIG_LIBUNWIND` determine compile with libunwind or not, default `ON`. If you want to turn it off, such as:
 
 ```
 $ cmake -DCONFIG_CAPSTONE=OFF ..
@@ -181,6 +175,12 @@ Or
 
 ```
 $ sudo rpm -ivh ulpatch-*.rpm
+```
+
+If upgrade:
+
+```
+$ sudo rpm -iUh ulpatch-*.rpm
 ```
 
 ### Build RPM Packages Your Own
