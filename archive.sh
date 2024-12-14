@@ -5,6 +5,10 @@ if [[ ! -d .git/ ]]; then
 	exit 1
 fi
 
-version=$(git describe --abbrev=0 --tags 2>/dev/null)
+if [[ ${VERSION} ]]; then
+	version=${VERSION}
+else
+	version=$(git describe --abbrev=0 --tags 2>/dev/null)
+fi
 name=ulpatch-${version}
 git archive --format tar.gz --prefix=${name}/ --output ${name}.tar.gz master

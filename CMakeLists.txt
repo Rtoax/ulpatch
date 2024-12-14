@@ -22,7 +22,7 @@ message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
 # if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 10)
+set(ULPATCH_VERSION_PATCH 11)
 
 execute_process(
 	COMMAND git describe --abbrev=4 --dirty --tags
