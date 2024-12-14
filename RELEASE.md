@@ -1,1 +1,1 @@
-docs/RELEASE.md
+docs/en/RELEASE.md
