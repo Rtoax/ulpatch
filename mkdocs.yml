@@ -129,8 +129,8 @@ plugins:
             Code Style: 代码风格
             Developer: 开发者
             Log: 日志
-            ULPatch: 用户态热补丁
-            ULTask: 进程热修改器
+            ULPatch: ULPatch用户态热补丁
+            ULTask: ULTask进程修改器
             ULPatchTest: ULPatch测试
             Contributing: 贡献
             Knowledge: 相关知识
