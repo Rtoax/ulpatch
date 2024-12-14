@@ -33,20 +33,20 @@ The heart of a penguin is a CPU, which of course is closely related to the instr
 
 For a process like Qemu that cannot be interrupted and restarted, vulnerability fixing is very difficult. Especially for cloud vendors, the live patch is very important.
 
-Hot patching in the kernel is already a relatively mature technology. Implementing [livepatch](https://docs.kernel.org/livepatch/livepatch.html) based on ftrace in the [linux kernel](https://github.com/torvalds/linux). Of course, the ULPatch project only discusses user-mode programs.
+Of course, the ULPatch project only discusses user-mode programs.
 
 
 ## Related Projects
 
 ULPatch draws on several excellent open source projects, such as [cloudlinux/libcare](https://github.com/cloudlinux/libcare), and Huawei’s secondary development [openeuler/libcareplus](https://gitee.com/openeuler/libcareplus). SUSE has also open sourced its own live patch solution [SUSE/libpulp](https://github.com/SUSE/libpulp).
 
-In kernel space, [livepatch](https://docs.kernel.org/livepatch/livepatch.html).
+Hot patching in the kernel is already a relatively mature technology. Implementing [livepatch](https://docs.kernel.org/livepatch/livepatch.html) based on ftrace in the [linux kernel](https://github.com/torvalds/linux).
 
 There are also some enterprise-level software. [QEMUCare](https://tuxcare.com/enterprise-live-patching-services/qemucare/) can automatically patch your QEMU-based virtualization systems while they're running, without needing to shut down or migrate the virtualization layer or reboot. [KernelCare](https://docs.tuxcare.com/live-patching-services/) SimplePatch is a kernel live patching product that provides security patches for a range of popular Linux kernels that can be installed without rebooting the system.
 
-At the same time, the implementation of the kernel's `finit_module(2)` and `init_module(2)` system calls is also of great reference value. Even in the early stages of development, the relocation code was transplanted from these two system calls.
+At the same time, the implementation of the kernel's `finit_module(2)` and `init_module(2)` system calls is also of great reference value. Even in the early stages of ULPatch development, the relocation code was transplanted from these two system calls.
 
-Judging from the current research on outstanding projects, the live patch function relies on modifying the assembly instructions at the function entrance to make it jump to a new function, thereby realizing the live patch function.
+Judging from the current research on outstanding projects, the live patch function relies on modifying the assembly instructions at the function entrance to make it jump to a new function.
 
 I think I should detail the inspiration of ULPatch from these open source projects in another document instead of a README file.
 
@@ -65,6 +65,6 @@ I'm a Linux Newbie, little student.
 ## Links
 
 - [GitHub ULPatch](https://github.com/Rtoax/ulpatch)
-- [GitHub.io ULPatch (this page)](https://rtoax.github.io/ulpatch/)
+- [ULPatch Documents](https://rtoax.github.io/ulpatch/)
 - [Gitee ULPatch (mirror)](https://gitee.com/rtoax/ulpatch)
 
