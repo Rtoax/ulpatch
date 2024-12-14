@@ -1,4 +1,5 @@
 site_name: ULPatch Documents
+site_description: ULPatch is open source user space live patch tool
 site_url: https://rtoax.github.io/ulpatch/
 repo_url: https://github.com/Rtoax/ulpatch
 repo_name: Rtoax/ulpatch
