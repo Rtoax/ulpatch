@@ -4,7 +4,7 @@ hide:
 ---
 
 
-## TODO
+## TODO-Lists
 
 ### Now
 
@@ -25,10 +25,9 @@ hide:
 - loongarch64 support.
 - GUI support, like GTK/Qt, etc.
 - Like kernel module has `module_init` and `module_exit`, ULPatch should has too, if create thread and thread callback is in ULP vma, during unpatch, segvfault will be triggered.
-- Support capstone to show ULPatch assembler.
+- Maybe we could use dlopen/dlsym to map ulpatch file.
 
 
 ### No support (ideal is plump, reality is bony)
 
 - Anon vma for each patch and use prctl(2)(`CONFIG_ANON_VMA_NAME`) set vma's name, and I try to submit kernel patch, but **David Hildenbrand** don't like it, see [LKML Link](https://lore.kernel.org/lkml/b2f4c084-47dc-4e92-a9e3-daec3f48425d@redhat.com/)
-- Maybe we could use dlopen/dlsym to map ulpatch file.
