@@ -8,6 +8,6 @@ By design, the [ELF format](https://refspecs.linuxbase.org/elf/elf.pdf) is flexi
 ![ELF Layout](images/Elf-layout--en.svg.png)
 
 
-## ULPatch ELF
+## ULPatch ELF Format
 
 TODO
