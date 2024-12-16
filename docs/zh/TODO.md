@@ -4,7 +4,7 @@ hide:
 ---
 
 
-## 未完成列表
+## 未完成任务列表
 
 ### 当前任务
 
@@ -21,13 +21,13 @@ hide:
 
 - 支持静态编译的可执行文件。
 - 支持签名和检测。
-- 支持strip的可执行文件，符号表。
+- 支持无符号表（`strip`）的可执行文件，符号表。
 - 支持`loongarch64`。
-- 支持GUI，可以用GTK/Qt实现。
+- 支持 GUI，可以用 GTK/Qt 实现。
 - 像内核`module_init`,`module_exit`一样支持执行初始化和退出函数。
 - 或许我们应该使用 `dlopen/dlsym` 实现热补丁的插入。
 
 
 ### 不打算支持 (理想很丰满、现实很骨感)
 
-- 匿名vma命名，使用`prctl(2)`(`CONFIG_ANON_VMA_NAME`)设置VMA名字，我尝试提交了补丁，但是**David Hildenbrand**不喜欢，参见 [LKML Link](https://lore.kernel.org/lkml/b2f4c084-47dc-4e92-a9e3-daec3f48425d@redhat.com/)。
+- 匿名 VMA 命名，使用`prctl(2)`(`CONFIG_ANON_VMA_NAME`)设置 VMA 名字，我尝试提交了补丁，但是**David Hildenbrand**不喜欢，参见 [LKML Link](https://lore.kernel.org/lkml/b2f4c084-47dc-4e92-a9e3-daec3f48425d@redhat.com/)。

@@ -55,7 +55,7 @@ ULPatch 借鉴了 [cloudlinux/libcare](https://github.com/cloudlinux/libcare) �
 
 **我不希望卷入许可证之战**，所以，如果本项目错误地引用了开源代码，请原谅我。毕竟，这不是一个商业项目。
 
-我使用 [drawio](https://github.com/jgraph/drawio-desktop/releases) 绘制了 ULPatch 中显示的所有logo和矢量图。
+我使用 [drawio](https://github.com/jgraph/drawio-desktop/releases) 绘制了 ULPatch 中显示的所有 logo 和矢量图。
 
 我是 Linux 新手，小学生。
 

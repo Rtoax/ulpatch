@@ -8,7 +8,7 @@
 
 **如何解析 symbol 地址？**
 
-GDB 的符号解析实现 [binutils-gdb](https://sourceware.org/git/binutils-gdb) 很有帮助，我们应该使用 'BFD' 来解析符号和重定位。
+GDB 的符号解析实现 [binutils-gdb](https://sourceware.org/git/binutils-gdb) 很有帮助，我们应该使用 `BFD` 来解析符号和重定位。
 
 
 ## Linux内核对ELF文件的内存映射
@@ -37,7 +37,7 @@ elf_map(file, load_bias + vaddr, ...) {
 
 在 `/proc/PID/maps` 中，我们可以看到进程的 VMA，内核会将 `PT_LOAD` 加载到内存中，而 `linker`（例如在 `x86_64` fedora40 上 `/lib64/ld-linux-x86-64.so.2`）将分离一些 vma。例如：
 
-非PIE hello的 `PT_LOAD`
+非 PIE hello 程序的 `PT_LOAD`
 
 ```bash
 Program Headers:
@@ -79,7 +79,7 @@ $ cat /proc/$(pidof hello)/maps
 (gdb) continue
 ```
 
-发现VMA发生变化：
+发现 VMA 发生变化：
 
 ```
 $ cat /proc/$(pidof hello)/maps

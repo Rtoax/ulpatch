@@ -10,7 +10,7 @@
 [![PRs](https://img.shields.io/badge/PRs-welcome-pink.svg)](https://github.com/Rtoax/ulpatch/pulls)
 [![docs](https://img.shields.io/badge/docs-latest-blue)](https://rtoax.github.io/ulpatch/)
 
-[📝Documentation](https://rtoax.github.io/ulpatch/)/[zh](https://rtoax.github.io/ulpatch/) |
+[📝Documentation](https://rtoax.github.io/ulpatch/)/[zh](https://rtoax.github.io/ulpatch/zh/) |
 [🚀Installation](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) |
 [🎉Update News](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) |
 [🐛Reporting Issues](https://github.com/Rtoax/ulpatch/issues/new/choose)
@@ -18,14 +18,14 @@
 </div>
 
 
-# Introduction
+# ULPatch Introduction
 
 ULPatch is open source user space live patch tool.
 
 More to see [docs/index.md](docs/index.md). Alternatively, you can directly access the [ULPatch website main page](https://rtoax.github.io/ulpatch/) to view the documentation.
 
 
-# Support Architecture
+# ULPatch Support Architecture
 
 Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with and I want to support, if they do not contain what you need, you are welcome to co-develop.
 
@@ -35,19 +35,19 @@ Due to my limited personal experience, I can't understand and master all the arc
 - [ ] `riscv64`: ready to go
 
 
-# Installing
+# ULPatch Installing
 
-See [docs/INSTALL.md](docs/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/) for installation steps on your platform.
-
-
-# Theory
-
-See [docs/THEORY.md](docs/THEORY.md) or [website](https://rtoax.github.io/ulpatch/theory/) for theory.
+See [docs/INSTALL.md](docs/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) for installation steps on your platform.
 
 
-# Releases
+# ULpatch Theory
 
-See [docs/RELEASE.md](docs/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/) for releases.
+See [docs/THEORY.md](docs/THEORY.md) or [website](https://rtoax.github.io/ulpatch/THEORY/)/[zh](https://rtoax.github.io/ulpatch/zh/THEORY/) for theory.
+
+
+# ULpatch Releases
+
+See [docs/RELEASE.md](docs/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) for releases.
 
 
 # Warnings

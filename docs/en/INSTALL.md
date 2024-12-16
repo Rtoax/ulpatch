@@ -12,7 +12,7 @@ hide:
 On **RHEL** like linux distrobution, manage packages with [rpm](https://github.com/rpm-software-management) and [dnf/yum](https://github.com/rpm-software-management/dnf).
 
 ```bash
-# RHEL like distributions need epel-release, Fedora don't.
+# Some distributions like RHEL need epel-release package, Fedora don't.
 $ sudo dnf install -y epel-release
 $ sudo dnf groupinstall -y "Development Tools" "Development Libraries"
 $ sudo dnf install -y \
@@ -30,7 +30,7 @@ $ sudo dnf install -y \
 
 #### Debian/Ubuntu
 
-On **Debian** like linux distrobutions, manage packages with [apt](https://salsa.debian.org/apt-team/apt).
+On **Debian** like linux distrobutions, manage packages with [dpkg](https://git.dpkg.org/git/dpkg/dpkg.git) and [apt](https://salsa.debian.org/apt-team/apt).
 
 ```bash
 $ sudo apt install -y build-essential

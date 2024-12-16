@@ -40,3 +40,9 @@ You may often see the special character `^M` under Unix like system if code is *
 
 - Never use `%s`+`strerror(errno)` display string describing error number in log, use `%m` instead.
 
+
+## Documents Standards
+
+- Modify Chinese and English documents simultaneously;
+- English words in Chinese documents need to be separated from Chinese words by **space**;
+
