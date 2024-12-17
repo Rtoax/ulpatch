@@ -237,8 +237,6 @@ static void print_help(void)
 	"  Exe: %s\n"
 	"\n"
 	"Test ulpatch\n"
-	"\n"
-	"Mandatory arguments to long options are mandatory for short options too.\n"
 	"\n",
 	ulpatch_test_path
 	);
