@@ -10,8 +10,8 @@ void ulp_asm_write(unsigned long ul)
 	char msg[] = {"Hello-\n"};
 	int len = 7;
 #if defined(__x86_64__) || defined(__aarch64__)
-	ASM_WRITE(1, msg, len);
-	ASM_WRITE_HELLO();
+	__ulp_builtin_write(1, msg, len);
+	__ulp_builtin_write_hello();
 #else
 # warning Not supported CPU architecture yet.
 #endif

@@ -13,7 +13,7 @@ TEST_STUB(patch_asm);
 
 TEST(Patch_asm, sleep, 0)
 {
-	ASM_SLEEP(1);
+	__ulp_builtin_sleep(1);
 	return 0;
 }
 
@@ -21,8 +21,8 @@ TEST(Patch_asm, write, 0)
 {
 	char msg[] = {"Hello-\n"};
 	int len = 7;
-	ASM_WRITE(1, msg, len);
-	ASM_WRITE_HELLO();
+	__ulp_builtin_write(1, msg, len);
+	__ulp_builtin_write_hello();
 	return 0;
 }
 
@@ -34,7 +34,7 @@ TEST(Patch_asm, exit, 0)
 
 	pid = fork();
 	if (pid == 0)
-		ASM_EXIT(EXIT_VAL);
+		__ulp_builtin_exit(EXIT_VAL);
 	else {
 		waitpid(pid, &status, 0);
 		if (WEXITSTATUS(status) != EXIT_VAL)

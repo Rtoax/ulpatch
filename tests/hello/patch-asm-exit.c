@@ -7,8 +7,8 @@
 
 void ulp_asm_exit(unsigned long ul)
 {
-#ifdef ASM_EXIT
-	ASM_EXIT(0x2);
+#ifdef __ulp_builtin_exit
+	__ulp_builtin_exit(0x2);
 #endif
 }
 ULPATCH_INFO(ulp_asm_exit, print_hello, "Rong Tao");

@@ -145,8 +145,8 @@ static int static_asm_putchar(int ret)
 {
 	char msg[] = {"Hello-\n"};
 	int len = 7;
-	ASM_WRITE(1, msg, len);
-	ASM_WRITE_HELLO();
+	__ulp_builtin_write(1, msg, len);
+	__ulp_builtin_write_hello();
 	return ret;
 }
 

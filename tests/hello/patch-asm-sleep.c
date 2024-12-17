@@ -7,6 +7,6 @@
 
 void ulp_asm_sleep(unsigned long ul)
 {
-	ASM_SLEEP(1);
+	__ulp_builtin_sleep(1);
 }
 ULPATCH_INFO(ulp_asm_sleep, print_hello, "Rong Tao");
