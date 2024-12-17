@@ -19,6 +19,7 @@ nav:
     - Developer: developers.md
     - Log: log.md
     - ULPatch: ulpatch.md
+    - ULPInfo: ulpinfo.md
     - ULTask: ultask.md
     - ULPatchTest: ulpatch_test.md
     - Contributing: CONTRIBUTING.md
@@ -135,6 +136,7 @@ plugins:
             Developer: 开发者
             Log: 日志
             ULPatch: ULPatch用户态热补丁
+            ULPInfo: ULPatch用户态热补丁查看
             ULTask: ULTask进程修改器
             ULPatchTest: ULPatch测试
             Contributing: 贡献
