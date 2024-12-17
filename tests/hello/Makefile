@@ -1,11 +1,21 @@
 # This is ULPatch test Makefile wrote by Rong Tao.
 SHELL = bash
+ifeq ($(V),1)
+  Q =
+else
+  Q = @
+  MAKEFLAGS += --silent
+  MAKEFLAGS += --no-print-directory
+endif
+export Q
 
-CC = gcc
-LD = ld
+CC := gcc
+LD := ld
+CFLAGS :=
+LDFLAGS :=
 
-HDR_META=/usr/include/ulpatch/meta.h
-ULP_CONFIG=$(shell which ulp-config 2>/dev/null)
+HDR_META = /usr/include/ulpatch/meta.h
+ULP_CONFIG = $(shell which ulp-config 2>/dev/null)
 
 ifeq ($(wildcard ${HDR_META}),)
   $(error Not found ${HDR_META}, Please install ulpatch first)
@@ -16,7 +26,6 @@ ifeq ($(wildcard ${ULP_CONFIG}),)
   $(error Not found ulp-config, Please install ulpatch first)
 endif
 
-CFLAGS :=
 CFLAGS += -O0 -ggdb -g
 CFLAGS += -pthread
 ifdef MCOUNT
@@ -70,6 +79,7 @@ $(info CFLAGS = ${CFLAGS})
 $(info CFLAGS_ULP = ${CFLAGS_ULP})
 $(info LDFLAGS_ULP = ${LDFLAGS_ULP})
 
+.PHONY: build
 build: ${TARGETS_ULP} ${TARGETS}
 
 hello: hello.o
@@ -85,22 +95,23 @@ CFLAGS_test := $(CFLAGS_ULP)
 
 %.o: %.c
 	@echo -e " CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*)) ${CFLAGS_ULP}
+	$(Q)$(CC) -o $(@) -c $(<) $(CFLAGS) $(CFLAGS_$(*)) ${CFLAGS_ULP}
 
 %.ulpo: %.c
 	@echo -e " CC ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@$(CC) -o $(@) -c $(<) $(CFLAGS_ULP)
+	$(Q)$(CC) -o $(@) -c $(<) $(CFLAGS_ULP)
 
 %.ulp: %.ulpo
 	@echo -e " LD ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@cp $(<) $(@).no-build-id
-	@$(LD) ${LDFLAGS_ULP} -o $(@) $(<)
+	$(Q)cp $(<) $(@).no-build-id
+	$(Q)$(LD) ${LDFLAGS_ULP} -o $(@) $(<)
 
 $(TARGETS): %:
 	@echo -e " LD  \033[1;32m$(@)\033[m"
-	@$(CC) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
-	@strip $(@) -o $(@).stripped
+	$(Q)$(CC) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
+	$(Q)strip $(@) -o $(@).stripped
 
+.PHONY: clean
 clean:
 	@echo -e " CLEAN   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
-	@rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.ulp.no-build-id *.stripped
+	$(Q)rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.ulp.no-build-id *.stripped

@@ -66,7 +66,7 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/usr \
 $ make -j$(nproc)
 ```
 
-Or you could specify `-B build` argument of cmake, like `cmake -B build -DCMAKE_BUILD_TYPE=Release`.
+Or you could specify `-B build` argument of cmake, like `cmake -B build -DCMAKE_BUILD_TYPE=Release`. If you want to see the compile detail, use `make VERBOSE=1`.
 
 
 ### CMake Macros

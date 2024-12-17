@@ -66,7 +66,7 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/usr \
 $ make -j$(nproc)
 ```
 
-或者你可以通过指定 `-B build` 参数，像 `cmake -B build -DCMAKE_BUILD_TYPE=Release`.
+或者你可以通过指定 `-B build` 参数，像 `cmake -B build -DCMAKE_BUILD_TYPE=Release`。如果你想要编译时查看详情，使用`make VERBOSE=1`。
 
 
 ### CMake 相关宏
@@ -150,6 +150,7 @@ $ cmake -DCONFIG_CAPSTONE=OFF ..
 ```bash
 $ sudo make install
 ```
+
 
 ### 卸载 ULPatch
 
