@@ -573,7 +573,7 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 	}
 	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
-		ulp_error("vma not exist.\n");
+		ulp_error("%s vma not exist on 0x%lx.\n", task->comm, addr);
 		return -1;
 	}
 
@@ -602,7 +602,7 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 	size_t vma_size = 0;
 	struct vm_area_struct *vma = find_vma(task, addr);
 	if (!vma) {
-		ulp_error("vma not exist.\n");
+		ulp_error("%s vma not exist on 0x%lx.\n", task->comm, addr);
 		return -1;
 	}
 

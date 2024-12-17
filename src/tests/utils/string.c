@@ -79,11 +79,13 @@ TEST(Utils_str, str2addr, 0)
 		{"1234", 1234},
 		{"0x1234KB", 0x1234},
 		{"1234KB", 1234},
+		{"01234", 01234},
+		{"001234", 01234},
 	};
 
 	for (i = 0; i < ARRAY_SIZE(values); i++) {
 		unsigned long v = str2addr(values[i].str);
-		ulp_debug("v = %lx\n", v);
+		ulp_debug("v = 0x%lx, %ld\n", v, v);
 		if (v != values[i].expect)
 			ret++;
 	}

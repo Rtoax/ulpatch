@@ -193,8 +193,12 @@ unsigned long str2addr(const char *str)
 		return 0;
 	}
 
+	/* start with '0x' */
 	if (str[0] == '0' && str[1] == 'x')
 		addr = strtoull(str, NULL, 16);
+	/* start with '0[0-9]' */
+	else if (str[0] == '0' && (str[1] >= '0' && str[1] <= '9'))
+		addr = strtoull(str, NULL, 8);
 	else
 		addr = strtoull(str, NULL, 10);
 
