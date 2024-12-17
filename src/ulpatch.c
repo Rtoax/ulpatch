@@ -35,6 +35,7 @@ enum {
 	ARG_MIN = ARG_COMMON_MAX,
 	ARG_PATCH,
 	ARG_UNPATCH,
+	ARG_MAP_PFX,
 };
 
 static const char *prog_name = "ulpatch";
@@ -67,7 +68,12 @@ static int print_help(void)
 	"  --patch  [PATCH]    patch an object file into target task, and patch\n"
 	"                      the patch.\n"
 	"  --unpatch           unpatch the latest ulpatch from target task.\n"
-	"\n");
+	"\n"
+	" Display argument:\n"
+	"\n"
+	"  --map-pfx           display /proc/PID/maps prefix: '%s'.\n"
+	"\n",
+	PATCH_VMA_TEMP_PREFIX);
 	print_usage_common(prog_name);
 	cmd_exit_success();
 	return 0;
@@ -81,6 +87,7 @@ static int parse_config(int argc, char *argv[])
 		{ "pid",            required_argument, 0, 'p' },
 		{ "patch",          required_argument, 0, ARG_PATCH },
 		{ "unpatch",        no_argument,       0, ARG_UNPATCH },
+		{ "map-pfx",        no_argument,       0, ARG_MAP_PFX },
 		COMMON_OPTIONS
 		{ NULL }
 	};
@@ -103,6 +110,10 @@ static int parse_config(int argc, char *argv[])
 			break;
 		case ARG_UNPATCH:
 			command_type = CMD_UNPATCH;
+			break;
+		case ARG_MAP_PFX:
+			printf("%s\n", PATCH_VMA_TEMP_PREFIX);
+			cmd_exit_success();
 			break;
 		COMMON_GETOPT_CASES(prog_name, print_help, argv)
 		default:

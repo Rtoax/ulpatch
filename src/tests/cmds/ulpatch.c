@@ -7,3 +7,10 @@
 
 TEST_STUB(cmds_ulpatch);
 
+TEST(ulpatch, display, 0)
+{
+	int ret = 0;
+	char *argv[] = { "ulpatch", "--map-pfx", };
+	ret += ulpatch(2, argv);
+	return ret;
+}

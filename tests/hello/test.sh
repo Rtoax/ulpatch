@@ -109,12 +109,14 @@ cat /proc/${pid}/maps
 ulpinfo -p ${pid} ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-vvv}
 
 dump_all_process_ulpatch() {
-	local patches_addr_range=( $(cat /proc/${pid}/maps | grep ulp- | awk '{print $1}') )
+	local range_addrs=( $(cat /proc/${pid}/maps \
+				| grep $(ulpatch --map-pfx) \
+				| awk '{print $1}') )
 
-	for ((i = 0; i < ${#patches_addr_range[@]}; i++))
+	for ((i = 0; i < ${#range_addrs[@]}; i++))
 	do
 		rm -f patch-$i.ulp
-		ultask -p ${pid} --dump vma,addr=${patches_addr_range[$i]} -o patch-$i.ulp
+		ultask -p ${pid} --dump vma,addr=${range_addrs[$i]} -o patch-$i.ulp
 	done
 }
 dump_all_process_ulpatch
