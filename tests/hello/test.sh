@@ -103,18 +103,18 @@ fi
 
 # Disasm print_hello
 print_hello_addr=$(ultask -p ${pid} --sym | grep -w print_hello | awk '{print $3}')
-ultask -p ${pid} --disasm-addr ${print_hello_addr} --disasm-size 16
+ultask -p ${pid} --dump disasm,addr=${print_hello_addr},size=16
 
 cat /proc/${pid}/maps
 ulpinfo -p ${pid} ${debug:+--lv=dbg} ${error:+--lv=err} ${verbose:+-vvv}
 
 dump_all_process_ulpatch() {
-	local patches_addr_range=( $(cat /proc/${pid}/maps | grep patch- | awk '{print $1}') )
+	local patches_addr_range=( $(cat /proc/${pid}/maps | grep ulp- | awk '{print $1}') )
 
 	for ((i = 0; i < ${#patches_addr_range[@]}; i++))
 	do
 		rm -f patch-$i.ulp
-		ultask -p ${pid} --dump-vma ${patches_addr_range[$i]} -o patch-$i.ulp
+		ultask -p ${pid} --dump vma,addr=${patches_addr_range[$i]} -o patch-$i.ulp
 	done
 }
 dump_all_process_ulpatch
