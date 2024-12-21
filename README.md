@@ -37,17 +37,17 @@ Due to my limited personal experience, I can't understand and master all the arc
 
 # ULPatch Installing
 
-See [docs/INSTALL.md](docs/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) for installation steps on your platform.
+See [INSTALL.md](docs/en/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) for installation steps on your platform.
 
 
 # ULpatch Theory
 
-See [docs/THEORY.md](docs/THEORY.md) or [website](https://rtoax.github.io/ulpatch/THEORY/)/[zh](https://rtoax.github.io/ulpatch/zh/THEORY/) for theory.
+See [THEORY.md](docs/en/THEORY.md) or [website](https://rtoax.github.io/ulpatch/THEORY/)/[zh](https://rtoax.github.io/ulpatch/zh/THEORY/) for theory.
 
 
 # ULpatch Releases
 
-See [docs/RELEASE.md](docs/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) for releases.
+See [RELEASE.md](docs/en/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) for releases.
 
 
 # Warnings
