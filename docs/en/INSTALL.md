@@ -125,6 +125,14 @@ You can specify `CONFIG_BUILD_MAN` to determine compile manual pages of ULPatch 
 $ cmake -DCONFIG_BUILD_MAN=0 ..
 ```
 
+#### CONFIG_BUILD_BASH_COMPLETIONS
+
+You can specify `CONFIG_BUILD_BASH_COMPLETIONS` to determine install bash completions of ULPatch or not, default `ON`. If you want to turn it off, such as:
+
+```
+$ cmake -DCONFIG_BUILD_BASH_COMPLETIONS=0 ..
+```
+
 #### CONFIG_CAPSTONE
 
 CMake `CONFIG_CAPSTONE` determine compile with capstone or not, default `ON`. If you want to turn it off, such as:

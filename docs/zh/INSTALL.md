@@ -125,6 +125,14 @@ $ cmake -DCONFIG_BUILD_ULTASK=0 ..
 $ cmake -DCONFIG_BUILD_MAN=0 ..
 ```
 
+#### CONFIG_BUILD_BASH_COMPLETIONS
+
+通过指定 `CONFIG_BUILD_BASH_COMPLETIONS` 来决定是否安装bash补全功能，默认开启 `ON`。如果你想要关闭，可以：
+
+```
+$ cmake -DCONFIG_BUILD_BASH_COMPLETIONS=0 ..
+```
+
 #### CONFIG_CAPSTONE
 
 CMake `CONFIG_CAPSTONE`选项决定是否支持`capstone`，默认开启 `ON`。如果你想要关闭，可以：

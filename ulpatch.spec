@@ -17,12 +17,16 @@ Name:		ulpatch
 # top-level directory.
 Version:	0.5.11
 Release:	0%{?dist}
-Summary:	Userspace Live Patch
+Summary:	Userspace Live Patch Toolset
 
 License:	GPL-2.0
 URL:		https://github.com/Rtoax/ulpatch
 
 Source0:	ulpatch-v%{version}.tar.gz
+
+Recommends:	bash-completion
+
+# ========== build requires ==========
 
 BuildRequires:	binutils-devel
 BuildRequires:  cmake
@@ -34,10 +38,25 @@ BuildRequires:  libunwind-devel
 BuildRequires:  capstone-devel
 %endif
 
+%if 0%{?fedora} > 40 || 0%{?rhel} > 10
+BuildRequires:	bash-completion-devel
+%else
+BuildRequires:	bash-completion
+%endif
+
 Requires:	libunwind
 Requires:	elfutils-libelf
 
 Provides:	%{name} = %{version}-%{release}
+Provides:	%{name}-command(ulpatch)
+Provides:	%{name}-command(ulpinfo)
+Provides:	%{name}-command(ulptask)
+Provides:	%{name}-command(ulp-config)
+%if 0%{?with_ulftrace}
+Provides:	%{name}-command(ulftrace)
+%endif
+Provides:	%{name}-man = %{version}-%{release}
+Provides:	%{name}-bash-completion = %{version}-%{release}
 
 %package devel
 Summary:	The ULPatch's development headers.
@@ -63,16 +82,14 @@ Development headers and auxiliary files for developing ULPatch patch.
 ULPatch tests.
 
 %prep
-echo "Prep"
 %ifnarch aarch64 x86_64
-echo "Not support architecture but aarch64, x86_64"
+echo "ERROR: Not support architecture but aarch64, x86_64"
 exit 1
 %endif
 
 %setup -q -n ulpatch-v%{version}
 
 %build
-echo "Build"
 pushd %{_builddir}/ulpatch-v%{version}
 mkdir build
 pushd build
@@ -89,13 +106,11 @@ popd
 popd
 
 %install
-echo "Install"
 pushd %{_builddir}/ulpatch-v%{version}/build/
 make install DESTDIR="%{buildroot}"
 popd
 
 %check
-echo "Check"
 %{_bindir}/ulpatch_test --version
 %{_bindir}/ulpatch_test
 
@@ -113,6 +128,15 @@ echo "Check"
 %{_mandir}/man8/ulpinfo.8.gz
 %{_mandir}/man8/ultask.8.gz
 %{_datadir}/ulpatch/ftrace/ftrace-mcount.obj
+%dir %{_datadir}/bash-completion/
+%dir %{_datadir}/bash-completion/completions/
+%{_datadir}/bash-completion/completions/ulpatch
+%{_datadir}/bash-completion/completions/ulpinfo
+%{_datadir}/bash-completion/completions/ulpconfig
+%{_datadir}/bash-completion/completions/ultask
+%if 0%{?with_ulftrace}
+%{_datadir}/bash-completion/completions/ulftrace
+%endif
 %license LICENSE
 
 %files devel
