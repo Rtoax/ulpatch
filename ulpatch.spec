@@ -19,7 +19,7 @@ Version:	0.5.11
 Release:	0%{?dist}
 Summary:	Userspace Live Patch Toolset
 
-License:	GPL-2.0
+License:	GPL-2.0 or later
 URL:		https://github.com/Rtoax/ulpatch
 
 Source0:	ulpatch-v%{version}.tar.gz
