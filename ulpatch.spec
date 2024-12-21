@@ -8,6 +8,10 @@
 
 # Default disable ulftrace, beacuse it's is unimplemented.
 %define with_ulftrace	0
+
+# Default enable ultask
+%define with_ultask	1
+
 # By default, the capstone disassembly function is supported, which is helpful
 # for debugging.
 %define with_capstone	0%{?!_without_capstone:1}
@@ -120,20 +124,26 @@ popd
 %{_bindir}/ulftrace
 %endif
 %{_bindir}/ulpinfo
+%if 0%{?with_ultask}
 %{_bindir}/ultask
+%endif
 %if 0%{?with_ulftrace}
 %{_mandir}/man8/ulftrace.8.gz
 %endif
 %{_mandir}/man8/ulpatch.8.gz
 %{_mandir}/man8/ulpinfo.8.gz
+%if 0%{?with_ultask}
 %{_mandir}/man8/ultask.8.gz
+%endif
 %{_datadir}/ulpatch/ftrace/ftrace-mcount.obj
 %dir %{_datadir}/bash-completion/
 %dir %{_datadir}/bash-completion/completions/
 %{_datadir}/bash-completion/completions/ulpatch
 %{_datadir}/bash-completion/completions/ulpinfo
 %{_datadir}/bash-completion/completions/ulpconfig
+%if 0%{?with_ultask}
 %{_datadir}/bash-completion/completions/ultask
+%endif
 %if 0%{?with_ulftrace}
 %{_datadir}/bash-completion/completions/ulftrace
 %endif
