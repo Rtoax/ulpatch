@@ -1,0 +1,21 @@
+# bash completion of ULPatch ulpatch
+
+_ulpatch()
+{
+	local cur prev words objword
+
+	_init_completion || return
+
+	# Deal with options
+	if [[ ${words[cword]} == -* && $cword -eq 1 ]]; then
+		local c="-h --help -V --version --info -F --force \
+			-v --verbose -vv -vvv -vvvv -vvvvv -vvvvvv \
+			--log-debug --log-error \
+			-u --dry-run"
+		COMPREPLY=( $(compgen -W "${c}" -- ${cur}) )
+		return 0
+	fi
+
+}
+
+complete -F _ulpatch ulpatch
