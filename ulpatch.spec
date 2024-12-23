@@ -48,7 +48,11 @@ BuildRequires:	bash-completion-devel
 BuildRequires:	bash-completion
 %endif
 
+Requires:	binutils
 Requires:	libunwind
+%if 0%{?with_capstone}
+Requires:	capstone
+%endif
 Requires:	elfutils-libelf
 
 Provides:	%{name} = %{version}-%{release}
