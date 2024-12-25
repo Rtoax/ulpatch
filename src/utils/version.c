@@ -117,6 +117,11 @@ void ulpatch_info(const char *progname)
 #else
 	printf("  man no\n");
 #endif
+#ifdef CONFIG_BUILD_BASH_COMPLETIONS
+	printf("  bash-completion yes\n");
+#else
+	printf("  bash-completion no\n");
+#endif
 	printf("\n");
 	printf("Run\n");
 	printf("  Verbose %d\n", get_verbose());
