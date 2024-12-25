@@ -1,1 +1,44 @@
 # bash completion of ULPatch ultask
+
+_ultask()
+{
+	local cur prev words
+
+	_init_completion -- "$@" || return
+
+	local all_args='-p --pid --vmas --dump --jmp --threads --fds
+			--auxv --status --map --unmap --mprotect
+			--syms --symbols -o --output
+			--log-level --lv --log-debug --log-error
+			-u --dry-run -v -vv -vvv -vvvv --verbose
+			-h --help -V --version -F --force --info'
+
+	local str_lv='debug dbg info inf notice note warning warn error err crit alert emerg'
+
+	case ${prev} in
+	-p | --pid)
+		local PIDS=$(cd /proc && echo [0-9]*)
+		COMPREPLY=( $(compgen -W "$PIDS" -- ${cur}) )
+		return 0
+		;;
+	-o | --output)
+		_comp_compgen_filedir
+		return
+		;;
+	--lv | --log-level)
+		_comp_compgen -- -W "${str_lv}"
+		return
+		;;
+	# No need to other arguments
+	-h | --help | -V | --version | --info)
+		return
+		;;
+	esac
+
+	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
+		_comp_compgen -- -W "${all_args}"
+		return
+	fi
+}
+
+complete -F _ultask ultask
