@@ -191,7 +191,7 @@ static int print_help(void)
 	"\n"
 	"  --dump [TYPE,addr=ADDR,size=SIZE]\n"
 	"\n"
-	"      TYPE=           dump address memory to file\n"
+	"      TYPE=           type of dump.\n"
 	"\n"
 	"      TYPE=vma\n"
 	"                      save VMA address space to console or to a file,\n"
