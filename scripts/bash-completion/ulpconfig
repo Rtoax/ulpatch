@@ -1,4 +1,4 @@
-# bash completion of ULPatch ulp-config
+# bash completion of ULPatch ulpconfig
 
 _ulpconfig()
 {

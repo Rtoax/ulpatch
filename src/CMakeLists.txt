@@ -42,15 +42,15 @@ target_compile_definitions(ulpatch PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 add_executable(ulpinfo ulpinfo.c)
 target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 
-message(STATUS "target ulp-config")
-add_custom_target(ulp-config ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulp-config)
+message(STATUS "target ulpconfig")
+add_custom_target(ulpconfig ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulpconfig)
 add_custom_command(
-	TARGET ulp-config
-	BYPRODUCTS ulp-config
-	COMMAND sed 's|@ULP_CONFIG_VERSION@|${ULPATCH_VERSION}|g' ${PROJECT_SOURCE_DIR}/src/ulp-config > ulp-config
+	TARGET ulpconfig
+	BYPRODUCTS ulpconfig
+	COMMAND sed 's|@ULP_CONFIG_VERSION@|${ULPATCH_VERSION}|g' ${PROJECT_SOURCE_DIR}/src/ulpconfig > ulpconfig
 	PRE_BUILD
-	COMMENT "Build ulp-config"
-	DEPENDS ${PROJECT_SOURCE_DIR}/src/ulp-config
+	COMMENT "Build ulpconfig"
+	DEPENDS ${PROJECT_SOURCE_DIR}/src/ulpconfig
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
 )
 

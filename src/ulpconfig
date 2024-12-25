@@ -23,13 +23,13 @@ __usage__()
 {
 	echo -e "
 ${ANSI_BOLD}NAME${ANSI_RESET}
-    ulp-config - Print ULPatch compilation options
+    ulpconfig - Print ULPatch compilation options
 
 ${ANSI_BOLD}SYNOPSIS${ANSI_RESET}
-    ${ANSI_BOLD}ulp-config${ANSI_RESET} [${ANSI_UNDERLINE}options${ANSI_RESET}]
+    ${ANSI_BOLD}ulpconfig${ANSI_RESET} [${ANSI_UNDERLINE}options${ANSI_RESET}]
 
 ${ANSI_BOLD}DESCRIPTION${ANSI_RESET}
-    ulp-config makes it easier to build ulpatch that use ULPatch. It  can print
+    ulpconfig makes it easier to build ulpatch that use ULPatch. It  can print
     the  compiler flags, linker  flags  and  object  libraries  needed  to link
     against ULPatch.
 
@@ -58,7 +58,7 @@ ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
    -v, --verbose      show verbose of running, just for debug.
 
 ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
-   ulpinfo(8), ulftrace(8), ultask(8), ulp-config(8)
+   ulpinfo(8), ulftrace(8), ultask(8), ulpconfig(8)
 
 " >&2
 
@@ -171,7 +171,7 @@ TEMP=$(getopt \
 	--long help \
 	--long version \
 	--long verbose \
-	-n ulp-config -- "$@")
+	-n ulpconfig -- "$@")
 
 test $? != 0 && __usage__ 1
 
@@ -214,7 +214,7 @@ while true; do
 		;;
 	-V|--version)
 		shift
-		echo "ulp-config ${VERSION}"
+		echo "ulpconfig ${VERSION}"
 		exit 0
 		;;
 	--)

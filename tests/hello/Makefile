@@ -15,15 +15,15 @@ CFLAGS :=
 LDFLAGS :=
 
 HDR_META = /usr/include/ulpatch/meta.h
-ULP_CONFIG = $(shell which ulp-config 2>/dev/null)
+ULP_CONFIG = $(shell which ulpconfig 2>/dev/null)
 
 ifeq ($(wildcard ${HDR_META}),)
   $(error Not found ${HDR_META}, Please install ulpatch first)
 endif
 
-# Since ULPatch support ulp-config command, we should use it first.
+# Since ULPatch support ulpconfig command, we should use it first.
 ifeq ($(wildcard ${ULP_CONFIG}),)
-  $(error Not found ulp-config, Please install ulpatch first)
+  $(error Not found ulpconfig, Please install ulpatch first)
 endif
 
 CFLAGS += -O0 -ggdb -g
@@ -48,7 +48,7 @@ TARGETS_ULP += patch-pthread.ulp
 
 CFLAGS_ULP := $(shell ${ULP_CONFIG} --cflags)
 CFLAGS_ULP += -O0
-# FIXME: This PIC option should move to ulp-config, just for test here.
+# FIXME: This PIC option should move to ulpconfig, just for test here.
 ifdef ULP_PIC
   CFLAGS_ULP += -fpic
   CFLAGS_ULP += -fno-common

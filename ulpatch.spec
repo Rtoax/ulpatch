@@ -59,7 +59,7 @@ Provides:	%{name} = %{version}-%{release}
 Provides:	%{name}-command(ulpatch)
 Provides:	%{name}-command(ulpinfo)
 Provides:	%{name}-command(ulptask)
-Provides:	%{name}-command(ulp-config)
+Provides:	%{name}-command(ulpconfig)
 %if 0%{?with_ulftrace}
 Provides:	%{name}-command(ulftrace)
 %endif
@@ -156,8 +156,8 @@ popd
 %files devel
 %{_includedir}/ulpatch/asm.h
 %{_includedir}/ulpatch/meta.h
-%{_bindir}/ulp-config
-%{_mandir}/man8/ulp-config.8.gz
+%{_bindir}/ulpconfig
+%{_mandir}/man8/ulpconfig.8.gz
 
 %files tests
 %{_bindir}/ulpatch_test

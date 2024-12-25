@@ -271,7 +271,7 @@ if (CONFIG_BUILD_TESTING)
 endif()
 install(
 PROGRAMS
-	${CMAKE_CURRENT_BINARY_DIR}/src/ulp-config
+	${CMAKE_CURRENT_BINARY_DIR}/src/ulpconfig
 DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 )
 

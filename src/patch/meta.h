@@ -3,7 +3,7 @@
 #pragma once
 
 #ifndef __ULP_DEV
-# error "Must define __ULP_DEV, maybe use 'ulp-config --cflags'."
+# error "Must define __ULP_DEV, maybe use 'ulpconfig --cflags'."
 #endif
 
 /**
