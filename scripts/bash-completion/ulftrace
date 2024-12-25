@@ -21,7 +21,7 @@ _ulftrace()
 		;;
 	# Input patch object file
 	-j | --patch-obj)
-		_comp_compgen_filedir
+		_ulpatch_comp_filedir
 		return
 		;;
 	--lv | --log-level)
@@ -35,7 +35,7 @@ _ulftrace()
 	esac
 
 	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
-		_comp_compgen -- -W "${all_args}"
+		COMPREPLY=( $(compgen -W "${all_args}" -- ${cur}) )
 		return
 	fi
 }

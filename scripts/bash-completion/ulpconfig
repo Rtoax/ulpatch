@@ -11,11 +11,11 @@ _ulpconfig()
 
 	case ${prev} in
 	--cc)
-		_comp_compgen -- -W "gcc clang"
+		COMPREPLY=( $(compgen -W "gcc clang" -- ${cur}) )
 		return
 		;;
 	--ld)
-		_comp_compgen -- -W "ld mold"
+		COMPREPLY=( $(compgen -W "ld mold" -- ${cur}) )
 		return
 		;;
 	# No need to other arguments
@@ -25,7 +25,7 @@ _ulpconfig()
 	esac
 
 	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
-		_comp_compgen -- -W "${all_args}"
+		COMPREPLY=( $(compgen -W "${all_args}" -- ${cur}) )
 		return
 	fi
 }

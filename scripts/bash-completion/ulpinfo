@@ -21,11 +21,11 @@ _ulpinfo()
 		;;
 	# Input patch file
 	-i | --patch)
-		_comp_compgen_filedir
+		_ulpatch_comp_filedir
 		return
 		;;
 	--lv | --log-level)
-		_comp_compgen -- -W "${str_lv}"
+		COMPREPLY=( $(compgen -W "${str_lv}" -- ${cur}) )
 		return
 		;;
 	# No need to other arguments
@@ -35,7 +35,7 @@ _ulpinfo()
 	esac
 
 	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
-		_comp_compgen -- -W "${all_args}"
+		COMPREPLY=( $(compgen -W "${all_args}" -- ${cur}) )
 		return
 	fi
 }
