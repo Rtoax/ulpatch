@@ -1,1 +1,33 @@
 # bash completion of ULPatch ulp-config
+
+_ulpconfig()
+{
+	local cur prev words
+
+	_init_completion -- "$@" || return
+
+	local all_args='--cflags --ldflags --libs --cc --ld
+			-v --verbose -h --help -V --version'
+
+	case ${prev} in
+	--cc)
+		_comp_compgen -- -W "gcc clang"
+		return
+		;;
+	--ld)
+		_comp_compgen -- -W "ld mold"
+		return
+		;;
+	# No need to other arguments
+	-h | --help | -V | --version)
+		return
+		;;
+	esac
+
+	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
+		_comp_compgen -- -W "${all_args}"
+		return
+	fi
+}
+
+complete -F _ulpconfig ulpconfig

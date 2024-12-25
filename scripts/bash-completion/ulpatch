@@ -2,20 +2,42 @@
 
 _ulpatch()
 {
-	local cur prev words objword
+	local cur prev words
 
-	_init_completion || return
+	_init_completion -- "$@" || return
 
-	# Deal with options
-	if [[ ${words[cword]} == -* && $cword -eq 1 ]]; then
-		local c="-h --help -V --version --info -F --force \
-			-v --verbose -vv -vvv -vvvv -vvvvv -vvvvvv \
-			--log-debug --log-error \
-			-u --dry-run"
-		COMPREPLY=( $(compgen -W "${c}" -- ${cur}) )
+	local all_args='-p --pid --patch --unpatch --map-pfx
+			--log-level --lv --log-debug --log-error
+			-u --dry-run -v -vv -vvv -vvvv --verbose
+			-h --help -V --version -F --force --info'
+
+	local str_lv='debug dbg info inf notice note warning warn error err crit alert emerg'
+
+	case ${prev} in
+	-p | --pid)
+		local PIDS=$(cd /proc && echo [0-9]*)
+		COMPREPLY=( $(compgen -W "$PIDS" -- ${cur}) )
 		return 0
-	fi
+		;;
+	# Input patch file
+	--patch)
+		_comp_compgen_filedir
+		return
+		;;
+	--lv | --log-level)
+		_comp_compgen -- -W "${str_lv}"
+		return
+		;;
+	# No need to other arguments
+	-h | --help | -V | --version | --info | --map-pfx)
+		return
+		;;
+	esac
 
+	if [[ ${cur} == -* ]] || [[ -z ${cur} ]]; then
+		_comp_compgen -- -W "${all_args}"
+		return
+	fi
 }
 
 complete -F _ulpatch ulpatch
