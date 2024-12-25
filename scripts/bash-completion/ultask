@@ -1,5 +1,15 @@
 # bash completion of ULPatch ultask
 
+_comp_filedir()
+{
+	if [[ ${BASH_COMPLETION_VERSINFO[1]} > 11 ]]; then
+		_comp_compgen_filedir "${@}"
+	else
+		_filedir "${@}"
+	fi
+}
+
+
 _ultask()
 {
 	local cur prev words
@@ -22,7 +32,7 @@ _ultask()
 		return 0
 		;;
 	-o | --output)
-		_ulpatch_comp_filedir
+		_comp_filedir
 		return
 		;;
 	--lv | --log-level)

@@ -1,5 +1,14 @@
 # bash completion of ULPatch ulftrace
 
+_comp_filedir()
+{
+	if [[ ${BASH_COMPLETION_VERSINFO[1]} > 11 ]]; then
+		_comp_compgen_filedir "${@}"
+	else
+		_filedir "${@}"
+	fi
+}
+
 _ulftrace()
 {
 	local cur prev words
@@ -21,7 +30,7 @@ _ulftrace()
 		;;
 	# Input patch object file
 	-j | --patch-obj)
-		_ulpatch_comp_filedir
+		_comp_filedir
 		return
 		;;
 	--lv | --log-level)
