@@ -1,5 +1,13 @@
 #!/bin/bash
+#
+# ulpatch config - to get cflags and ldflags needed by ulpatch.elf's
+# compilation.
+#
 # Copyright (C) 2024 Rong Tao
+#
+# The latest version of this software can be obtained here:
+#
+# https://github.com/rtoax/ulpatch
 #
 set -e
 
