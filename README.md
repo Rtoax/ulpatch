@@ -3,7 +3,7 @@
 
 <div align="center" markdown>
 
-# ULPatch: A tool for userspace live patch
+# ULPatch: A toolset for userspace live patch
 
 [![docs](https://github.com/Rtoax/ulpatch/actions/workflows/docs.yml/badge.svg)](https://rtoax.github.io/ulpatch/)
 [![license](https://img.shields.io/github/license/Rtoax/ulpatch.svg)](https://github.com/Rtoax/ulpatch/blob/master/LICENSE)
@@ -22,6 +22,8 @@
 
 ULPatch is open source user space live patch tool.
 
+ULPatch can fix bugs and CVEs in the process without restarting.
+
 More to see [docs/index.md](docs/index.md). Alternatively, you can directly access the [ULPatch website main page](https://rtoax.github.io/ulpatch/) to view the documentation.
 
 
@@ -29,23 +31,23 @@ More to see [docs/index.md](docs/index.md). Alternatively, you can directly acce
 
 Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with and I want to support, if they do not contain what you need, you are welcome to co-develop.
 
-- [ ] `x86_64`: ready to go, support some easy demo already.
-- [ ] `aarch64`: ready to go, support some easy demo already.
+- [ ] `x86_64`: ready to go, support some simple demostration already.
+- [ ] `aarch64`: ready to go, support some simple demostration already.
 - [ ] `loongarch64`: ready to go
 - [ ] `riscv64`: ready to go
 
 
-# ULPatch Installing
+# ULPatch Installation
 
 See [INSTALL.md](docs/en/INSTALL.md) or [website](https://rtoax.github.io/ulpatch/INSTALL/)/[zh](https://rtoax.github.io/ulpatch/zh/INSTALL/) for installation steps on your platform.
 
 
-# ULpatch Theory
+# ULPatch Theory
 
 See [THEORY.md](docs/en/THEORY.md) or [website](https://rtoax.github.io/ulpatch/THEORY/)/[zh](https://rtoax.github.io/ulpatch/zh/THEORY/) for theory.
 
 
-# ULpatch Releases
+# ULPatch Releases
 
 See [RELEASE.md](docs/en/RELEASE.md) or [website](https://rtoax.github.io/ulpatch/RELEASE/)/[zh](https://rtoax.github.io/ulpatch/zh/RELEASE/) for releases.
 
