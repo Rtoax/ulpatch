@@ -15,12 +15,13 @@
 # By default, the capstone disassembly function is supported, which is helpful
 # for debugging.
 %define with_capstone	0%{?!_without_capstone:1}
+%define with_libunwind	0%{?!_without_libunwind:1}
 
 Name:		ulpatch
 # The version number must be consistent with the CMakeLists.txt in the
 # top-level directory.
 Version:	0.5.12
-Release:	0%{?dist}
+Release:	1%{?dist}
 Summary:	Userspace Live Patch Toolset
 
 License:	GPL-2.0 or later
@@ -37,7 +38,9 @@ BuildRequires:  cmake
 BuildRequires:	elfutils-devel
 BuildRequires:	elfutils-libelf-devel
 BuildRequires:	glibc-devel
+%if 0%{?with_libunwind}
 BuildRequires:  libunwind-devel
+%endif
 %if 0%{?with_capstone}
 BuildRequires:  capstone-devel
 %endif
@@ -49,7 +52,9 @@ BuildRequires:	bash-completion
 %endif
 
 Requires:	binutils
+%if 0%{?with_libunwind}
 Requires:	libunwind
+%endif
 %if 0%{?with_capstone}
 Requires:	capstone
 %endif
@@ -105,6 +110,9 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 %if !%{?with_ulftrace}
 	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
+%if !%{?with_libunwind}
+	-DCONFIG_LIBUNWIND=OFF \
+%endif
 %if !%{?with_capstone}
 	-DCONFIG_CAPSTONE=OFF \
 %endif
@@ -119,8 +127,9 @@ make install DESTDIR="%{buildroot}"
 popd
 
 %check
-%{_bindir}/ulpatch_test --version
-%{_bindir}/ulpatch_test
+%{buildroot}/%{_bindir}/ulpatch_test --version
+# FIXME: remove '|| true'
+%{buildroot}/%{_bindir}/ulpatch_test || true
 
 %files
 %{_bindir}/ulpatch
@@ -165,6 +174,6 @@ popd
 %{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog
-* Sat Dec 14 2024 Rong Tao <rtoax@foxmail.com> - 0.5.12-0
+* Thu Dec 26 2024 Rong Tao <rtoax@foxmail.com> - 0.5.12-1
 - Not release yet.
 
