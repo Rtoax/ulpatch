@@ -15,7 +15,7 @@ _ulpconfig()
 		return
 		;;
 	--ld)
-		COMPREPLY=( $(compgen -W "ld mold" -- ${cur}) )
+		COMPREPLY=( $(compgen -W "ld ld.bfd mold" -- ${cur}) )
 		return
 		;;
 	# No need to other arguments
