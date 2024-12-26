@@ -179,6 +179,8 @@ Then, use `rpm` or `dnf` command to install the rpm packages.
 $ sudo dnf install ulpatch-*.rpm
 ```
 
+> Use 'localinstall' is better(dnf <= 4, dnf5 not support 'localinstall' anymore).
+
 Or
 
 ```

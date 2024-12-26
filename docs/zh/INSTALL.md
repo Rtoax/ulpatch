@@ -181,6 +181,8 @@ $ sudo make uninstall
 $ sudo dnf install ulpatch-*.rpm
 ```
 
+> 使用‘localinstall’可能更好(dnf <= 4，dnf5 不再支持 “localinstall”)。
+
 或者：
 
 ```
