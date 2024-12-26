@@ -11,6 +11,7 @@ export Q
 
 CC := gcc
 LD := ld
+
 CFLAGS :=
 LDFLAGS :=
 
@@ -46,7 +47,7 @@ TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
 TARGETS_ULP += patch-pthread.ulp
 
-CFLAGS_ULP := $(shell ${ULP_CONFIG} --cflags)
+CFLAGS_ULP := $(shell ${ULP_CONFIG} --cc=${CC} --cflags)
 CFLAGS_ULP += -O0
 # FIXME: This PIC option should move to ulpconfig, just for test here.
 ifdef ULP_PIC
@@ -73,7 +74,7 @@ ifdef STACK
   CFLAGS += -DSTACK=1
 endif
 
-LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ldflags)
+LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ld=${LD} --ldflags)
 
 $(info CFLAGS = ${CFLAGS})
 $(info CFLAGS_ULP = ${CFLAGS_ULP})
