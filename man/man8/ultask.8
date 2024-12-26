@@ -23,10 +23,6 @@ elfutils-libelf, bfd
 .SS
 \fB\-p\fR, \fB\-\-pid\fR [PID]
 Specify a target process's PID.
-.SS
-\fB\-\-vmas\fR
-Dump process's VMA, see also
-.IR /proc/ PID /maps .
 
 .SS
 \fB\-\-dump\fR=[\fI\,TYPE\/\fR,addr=\fI\,ADDR\/\fR,size=\fI\,SIZE\/\fR]
@@ -52,26 +48,6 @@ You better know what you're doing.
 This action cannot be undone.
 
 .SS
-\fB\-\-threads\fR
-Dump process's Thread, see also
-.IR /proc/ PID /task/ .
-
-.SS
-\fB\-\-fds\fR
-Dump process's File Descriptors, see also
-.IR /proc/ PID /fd/.
-
-.SS
-\fB\-\-auxv\fR
-Print process's auxv, see also
-.IR /proc/ PID /auxv .
-
-.SS
-\fB\-\-status\fR
-Print process's status, see also
-.IR /proc/ PID /status .
-
-.SS
 \fB\-\-map\fR [file=\fI\,FILE\/\fR,ro,noexec,addr=\fIADDR\fR]
 Map a file into target process. The \fI\,FILE\/\fR should under target process \fBcwd\fR,
 see
@@ -95,9 +71,32 @@ see also
 .BR mprotect (2).
 
 .SS
-\fB\-\-syms\fR
+\fB\-\-vmas\fR
+Dump process's VMA, see also
+.IR /proc/ PID /maps .
+
 .SS
-\fB\-\-symbols\fR
+\fB\-\-threads\fR
+Dump process's Thread, see also
+.IR /proc/ PID /task/ .
+
+.SS
+\fB\-\-fds\fR
+Dump process's File Descriptors, see also
+.IR /proc/ PID /fd/ .
+
+.SS
+\fB\-\-auxv\fR
+Print process's auxv, see also
+.IR /proc/ PID /auxv .
+
+.SS
+\fB\-\-status\fR
+Print process's status, see also
+.IR /proc/ PID /status .
+
+.SS
+\fB\-\-syms\fR, \fB\-\-symbols\fR
 List all symbols of target process.
 
 .SS

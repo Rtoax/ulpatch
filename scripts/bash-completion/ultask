@@ -9,7 +9,6 @@ _comp_filedir()
 	fi
 }
 
-
 _ultask()
 {
 	local cur prev words
