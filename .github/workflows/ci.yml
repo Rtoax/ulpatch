@@ -1,0 +1,21 @@
+# ULPatch CI on github
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          apt install -y cmake gcc binutils-dev elfutils libcapstone-dev \
+                libelf-dev libunwind-dev
+      - name: Build binary
+        run: |
+          cmake .
+          make -j2
+
