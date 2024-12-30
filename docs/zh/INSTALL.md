@@ -50,6 +50,8 @@ $ sudo apt install -y \
 $ sudo apt install -y mkdocs
 ```
 
+然后，你可以在ulpatch仓库根目录执行 `mkdocs build` 和 `mkdocs serve`，然后访问 [http://127.0.0.1:8000/ulpatch/](http://127.0.0.1:8000/ulpatch/)。
+
 
 ### 源码编译软件
 

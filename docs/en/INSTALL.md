@@ -50,6 +50,8 @@ If you want to compile the website, install
 $ sudo apt install -y mkdocs
 ```
 
+Then, you could run `mkdocs build` on git-root directory, after that, running `mkdocs serve` to access local website [http://127.0.0.1:8000/ulpatch/](http://127.0.0.1:8000/ulpatch/).
+
 
 ### Compile
 
