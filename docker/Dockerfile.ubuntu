@@ -10,7 +10,8 @@ RUN apt-get install -y \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
-	libunwind-dev
+	libunwind-dev \
+	util-linux
 
 COPY . /src
 WORKDIR /src

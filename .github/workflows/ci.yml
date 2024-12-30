@@ -12,13 +12,31 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: System info
-      run: |
-        cat /etc/os-release
-        uname -a
-        ip addr
+      run: ./.github/include/sysinfo.sh
     - name: Install dependencies
       run: |
         sudo apt install -y cmake gcc binutils-dev elfutils libcapstone-dev \
               libelf-dev libunwind-dev tree
+    - name: Build binary
+      run: ./.github/include/ci.sh
+
+  test_ulpatch_fedora:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fedora-version: [38, 41]
+    container:
+      image: "fedora:${{matrix.fedora-version}}"
+      # These options are required to be able to run lldb inside the container
+      options: "--cap-add=SYS_PTRACE --security-opt seccomp=unconfined"
+    steps:
+    - uses: actions/checkout@v4
+    - name: System info
+      run: ./.github/include/sysinfo.sh
+    - name: Install dependencies
+      run: |
+        sudo dnf install -y binutils-devel capstone-devel cmake \
+              elfutils-devel elfutils-libelf-devel gcc gcc-c++ \
+              glibc-devel libunwind-devel tree util-linux
     - name: Build binary
       run: ./.github/include/ci.sh

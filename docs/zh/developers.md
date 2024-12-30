@@ -29,3 +29,8 @@
 #### current
 
 像内核的 `current`，`current` 表示当前被打开的远端进程。
+
+
+### GitHub CI
+
+参见 [ulpatch/.github](https://github.com/Rtoax/ulpatch/tree/master/.github/workflows)。
