@@ -24,7 +24,8 @@ $ sudo dnf install -y \
 	gcc \
 	gcc-c++ \
 	glibc-devel \
-	libunwind-devel
+	libunwind-devel \
+	util-linux
 ```
 
 
@@ -41,7 +42,8 @@ $ sudo apt install -y \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
-	libunwind-dev
+	libunwind-dev \
+	util-linux
 ```
 
 If you want to compile the website, install
