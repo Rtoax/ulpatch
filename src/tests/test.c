@@ -12,7 +12,7 @@
 int nr_tests = 0;
 
 
-__attribute__((nonnull(1,2,4)))
+__attribute__((nonnull(1, 2, 4)))
 struct test *create_test(char *category, char *name, test_prio prio,
 			 int (*cb)(void), int expect_ret)
 {

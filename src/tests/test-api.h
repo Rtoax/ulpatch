@@ -5,6 +5,7 @@
 #include <malloc.h>
 #include <sys/time.h>
 #include <sys/msg.h>
+#include <setjmp.h>
 
 #include <utils/list.h>
 #include <utils/compiler.h>
@@ -56,12 +57,50 @@ struct test {
 	struct timeval start, end;
 	suseconds_t spend_us;
 
+#define TEST_JMP_RETURN	0xff123
+#define TEST_RET_EMERG 0xff
+
+#define INIT_TEST_JMP()	do {	\
+		if (sigsetjmp(current_test->jmpbuf, 0) == TEST_JMP_RETURN)	\
+			return TEST_RET_EMERG;	\
+	} while (0)
+
+#define GO_BACK_TO_TEST_AND_SKIP_TEST()	do {	\
+		siglongjmp(current_test->jmpbuf, TEST_JMP_RETURN);	\
+	} while (0)
+
+	/**
+	 * jmpbuf could skip emergency like SIGILL, make ulpatch_test done.
+	 *
+	 * (3)  +---->sighandler() {
+	 * (4)  |       SIGSEGV, SIGILL-----+
+	 *      |     }                     |
+	 *      | +-------------------------+
+	 *      | |
+	 * (1)  | |    current_test() {
+	 * (5)  | +-----> jmpbuf-----------> return TEST_RET_EMERG; (6)
+	 *      |         +----------------+
+	 * (2)  +---------+ SIGSEGV/SIGILL |
+	 *                +----------------+
+	 *             }
+	 *
+	 * Procedures
+	 * (1) running a test;
+	 * (2) sigill happen;
+	 * (3) signal handle;
+	 * (4) case of signal;
+	 * (5) long jump to current test;
+	 * (6) return TEST_RET_EMERG;
+	 */
+	sigjmp_buf jmpbuf;
+
 	struct list_head node;
 	/* if test result is failed, add to 'failed_list' */
 	struct list_head failed;
 };
 
 extern int nr_tests;
+extern struct test *current_test;
 
 #define TEST_SKIP_RET	0xdead9527
 

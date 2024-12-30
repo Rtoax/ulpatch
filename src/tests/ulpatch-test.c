@@ -35,6 +35,9 @@ static LIST_HEAD(failed_list);
 
 static LIST_HEAD(mix_role_list);
 
+/* ulpatch_test always single-thread, thus, current is safety. */
+struct test *current_test = NULL;
+
 int main(int argc, char *argv[]);
 
 static void __ctor(TEST_PRIO_START) __init_test_list(void)
@@ -519,6 +522,8 @@ static int operate_test(struct test *test)
 		test->category, test->name,
 		is_verbose() ? '\n' : '\0');
 
+	current_test = test;
+
 	gettimeofday(&test->start, NULL);
 
 	/* Exe test entry */
@@ -539,6 +544,8 @@ static int operate_test(struct test *test)
 		- test->start.tv_sec * 1000000UL - test->start.tv_usec;
 
 	total_spent_us += test->spend_us;
+
+	current_test = NULL;
 
 	test_log("\033[2m%ldus\033[m %s%-8s%s %s ret:%d:%d\n",
 		test->spend_us,
@@ -914,9 +921,11 @@ static void sig_handler(int signum)
 		/* exit abnormal */
 		exit(1);
 		break;
+	case SIGILL:
 	case SIGSEGV:
-		ulp_emerg("Segv fault.\n");
+		ulp_emerg("Catch emerge signal.\n");
 		do_backtrace(stdout);
+		GO_BACK_TO_TEST_AND_SKIP_TEST();
 		exit(1);
 		break;
 	}
@@ -983,6 +992,8 @@ int main(int argc, char *argv[])
 	ulpatch_init();
 
 	signal(SIGINT, sig_handler);
+	signal(SIGSEGV, sig_handler);
+	signal(SIGILL, sig_handler);
 
 	parse_config(argc, argv);
 
