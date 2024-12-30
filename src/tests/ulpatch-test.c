@@ -530,7 +530,7 @@ static int operate_test(struct test *test)
 	verbose = get_verbose();
 	test->real_ret = test->test_cb();
 	enable_verbose(verbose);
-	if (test->real_ret == test->expect_ret || test->expect_ret == TEST_SKIP_RET) {
+	if (test->real_ret == test->expect_ret || test->expect_ret == TEST_RET_SKIP) {
 		stat_count[STAT_IDX_SUCCESS]++;
 	} else {
 		stat_count[STAT_IDX_FAILED]++;
@@ -551,7 +551,9 @@ static int operate_test(struct test *test)
 		test->spend_us,
 		failed ? "\033[31m" : "\033[32m",
 		failed ? "Failed: " : "OK",
-		failed ? strerror(errno) : "",
+		failed ? (
+				str_special_ret(test->real_ret) ?: strerror(errno)
+			) : "",
 		"\033[m",
 		test->expect_ret, test->real_ret);
 

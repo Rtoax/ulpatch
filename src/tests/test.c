@@ -71,3 +71,26 @@ void release_tests(void)
 		}
 	}
 }
+
+const char *str_special_ret(test_special_ret val)
+{
+	switch (val) {
+	case TEST_RET_SKIP:
+		return "ULPatch Skip";
+		break;
+	case TEST_RET_EMERG:
+		return "ULPatch Emergency";
+		break;
+	default:
+		break;
+	}
+	return NULL;
+}
+
+TEST(test, SIGILL, TEST_RET_SKIP)
+{
+	INIT_TEST_JMP();
+	/* Trigger SIGILL */
+	__asm__ __volatile__("ud2\n");
+	return 0;
+}

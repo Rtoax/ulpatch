@@ -39,6 +39,14 @@ typedef enum {
 	TEST_PRIO_NUM
 } test_prio;
 
+typedef enum {
+	TEST_RET_MIN = 0xdead0001,
+	TEST_RET_SKIP,
+#define TEST_RET_SKIP	TEST_RET_SKIP
+	TEST_RET_EMERG,
+#define TEST_RET_EMERG	TEST_RET_EMERG
+} test_special_ret;
+
 /**
  * test entry
  *
@@ -57,16 +65,15 @@ struct test {
 	struct timeval start, end;
 	suseconds_t spend_us;
 
-#define TEST_JMP_RETURN	0xff123
-#define TEST_RET_EMERG 0xff
+#define TEST_JMP_STATUS	0xff123
 
 #define INIT_TEST_JMP()	do {	\
-		if (sigsetjmp(current_test->jmpbuf, 0) == TEST_JMP_RETURN)	\
+		if (sigsetjmp(current_test->jmpbuf, 0) == TEST_JMP_STATUS)	\
 			return TEST_RET_EMERG;	\
 	} while (0)
 
 #define GO_BACK_TO_TEST_AND_SKIP_TEST()	do {	\
-		siglongjmp(current_test->jmpbuf, TEST_JMP_RETURN);	\
+		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
 	} while (0)
 
 	/**
@@ -102,11 +109,9 @@ struct test {
 extern int nr_tests;
 extern struct test *current_test;
 
-#define TEST_SKIP_RET	0xdead9527
-
 /**
  * Define a test
- * If Ret = TEST_SKIP_RET, the test will success anyway.
+ * If Ret = TEST_RET_SKIP, the test will success anyway.
  */
 #define __TEST(Category, Name, Prio, Ret) \
 	extern int test_ ##Category ##_##Name(void);	\
@@ -235,6 +240,8 @@ struct ulpatch_object {
 };
 extern const struct ulpatch_object ulpatch_objs[];
 int nr_ulpatch_objs(void);
+
+const char *str_special_ret(test_special_ret val);
 
 /**
  * Test target functions.

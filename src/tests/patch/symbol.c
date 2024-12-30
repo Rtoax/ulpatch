@@ -67,7 +67,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	return ret;
 }
 
-TEST(Patch_sym, init_patch, TEST_SKIP_RET)
+TEST(Patch_sym, init_patch, TEST_RET_SKIP)
 {
 	return test_task_patch(FTO_ULFTRACE, NULL);
 }
