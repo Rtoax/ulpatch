@@ -40,3 +40,5 @@ jobs:
               glibc-devel libunwind-devel tree util-linux
     - name: Build binary
       run: ./.github/include/ci.sh
+    - name: Running ulpatch_test
+      run: ulpatch_test
