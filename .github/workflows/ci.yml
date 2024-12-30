@@ -7,15 +7,18 @@ permissions:
   contents: write
 
 jobs:
-  deploy:
+  test_ulpatch:
     runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt install -y cmake gcc binutils-dev elfutils libcapstone-dev \
-                libelf-dev libunwind-dev
-      - name: Build binary
-        run: |
-          cmake .
-          make -j2
-
+    - uses: actions/checkout@v4
+    - name: System info
+      run: |
+        cat /etc/os-release
+        uname -a
+        ip addr
+    - name: Install dependencies
+      run: |
+        sudo apt install -y cmake gcc binutils-dev elfutils libcapstone-dev \
+              libelf-dev libunwind-dev tree
+    - name: Build binary
+      run: ./.github/include/ci.sh
