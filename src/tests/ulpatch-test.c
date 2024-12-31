@@ -929,8 +929,7 @@ static void sig_handler(int signum)
 	case SIGSEGV:
 		ulp_emerg("Catch emerge signal.\n");
 		do_backtrace(stdout);
-		GO_BACK_AND_SKIP_TEST();
-		exit(1);
+		GO_BACK_TO_TEST_AND_SKIP();
 		break;
 	}
 }

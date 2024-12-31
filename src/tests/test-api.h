@@ -72,7 +72,7 @@ struct test {
 			return TEST_RET_EMERG;	\
 	} while (0)
 
-#define GO_BACK_AND_SKIP_TEST()	do {	\
+#define GO_BACK_TO_TEST_AND_SKIP()	do {	\
 		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
 	} while (0)
 
