@@ -19,6 +19,8 @@ jobs:
               libelf-dev libunwind-dev tree
     - name: Build binary
       run: ./.github/include/ci.sh
+    - name: Running ulpatch_test
+      run: ulpatch_test
 
   test_ulpatch_fedora:
     runs-on: ubuntu-latest
