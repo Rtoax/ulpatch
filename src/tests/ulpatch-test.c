@@ -522,6 +522,7 @@ static int operate_test(struct test *test)
 		test->category, test->name,
 		is_verbose() ? '\n' : '\0');
 
+	/* Set current test */
 	current_test = test;
 
 	gettimeofday(&test->start, NULL);
@@ -545,6 +546,7 @@ static int operate_test(struct test *test)
 
 	total_spent_us += test->spend_us;
 
+	/* Reset current test */
 	current_test = NULL;
 
 	test_log("\033[2m%ldus\033[m %s%-8s%s %s ret:%d:%d\n",
@@ -927,7 +929,7 @@ static void sig_handler(int signum)
 	case SIGSEGV:
 		ulp_emerg("Catch emerge signal.\n");
 		do_backtrace(stdout);
-		GO_BACK_TO_TEST_AND_SKIP_TEST();
+		GO_BACK_AND_SKIP_TEST();
 		exit(1);
 		break;
 	}

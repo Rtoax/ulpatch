@@ -68,11 +68,11 @@ struct test {
 #define TEST_JMP_STATUS	0xff123
 
 #define INIT_TEST_JMP()	do {	\
-		if (sigsetjmp(current_test->jmpbuf, 0) == TEST_JMP_STATUS)	\
+		if (sigsetjmp(current_test->jmpbuf, 1) == TEST_JMP_STATUS)	\
 			return TEST_RET_EMERG;	\
 	} while (0)
 
-#define GO_BACK_TO_TEST_AND_SKIP_TEST()	do {	\
+#define GO_BACK_AND_SKIP_TEST()	do {	\
 		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
 	} while (0)
 
