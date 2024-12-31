@@ -94,3 +94,12 @@ TEST(test, SIGILL, TEST_RET_SKIP)
 	__asm__ __volatile__("ud2\n");
 	return 0;
 }
+
+TEST(test, SIGSEGV, TEST_RET_SKIP)
+{
+	INIT_TEST_JMP();
+	/* Trigger SIGSEGV */
+	char *str = NULL;
+	str[1024] = 'a';
+	return 0;
+}

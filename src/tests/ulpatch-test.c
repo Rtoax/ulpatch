@@ -1031,7 +1031,7 @@ int main(int argc, char *argv[])
 	release_tests();
 	free_filter_fmt_list();
 
-	return 0;
+	return stat_count[STAT_IDX_FAILED] == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 /* There are some selftests */
