@@ -39,8 +39,12 @@ jobs:
       run: |
         sudo dnf install -y binutils-devel capstone-devel cmake \
               elfutils-devel elfutils-libelf-devel gcc gcc-c++ \
-              glibc-devel libunwind-devel tree util-linux
+              glibc-devel libunwind-devel tree util-linux rpm-build
     - name: Build binary
       run: ./.github/include/ci.sh
     - name: Running ulpatch_test
       run: ulpatch_test
+    - name: Build RPMS
+      run: |
+        ./archive.sh
+        ./rpmbuild.sh
