@@ -956,6 +956,7 @@ void never_called_stub(void)
 	CALL_TEST_STUB(patch_object);
 	CALL_TEST_STUB(patch_patch);
 	CALL_TEST_STUB(patch_symbol);
+	CALL_TEST_STUB(test_signal);
 	CALL_TEST_STUB(task_core);
 	CALL_TEST_STUB(task_current);
 	CALL_TEST_STUB(task_proc);

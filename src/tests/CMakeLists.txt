@@ -19,6 +19,7 @@ add_executable(ulpatch_test
 	listener.c
 	notify.c
 	objects.c
+	signal.c
 	test.c
 	ulpatch-test.c
 	# When testing ulpatches, the target functions are specified in the
