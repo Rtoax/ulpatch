@@ -401,15 +401,15 @@ int read_task_vmas(struct task_struct *task, bool update_ulp);
 int update_task_vmas_ulp(struct task_struct *task);
 int free_task_vmas(struct task_struct *task);
 
-int dump_task(const struct task_struct *t, bool detail);
+int dump_task(FILE *fp, const struct task_struct *t, bool detail);
 
 void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
-void dump_task_threads(struct task_struct *task, bool detail);
-void dump_task_fds(struct task_struct *task, bool detail);
+void dump_task_threads(FILE *fp, struct task_struct *task, bool detail);
+void dump_task_fds(FILE *fp, struct task_struct *task, bool detail);
 
 int vma_prot2flags(unsigned int prot);
 unsigned int vma_perms2prot(char *perms);

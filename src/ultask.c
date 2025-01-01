@@ -795,10 +795,10 @@ int ultask(int argc, char *argv[])
 		list_all_symbols();
 
 	if (flag_print_threads)
-		dump_task_threads(target_task, is_verbose());
+		dump_task_threads(stdout, target_task, is_verbose());
 
 	if (flag_print_fds)
-		dump_task_fds(target_task, is_verbose());
+		dump_task_fds(stdout, target_task, is_verbose());
 
 	if (jmp_addr_from && jmp_addr_to) {
 		struct vm_area_struct *vma_from, *vma_to;

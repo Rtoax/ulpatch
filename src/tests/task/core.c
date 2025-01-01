@@ -71,10 +71,10 @@ TEST(Task, dump, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 
-	dump_task(task, true);
+	dump_task(stdout, task, true);
 	dump_task_vmas(stdout, task, true);
-	dump_task_threads(task, true);
-	dump_task_fds(task, true);
+	dump_task_threads(stdout, task, true);
+	dump_task_fds(stdout, task, true);
 
 	return close_task(task);
 }

@@ -533,9 +533,11 @@ void print_fd(FILE *fp, struct task_struct *task, struct fd *fd)
 	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);
 }
 
-int dump_task(const struct task_struct *task, bool detail)
+int dump_task(FILE *fp, const struct task_struct *task, bool detail)
 {
-	print_task(stdout, task, detail);
+	if (!fp)
+		fp = stdout;
+	print_task(fp, task, detail);
 	return 0;
 }
 
@@ -614,9 +616,12 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 	return dump_task_addr_to_file(ofile, task, vma->vm_start, vma_size);
 }
 
-void dump_task_threads(struct task_struct *task, bool detail)
+void dump_task_threads(FILE *fp, struct task_struct *task, bool detail)
 {
 	struct thread *thread;
+
+	if (!fp)
+		fp = stdout;
 
 	if (!(task->fto_flag & FTO_THREADS)) {
 		ulp_error("Not set FTO_THREADS(%ld) flag\n", FTO_THREADS);
@@ -624,12 +629,15 @@ void dump_task_threads(struct task_struct *task, bool detail)
 	}
 
 	list_for_each_entry(thread, &task->threads_list, node)
-		print_thread(stdout, task, thread);
+		print_thread(fp, task, thread);
 }
 
-void dump_task_fds(struct task_struct *task, bool detail)
+void dump_task_fds(FILE *fp, struct task_struct *task, bool detail)
 {
 	struct fd *fd;
+
+	if (!fp)
+		fp = stdout;
 
 	if (!(task->fto_flag & FTO_FD)) {
 		ulp_error("Not set FTO_FD(%ld) flag\n", FTO_FD);
@@ -637,7 +645,7 @@ void dump_task_fds(struct task_struct *task, bool detail)
 	}
 
 	list_for_each_entry(fd, &task->fds_list, node)
-		print_fd(stdout, task, fd);
+		print_fd(fp, task, fd);
 }
 
 int free_task_vmas(struct task_struct *task)
