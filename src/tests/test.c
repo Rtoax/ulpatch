@@ -100,6 +100,20 @@ TEST(test, SIGSEGV, TEST_RET_SKIP)
 	INIT_TEST_JMP();
 	/* Trigger SIGSEGV */
 	char *str = NULL;
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Warray-bounds"
+# pragma clang diagnostic ignored "-Wstringop-overflow"
+#elif defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Warray-bounds"
+# pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 	str[1024] = 'a';
+#if defined(__clang__)
+# pragma clang diagnostic pop
+#elif defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 	return 0;
 }
