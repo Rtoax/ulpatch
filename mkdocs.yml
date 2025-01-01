@@ -8,7 +8,7 @@ site_description: ULPatch is open source user space live patch tool
 site_url: https://rtoax.github.io/ulpatch/
 repo_url: https://github.com/Rtoax/ulpatch
 repo_name: Rtoax/ulpatch
-copyright: Copyright &copy; 2021 - 2024 Rong Tao
+copyright: Copyright &copy; 2021 - 2025 Rong Tao
 
 nav:
   - Home: index.md

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2024 Rong Tao */
+/* Copyright (C) 2024-2025 Rong Tao */
 #pragma once
 
 #define CMD_RETURN_SUCCESS_VALUE 0x123

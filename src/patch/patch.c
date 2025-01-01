@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2024 Rong Tao */
+/* Copyright (C) 2022-2025 Rong Tao */
 #include <stdlib.h>
 #include <unistd.h>
 #include <malloc.h>
