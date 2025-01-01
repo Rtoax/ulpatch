@@ -107,7 +107,9 @@ TEST(test, SIGSEGV, TEST_RET_SKIP)
 #elif defined(__GNUC__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Warray-bounds"
-# pragma GCC diagnostic ignored "-Wstringop-overflow"
+# if __GNUC__ >= 11 && __GNUC_MINOR__ >= 1
+#  pragma GCC diagnostic ignored "-Wstringop-overflow"
+# endif
 #endif
 	str[1024] = 'a';
 #if defined(__clang__)
