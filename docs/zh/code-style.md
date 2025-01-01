@@ -36,7 +36,7 @@ ULPatch 使用 **Unix format** 而不是 **DOS or Mac format**。
 如果你的文件是 **DOS or Mac format**，你可能经常在 UNIX 下看到源代码行尾存在`^M`。
 
 
-## 变成标准
+## 编成标准
 
 - 不要使用 `%s`+`strerror(errno)` 的方式打印错误信息，而是使用`%m`。
 
