@@ -16,7 +16,7 @@ hide:
 
 下图显示了 Livepatch 加载过程。
 
-![ulpatch](images/ulpatch-patch.drawio.svg)
+![ulpatch::patch](images/ulpatch-patch.drawio.svg)
 
 具体步骤如下：
 
@@ -24,6 +24,10 @@ hide:
 2. 将可重定位的 ELF 文件加载到目标进程地址空间;
 3. 根据目标进程地址符号表，对 patch 中的符号进行重新定位;
 4. 修改 patch 函数入口，跳转到 patch 函数;
+
+目标函数的起始指令将被替换为跳转至补丁函数的跳转指令，如下图所示：
+
+![ulpatch::callee](images/ulpatch-func-trampoline.drawio.svg)
 
 
 ### Unpatch
