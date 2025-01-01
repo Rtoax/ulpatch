@@ -51,7 +51,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	if (cb)
 		ret = cb(task);
 
-	dump_task_vmas(task, true);
+	dump_task_vmas(stdout, task, true);
 
 	delete_patch(task);
 

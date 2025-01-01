@@ -539,17 +539,20 @@ int dump_task(const struct task_struct *task, bool detail)
 	return 0;
 }
 
-void dump_task_vmas(struct task_struct *task, bool detail)
+void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail)
 {
 	int first_line = 1;
 	struct vm_area_struct *vma;
 
+	if (!fp)
+		fp = stdout;
+
 	list_for_each_entry(vma, &task->vma_list, node_list) {
-		print_vma(stdout, first_line, vma, detail);
+		print_vma(fp, first_line, vma, detail);
 		first_line = 0;
 	}
 
-	printf("\n(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n");
+	fprintf(fp, "\n(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n");
 }
 
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,

@@ -403,7 +403,7 @@ int free_task_vmas(struct task_struct *task);
 
 int dump_task(const struct task_struct *t, bool detail);
 
-void dump_task_vmas(struct task_struct *task, bool detail);
+void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
