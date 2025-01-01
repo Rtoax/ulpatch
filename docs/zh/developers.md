@@ -31,6 +31,11 @@
 像内核的 `current`，`current` 表示当前被打开的远端进程。
 
 
+### C 函数
+
+ULpatch 函数会在失败的情况下设置 `errno`。
+
+
 ### GitHub CI
 
 参见 [ulpatch/.github](https://github.com/Rtoax/ulpatch/tree/master/.github/workflows)。

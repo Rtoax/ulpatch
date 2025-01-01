@@ -71,7 +71,7 @@ struct pelf *openp(pid_t pid, off_t base)
 
 	pelf = malloc(sizeof(struct pelf));
 	if (!pelf) {
-		errno = -ENOMEM;
+		errno = ENOMEM;
 		return NULL;
 	}
 
@@ -120,7 +120,7 @@ struct pelf *openp(pid_t pid, off_t base)
 		if (phdr.p_type == PT_LOAD) {
 			if (ehdr.e_type == ET_EXEC) {
 				if (vaddr - offset < base) {
-					errno = -EFAULT;
+					errno = EFAULT;
 					goto fatal;
 				}
 			}

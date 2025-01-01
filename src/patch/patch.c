@@ -600,7 +600,7 @@ static const unsigned long resolve_symbol(const struct task_struct *task,
 	unsigned long addr = 0;
 
 	if (!task || !name) {
-		errno = -EINVAL;
+		errno = EINVAL;
 		return 0;
 	}
 	if (!(task->fto_flag & FTO_VMA_ELF_SYMBOLS)) {

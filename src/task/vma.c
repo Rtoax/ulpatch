@@ -118,6 +118,7 @@ struct vm_area_struct *find_vma(const struct task_struct *task,
 			       __find_vma_cmp, vaddr);
 	if (rnode)
 		return rb_entry(rnode, struct vm_area_struct, node_rb);
+	errno = ENOENT;
 	return NULL;
 }
 

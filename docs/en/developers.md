@@ -31,6 +31,11 @@ see [INSTALL](./INSTALL.md).
 Like kernel macro `current`, this `current` indicates the currently opened remote process.
 
 
+### C Functions
+
+ULpatch functions set `errno` for bad situation.
+
+
 ### GitHub CI
 
 Check [ulpatch/.github](https://github.com/Rtoax/ulpatch/tree/master/.github/workflows).

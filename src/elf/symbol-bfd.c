@@ -474,7 +474,7 @@ struct bfd_elf_file *bfd_elf_open(const char *elf_file)
 	struct bfd_elf_file *file = NULL;
 
 	if (!fexist(elf_file)) {
-		errno = -EEXIST;
+		errno = EEXIST;
 		return NULL;
 	}
 

@@ -143,6 +143,7 @@ int alloc_ulp(struct vm_area_struct *vma)
 	if (ret == -1 || ret < ulp_size) {
 		ulp_error("Failed read %lx:%s\n", vma->vm_start, vma->name_);
 		free_ulp(vma);
+		errno = EAGAIN;
 		return -EAGAIN;
 	}
 
@@ -154,8 +155,10 @@ void free_ulp(struct vm_area_struct *vma)
 {
 	struct vma_ulp *ulp = vma->ulp;
 
-	if (!ulp)
+	if (!ulp) {
+		errno = EINVAL;
 		return;
+	}
 
 	ulp_debug("Remove %s from ulpatch list.\n", vma->name_);
 
@@ -183,12 +186,14 @@ int vma_load_ulp(struct vm_area_struct *vma)
 	if (ret == -1 || ret < sizeof(ehdr)) {
 		ulp_error("Failed read from %lx:%s\n", vma->vm_start,
 			  vma->name_);
+		errno = EAGAIN;
 		return -EAGAIN;
 	}
 
 	if (!ehdr_magic_ok(&ehdr)) {
 		ulp_error("VMA %s(%lx) is ULPATCH, but it's not ELF.",
 			  vma->name_, vma->vm_start);
+		errno = ENOENT;
 		return -ENOENT;
 	}
 
@@ -253,12 +258,15 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	if (ret < sizeof(ehdr)) {
 		ulp_error("Failed read from %lx:%s\n", vma->vm_start,
 			  vma->name_);
+		errno = EAGAIN;
 		return -EAGAIN;
 	}
 
 	/* If it's not ELF, return success, skip the non-ELF VMAs */
-	if (!ehdr_ok(&ehdr))
+	if (!ehdr_ok(&ehdr)) {
+		errno = ENOENT;
 		return 0;
+	}
 
 	vma->is_elf = true;
 
@@ -462,8 +470,10 @@ static int vma_load_elf_file(struct vm_area_struct *vma)
 {
 	struct task_struct *task = vma->task;
 
-	if (!vma->is_elf)
+	if (!vma->is_elf) {
+		errno = EINVAL;
 		return -EINVAL;
+	}
 
 	/**
 	 * "[vdso]" vma is elf, but file is not exist, could not open it.
@@ -472,6 +482,7 @@ static int vma_load_elf_file(struct vm_area_struct *vma)
 		vma->bfd_elf_file = bfd_elf_open(vma->name_);
 		if (!vma->bfd_elf_file) {
 			ulp_error("Open ELF bfd %s failed.\n", vma->name_);
+			errno = EINVAL;
 			return -EINVAL;
 		}
 		switch (vma->type) {
@@ -491,8 +502,10 @@ static int vma_load_elf_file(struct vm_area_struct *vma)
 
 void vma_free_elf(struct vm_area_struct *vma)
 {
-	if (!vma->is_elf || vma->type == VMA_ULPATCH)
+	if (!vma->is_elf || vma->type == VMA_ULPATCH) {
+		errno = EINVAL;
 		return;
+	}
 
 	free(vma->vma_elf->phdrs);
 	free(vma->vma_elf);
@@ -505,8 +518,10 @@ int update_task_vmas_ulp(struct task_struct *task)
 
 void print_task(FILE *fp, const struct task_struct *task, bool detail)
 {
-	if (!task || !fp)
+	if (!task || !fp) {
+		errno = EINVAL;
 		return;
+	}
 
 	fprintf(fp, "Command: %-32s\n", task->comm);
 	fprintf(fp, "Exe:     %-32s\n", task->exe);
@@ -950,7 +965,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	if (!proc_pid_exist(pid)) {
 		ulp_error("pid %d is not exist.\n", pid);
-		errno = -ENOENT;
+		errno = ENOENT;
 		return NULL;
 	}
 
