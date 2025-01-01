@@ -128,6 +128,7 @@ popd
 
 %check
 %{buildroot}/%{_bindir}/ulpatch_test --version
+%{buildroot}/%{_bindir}/ulpatch_test --info
 # FIXME: remove '|| true'
 %{buildroot}/%{_bindir}/ulpatch_test || true
 
