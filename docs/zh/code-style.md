@@ -39,6 +39,7 @@ ULPatch 使用 **Unix format** 而不是 **DOS or Mac format**。
 ## 编成标准
 
 - 不要使用 `%s`+`strerror(errno)` 的方式打印错误信息，而是使用`%m`。
+- 记住，在必要的时候，在函数中设置`errno`。
 
 
 ## 文档标准

@@ -39,6 +39,7 @@ You may often see the special character `^M` under Unix like system if code is *
 ## Programming Standards
 
 - Never use `%s`+`strerror(errno)` display string describing error number in log, use `%m` instead.
+- Remember, set `errno` in ULPatch functions if necessary.
 
 
 ## Documents Standards
