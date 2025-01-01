@@ -43,6 +43,8 @@ Livepatch 的卸载过程如下图所示。
 
 ULTask 是修改目标进程的有用工具，我称之为 **Program Modifier**。`CONFIG_BUILD_ULTASK` 决定是否编译 `ultask`。查看手册 `ultask(8)` 以了解更多信息。
 
+ULTask 使用 `/proc/` 文件系统对对目标进程进行修改和查看。例如，通过 `/proc/PID/mem` 对目标进程内存进行读取或修改。
+
 TODO
 
 

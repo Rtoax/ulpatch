@@ -43,6 +43,8 @@ The `unpatch` operation is the reverse operation of `patch`, but without the rel
 
 It's an useful tool to modify target process, I call it **Program Modifier**. `CONFIG_BUILD_ULTASK` decides whether to compile `ultask`. Check manual `ultask(8)` to see more.
 
+ULTask uses the `/proc/` file system to modify and view the target process. For example, read or modify the target process memory via `/proc/PID/mem`.
+
 TODO
 
 
