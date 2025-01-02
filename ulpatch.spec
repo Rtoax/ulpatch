@@ -17,11 +17,14 @@
 %define with_capstone	0%{?!_without_capstone:1}
 %define with_libunwind	0%{?!_without_libunwind:1}
 
+# Compile executions as PIE or not
+%define build_pie	0%{?pie}
+
 Name:		ulpatch
 # The version number must be consistent with the CMakeLists.txt in the
 # top-level directory.
 Version:	0.5.12
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Userspace Live Patch Toolset
 
 License:	GPL-2.0 or later
@@ -115,6 +118,9 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 %if "%{toolchain}" == "clang"
 	-DCMAKE_C_COMPILER=clang \
 %endif
+%if %{build_pie}
+	-DCONFIG_BUILD_PIE_EXE=ON \
+%endif
 %if !%{?with_ulftrace}
 	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
@@ -183,6 +189,6 @@ popd
 %{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog
-* Thu Jan 02 2025 Rong Tao <rtoax@foxmail.com> - 0.5.12-2
+* Thu Jan 02 2025 Rong Tao <rtoax@foxmail.com> - 0.5.12-3
 - Not release yet.
 

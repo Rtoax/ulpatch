@@ -9,6 +9,8 @@ permissions:
 jobs:
   test_ulpatch:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
@@ -25,8 +27,10 @@ jobs:
   test_ulpatch_fedora:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         fedora-version: [38, 41]
+        pie: [OFF, ON]
     container:
       image: "fedora:${{matrix.fedora-version}}"
       # These options are required to be able to run lldb inside the container
@@ -40,16 +44,16 @@ jobs:
         sudo dnf install -y binutils-devel capstone-devel cmake \
               elfutils-devel elfutils-libelf-devel gcc gcc-c++ \
               glibc-devel libunwind-devel tree util-linux rpm-build \
-              git dnf-plugins-core
+              git dnf-plugins-core procps-ng
         sudo dnf builddep -y ulpatch.spec
     - name: System info
       run: ./.github/include/sysinfo.sh
     - name: Build binary
-      run: ./.github/include/ci.sh
+      run: ./.github/include/ci.sh --pie=${{matrix.pie}}
     - name: Running ulpatch_test
       run: ulpatch_test
     - name: Build RPMS
       working-directory: /workdir/ulpatch/
       run: |
         ./archive.sh
-        ./rpmbuild.sh
+        ./rpmbuild.sh --pie ${{matrix.pie}}

@@ -1,5 +1,6 @@
 # Build
 build
+build-ci
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
