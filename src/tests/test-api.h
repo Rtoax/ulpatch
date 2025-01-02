@@ -8,6 +8,7 @@
 #include <setjmp.h>
 
 #include <utils/list.h>
+#include <utils/log.h>
 #include <utils/compiler.h>
 
 #if defined(__x86_64__)
@@ -67,7 +68,12 @@ struct test {
 
 #define TEST_JMP_STATUS	0xff123
 
-#define GO_BACK_TO_TEST_AND_SKIP()	do {	\
+#define GOTO_TESTER_AND_SKIP_TEST()	do {	\
+		/* Mergency not happen in tests, it's a BUG some where */	\
+		if (!current_test) {	\
+		      ulp_emerg("Emergency not in test.\n");	\
+		      abort();	\
+		}	\
 		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
 	} while (0)
 

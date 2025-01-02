@@ -507,7 +507,7 @@ static bool should_skip(struct test *test)
 	return skip;
 }
 
-static int operate_test(struct test *test)
+static int execute_one_test(struct test *test)
 {
 	bool failed = false;
 	int verbose;
@@ -624,7 +624,7 @@ static void launch_tester(void)
 				continue;
 			}
 
-			ret = operate_test(test);
+			ret = execute_one_test(test);
 			/* if error */
 			if (ret != 0)
 				goto print_stat;
@@ -940,7 +940,7 @@ static void sig_handler(int signum)
 	case SIGSEGV:
 		ulp_emerg("Catch emerge signal.\n");
 		do_backtrace(stdout);
-		GO_BACK_TO_TEST_AND_SKIP();
+		GOTO_TESTER_AND_SKIP_TEST();
 		break;
 	}
 }
