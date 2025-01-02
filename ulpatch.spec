@@ -21,7 +21,7 @@ Name:		ulpatch
 # The version number must be consistent with the CMakeLists.txt in the
 # top-level directory.
 Version:	0.5.12
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Userspace Live Patch Toolset
 
 License:	GPL-2.0 or later
@@ -34,6 +34,11 @@ Recommends:	bash-completion
 # ========== build requires ==========
 
 BuildRequires:	binutils-devel
+%if "%{toolchain}" == "clang"
+BuildRequires:  clang
+%else
+BuildRequires:  gcc
+%endif
 BuildRequires:  cmake
 BuildRequires:	elfutils-devel
 BuildRequires:	elfutils-libelf-devel
@@ -107,6 +112,9 @@ pushd %{_builddir}/ulpatch-v%{version}
 mkdir build
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release \
+%if "%{toolchain}" == "clang"
+	-DCMAKE_C_COMPILER=clang \
+%endif
 %if !%{?with_ulftrace}
 	-DCONFIG_BUILD_ULFTRACE=OFF \
 %endif
@@ -175,6 +183,6 @@ popd
 %{_datadir}/ulpatch/ulpatches/printf.ulp
 
 %changelog
-* Thu Dec 26 2024 Rong Tao <rtoax@foxmail.com> - 0.5.12-1
+* Thu Jan 02 2025 Rong Tao <rtoax@foxmail.com> - 0.5.12-2
 - Not release yet.
 
