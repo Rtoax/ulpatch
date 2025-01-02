@@ -16,6 +16,7 @@ On **RHEL** like linux distrobution, manage packages with [rpm](https://github.c
 $ sudo dnf install -y epel-release
 $ sudo dnf group install -y "Development Tools"
 $ sudo dnf install -y \
+	bash-completion-devel \
 	binutils-devel \
 	capstone-devel \
 	cmake \
@@ -36,9 +37,10 @@ On **Debian** like linux distrobutions, manage packages with [dpkg](https://git.
 ```bash
 $ sudo apt install -y build-essential
 $ sudo apt install -y \
+	bash-completion \
+	binutils-dev \
 	cmake \
 	gcc \
-	binutils-dev \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
@@ -210,7 +212,9 @@ $ sudo dnf install rpm-build
 Then, install the depends of ulpatch according to spec:
 
 ```
-$ sudo dnf builddep ulpatch.spec
+# Or sudo dnf install -y dnf-plugins-core
+$ sudo dnf install -y 'dnf-command(builddep)'
+$ sudo dnf builddep -y ulpatch.spec
 ```
 
 Now, you can compile with rpmbuild. In the root directory of this project, I have written an rpmbuild(`rpmbuild.sh`) example for you. And of course, you need to archive the source code to tar package.
