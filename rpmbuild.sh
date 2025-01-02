@@ -4,12 +4,15 @@ set -e
 # Use half of CPU cores
 np=$(( $(nproc) / 2 ))
 
+pie=
 without_capstone=
 without_libunwind=
 nodebuginfo=
 
 __usage__() {
 	echo -e "
+--pie [ON|OFF]
+
 --without-capstone  build without capstone
 --without-libunwind build without libunwind
 
@@ -21,6 +24,7 @@ __usage__() {
 
 TEMP=$( getopt --options h \
 	--long help \
+	--long pie: \
 	--long without-capstone \
 	--long without-libunwind \
 	--long nodebuginfo \
@@ -34,6 +38,11 @@ while true ; do
 	-h | --help)
 		shift
 		__usage__
+		;;
+	--pie)
+		shift
+		pie=$1
+		shift
 		;;
 	--without-capstone)
 		shift
@@ -54,6 +63,9 @@ while true ; do
 	esac
 done
 
+PIE=
+[[ ${pie} == ON ]] && PIE=ON
+
 rpmbuild -ba \
 	--define "_topdir $PWD" \
 	--define "_sourcedir $PWD" \
@@ -61,4 +73,5 @@ rpmbuild -ba \
 	${without_capstone:+--without capstone} \
 	${without_libunwind:+--without libunwind} \
 	${nodebuginfo:+--nodebuginfo} \
+	${PIE:+--define "pie 1"} \
 	ulpatch.spec
