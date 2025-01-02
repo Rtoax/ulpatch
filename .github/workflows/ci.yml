@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: System info
-      run: ./.github/include/sysinfo.sh
     - name: Install dependencies
       run: |
         sudo apt install -y cmake gcc binutils-dev elfutils libcapstone-dev \
-              libelf-dev libunwind-dev tree
+              libelf-dev libunwind-dev tree bash-completion
+    - name: System info
+      run: ./.github/include/sysinfo.sh
     - name: Build binary
       run: ./.github/include/ci.sh
     - name: Running ulpatch_test
@@ -31,20 +31,25 @@ jobs:
       image: "fedora:${{matrix.fedora-version}}"
       # These options are required to be able to run lldb inside the container
       options: "--cap-add=SYS_PTRACE --security-opt seccomp=unconfined"
+      volumes:
+        - ${{ github.workspace }}:/workdir/ulpatch/
     steps:
     - uses: actions/checkout@v4
-    - name: System info
-      run: ./.github/include/sysinfo.sh
     - name: Install dependencies
       run: |
         sudo dnf install -y binutils-devel capstone-devel cmake \
               elfutils-devel elfutils-libelf-devel gcc gcc-c++ \
-              glibc-devel libunwind-devel tree util-linux rpm-build
+              glibc-devel libunwind-devel tree util-linux rpm-build \
+              git dnf-plugins-core
+        sudo dnf builddep -y ulpatch.spec
+    - name: System info
+      run: ./.github/include/sysinfo.sh
     - name: Build binary
       run: ./.github/include/ci.sh
     - name: Running ulpatch_test
       run: ulpatch_test
     - name: Build RPMS
+      working-directory: /workdir/ulpatch/
       run: |
         ./archive.sh
         ./rpmbuild.sh

@@ -6,3 +6,6 @@ systemd-detect-virt || true
 uname -a
 # Fedora base container doesn't contain ip command.
 ip addr || true
+gcc --version
+echo cwd=$PWD
+ls -al

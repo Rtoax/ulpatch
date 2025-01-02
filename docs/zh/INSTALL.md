@@ -16,6 +16,7 @@ hide:
 $ sudo dnf install -y epel-release
 $ sudo dnf group install -y "Development Tools"
 $ sudo dnf install -y \
+	bash-completion-devel \
 	binutils-devel \
 	capstone-devel \
 	cmake \
@@ -35,9 +36,10 @@ $ sudo dnf install -y \
 ```bash
 $ sudo apt install -y build-essential
 $ sudo apt install -y \
+	bash-completion \
+	binutils-dev \
 	cmake \
 	gcc \
-	binutils-dev \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
@@ -210,7 +212,9 @@ $ sudo dnf install rpm-build
 然后，安装 ULPatch 构建所需要的依赖：
 
 ```
-$ sudo dnf builddep ulpatch.spec
+# Or sudo dnf install -y dnf-plugins-core
+$ sudo dnf install -y 'dnf-command(builddep)'
+$ sudo dnf builddep -y ulpatch.spec
 ```
 
 现在，你可以通过`rpmbuild`构建RPM包了。在ULPatch代码仓库的根目录下，我已经封装了`rpmbuild.sh`命令。当然，你需要先打包源代码。生成 tar 包：
