@@ -67,11 +67,6 @@ struct test {
 
 #define TEST_JMP_STATUS	0xff123
 
-#define INIT_TEST_JMP()	do {	\
-		if (sigsetjmp(current_test->jmpbuf, 1) == TEST_JMP_STATUS)	\
-			return TEST_RET_EMERG;	\
-	} while (0)
-
 #define GO_BACK_TO_TEST_AND_SKIP()	do {	\
 		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
 	} while (0)
@@ -79,25 +74,34 @@ struct test {
 	/**
 	 * jmpbuf could skip emergency like SIGILL, make ulpatch_test done.
 	 *
-	 * (3)  +---->sighandler() {
-	 * (4)  |       SIGSEGV, SIGILL-----+
-	 *      |     }                     |
-	 *      | +-------------------------+
-	 *      | |
-	 * (1)  | |    current_test() {
-	 * (5)  | +-----> jmpbuf-----------> return TEST_RET_EMERG; (6)
-	 *      |         +----------------+
-	 * (2)  +---------+ SIGSEGV/SIGILL |
-	 *                +----------------+
-	 *             }
+	 * (4) +---->sighandler() {
+	 *     |       SIGSEGV, SIGILL-----+
+	 *     |     }                     |
+	 *     | +-------------------------+
+	 *     | |
+	 * (1) | |   execute_one_test() {
+	 *     | |                        +-------------------------+
+	 * (5) | +----> jmpbuf----------->|real_ret= TEST_RET_EMERG;|(6)
+	 *     |                          |goto skip_test;          |
+	 *     |                          +-------------------------+
+	 * (2) |        current_test() {
+	 *     |           +----------------+
+	 * (3) +-----------+ SIGSEGV/SIGILL |
+	 *                 +----------------+
+	 *              }
+	 *
+	 * (7)       skip_test:
+	 *              ...
+	 *           }
 	 *
 	 * Procedures
 	 * (1) running a test;
-	 * (2) sigill happen;
-	 * (3) signal handle;
-	 * (4) case of signal;
-	 * (5) long jump to current test;
-	 * (6) return TEST_RET_EMERG;
+	 * (2) calling callback function;
+	 * (3) sigill happen;
+	 * (4) signal handler, handle case of signal;
+	 * (5) long jump to executer;
+	 * (6) set return TEST_RET_EMERG and skip test;
+	 * (7) skip this test;
 	 */
 	sigjmp_buf jmpbuf;
 

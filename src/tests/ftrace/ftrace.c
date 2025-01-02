@@ -244,11 +244,6 @@ TEST(Patch, ftrace_nop, 0)
 		.replace = REPLACE_NOP,
 	};
 
-	/**
-	 * Debian maybe SIGILL.
-	 */
-	INIT_TEST_JMP();
-
 	return direct_patch_ftrace_test(&arg, 0);
 }
 #endif

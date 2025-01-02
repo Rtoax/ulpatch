@@ -525,12 +525,23 @@ static int operate_test(struct test *test)
 	/* Set current test */
 	current_test = test;
 
+	/**
+	 * If test has emergency situation, will jump here from signal handler,
+	 * then, skip the test.
+	 */
+	if (sigsetjmp(test->jmpbuf, 1) == TEST_JMP_STATUS) {
+		test->real_ret = TEST_RET_EMERG;
+		goto done_test;
+	}
+
 	gettimeofday(&test->start, NULL);
 
 	/* Exe test entry */
 	verbose = get_verbose();
 	test->real_ret = test->test_cb();
 	enable_verbose(verbose);
+
+done_test:
 	if (test->real_ret == test->expect_ret || test->expect_ret == TEST_RET_SKIP) {
 		stat_count[STAT_IDX_SUCCESS]++;
 	} else {

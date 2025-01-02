@@ -13,7 +13,6 @@ TEST_STUB(test_signal);
 
 TEST(Signal, SIGILL, TEST_RET_SKIP)
 {
-	INIT_TEST_JMP();
 	/* Trigger SIGILL */
 	__asm__ __volatile__("ud2\n");
 	return 0;
@@ -21,7 +20,6 @@ TEST(Signal, SIGILL, TEST_RET_SKIP)
 
 TEST(Signal, SIGSEGV, TEST_RET_SKIP)
 {
-	INIT_TEST_JMP();
 	/* Trigger SIGSEGV */
 	char *str = NULL;
 #if defined(__clang__)
