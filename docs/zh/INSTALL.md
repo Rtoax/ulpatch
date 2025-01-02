@@ -72,6 +72,8 @@ $ make -j$(nproc)
 
 或者你可以通过指定 `-B build` 参数，像 `cmake -B build -DCMAKE_BUILD_TYPE=Release`。如果你想要编译时查看详情，使用`make VERBOSE=1`。
 
+默认使用`gcc`，如果想要使用`clang`，需要指定 cmake 参数`-DCMAKE_C_COMPILER=clang`。
+
 
 ### CMake 相关宏
 

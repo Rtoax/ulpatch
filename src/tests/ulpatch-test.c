@@ -161,7 +161,7 @@ static inline int has_filter_match(void)
 	return false;
 }
 
-static inline int has_filter_skip(void)
+static inline __unused int has_filter_skip(void)
 {
 	struct filter_fmt *fmt;
 	list_for_each_entry(fmt, &filter_fmt_list, node)
@@ -735,7 +735,7 @@ int printer_print_hello(int nloop, const char *content)
 			__stringify(printer_print_hello), printer_print_hello,
 			__stringify(static_func1), static_func1);
 	hello_world();
-	return 0;
+	return ret;
 }
 
 static void launch_printer(void)

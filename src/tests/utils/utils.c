@@ -19,5 +19,5 @@ TEST(Utils, page, 0)
 	ret += ulp_page_size() != PAGE_SIZE;
 	ret += ulp_page_shift() != PAGE_SHIFT;
 
-	return 0;
+	return ret;
 }

@@ -74,6 +74,8 @@ $ make -j$(nproc)
 
 Or you could specify `-B build` argument of cmake, like `cmake -B build -DCMAKE_BUILD_TYPE=Release`. If you want to see the compile detail, use `make VERBOSE=1`.
 
+Default use `gcc`, if want to use `clang`, you could specify `-DCMAKE_C_COMPILER=clang` argument of cmake.
+
 
 ### CMake Macros
 

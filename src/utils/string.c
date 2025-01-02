@@ -119,7 +119,6 @@ static void __free_str(struct str_node *str)
  */
 int parse_strstr(char *src, struct list_head *list)
 {
-	int n = 0;
 	char *newstr = strdup(src);
 	char *p = newstr;
 
@@ -141,10 +140,8 @@ int parse_strstr(char *src, struct list_head *list)
 				p++;
 			}
 
-			if (name[0] != '\0') {
+			if (name[0] != '\0')
 				__add_to_str_list(name, list);
-				n++;
-			}
 		} else break;
 	}
 	free(newstr);
