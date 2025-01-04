@@ -1164,7 +1164,7 @@ static void __clean_task_proc(struct task_struct *task)
 	/* ULP_PROC_ROOT_DIR/PID/TASK_PROC_COMM */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d/" TASK_PROC_COMM,
 		 task->pid);
-	if (unlink(buffer) != 0)
+	if (fexist(buffer) && unlink(buffer) != 0)
 		ulp_error("unlink(%s) for %d:%s failed, %m.\n",
 			buffer, task->pid, task->exe);
 
@@ -1175,13 +1175,13 @@ static void __clean_task_proc(struct task_struct *task)
 	 * If process was patched, we should not remove the proc directory,
 	 * and rmdir can't remove the directory has file in it.
 	 */
-	if (rmdir(buffer) != 0)
+	if (fexist(buffer) && rmdir(buffer) != 0)
 		ulp_error("rmdir(%s) for %d:%s failed, %m.\n", buffer,
 			task->pid, task->exe);
 
 	/* ULP_PROC_ROOT_DIR/PID */
 	snprintf(buffer, PATH_MAX - 1, ULP_PROC_ROOT_DIR "/%d", task->pid);
-	if (rmdir(buffer) != 0)
+	if (fexist(buffer) && rmdir(buffer) != 0)
 		ulp_error("rmdir(%s) for %d:%s failed, %m.\n", buffer,
 			task->pid, task->exe);
 }
