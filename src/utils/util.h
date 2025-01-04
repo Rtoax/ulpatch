@@ -227,6 +227,7 @@ void free_strstr_list(struct list_head *list);
 unsigned long str2size(const char *str);
 unsigned long str2addr(const char *str);
 
+int fmembytes(FILE *fp, const void *data, int data_len);
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)

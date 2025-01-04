@@ -53,6 +53,9 @@ void sig_handler(int sig)
 	}
 }
 
+/**
+ * This maybe use to test 'ultash --jmp ...'
+ */
 void patch_hello2(unsigned long ul)
 {
 	printf("Hello World. %ld, %ld, patched\n", count, ul);

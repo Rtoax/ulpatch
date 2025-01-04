@@ -34,6 +34,11 @@ TEST(Utils_str, memshow, 0)
 	return 0;
 }
 
+TEST(Utils_str, fmembytes, 0)
+{
+	return fmembytes(stdout, docs, sizeof(docs));
+}
+
 TEST(Utils_str, print, 0)
 {
 	print_string_hex(stdout, NULL, (void *)docs, sizeof(docs));

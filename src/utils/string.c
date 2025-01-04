@@ -87,6 +87,20 @@ int print_bytes(FILE *fp, void *mem, size_t len)
 	return ret;
 }
 
+int fmembytes(FILE *fp, const void *data, int data_len)
+{
+	int i;
+	const uint8_t *b;
+
+	if (!fp)
+		fp = stdout;
+
+	for (i = 0, b = data; i < data_len; i++, b++)
+		fprintf(fp, "%02x%s", *b, i < (data_len - 1) ? " " : "");
+	fprintf(fp, "\n");
+	return 0;
+}
+
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int ulp_startswith(const char *str, const char *prefix)
 {
@@ -201,4 +215,3 @@ unsigned long str2addr(const char *str)
 
 	return addr;
 }
-

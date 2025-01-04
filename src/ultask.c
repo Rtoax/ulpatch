@@ -821,6 +821,18 @@ int ultask(int argc, char *argv[])
 		new_insn = (void *)&jmp_entry;
 		insn_sz = sizeof(struct jmp_table_entry);
 
+		char buf[sizeof(struct jmp_table_entry)] = {};
+
+		n = memcpy_from_task(target_task, buf, jmp_addr_from, insn_sz);
+		if (n == -1 || n < insn_sz) {
+			ulp_error("failed read target process.\n");
+			ret = -1;
+			goto done;
+		}
+
+		fprintf(stdout, "Original data bytes: ");
+		fmembytes(stdout, buf, insn_sz);
+
 		n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
 					insn_sz);
 		if (n == -1 || n < insn_sz) {
