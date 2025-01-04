@@ -733,6 +733,55 @@ static void list_all_symbols(void)
 	}
 }
 
+int run_jmp(void)
+{
+	int err = 0;
+	struct vm_area_struct *vma_from, *vma_to;
+	size_t n, insn_sz;
+	char *new_insn;
+	struct jmp_table_entry jmp_entry;
+	char buf[sizeof(struct jmp_table_entry)] = {};
+
+	if (!jmp_addr_from || !jmp_addr_to)
+		return 0;
+
+	vma_from = find_vma(target_task, jmp_addr_from);
+	vma_to = find_vma(target_task, jmp_addr_to);
+	if (!vma_from || !vma_to) {
+		fprintf(stderr,
+			"0x%lx ot 0x%lx not in process address space\n"
+			"check with /proc/%d/maps or gdb.\n",
+			jmp_addr_from, jmp_addr_to, target_pid);
+		err = -ENOENT;
+		goto done;
+	}
+
+	jmp_entry.jmp = arch_jmp_table_jmp();
+	jmp_entry.addr = jmp_addr_to;
+	new_insn = (void *)&jmp_entry;
+	insn_sz = sizeof(struct jmp_table_entry);
+
+	n = memcpy_from_task(target_task, buf, jmp_addr_from, insn_sz);
+	if (n == -1 || n < insn_sz) {
+		ulp_error("failed read target process.\n");
+		err = -ENOMEM;
+		goto done;
+	}
+
+	fprintf(stdout, "Original data bytes: ");
+	fmembytes(stdout, buf, insn_sz);
+
+	n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
+				insn_sz);
+	if (n == -1 || n < insn_sz) {
+		ulp_error("failed kick target process.\n");
+		err = -ENOMEM;
+		goto done;
+	}
+done:
+	return err;
+}
+
 int ultask(int argc, char *argv[])
 {
 	int ret = 0;
@@ -800,47 +849,7 @@ int ultask(int argc, char *argv[])
 	if (flag_print_fds)
 		dump_task_fds(stdout, target_task, is_verbose());
 
-	if (jmp_addr_from && jmp_addr_to) {
-		struct vm_area_struct *vma_from, *vma_to;
-		vma_from = find_vma(target_task, jmp_addr_from);
-		vma_to = find_vma(target_task, jmp_addr_to);
-		if (!vma_from || !vma_to) {
-			fprintf(stderr,
-				"0x%lx ot 0x%lx not in process address space\n"
-				"check with /proc/%d/maps or gdb.\n",
-				jmp_addr_from, jmp_addr_to, target_pid);
-			ret = -1;
-			goto done;
-		}
-		size_t n, insn_sz;
-		char *new_insn;
-		struct jmp_table_entry jmp_entry;
-
-		jmp_entry.jmp = arch_jmp_table_jmp();
-		jmp_entry.addr = jmp_addr_to;
-		new_insn = (void *)&jmp_entry;
-		insn_sz = sizeof(struct jmp_table_entry);
-
-		char buf[sizeof(struct jmp_table_entry)] = {};
-
-		n = memcpy_from_task(target_task, buf, jmp_addr_from, insn_sz);
-		if (n == -1 || n < insn_sz) {
-			ulp_error("failed read target process.\n");
-			ret = -1;
-			goto done;
-		}
-
-		fprintf(stdout, "Original data bytes: ");
-		fmembytes(stdout, buf, insn_sz);
-
-		n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
-					insn_sz);
-		if (n == -1 || n < insn_sz) {
-			ulp_error("failed kick target process.\n");
-			ret = -1;
-			goto done;
-		}
-	}
+	run_jmp();
 
 	if (disasm_addr && disasm_size) {
 		void *mem = malloc(disasm_size);
@@ -857,7 +866,6 @@ int ultask(int argc, char *argv[])
 		free(mem);
 	}
 
-done:
 	close_task(target_task);
 	return ret;
 }
