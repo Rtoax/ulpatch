@@ -769,18 +769,19 @@ static int __get_exe(struct task_struct *task)
 	return 0;
 }
 
-int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
+static int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 {
 	int fd, n, ret = 0;
 	char buf[PATH_MAX];
 	GElf_auxv_t auxv;
 
 	memset(pauxv, 0x00, sizeof(struct task_struct_auxv));
+
 	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
 	fd = open(buf, O_RDONLY);
 	if (fd == -1) {
-		ulp_error("Open %s failed, %m\n", buf);
 		ret = -errno;
+		ulp_error("Open %s failed, %m\n", buf);
 		goto exit;
 	}
 
@@ -846,7 +847,15 @@ exit:
 
 int print_task_auxv(FILE *fp, const struct task_struct *task)
 {
-	const struct task_struct_auxv *pauxv = &task->auxv;
+	const struct task_struct_auxv *pauxv;
+
+	if (!task || !(task->fto_flag & FTO_AUXV)) {
+		ulp_error("Not set FTO_AUXV.\n");
+		errno = EINVAL;
+		return -EINVAL;
+	}
+
+	pauxv = &task->auxv;
 
 	if (!fp)
 		fp = stdout;
@@ -989,9 +998,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 	rb_init(&task->vmas_rb);
 	task_syms_init(&task->tsyms);
 
-	err = load_task_auxv(pid, &task->auxv);
-	if (err)
-		goto free_task;
+	if (flag & FTO_AUXV) {
+		err = load_task_auxv(pid, &task->auxv);
+		if (err)
+			goto free_task;
+	}
 
 	err =load_task_status(pid, &task->status);
 	if (err)
