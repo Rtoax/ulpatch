@@ -40,19 +40,19 @@ enum {
 };
 
 enum {
-	VMA_OPTION,
-	DISASM_OPTION,
-	ADDR_OPTION,
-	SIZE_OPTION,
-	END_DUMP_OPTION,
+	DUMP_VMA_OPTION,
+	DUMP_DISASM_OPTION,
+	DUMP_ADDR_OPTION,
+	DUMP_SIZE_OPTION,
+	DUMP_END_NULL_OPTION,
 };
 
 char *const dump_opts[] = {
-	[VMA_OPTION] = "vma",
-	[DISASM_OPTION] = "disasm",
-	[ADDR_OPTION] = "addr",
-	[SIZE_OPTION] = "size",
-	[END_DUMP_OPTION] = NULL,
+	[DUMP_VMA_OPTION] = "vma",
+	[DUMP_DISASM_OPTION] = "disasm",
+	[DUMP_ADDR_OPTION] = "addr",
+	[DUMP_SIZE_OPTION] = "size",
+	[DUMP_END_NULL_OPTION] = NULL,
 };
 
 enum {
@@ -71,7 +71,7 @@ enum {
 	MAP_FILE_OPTION,
 	MAP_RO_OPTION,
 	MAP_NO_EXEC_OPTION,
-	MAP_ADDR_OPTION,
+	MAP_DUMP_ADDR_OPTION,
 	END_MAP_OPTION,
 };
 
@@ -79,12 +79,12 @@ char *const map_opts[] = {
 	[MAP_FILE_OPTION] = "file",
 	[MAP_RO_OPTION] = "ro",
 	[MAP_NO_EXEC_OPTION] = "noexec",
-	[MAP_ADDR_OPTION] = "addr",
+	[MAP_DUMP_ADDR_OPTION] = "addr",
 	[END_MAP_OPTION] = NULL,
 };
 
 enum {
-	MPROT_ADDR_OPTION,
+	MPROT_DUMP_ADDR_OPTION,
 	MPROT_LEN_OPTION,
 	MPROT_NONE_OPTION,
 	MPROT_READ_OPTION,
@@ -94,7 +94,7 @@ enum {
 };
 
 char *const mprotect_opts[] = {
-	[MPROT_ADDR_OPTION] = "addr",
+	[MPROT_DUMP_ADDR_OPTION] = "addr",
 	[MPROT_LEN_OPTION] = "len",
 	[MPROT_NONE_OPTION] = "none",
 	[MPROT_READ_OPTION] = "read",
@@ -280,16 +280,16 @@ static int parse_config(int argc, char *argv[])
 			subopts = optarg;
 			while (*subopts != '\0') {
 				switch (getsubopt(&subopts, dump_opts, &value)) {
-				case VMA_OPTION:
+				case DUMP_VMA_OPTION:
 					flag_dump_vma = true;
 					break;
-				case DISASM_OPTION:
+				case DUMP_DISASM_OPTION:
 					flag_disasm = true;
 					break;
-				case ADDR_OPTION:
+				case DUMP_ADDR_OPTION:
 					dump_addr = str2addr(value);
 					break;
-				case SIZE_OPTION:
+				case DUMP_SIZE_OPTION:
 					dump_size = str2size(value);
 					break;
 				default:
@@ -358,7 +358,7 @@ static int parse_config(int argc, char *argv[])
 				case MAP_NO_EXEC_OPTION:
 					map_noexec = true;
 					break;
-				case MAP_ADDR_OPTION:
+				case MAP_DUMP_ADDR_OPTION:
 					map_addr = str2addr(value);
 					if (map_addr == 0) {
 						fprintf(stderr, "invalid map addr.\n");
@@ -389,7 +389,7 @@ static int parse_config(int argc, char *argv[])
 			while (*subopts != '\0') {
 				switch (getsubopt(&subopts, mprotect_opts,
 					&value)) {
-				case MPROT_ADDR_OPTION:
+				case MPROT_DUMP_ADDR_OPTION:
 					mprotect_addr = str2addr(value);
 					break;
 				case MPROT_LEN_OPTION:
