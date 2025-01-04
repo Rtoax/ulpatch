@@ -782,6 +782,34 @@ done:
 	return err;
 }
 
+int run_disasm(void)
+{
+	void *mem;
+	int ret = 0;
+
+	if (!disasm_addr || !disasm_size)
+		return 0;
+
+	mem = malloc(disasm_size);
+
+	ret = memcpy_from_task(target_task, mem, disasm_addr, disasm_size);
+	if (ret <= 0) {
+		fprintf(stderr, "Bad address 0x%lx\n", disasm_addr);
+		ret = -ENOMEM;
+		goto done;
+	}
+
+	print_string_hex(stdout, "Hex: ", mem, disasm_size);
+	ret = fdisasm_arch(stdout, NULL, 0, mem, disasm_size);
+	if (ret) {
+		fprintf(stderr, "Disasm failed\n");
+	}
+
+done:
+	free(mem);
+	return ret;
+}
+
 int ultask(int argc, char *argv[])
 {
 	int ret = 0;
@@ -850,21 +878,7 @@ int ultask(int argc, char *argv[])
 		dump_task_fds(stdout, target_task, is_verbose());
 
 	run_jmp();
-
-	if (disasm_addr && disasm_size) {
-		void *mem = malloc(disasm_size);
-		ret = memcpy_from_task(target_task, mem, disasm_addr, disasm_size);
-		if (ret <= 0) {
-			fprintf(stderr, "Bad address 0x%lx\n", disasm_addr);
-		} else {
-			print_string_hex(stdout, "Hex: ", mem, disasm_size);
-			ret = fdisasm_arch(stdout, NULL, 0, mem, disasm_size);
-			if (ret) {
-				fprintf(stderr, "Disasm failed\n");
-			}
-		}
-		free(mem);
-	}
+	run_disasm();
 
 	close_task(target_task);
 	return ret;
