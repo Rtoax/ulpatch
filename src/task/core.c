@@ -781,7 +781,7 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 	if (fd == -1) {
 		ulp_error("Open %s failed, %m\n", buf);
 		ret = -errno;
-		goto close_exit;
+		goto exit;
 	}
 
 	while (true) {
@@ -840,6 +840,7 @@ int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
 
 close_exit:
 	close(fd);
+exit:
 	return ret;
 }
 
@@ -959,6 +960,7 @@ int print_task_status(FILE *fp, const struct task_struct *task)
  */
 struct task_struct *open_task(pid_t pid, int flag)
 {
+	int err = 0;
 	struct task_struct *task = NULL;
 	int o_flags;
 	struct vm_area_struct *tmp_vma;
@@ -987,15 +989,20 @@ struct task_struct *open_task(pid_t pid, int flag)
 	rb_init(&task->vmas_rb);
 	task_syms_init(&task->tsyms);
 
-	if (load_task_auxv(pid, &task->auxv))
+	err = load_task_auxv(pid, &task->auxv);
+	if (err)
 		goto free_task;
 
-	if (load_task_status(pid, &task->status))
+	err =load_task_status(pid, &task->status);
+	if (err)
 		goto free_task;
 
-	__get_comm(task);
+	err = __get_comm(task);
+	if (err)
+		goto free_task;
 
-	if (__get_exe(task))
+	err = __get_exe(task);
+	if (err)
 		goto free_task;
 
 	/* Open target process memory */
@@ -1006,7 +1013,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	task->proc_mem_fd = task->proc_mem_fd;
 
-	if (read_task_vmas(task, false))
+	err = read_task_vmas(task, false);
+	if (err)
 		goto free_task;
 
 	if (!task->libc_vma || !task->stack) {
@@ -1147,6 +1155,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 free_task:
 	close_task(task);
 failed:
+	errno = -err;
 	return NULL;
 }
 
