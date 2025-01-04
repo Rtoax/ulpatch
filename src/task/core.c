@@ -872,7 +872,7 @@ int print_task_auxv(FILE *fp, const struct task_struct *task)
 	return 0;
 }
 
-int load_task_status(pid_t pid, struct task_status *status)
+static int load_task_status(pid_t pid, struct task_status *status)
 {
 	int fd, ret = 0;
 	char buf[PATH_MAX];
@@ -1004,9 +1004,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 			goto free_task;
 	}
 
-	err =load_task_status(pid, &task->status);
-	if (err)
-		goto free_task;
+	if (flag & FTO_STATUS) {
+		err =load_task_status(pid, &task->status);
+		if (err)
+			goto free_task;
+	}
 
 	err = __get_comm(task);
 	if (err)

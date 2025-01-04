@@ -200,6 +200,10 @@ struct fd {
  * Open /proc/PID/auxv.
  */
 #define FTO_AUXV	BIT(7)
+/**
+ * Open /proc/PID/status.
+ */
+#define FTO_STATUS	BIT(8)
 
 #define FTO_ALL 0xffffffff
 
@@ -208,7 +212,8 @@ struct fd {
 			FTO_THREADS | \
 			FTO_RDWR | \
 			FTO_FD | \
-			FTO_AUXV)
+			FTO_AUXV | \
+			FTO_STATUS)
 #define FTO_ULPATCH	FTO_ULFTRACE
 
 /* under ULP_PROC_ROOT_DIR/${PID}/ */
@@ -431,8 +436,6 @@ int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
 
 int print_task_auxv(FILE *fp, const struct task_struct *task);
-
-int load_task_status(pid_t pid, struct task_status *status);
 int print_task_status(FILE *fp, const struct task_struct *task);
 
 #define current get_current_task()
