@@ -2,7 +2,9 @@
 
 _comp_filedir()
 {
-	if [[ ${BASH_COMPLETION_VERSINFO[1]} > 11 ]]; then
+	# bash-completion 2.11-1091-g6e8a1546bde2 rename _filedir to _comp_compgen_filedir
+	if [[ ${BASH_COMPLETION_VERSINFO[0]} == 2 ]] && \
+	   [[ ${BASH_COMPLETION_VERSINFO[1]} > 11 ]]; then
 		_comp_compgen_filedir "${@}"
 	else
 		_filedir "${@}"
