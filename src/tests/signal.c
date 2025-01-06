@@ -14,7 +14,13 @@ TEST_STUB(test_signal);
 TEST(Signal, SIGILL, TEST_RET_SKIP)
 {
 	/* Trigger SIGILL */
+#if defined(__x86_64__)
 	__asm__ __volatile__("ud2\n");
+#elif defined(__aarch64__)
+	__asm__ __volatile__("udf #0\n");
+#else
+# error "Not support architecture!"
+#endif
 	return 0;
 }
 
