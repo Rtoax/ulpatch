@@ -768,8 +768,20 @@ int run_jmp(void)
 		goto done;
 	}
 
-	fprintf(stdout, "Original data bytes: ");
+	/**
+	 * Display original data, disasm too, however, if the data is not in
+	 * code(.text) section, it's means nothing.
+	 */
+	fprintf(stdout, "OrigBytes:  ");
 	fmembytes(stdout, buf, insn_sz);
+	fdisasm_arch(stdout, "OrigBytes:  ", jmp_addr_from,
+		     (unsigned char *)buf, insn_sz);
+
+	/* Display new data */
+	fprintf(stdout, "WroteBytes: ");
+	fmembytes(stdout, new_insn, insn_sz);
+	fdisasm_arch(stdout, "WroteBytes: ", jmp_addr_from,
+		     (unsigned char *)new_insn, insn_sz);
 
 	n = memcpy_to_task(target_task, jmp_addr_from, new_insn,
 				insn_sz);

@@ -96,7 +96,7 @@ int fmembytes(FILE *fp, const void *data, int data_len)
 		fp = stdout;
 
 	for (i = 0, b = data; i < data_len; i++, b++)
-		fprintf(fp, "%02x%s", *b, i < (data_len - 1) ? " " : "");
+		fprintf(fp, "0x%02x%s", *b, i < (data_len - 1) ? "," : "");
 	fprintf(fp, "\n");
 	return 0;
 }
