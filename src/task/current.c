@@ -27,6 +27,8 @@
 static struct task_struct *current_task = NULL;
 static struct task_struct fallback_task = {
 	.pid = 0,
+	.fto_flag = 0,
+	.exe = "??",
 };
 
 int set_current_task(struct task_struct *task)
