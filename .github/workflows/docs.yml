@@ -1,5 +1,5 @@
 # Build the ULPatch documentation on github
-name: docs
+name: DOC
 on:
   push:
     paths:
@@ -7,6 +7,8 @@ on:
       - 'docs/en/**'
       - 'docs/zh/**'
       - 'docs/images/**'
+      - .github/workflows/docs.yml
+      - .github/workflows/requirements.txt
       - mkdocs.yml
     branches:
       - master
@@ -16,6 +18,8 @@ on:
       - 'docs/en/**'
       - 'docs/zh/**'
       - 'docs/images/**'
+      - .github/workflows/docs.yml
+      - .github/workflows/requirements.txt
       - mkdocs.yml
 
 permissions:
@@ -33,14 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install 'numpy>=1.17.0' \
-                      'pyyaml>=5.3' \
-                      'tqdm' \
-                      'mkdocs>=1.5.2' \
-                      'mkdocs-material>=9.2.6' \
-                      'mkdocstrings[python]>=0.22.0' \
-                      'mkdocs-static-i18n>=1.0.2' \
-                      'mkdocs-include-markdown-plugin>=6.0.1'
+          pip install -r .github/workflows/requirements.txt
       - name: Build site
         run: mkdocs build
       - name: Deploy to gh-pages
