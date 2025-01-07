@@ -1,7 +1,29 @@
 # ULPatch CI on github
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'cmake/**'
+      - 'man/**'
+      - 'scripts/**'
+      - 'src/**'
+      - archive.sh
+      - rpmbuild.sh
+      - ulpatch.spec
+      - CMakeLists.txt
+    branches:
+      - master
+  pull_request:
+    paths:
+      - 'cmake/**'
+      - 'man/**'
+      - 'scripts/**'
+      - 'src/**'
+      - archive.sh
+      - rpmbuild.sh
+      - ulpatch.spec
+      - CMakeLists.txt
 
 permissions:
   contents: write
