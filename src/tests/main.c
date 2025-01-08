@@ -828,13 +828,11 @@ static void init_test_symbols(void)
 #define TEST_FUNC_SYM(s) \
 	if (!strcmp(#s, test_symbols[i].sym) && test_symbols[i].type == TYPE_TST_SYM_FUNC) {	\
 		test_symbols[i].addr = (unsigned long)s;	\
-		ulp_debug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
 	}
 /* DATA need '&' operater */
 #define TEST_DATA_SYM(s) \
 	if (!strcmp(#s, test_symbols[i].sym) && test_symbols[i].type == TYPE_TST_SYM_DATA) {	\
 		test_symbols[i].addr = (unsigned long)&s;	\
-		ulp_debug("Sym %s addr %lx\n", #s, test_symbols[i].addr);	\
 	}
 # include <tests/test-symbols.h>
 #undef TEST_FUNC_SYM

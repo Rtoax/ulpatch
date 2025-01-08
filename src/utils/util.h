@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/types.h>
 #include <limits.h>
 
@@ -226,6 +227,8 @@ void free_strstr_list(struct list_head *list);
 
 unsigned long str2size(const char *str);
 unsigned long str2addr(const char *str);
+void *strbytes2mem(const char *bytes, size_t *nbytes, void *buf, size_t buf_len,
+		   char seperator);
 
 int fmembytes(FILE *fp, const void *data, int data_len);
 

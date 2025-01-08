@@ -3,7 +3,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <utils/log.h>
+#include <utils/util.h>
 #include <utils/list.h>
+#include <utils/disasm.h>
 #include <tests/test-api.h>
 
 TEST_STUB(utils_string);
@@ -92,6 +94,102 @@ TEST(Utils_str, str2addr, 0)
 		unsigned long v = str2addr(values[i].str);
 		ulp_debug("v = 0x%lx, %ld\n", v, v);
 		if (v != values[i].expect)
+			ret++;
+	}
+
+	return ret;
+}
+
+TEST(Utils_str, strbytes2mem, 0)
+{
+	int ret, i;
+	char buf[1024];
+	size_t nbytes;
+
+	struct {
+		char *s;
+		uint8_t mem[128];
+		size_t n;
+		char seperator;
+	} values[] = {
+		{
+			.s = "0xff",
+			.mem = {0xff},
+			.n = 1,
+		},
+		{
+			.s = "0xff,",
+			.mem = {0xff},
+			.n = 1,
+		},
+		{
+			.s = ",,,0xff,,,,",
+			.mem = {0xff},
+			.n = 1,
+		},
+		{
+			.s = "0xff,0x11",
+			.mem = {0xff,0x11},
+			.n = 2,
+		},
+		{
+			.s = ",,,,0xff,,,0x11,,,",
+			.mem = {0xff,0x11},
+			.n = 2,
+		},
+		{
+			.s = "0xff,0x1,0x2",
+			.mem = {0xff,0x1,0x2},
+			.n = 3,
+		},
+		{
+			.s = "0xff,,,0x1,,,0x2,,",
+			.mem = {0xff,0x1,0x2},
+			.n = 3,
+		},
+		{
+			.s = "0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90",
+			.mem = {0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90},
+			.n = 8,
+		},
+		{
+			.s = "0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90,0xff,0x25,0x02,0x00,0x00",
+			.mem = {0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90,0xff,0x25,0x02,0x00,0x00},
+			.n = 13,
+		},
+		{
+			.s = "0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90,0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90",
+			.mem = {0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90,0xff,0x25,0x02,0x00,0x00,0x00,0x90,0x90},
+			.n = 16,
+		},
+		{
+			.s = "0xff;",
+			.mem = {0xff},
+			.n = 1,
+			.seperator = ';',
+		},
+		{
+			.s = "+++0xff+++0x1++++0x3++0x2++",
+			.mem = {0xff,0x1,0x3,0x2},
+			.n = 4,
+			.seperator = '+',
+		},
+	};
+
+	ret = 0;
+
+	for (i = 0; i < ARRAY_SIZE(values); i++) {
+		void *mem = strbytes2mem(values[i].s, &nbytes, buf, sizeof(buf),
+				values[i].seperator);
+
+		printf("%s : %ld (expect %ld)\n", values[i].s, nbytes, values[i].n);
+#if defined(DEBUG)
+		fdisasm_arch(stdout, ">> ", 0, (unsigned char *)mem, nbytes);
+#endif
+		if (memcmp(mem, values[i].mem, MAX(nbytes, values[i].n)))
+			ret++;
+
+		if (nbytes != values[i].n)
 			ret++;
 	}
 
