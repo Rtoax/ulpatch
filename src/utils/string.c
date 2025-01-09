@@ -101,6 +101,31 @@ int fmembytes(FILE *fp, const void *data, int data_len)
 	return 0;
 }
 
+static int strbytes2mem_check(const char *bytes, char seperator)
+{
+	const char *s = bytes;
+
+	while (s && *s != '\0') {
+#if defined(DEBUG)
+		ulp_debug("s %s %c %c\n", s, *s, seperator);
+#endif
+		switch (*s) {
+		case '0' ... '9':
+		case 'a' ... 'f':
+		case 'A' ... 'F':
+		case 'x':
+			break;
+		default:
+			if (*s == seperator)
+				break;
+			errno = EINVAL;
+			return -EINVAL;
+		}
+		s++;
+	}
+	return 0;
+}
+
 /**
  * convert string to memory bytes, split with ','.
  *
@@ -110,12 +135,25 @@ int fmembytes(FILE *fp, const void *data, int data_len)
 void *strbytes2mem(const char *bytes, size_t *nbytes, void *buf, size_t buf_len,
 		   char seperator)
 {
+	int err;
 	size_t n = 0;
 	uint8_t *u = buf;
 	char sep = ',', str_sep[2];
 
+	errno = 0;
+
 	if (seperator)
 		sep = seperator;
+
+	/* "0xff" -> 0xff -> size of 1 */
+	if (!buf || buf_len < 1) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	err = strbytes2mem_check(bytes, sep);
+	if (err)
+		return NULL;
 
 	sprintf(str_sep, "%c", sep);
 

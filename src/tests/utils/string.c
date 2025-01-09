@@ -111,6 +111,7 @@ TEST(Utils_str, strbytes2mem, 0)
 		uint8_t mem[128];
 		size_t n;
 		char seperator;
+		int expect_errno;
 	} values[] = {
 		{
 			.s = "0xff",
@@ -174,11 +175,20 @@ TEST(Utils_str, strbytes2mem, 0)
 			.n = 4,
 			.seperator = '+',
 		},
+		{
+			.s = "0xff,0x1,0x3,0x2",
+			.mem = {0xff,0x1,0x3,0x2},
+			.n = 0,
+			.seperator = ';', /* Bad string, return NULL */
+			.expect_errno = EINVAL,
+		},
 	};
 
 	ret = 0;
 
 	for (i = 0; i < ARRAY_SIZE(values); i++) {
+		nbytes = 0;
+
 		void *mem = strbytes2mem(values[i].s, &nbytes, buf, sizeof(buf),
 				values[i].seperator);
 
@@ -186,10 +196,22 @@ TEST(Utils_str, strbytes2mem, 0)
 #if defined(DEBUG)
 		fdisasm_arch(stdout, ">> ", 0, (unsigned char *)mem, nbytes);
 #endif
-		if (memcmp(mem, values[i].mem, MAX(nbytes, values[i].n)))
+		if (nbytes != values[i].n) {
+			ret++;
+			continue;
+		}
+
+		/**
+		 * errno equal to zero or EINVAL, and _MUST_ equal to
+		 * expect_errno
+		 */
+		if (values[i].expect_errno != errno)
 			ret++;
 
-		if (nbytes != values[i].n)
+		if (!mem && errno != EINVAL)
+			ret++;
+
+		if (mem && memcmp(mem, values[i].mem, MAX(nbytes, values[i].n)))
 			ret++;
 	}
 
