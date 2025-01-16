@@ -196,6 +196,53 @@ void *strbytes2mem(const char *bytes, size_t *nbytes, void *buf, size_t buf_len,
 	return buf;
 }
 
+/**
+ * memory to bytes string buffer.
+ */
+char *mem2strbytes(const void *mem, size_t mem_len, char *bytes_buf,
+		   size_t buf_len, char seperator)
+{
+	int i;
+
+	errno = 0;
+
+	if (!mem || mem_len < 1 || !bytes_buf || buf_len < 5) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	/**
+	 * mem     = 0x123456
+	 * mem_len = 3
+	 * buf_len = "0x12,0x34,0x56\0"
+	 *            ^^^^^ 5
+	 */
+	if (buf_len < 5 * mem_len) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	bytes_buf[0] = '\0';
+	for (i = 0; i < mem_len; i++) {
+		uint8_t u8 = *(uint8_t *)(mem + i);
+		char *s = bytes_buf + i * 5;
+		/**
+		 * "0x12,0x34,0x56\0"
+		 *            ^^^^^
+		 */
+		if (i == mem_len - 1)
+			sprintf(s, "0x%02x", u8);
+		/**
+		 * "0x12,0x34,0x56\0"
+		 *  ^^^^^
+		 */
+		else
+			sprintf(s, "0x%02x%c", u8, seperator);
+	}
+
+	return bytes_buf;
+}
+
 /* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
 int ulp_startswith(const char *str, const char *prefix)
 {

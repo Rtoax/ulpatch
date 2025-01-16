@@ -229,6 +229,8 @@ unsigned long str2size(const char *str);
 unsigned long str2addr(const char *str);
 void *strbytes2mem(const char *bytes, size_t *nbytes, void *buf, size_t buf_len,
 		   char seperator);
+char *mem2strbytes(const void *mem, size_t mem_len, char *bytes_buf,
+		   size_t buf_len, char seperator);
 
 int fmembytes(FILE *fp, const void *data, int data_len);
 

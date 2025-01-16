@@ -217,3 +217,71 @@ TEST(Utils_str, strbytes2mem, 0)
 
 	return ret;
 }
+
+TEST(Utils_str, mem2strbytes, 0)
+{
+	int i, err = 0;
+	char buf[1024];
+
+	struct {
+		uint8_t mem[128];
+		size_t mem_len;
+		char *expect_buf;
+		size_t buf_len;
+		char seperator;
+		int expect_errno;
+	} tests[] = {
+		{
+			.mem = {0x11},
+			.mem_len = 1,
+			.expect_buf = "0x11",
+			.buf_len = 5,
+			.seperator = ',',
+		},
+		{
+			.mem = {0x11},
+			.mem_len = 1,
+			.expect_buf = "0x11",
+			.buf_len = 4,
+			.seperator = ',',
+			.expect_errno = EINVAL,
+		},
+		{
+			.mem = {0x11,0x22},
+			.mem_len = 2,
+			.expect_buf = "0x11,0x22",
+			.buf_len = 10,
+			.seperator = ',',
+		},
+		{
+			.mem = {0x11,0x22},
+			.mem_len = 2,
+			.expect_buf = "0x11#0x22",
+			.buf_len = 10,
+			.seperator = '#',
+		},
+		{
+			.mem = {0x11,0x22,0x33,0x44,0x55,0x66,0x77},
+			.mem_len = 7,
+			.expect_buf = "0x11,0x22,0x33,0x44,0x55,0x66,0x77",
+			.buf_len = 35,
+			.seperator = ',',
+		},
+	};
+
+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
+		char *s = mem2strbytes(tests[i].mem, tests[i].mem_len, buf,
+				       tests[i].buf_len, tests[i].seperator);
+
+		if (strcmp(buf, tests[i].expect_buf)) {
+			err++;
+		}
+
+		if (tests[i].expect_errno != errno)
+			err++;
+
+		printf("s = <%s> (%s)\n", s, tests[i].expect_buf);
+	}
+
+	return err;
+}
