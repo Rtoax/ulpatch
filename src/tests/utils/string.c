@@ -239,6 +239,13 @@ TEST(Utils_str, mem2strbytes, 0)
 			.seperator = ',',
 		},
 		{
+			.mem = {0x1},
+			.mem_len = 1,
+			.expect_buf = "0x01",
+			.buf_len = 5,
+			.seperator = ',',
+		},
+		{
 			.mem = {0x11},
 			.mem_len = 1,
 			.expect_buf = "0x11",
@@ -250,6 +257,13 @@ TEST(Utils_str, mem2strbytes, 0)
 			.mem = {0x11,0x22},
 			.mem_len = 2,
 			.expect_buf = "0x11,0x22",
+			.buf_len = 10,
+			.seperator = ',',
+		},
+		{
+			.mem = {0x1,0xf},
+			.mem_len = 2,
+			.expect_buf = "0x01,0x0f",
 			.buf_len = 10,
 			.seperator = ',',
 		},
@@ -273,14 +287,17 @@ TEST(Utils_str, mem2strbytes, 0)
 		char *s = mem2strbytes(tests[i].mem, tests[i].mem_len, buf,
 				       tests[i].buf_len, tests[i].seperator);
 
-		if (strcmp(buf, tests[i].expect_buf)) {
+		if (errno == 0 && !s)
 			err++;
-		}
 
 		if (tests[i].expect_errno != errno)
 			err++;
 
-		printf("s = <%s> (%s)\n", s, tests[i].expect_buf);
+		if (s && strcmp(buf, tests[i].expect_buf)) {
+			err++;
+		}
+
+		printf("s = <%s> (%s) err = %d\n", s, tests[i].expect_buf, err);
 	}
 
 	return err;
