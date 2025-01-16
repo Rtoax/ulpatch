@@ -293,11 +293,65 @@ TEST(Utils_str, mem2strbytes, 0)
 		if (tests[i].expect_errno != errno)
 			err++;
 
-		if (s && strcmp(buf, tests[i].expect_buf)) {
+		if (s && strcmp(buf, tests[i].expect_buf))
 			err++;
-		}
 
 		printf("s = <%s> (%s) err = %d\n", s, tests[i].expect_buf, err);
+	}
+
+	return err;
+}
+
+TEST(Utils_str, strbytes2mem2strbytes, 0)
+{
+	int i, err = 0;
+	size_t nbytes;
+	char mem_buf[1024];
+	char str_buf[1024];
+
+	struct {
+		char *from_str;
+		size_t nbytes;
+		char seperator;
+		char *to_str;
+	} tests[] = {
+		{
+			.from_str = "0x1",
+			.nbytes = 1,
+			.seperator = ',',
+			.to_str = "0x01",
+		},
+		{
+			.from_str = "0x1,0x2",
+			.nbytes = 2,
+			.seperator = ',',
+			.to_str = "0x01,0x02",
+		},
+		{
+			.from_str = "0x1#0x2#0x03",
+			.nbytes = 3,
+			.seperator = '#',
+			.to_str = "0x01#0x02#0x03",
+		},
+		{
+			.from_str = "0x1,0x2,0x3,0x4,0x5,0x6",
+			.nbytes = 6,
+			.seperator = ',',
+			.to_str = "0x01,0x02,0x03,0x04,0x05,0x06",
+		},
+	};
+
+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
+		void *mem = strbytes2mem(tests[i].from_str, &nbytes, mem_buf,
+					 sizeof(mem_buf),
+					 tests[i].seperator);
+		char *s = mem2strbytes(mem, tests[i].nbytes, str_buf,
+				       sizeof(str_buf), tests[i].seperator);
+
+		if (strcmp(s, tests[i].to_str))
+			err++;
+
+		printf("s = <%s> (%s)\n", s, tests[i].to_str);
 	}
 
 	return err;
