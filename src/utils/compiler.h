@@ -79,6 +79,10 @@
 # define __opt_O0 __attribute__((optimize("-O0")))
 # define __opt_O1 __attribute__((optimize("-O1")))
 # define __opt_O2 __attribute__((optimize("-O2")))
+#else
+# define __opt_O0
+# define __opt_O1
+# define __opt_O2
 #endif
 
 #ifndef FALLTHROUGH
