@@ -216,8 +216,12 @@ enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 		type = VMA_LD;
 	} else if (!strcmp(name, "[stack]")) {
 		type = VMA_STACK;
+	} else if (!strcmp(name, "[uprobes]")) {
+		type = VMA_UPROBES;
 	} else if (!strcmp(name, "[vvar]")) {
 		type = VMA_VVAR;
+	} else if (!strcmp(name, "[vvar_vclock]")) {
+		type = VMA_VVAR_VCLOCK;
 	} else if (!strcmp(name, "[vdso]")) {
 		type = VMA_VDSO;
 	} else if (!strcmp(name, "[vsyscall]")) {
@@ -252,7 +256,9 @@ static const struct {
 	{VMA_HEAP, "heap"},
 	{VMA_LD, "ld"},
 	{VMA_STACK, "stack"},
+	{VMA_UPROBES, "uprobes"},
 	{VMA_VVAR, "vvar"},
+	{VMA_VVAR_VCLOCK, "vvar_vclock"},
 	{VMA_VDSO, "vdso"},
 	{VMA_VSYSCALL, "vsyscall"},
 	{VMA_LIB_UNKNOWN, "lib?"},

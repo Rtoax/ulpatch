@@ -28,7 +28,19 @@ enum vma_type {
 	VMA_HEAP,   /* [heap] */
 	VMA_LD,     /* ld-linux-xxxxx */
 	VMA_STACK,  /* [stack] */
+	/**
+	 * kernel v6.11-rc6-414-g6d27a31ef195
+	 * commit 6d27a31ef195 ("uprobes: introduce the global struct
+	 * vm_special_mapping xol_mapping") introduce "[uprobes]" vma.
+	 */
+	VMA_UPROBES,  /* [uprobes] */
 	VMA_VVAR,   /* [vvar] */
+	/**
+	 * kernel v6.12-rc2-33-ge93d2521b27f
+	 * commit e93d2521b27f ("x86/vdso: Split virtual clock pages into
+	 * dedicated mapping") introduce "[vvar_vclock]" vma.
+	 */
+	VMA_VVAR_VCLOCK,   /* [vvar_vclock] */
 	VMA_VDSO,   /* [vdso] */
 	VMA_VSYSCALL, /* [vsyscall] */
 	VMA_LIB_UNKNOWN, /* Unknown Library */

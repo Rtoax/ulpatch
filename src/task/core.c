@@ -224,7 +224,9 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	/* Check VMA type, and skip it */
 	switch (vma->type) {
 	case VMA_VVAR:
+	case VMA_VVAR_VCLOCK:
 	case VMA_STACK:
+	case VMA_UPROBES:
 	case VMA_VSYSCALL:
 		ulp_debug("skip %s\n", vma_type_name(vma->type));
 		return 0;
