@@ -15,6 +15,8 @@ hide:
 - Add ulpatches that already patched symbols to task symbols.
 - Support uninitialized variable yet, see `.bss` `SHT_NOBITS`
 - ULPatch VMA better isn't file map
+- Relocation entry out of address space range.
+  - See the kernel patch set [arm64: module: improve module VA range selection](https://lore.kernel.org/all/20230530110328.2213762-1-mark.rutland@arm.com/)
 
 
 ### Further

@@ -15,6 +15,8 @@ hide:
 - 添加已经载入补丁的符号表，用以支持互相依赖的补丁。
 - 支持未初始化的变量，见`.bss` `SHT_NOBITS`。
 - ULPatch VMA 最好不使用文件映射。
+- 重定位条目超出地址空间范围。
+  - 可参见内核补丁集 [arm64: module: improve module VA range selection](https://lore.kernel.org/all/20230530110328.2213762-1-mark.rutland@arm.com/)
 
 
 ### 未来规划
