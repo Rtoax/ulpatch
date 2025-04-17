@@ -29,6 +29,7 @@ nav:
     - Symbol Value: symbol-value.md
     - Data Structure: data-structure.md
   - Releases: RELEASE.md
+  - Changelog: CHANGELOG.md
   - TODO: TODO.md
 
 theme:
@@ -146,6 +147,7 @@ plugins:
             Symbol Value: 符号地址
             Data Structure: 数据结构
             Releases: 发布
+            Changelog: 修改记录
             TODO: 未完待续
 
 extra:
