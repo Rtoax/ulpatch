@@ -1,17 +1,11 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 FROM ubuntu:devel
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt install -y build-essential
-RUN apt-get install -y \
-	cmake \
-	gcc \
-	binutils-dev \
-	libc6 \
-	libcapstone-dev \
-	libelf-dev \
-	libunwind-dev \
-	util-linux
+RUN apt-get install -y cmake gcc binutils-dev libc6 libcapstone-dev libelf-dev \
+	libunwind-dev util-linux
 
 COPY . /src
 WORKDIR /src
