@@ -15,11 +15,16 @@ readonly ANSI_BOLD="\033[1m"
 readonly ANSI_GRAY="\033[2m"
 readonly ANSI_UNDERLINE="\033[4m"
 readonly ANSI_RESET="\033[m"
-readonly VERSION="@ULP_CONFIG_VERSION@"
+readonly ULPATCH_VERSION_MAJOR=@ULPATCH_VERSION_MAJOR@
+readonly ULPATCH_VERSION_MINOR=@ULPATCH_VERSION_MINOR@
+readonly ULPATCH_VERSION_PATCH=@ULPATCH_VERSION_PATCH@
+readonly ULPATCH_VERSION="@ULP_CONFIG_VERSION@"
 
 CC=gcc
 LD=ld
 
+verbose=
+show_version=
 already_run=
 run_cflags=
 run_libs=
@@ -63,7 +68,7 @@ ${ANSI_BOLD}ARGUMENT${ANSI_RESET}
    -h, --help         show this help information
    -V, --version      show version
 
-   -v, --verbose      show verbose of running, just for debug.
+   -v, --verbose      show verbose of running
 
 ${ANSI_BOLD}SEE ALSO${ANSI_RESET}
    ulpinfo(8), ulftrace(8), ultask(8), ulpconfig(8)
@@ -218,12 +223,11 @@ while true; do
 		;;
 	-v|--verbose)
 		shift
-		set -x
+		verbose=YES
 		;;
 	-V|--version)
 		shift
-		echo "ulpconfig ${VERSION}"
-		exit 0
+		show_version=YES
 		;;
 	--)
 		shift
@@ -231,6 +235,21 @@ while true; do
 		;;
 	esac
 done
+
+if [[ ${show_version} ]]; then
+	echo "ulpconfig ${ULPATCH_VERSION}"
+	if [[ ${verbose} ]]; then
+		echo ULPATCH_VERSION_MAJOR = ${ULPATCH_VERSION_MAJOR}
+		echo ULPATCH_VERSION_MINOR = ${ULPATCH_VERSION_MINOR}
+		echo ULPATCH_VERSION_PATCH = ${ULPATCH_VERSION_PATCH}
+	fi
+	exit 0
+fi
+
+if [[ ${verbose} ]]; then
+	PS4='+${BASH_SOURCE}:${LINENO}:${FUNCNAME[0]}: '
+	set -x
+fi
 
 # Check CC and LD
 set_cc ${CC}
