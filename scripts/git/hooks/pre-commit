@@ -2,6 +2,9 @@
 
 try_add=( $(git status --short | grep ^A | awk '{print $2}') )
 
+# Redirect output to stderr.
+exec 1>&2
+
 for f in ${try_add[@]}
 do
 	[[ -d ${f} ]] && continue
@@ -13,6 +16,9 @@ do
 	# ar file start from "!<arch>\n", see /usr/include/ar.h
 	elif [[ $bin == $'!<arch>\n' ]]; then
 		echo "FATAL: You are trying to add <$f> ar file to git-tree, see git status."
+		exit 1
+	elif [[ $bin == $'gmon'* ]]; then
+		echo "FATAL: You are trying to add <$f> GNU prof performance file to git-tree, see git status."
 		exit 1
 	fi
 	if [[ $(basename $f) == vmlinux.h ]]; then
