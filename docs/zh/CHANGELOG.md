@@ -6,11 +6,16 @@
 并且该项目遵循
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+**别忘了同步修改英文版CHNAGELOG.md文件。**
+
+
 ## 未发布
 
 #### 重大变更
 #### 添加
-#### 更改
+- 增加头文件 /usr/include/ulpatch/version.h。
+#### Changed
+- 重命名 src/ulconfig 为 src/ulpconfig.sh.in。
 #### 弃用
 #### 移除
 #### 修复

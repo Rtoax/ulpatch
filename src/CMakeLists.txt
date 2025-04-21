@@ -43,11 +43,11 @@ add_executable(ulpinfo ulpinfo.c)
 target_compile_definitions(ulpinfo PRIVATE ${UTILS_CFLAGS_MACROS} ULP_CMD_MAIN)
 
 message(STATUS "target ulpconfig")
-add_custom_target(ulpconfig ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulpconfig)
+add_custom_target(ulpconfig ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/ulpconfig.sh.in)
 add_custom_command(
 	TARGET ulpconfig
 	BYPRODUCTS ulpconfig
-	COMMAND cp ${PROJECT_SOURCE_DIR}/src/ulpconfig ${CMAKE_CURRENT_BINARY_DIR}/ulpconfig
+	COMMAND cp ${PROJECT_SOURCE_DIR}/src/ulpconfig.sh.in ${CMAKE_CURRENT_BINARY_DIR}/ulpconfig
 	COMMAND sed -i 's|@ULP_CONFIG_VERSION@|${ULPATCH_VERSION}|g' ${CMAKE_CURRENT_BINARY_DIR}/ulpconfig
 	COMMAND sed -i 's|@ULPATCH_VERSION_MAJOR@|${ULPATCH_VERSION_MAJOR}|g' ${CMAKE_CURRENT_BINARY_DIR}/ulpconfig
 	COMMAND sed -i 's|@ULPATCH_VERSION_MINOR@|${ULPATCH_VERSION_MINOR}|g' ${CMAKE_CURRENT_BINARY_DIR}/ulpconfig
