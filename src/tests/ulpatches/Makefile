@@ -8,7 +8,7 @@ DESTDIR := /usr/share/ulpatch/ftrace/
 ULP_CONFIG :=
 
 ifndef ULP_CONFIG
-  ULP_CONFIG=$(shell which ulpconfig 2>/dev/null)
+  ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
   ifeq ($(wildcard ${ULP_CONFIG}),)
     $(error Not found ulpconfig, Please install ulpatch first)
   endif

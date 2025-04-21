@@ -5,8 +5,12 @@ set(make_include ${PROJECT_SOURCE_DIR}/src/)
 message(STATUS "Compile ulpatch hello ulp ${make_include}")
 add_custom_command(
 	OUTPUT make-ulpatches.log
-	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulpconfig
-	COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulpconfig
+	DEPENDS
+		# Use ulpconfig.sh.in directly
+		${PROJECT_SOURCE_DIR}/src/ulpconfig.sh.in
+		${CMAKE_CURRENT_SOURCE_DIR}/Makefile
+	COMMAND make INCS1="-I${make_include}" ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulpconfig.sh.in
+	COMMAND make install DESTDIR=${CMAKE_CURRENT_BINARY_DIR} ULP_CONFIG=${PROJECT_SOURCE_DIR}/src/ulpconfig.sh.in
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/tests/ulpatches
 )
 add_custom_target(tests_ulpatches ALL DEPENDS make-ulpatches.log)
