@@ -10,6 +10,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- Add header file /usr/include/ulpatch/version.h.
 #### Changed
 #### Deprecated
 #### Removed

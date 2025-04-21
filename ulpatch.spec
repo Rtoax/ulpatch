@@ -180,6 +180,7 @@ popd
 %files devel
 %{_includedir}/ulpatch/asm.h
 %{_includedir}/ulpatch/meta.h
+%{_includedir}/ulpatch/version.h
 %{_bindir}/ulpconfig
 %{_mandir}/man8/ulpconfig.8.gz
 

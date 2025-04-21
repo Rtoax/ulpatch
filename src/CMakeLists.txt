@@ -58,6 +58,22 @@ add_custom_command(
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
 )
 
+message(STATUS "target version.h")
+add_custom_target(version.h ALL DEPENDS ${PROJECT_SOURCE_DIR}/src/version.h.in)
+add_custom_command(
+	TARGET version.h
+	BYPRODUCTS version.h
+	COMMAND cp ${PROJECT_SOURCE_DIR}/src/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h
+	COMMAND sed -i 's|@ULP_CONFIG_VERSION@|${ULPATCH_VERSION}|g' ${CMAKE_CURRENT_BINARY_DIR}/version.h
+	COMMAND sed -i 's|@ULPATCH_VERSION_MAJOR@|${ULPATCH_VERSION_MAJOR}|g' ${CMAKE_CURRENT_BINARY_DIR}/version.h
+	COMMAND sed -i 's|@ULPATCH_VERSION_MINOR@|${ULPATCH_VERSION_MINOR}|g' ${CMAKE_CURRENT_BINARY_DIR}/version.h
+	COMMAND sed -i 's|@ULPATCH_VERSION_PATCH@|${ULPATCH_VERSION_PATCH}|g' ${CMAKE_CURRENT_BINARY_DIR}/version.h
+	PRE_BUILD
+	COMMENT "Build version.h"
+	DEPENDS ${PROJECT_SOURCE_DIR}/src/version.h
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/
+)
+
 if(CONFIG_BUILD_TESTING)
 	add_subdirectory(tests)
 endif()
