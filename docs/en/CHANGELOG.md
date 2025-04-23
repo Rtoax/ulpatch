@@ -15,6 +15,7 @@ and this project adheres to
 #### Added
 - Add header file /usr/include/ulpatch/version.h.
 - rpmbuild.sh add --nocheck argument.
+- task: Add C macro `task_vdso_vma(task)`
 #### Changed
 - Rename src/ulconfig to src/ulpconfig.sh.in
 #### Deprecated

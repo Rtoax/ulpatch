@@ -403,6 +403,16 @@ struct vm_area_struct *next_vma(struct task_struct *task,
 #define task_for_each_vma(vma, task) \
 	for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
+#define task_vdso_vma(task) ({	\
+		struct vm_area_struct *__vma_iter, *__vma_vdso = NULL;	\
+		task_for_each_vma(__vma_iter, task) {	\
+			if (__vma_iter->type == VMA_VDSO) {	\
+				__vma_vdso = __vma_iter;	\
+			}	\
+		}	\
+		__vma_vdso;	\
+	})
+
 struct vm_area_struct *alloc_vma(struct task_struct *task);
 void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
 		struct vm_area_struct *prev);

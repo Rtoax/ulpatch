@@ -59,6 +59,19 @@ failed:
 	return ret;
 }
 
+/**
+ * Maybe /proc/cmdline has vdso=0 parameter
+ */
+TEST(Task, vdso_vma, 0)
+{
+	int ret;
+	struct task_struct *task = open_task(getpid(), FTO_NONE);
+	struct vm_area_struct *vma = task_vdso_vma(task);
+	ret = vma ? 0 : -ENOENT;
+	close_task(task);
+	return ret;
+}
+
 TEST(Task, dump_task_vma_to_file, 0)
 {
 	int ret = 0;
