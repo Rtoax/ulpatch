@@ -8,6 +8,7 @@ pie=
 without_capstone=
 without_libunwind=
 nodebuginfo=
+nocheck=
 
 __usage__() {
 	echo -e "
@@ -17,6 +18,7 @@ __usage__() {
 --without-libunwind build without libunwind
 
 --nodebuginfo       skip debuginfo and debugsource packages
+--nocheck           skip %check
 -h, --help          print this info
 "
 	exit ${1-0}
@@ -28,6 +30,7 @@ TEMP=$( getopt --options h \
 	--long without-capstone \
 	--long without-libunwind \
 	--long nodebuginfo \
+	--long nocheck \
 	--name rpmbuild-ulpatch -- "$@" )
 test $? != 0 && __usage__ 1
 
@@ -56,6 +59,10 @@ while true ; do
 		shift
 		nodebuginfo=YES
 		;;
+	--nocheck)
+		shift
+		nocheck=YES
+		;;
 	--)
 		shift
 		break
@@ -73,5 +80,6 @@ rpmbuild -ba \
 	${without_capstone:+--without capstone} \
 	${without_libunwind:+--without libunwind} \
 	${nodebuginfo:+--nodebuginfo} \
+	${nocheck:+--nocheck} \
 	${PIE:+--define "pie 1"} \
 	ulpatch.spec

@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 #### Added
 - Add header file /usr/include/ulpatch/version.h.
+- rpmbuild.sh add --nocheck argument.
 #### Changed
 - Rename src/ulconfig to src/ulpconfig.sh.in
 #### Deprecated
