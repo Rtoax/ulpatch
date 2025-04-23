@@ -16,6 +16,7 @@ and this project adheres to
 - Add header file /usr/include/ulpatch/version.h.
 - rpmbuild.sh add --nocheck argument.
 - task: Add C macro `task_vdso_vma(task)`
+- ultask: support --dump vdso.
 #### Changed
 - Rename src/ulconfig to src/ulpconfig.sh.in
 #### Deprecated

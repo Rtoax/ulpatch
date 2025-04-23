@@ -16,6 +16,7 @@
 - 增加头文件 /usr/include/ulpatch/version.h。
 - rpmbuild.sh 添加 --nocheck 参数。
 - task: 添加C宏 `task_vdso_vma(task)`。
+- ultask: 支持 `--dump vdso`。
 #### Changed
 - 重命名 src/ulconfig 为 src/ulpconfig.sh.in。
 #### 弃用

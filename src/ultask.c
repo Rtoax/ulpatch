@@ -41,6 +41,7 @@ enum {
 
 enum {
 	DUMP_VMA_OPTION,
+	DUMP_VDSO_OPTION,
 	DUMP_DISASM_OPTION,
 	DUMP_ADDR_OPTION,
 	DUMP_SIZE_OPTION,
@@ -49,6 +50,7 @@ enum {
 
 char *const dump_opts[] = {
 	[DUMP_VMA_OPTION] = "vma",
+	[DUMP_VDSO_OPTION] = "vdso",
 	[DUMP_DISASM_OPTION] = "disasm",
 	[DUMP_ADDR_OPTION] = "addr",
 	[DUMP_SIZE_OPTION] = "size",
@@ -108,6 +110,7 @@ static pid_t target_pid = -1;
 static bool flag_print_task = true;
 static bool flag_print_vmas = false;
 static bool flag_dump_vma = false;
+static bool flag_dump_vdso = false;
 static bool flag_dump_addr = false;
 static bool flag_unmap_vma = false;
 static char *map_file = NULL;
@@ -145,6 +148,7 @@ static void ultask_args_reset(void)
 	flag_print_task = true;
 	flag_print_vmas = false;
 	flag_dump_vma = false;
+	flag_dump_vdso = false;
 	flag_dump_addr = false;
 	flag_unmap_vma = false;
 	map_file = NULL;
@@ -195,6 +199,8 @@ static int print_help(void)
 	"                      need to specify address of a VMA. check with -v.\n"
 	"                      the input will be take as base 16, default output\n"
 	"                      is stdout, write(2), specify output file with -o.\n"
+	"      TYPE=vdso\n"
+	"                      dump target process's vdso vma to file.\n"
 	"\n"
 	"      TYPE=disasm\n"
 	"                      disassemble a piece of code of target process.\n"
@@ -283,6 +289,9 @@ static int parse_config(int argc, char *argv[])
 				case DUMP_VMA_OPTION:
 					flag_dump_vma = true;
 					break;
+				case DUMP_VDSO_OPTION:
+					flag_dump_vdso = true;
+					break;
 				case DUMP_DISASM_OPTION:
 					flag_disasm = true;
 					break;
@@ -299,8 +308,11 @@ static int parse_config(int argc, char *argv[])
 				}
 			}
 
-			if (flag_dump_vma && flag_disasm) {
+			if ((flag_dump_vma || flag_dump_vdso) && flag_disasm) {
 				fprintf(stderr, "only vma or disasm.\n");
+				cmd_exit(1);
+			} else if (flag_dump_vma && flag_dump_vdso) {
+				fprintf(stderr, "only vma or vdso.\n");
 				cmd_exit(1);
 			} else if (flag_dump_vma) {
 				if (dump_addr == 0) {
@@ -315,6 +327,13 @@ static int parse_config(int argc, char *argv[])
 				}
 				disasm_addr = dump_addr;
 				disasm_size = dump_size;
+			} else if (flag_dump_vdso) {
+				/* no need other argument */
+				if (dump_addr != 0 || dump_size != 0) {
+					fprintf(stderr, "dump vdso no need addr and size\n");
+					cmd_exit(1);
+				}
+				dump_addr = 0;
 			} else {
 				if (dump_addr == 0 || dump_size == 0) {
 					fprintf(stderr, "dump memory need addr= and size=\n");
@@ -478,6 +497,7 @@ static int parse_config(int argc, char *argv[])
 	 */
 	if (!flag_print_vmas &&
 		!flag_dump_vma &&
+		!flag_dump_vdso &&
 		!flag_dump_addr &&
 		!map_file &&
 		!mprotect_addr &&
@@ -500,8 +520,8 @@ static int parse_config(int argc, char *argv[])
 		flag_print_task = false;
 	}
 
-	if (flag_dump_vma && !output_file) {
-		fprintf(stderr, "--dump vma need output file(-o).\n");
+	if ((flag_dump_vma || flag_dump_vdso) && !output_file) {
+		fprintf(stderr, "--dump vma|vdso need output file(-o).\n");
 		cmd_exit(1);
 	}
 
@@ -875,6 +895,11 @@ int ultask(int argc, char *argv[])
 	/* dump an VMA */
 	if (flag_dump_vma)
 		dump_task_vma_to_file(output_file, target_task, vma_addr);
+
+	if (flag_dump_vdso) {
+		struct vm_area_struct *vma = task_vdso_vma(target_task);
+		dump_task_vma_to_file(output_file, target_task, vma->vm_start + 1);
+	}
 
 	if (flag_dump_addr)
 		dump_task_addr_to_file(output_file, target_task, dump_addr,

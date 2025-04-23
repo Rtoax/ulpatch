@@ -63,6 +63,25 @@ TEST(ultask, dump, 0)
 	fremove(s_ofile);
 
 	/**
+	 * Dump vdso to file
+	 */
+	memset(s_dump, 0x0, sizeof(s_dump));
+	memset(s_ofile, 0x0, sizeof(s_ofile));
+	sprintf(s_dump, "vdso");
+	sprintf(s_ofile, "ultask.dump_vdso-%d.dat", getpid());
+
+	argc = 7;
+	char *argv_vdso[] = {
+		"ultask",
+		"--pid", s_pid,
+		"--dump", s_dump,
+		"--output", s_ofile
+	};
+
+	ret += ultask(argc, argv_vdso);
+	fremove(s_ofile);
+
+	/**
 	 * Disasm text
 	 */
 	memset(s_dump, 0x0, sizeof(s_dump));
