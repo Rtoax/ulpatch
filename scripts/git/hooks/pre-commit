@@ -1,15 +1,26 @@
 #!/bin/bash
+set -e
 
-try_add=( $(git status --short | grep ^A | awk '{print $2}') )
+try_add=( $(git status --short | grep ^A | awk '{print $2}' || true) )
+try_del=( $(git status --short | grep ^D | awk '{print $2}' || true) )
+try_modify=( $(git status --short | grep ^M | awk '{print $2}' || true) )
 
 # Redirect output to stderr.
 exec 1>&2
+
+must_modify_changelog() {
+	if ! [[ "${try_modify[@]}" =~ CHANGELOG.md ]]; then
+		echo "FATAL: do you forgot moidfy CHANGELOG.md???????????????????"
+		exit 1
+	fi
+}
 
 for f in ${try_add[@]}
 do
 	[[ -d ${f} ]] && continue
 
-	read -r -N 8 bin < $f
+	# true: for empty file
+	read -r -N 8 bin < $f || true
 	if [[ $bin == $'\x7f'ELF* ]]; then
 		echo "FATAL: You are trying to add <$f> ELF file to git-tree, see git status."
 		exit 1
@@ -25,4 +36,11 @@ do
 		echo "FATAL: vmlinux.h is too big, generate it with bpftool command!!!"
 		exit 1
 	fi
+
+	must_modify_changelog
 done
+
+# modify too much files or delete files, need modify CHANGELOG.md too
+if [[ ${#try_modify[@]} -ge 4 ]] || [[ ${#try_del[@]} -ge 1 ]]; then
+	must_modify_changelog
+fi
