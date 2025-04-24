@@ -13,6 +13,7 @@
 
 #### 重大变更
 #### 添加
+- 增加对 OpenSSL 的依赖，并且添加 fmd5sum() 相关函数。
 - 增加头文件 /usr/include/ulpatch/version.h。
 - rpmbuild.sh 添加 --nocheck 参数。
 - task: 添加C宏 `task_vdso_vma(task)`。

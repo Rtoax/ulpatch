@@ -26,6 +26,7 @@ $ sudo dnf install -y \
 	gcc-c++ \
 	glibc-devel \
 	libunwind-devel \
+	openssl-devel \
 	util-linux
 ```
 
@@ -44,6 +45,7 @@ $ sudo apt install -y \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
+	libssl-dev \
 	libunwind-dev \
 	util-linux
 ```

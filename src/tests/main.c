@@ -979,6 +979,7 @@ void never_called_stub(void)
 	CALL_TEST_STUB(utils_init);
 	CALL_TEST_STUB(utils_list);
 	CALL_TEST_STUB(utils_log);
+	CALL_TEST_STUB(utils_md5);
 	CALL_TEST_STUB(utils_rbtree);
 	CALL_TEST_STUB(utils_string);
 	CALL_TEST_STUB(utils_utils);

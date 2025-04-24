@@ -37,6 +37,11 @@ if(CONFIG_CAPSTONE)
 	set(disasm disasm.c)
 endif()
 
+find_library(LIBSSL ssl HINTS ${SEARCH_PATH})
+find_library(LIBCRYPTO crypto HINTS ${SEARCH_PATH})
+message(STATUS "LIBSSL ${LIBSSL}")
+message(STATUS "LIBCRYPTO ${LIBCRYPTO}")
+
 add_library(ulpatch_utils STATIC
 	ansi.c
 	callback.c
@@ -46,6 +51,7 @@ add_library(ulpatch_utils STATIC
 	init.c
 	list.c
 	log.c
+	md5_evp.c
 	rbtree.c
 	string.c
 	time.c
@@ -55,5 +61,5 @@ add_library(ulpatch_utils STATIC
 
 target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_CFLAGS_MACROS})
 target_link_libraries(ulpatch_utils PRIVATE
-	${ELF} ${BFD} ${CAPSTONE} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf
+	${ELF} ${BFD} ${CAPSTONE} ${LIBSSL} ${LIBCRYPTO} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf
 )

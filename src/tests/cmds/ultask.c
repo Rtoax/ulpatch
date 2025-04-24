@@ -68,7 +68,7 @@ TEST(ultask, dump, 0)
 	memset(s_dump, 0x0, sizeof(s_dump));
 	memset(s_ofile, 0x0, sizeof(s_ofile));
 	sprintf(s_dump, "vdso");
-	sprintf(s_ofile, "ultask.dump_vdso-%d.dat", getpid());
+	sprintf(s_ofile, "ultask.dump_vdso-%d.elf", getpid());
 
 	argc = 7;
 	char *argv_vdso[] = {
@@ -79,6 +79,35 @@ TEST(ultask, dump, 0)
 	};
 
 	ret += ultask(argc, argv_vdso);
+
+	if (is_root("PROG")) {
+		char s_ofile2[64];
+		unsigned char md5sum1[MD5_DIGEST_LENGTH];
+		unsigned char md5sum2[MD5_DIGEST_LENGTH];
+
+		sprintf(s_ofile2, "ultask.dump_vdso-%d.elf", 1);
+
+		argc = 7;
+		char *argv_vdso[] = {
+			"ultask",
+			"--pid", "1", /* use /sbin/init if root */
+			"--dump", s_dump,
+			"--output", s_ofile2
+		};
+
+		ret += ultask(argc, argv_vdso);
+
+		fmd5sum(s_ofile, md5sum1);
+		fmd5sum(s_ofile2, md5sum2);
+
+		if (memcmp(md5sum1, md5sum2, MD5_DIGEST_LENGTH)) {
+			ulp_emerg("MD5 %s != %s\n", s_ofile, s_ofile2);
+			ret += 1;
+		}
+
+		fremove(s_ofile2);
+	}
+
 	fremove(s_ofile);
 
 	/**

@@ -25,7 +25,9 @@ $ sudo dnf install -y \
 	gcc \
 	gcc-c++ \
 	glibc-devel \
-	libunwind-devel
+	libunwind-devel \
+	openssl-devel \
+	util-linux
 ```
 
 
@@ -43,7 +45,9 @@ $ sudo apt install -y \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
-	libunwind-dev
+	libssl-dev \
+	libunwind-dev \
+	util-linux
 ```
 
 如果想要构建文档，需要安装：

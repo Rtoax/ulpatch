@@ -16,6 +16,7 @@ add_library(ulpatch_test_utils STATIC
 	init.c
 	list.c
 	log.c
+	md5.c
 	rbtree.c
 	string.c
 	utils.c

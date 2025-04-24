@@ -11,6 +11,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <openssl/md5.h>
+#include <openssl/evp.h>
 
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 4096
@@ -263,6 +265,16 @@ char *fmktempname(char *buf, int buf_len, char *seed);
 int fmemcpy(void *mem, int mem_len, const char *file);
 int fprint_file(FILE *fp, const char *file);
 int fprint_fd(FILE *fp, int fd);
+
+#ifndef MD5_DIGEST_LENGTH
+/* see /usr/include/openssl/md5.h */
+#define MD5_DIGEST_LENGTH 16
+#endif
+#ifdef EVP_MAX_MD_SIZE
+/* see /usr/include/openssl/evp.h */
+#define EVP_MAX_MD_SIZE 64
+#endif
+int fmd5sum(const char *filename, unsigned char *md5_result);
 
 struct mmap_struct *fmmap_rdonly(const char *filepath);
 struct mmap_struct *fmmap_shmem_create(const char *filepath, size_t size);
