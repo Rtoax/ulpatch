@@ -7,6 +7,12 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
+set(md5)
+
+if(CONFIG_OPENSSL)
+	set(md5 md5.c)
+endif()
+
 add_library(ulpatch_test_utils STATIC
 	ansi.c
 	backtrace.c
@@ -16,7 +22,7 @@ add_library(ulpatch_test_utils STATIC
 	init.c
 	list.c
 	log.c
-	md5.c
+	${md5}
 	rbtree.c
 	string.c
 	utils.c

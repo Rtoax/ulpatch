@@ -150,14 +150,23 @@ CMake `CONFIG_CAPSTONE`选项决定是否支持`capstone`，默认开启 `ON`。
 ```
 $ cmake -DCONFIG_CAPSTONE=OFF ..
 ```
-如果 `CONFIG_CAPSTONE=ON`(默认)，并且你的系统没有安装`libunwind`，`cmake`将报错。
+如果 `CONFIG_CAPSTONE=ON`(默认)，并且你的系统没有安装`openssl`，`cmake`将报错。
+
+#### CONFIG_OPENSSL
+
+CMake `CONFIG_OPENSSL`选项决定是否支持`openssl`，默认开启 `ON`。如果你想要关闭，可以：
+
+```
+$ cmake -DCONFIG_OPENSSL=OFF ..
+```
+如果 `CONFIG_OPENSSL=ON`(默认)，并且你的系统没有安装`openssl`，`cmake`将报错。
 
 #### CONFIG_LIBUNWIND
 
 CMake `CONFIG_LIBUNWIND`选项决定是否支持`libunwind`，默认开启 `ON`。如果你想要关闭，可以：
 
 ```
-$ cmake -DCONFIG_CAPSTONE=OFF ..
+$ cmake -DCONFIG_LIBUNWIND=OFF ..
 ```
 
 如果 `CONFIG_LIBUNWIND=ON`(默认)，并且你的系统没有安装`libunwind`，`cmake`将报错。

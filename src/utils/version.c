@@ -94,6 +94,12 @@ void ulpatch_info(const char *progname)
 #else
 	printf("  capstone no\n");
 #endif
+#if defined(CONFIG_OPENSSL)
+	printf("  openssl yes (buildtime version %d.%d.%d)\n",
+		OPENSSL_VERSION_MAJOR, OPENSSL_VERSION_MINOR, OPENSSL_VERSION_PATCH);
+#else
+	printf("  openssl no\n");
+#endif
 	printf("\n");
 	printf("ULPatch\n");
 	printf("  ULP patch version: %d\n", ULPATCH_FILE_VERSION);

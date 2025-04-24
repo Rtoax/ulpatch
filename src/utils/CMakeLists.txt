@@ -28,6 +28,8 @@ endif()
 
 set(disasm)
 set(CAPSTONE)
+set(md5_evp)
+set(OPENSSL)
 
 if(CONFIG_CAPSTONE)
 	message(STATUS "UTILS Support capstone")
@@ -37,10 +39,14 @@ if(CONFIG_CAPSTONE)
 	set(disasm disasm.c)
 endif()
 
-find_library(LIBSSL ssl HINTS ${SEARCH_PATH})
-find_library(LIBCRYPTO crypto HINTS ${SEARCH_PATH})
-message(STATUS "LIBSSL ${LIBSSL}")
-message(STATUS "LIBCRYPTO ${LIBCRYPTO}")
+if(CONFIG_OPENSSL)
+	message(STATUS "UTILS Support openssl")
+	find_library(LIBSSL ssl HINTS ${SEARCH_PATH})
+	find_library(LIBCRYPTO crypto HINTS ${SEARCH_PATH})
+	message(STATUS "LIBSSL ${LIBSSL}")
+	message(STATUS "LIBCRYPTO ${LIBCRYPTO}")
+	set(md5_evp md5_evp.c)
+endif()
 
 add_library(ulpatch_utils STATIC
 	ansi.c
@@ -51,7 +57,7 @@ add_library(ulpatch_utils STATIC
 	init.c
 	list.c
 	log.c
-	md5_evp.c
+	${md5_evp}
 	rbtree.c
 	string.c
 	time.c

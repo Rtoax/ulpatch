@@ -151,12 +151,20 @@ CMake `CONFIG_CAPSTONE` determine compile with capstone or not, default `ON`. If
 $ cmake -DCONFIG_CAPSTONE=OFF ..
 ```
 
+#### CONFIG_OPENSSL
+
+CMake `CONFIG_OPENSSL` determine compile with openssl or not, default `ON`. If you want to turn it off, such as:
+
+```
+$ cmake -DCONFIG_OPENSSL=OFF ..
+```
+
 #### CONFIG_LIBUNWIND
 
 CMake `CONFIG_LIBUNWIND` determine compile with libunwind or not, default `ON`. If you want to turn it off, such as:
 
 ```
-$ cmake -DCONFIG_CAPSTONE=OFF ..
+$ cmake -DCONFIG_LIBUNWIND=OFF ..
 ```
 
 If `CONFIG_LIBUNWIND=ON(default)`, and your system donesn's have it, `cmake` will run fatal and tell you.
