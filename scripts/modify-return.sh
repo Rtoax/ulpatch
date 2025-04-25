@@ -153,19 +153,47 @@ aarch64)
 x86_64)
 	case ${return_size} in
 	32 | 64)
-		# return (int)false
-		# b8 00 00 00 00       	mov    $0x0,%eax
-		# c3                   	ret
-		# 0xb800000000c30000
-		# 0x00c30000b8000000
-		cat>>${gdb_script_set}<<-EOF
-		set {unsigned char}${ADDRESS} = 0xb8
-		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x1))) = 0x00
-		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x2))) = 0x00
-		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x3))) = 0x00
-		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x4))) = 0x00
-		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x5))) = 0xc3
-		EOF
+		if [[ ${return_neg_1011} ]]; then
+			if [[ ${return_size} == 32 ]]; then
+				# return (int)-1011
+				# b8 0d fc ff ff       	mov    $0xfffffc0d,%eax
+				# c3                   	ret
+				cat>>${gdb_script_set}<<-EOF
+				set {unsigned char}${ADDRESS} = 0xb8
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x1))) = 0x0d
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x2))) = 0xfc
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x3))) = 0xff
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x4))) = 0xff
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x5))) = 0xc3
+				EOF
+			else
+				# return (long)-1011
+				# 48 c7 c0 0d fc ff ff 	mov    $0xfffffffffffffc0d,%rax
+				# c3                   	ret
+				cat>>${gdb_script_set}<<-EOF
+				set {unsigned char}${ADDRESS} = 0x48
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x1))) = 0xc7
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x2))) = 0xc0
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x3))) = 0x0d
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x4))) = 0xfc
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x5))) = 0xff
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x6))) = 0xff
+				set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x7))) = 0xc3
+				EOF
+			fi
+		else
+			# return (long)false
+			# b8 00 00 00 00       	mov    $0x0,%eax
+			# c3                   	ret
+			cat>>${gdb_script_set}<<-EOF
+			set {unsigned char}${ADDRESS} = 0xb8
+			set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x1))) = 0x00
+			set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x2))) = 0x00
+			set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x3))) = 0x00
+			set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x4))) = 0x00
+			set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x5))) = 0xc3
+			EOF
+		fi
 		;;
 	esac
 	;;
