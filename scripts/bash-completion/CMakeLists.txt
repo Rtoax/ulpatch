@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 set(BASH_COMPLETIONS)
 set(BASH_COMPLETIONS ${BASH_COMPLETIONS} ulpatch ulpinfo ulpconfig)
 if (CONFIG_BUILD_ULFTRACE)
