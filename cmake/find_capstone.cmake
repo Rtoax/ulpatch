@@ -10,7 +10,7 @@
 #  CAPSTONE_CAPSTONE_H - the capstone has capstone.h header
 
 find_path(CAPSTONE_INCLUDE_DIRS
-	NAMES capstone.h
+	NAMES capstone/capstone.h
 	PATH_SUFFIXES capstone
 	PATHS ENV CPATH)
 
