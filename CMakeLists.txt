@@ -259,7 +259,7 @@ if(CONFIG_OPENSSL)
 		message(STATUS "Found openssl headers")
 		set(UTILS_CFLAGS_MACROS "${UTILS_CFLAGS_MACROS}" OPENSSL_INCLUDE_DIRS)
 	else()
-		message(FATAL_ERROR "Not found openssl headers")
+		message(FATAL_ERROR "Not found openssl headers, you could $ cmake -DCONFIG_OPENSSL=0")
 	endif()
 endif()
 
