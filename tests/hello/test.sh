@@ -46,6 +46,10 @@ while true; do
 	-p|--pid)
 		shift
 		pid=$1
+		if ! [[ -d /proc/${pid} ]]; then
+			echo >&2 "ERROR: PID=${pid} is not exist."
+			exit 1
+		fi
 		shift
 		;;
 	-u|--patch)
