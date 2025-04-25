@@ -21,6 +21,7 @@ hide:
 
 ### Further
 
+- Support dynamic library live patch.
 - Support static executable ELF (no need to any dynamic libraries).
 - Support sign and check.
 - How to patch to strip ELF process.
