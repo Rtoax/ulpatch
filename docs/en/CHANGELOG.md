@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- Add CMake macro `CONFIG_OPENSSL`
 - Add OpenSSL depends and add fmd5sum() function.
 - Add header file /usr/include/ulpatch/version.h.
 - rpmbuild.sh add --nocheck argument.
