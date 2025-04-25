@@ -5,6 +5,7 @@ set -e
 PID=
 GDB=$(which gdb 2>/dev/null || :)
 ADDRESS=
+return_size=64
 verbose=
 
 if [[ -z ${GDB} ]]; then
@@ -19,10 +20,12 @@ fi
 
 __usage__() {
 	echo "
-modify-return [-p <PID>] [--address <ADDRESS>]
+modify-return [-p <PID>] [--address=<ADDRESS>]
 
 -p, --pid  [PID]        specify pid
 -a, --address [ADDRESS] specify address to modify
+-s, --size [32|64]      specify return size, default: ${return_size}
+
 -v, --verbose           set -x
 -h, --help              print this info
 "
@@ -30,9 +33,10 @@ modify-return [-p <PID>] [--address <ADDRESS>]
 }
 
 TEMP=$(getopt \
-	--options p:a:vh \
+	--options p:a:s:vh \
 	--long pid: \
 	--long address: \
+	--long size: \
 	--long verbose \
 	--long help \
 	-n modify-return -- "$@")
@@ -57,9 +61,17 @@ while true; do
 		ADDRESS=$1
 		shift
 		;;
+	-s|--size)
+		shift
+		return_size=$1
+		if ! [[ " 32 64 " =~ " ${return_size} " ]]; then
+			echo >&2 "ERROR: return size only support 32|64"
+			exit 1
+		fi
+		shift
+		;;
 	-v|--verbose)
 		shift
-		set -x
 		verbose=yes
 		;;
 	-h|--help)
@@ -85,23 +97,35 @@ if [[ -z ${ADDRESS} ]] || [[ ${ADDRESS:0:2} != 0x ]]; then
 	exit 1
 fi
 
+[[ ${verbose} ]] && set -x
+
 gdb_script_set=$(mktemp -u set-XXXX.gdb)
 
 cleanup()
 {
-	rm -f ${gdb_script_set}
+	rm -f ${gdb_script_set} 2>&1 >/dev/null
 }
 trap cleanup EXIT
 
-# return (int)false
-# 52800000 	mov	w0, #0x0                   	// #0
-# d65f03c0 	ret
-# return (long)false
-# d2800000 	mov	x0, #0x0                   	// #0
-# d65f03c0 	ret
-cat>>${gdb_script_set}<<EOF
-set {unsigned long}${ADDRESS} = 0xd2800000d65f03c0
-EOF
+
+case ${return_size} in
+32)
+	# return (int)false
+	# 52800000 	mov	w0, #0x0                   	// #0
+	# d65f03c0 	ret
+	cat>>${gdb_script_set}<<-EOF
+	set {unsigned long}${ADDRESS} = 0xd65f03c052800000
+	EOF
+	;;
+64)
+	# return (long)false
+	# d2800000 	mov	x0, #0x0                   	// #0
+	# d65f03c0 	ret
+	cat>>${gdb_script_set}<<-EOF
+	set {unsigned long}${ADDRESS} = 0xd65f03c0d2800000
+	EOF
+	;;
+esac
 
 gdb --quiet -p ${PID} < ${gdb_script_set} 2>&1 2>/dev/null
 
