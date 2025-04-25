@@ -21,7 +21,7 @@ If no command line arguments are specified, some task information will be printe
 This program is also a basic command of ULPatch.
 
 .SH REQUIREMENTS
-elfutils-libelf, bfd
+elfutils-libelf, bfd, capstone
 
 .SH ARGUMENTS
 .SS
@@ -34,7 +34,7 @@ Dump something to file, \fBaddr\fR followed by the \fIADDR\fR format string. \fB
 See also
 .IR /proc/ PID /maps .
 .sp
-The \-\-dump option has 3 sub options:
+The \-\-dump option has 4 sub options:
 .TP
 .B \-\-dump addr=ADDR,size=SIZE
 If not specify \fITYPE\fR, dump process's address memory to file.
@@ -47,6 +47,7 @@ If \fITYPE\fR=\fBvdso\fR, dump process's vdso VMA to file.
 .TP
 .B \-\-dump disasm,addr=ADDR,size=SIZE
 If \fITYPE\fR=\fBdisasm\fR, disassemble a piece of code of target process.
+Only compile ulpatch with \fBCONFIG_CAPSTONE\fR could use disassemble dump.
 
 .SS
 \fB\-\-jmp\fR=[from=\fI\,ADDR\/\fR,to=\fI\,ADDR\/\fR]
