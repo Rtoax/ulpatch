@@ -27,4 +27,5 @@ and this project adheres to
 #### Fixed
 #### Security
 #### Docs
+- Add CHANGELOG.md
 #### Tools
