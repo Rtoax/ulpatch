@@ -13,8 +13,8 @@ if [[ -z ${GDB} ]]; then
 	exit 1
 fi
 
-if [[ $(uname -m) != aarch64 ]]; then
-	echo >&2 "ERROR: only support aarch64, not support $(uname -m) yet"
+if ! [[ " aarch64 x86_64 " =~ " $(uname -m) " ]]; then
+	echo >&2 "ERROR: not support $(uname -m) yet"
 	exit 1
 fi
 
@@ -107,23 +107,45 @@ cleanup()
 }
 trap cleanup EXIT
 
-
-case ${return_size} in
-32)
-	# return (int)false
-	# 52800000 	mov	w0, #0x0                   	// #0
-	# d65f03c0 	ret
-	cat>>${gdb_script_set}<<-EOF
-	set {unsigned long}${ADDRESS} = 0xd65f03c052800000
-	EOF
+case $(uname -m) in
+aarch64)
+	case ${return_size} in
+	32)
+		# return (int)false
+		# 52800000 	mov	w0, #0x0                   	// #0
+		# d65f03c0 	ret
+		cat>>${gdb_script_set}<<-EOF
+		set {unsigned long}${ADDRESS} = 0xd65f03c052800000
+		EOF
+		;;
+	64)
+		# return (long)false
+		# d2800000 	mov	x0, #0x0                   	// #0
+		# d65f03c0 	ret
+		cat>>${gdb_script_set}<<-EOF
+		set {unsigned long}${ADDRESS} = 0xd65f03c0d2800000
+		EOF
+		;;
+	esac
 	;;
-64)
-	# return (long)false
-	# d2800000 	mov	x0, #0x0                   	// #0
-	# d65f03c0 	ret
-	cat>>${gdb_script_set}<<-EOF
-	set {unsigned long}${ADDRESS} = 0xd65f03c0d2800000
-	EOF
+x86_64)
+	case ${return_size} in
+	32 | 64)
+		# return (int)false
+		# b8 00 00 00 00       	mov    $0x0,%eax
+		# c3                   	ret
+		# 0xb800000000c30000
+		# 0x00c30000b8000000
+		cat>>${gdb_script_set}<<-EOF
+		set {unsigned char}${ADDRESS} = 0xb8
+		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x1))) = 0x00
+		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x2))) = 0x00
+		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x3))) = 0x00
+		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x4))) = 0x00
+		set {unsigned char}$(printf "0x%lx" $((${ADDRESS} + 0x5))) = 0xc3
+		EOF
+		;;
+	esac
 	;;
 esac
 
