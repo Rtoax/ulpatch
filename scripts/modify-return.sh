@@ -3,7 +3,9 @@
 set -e
 
 PID=
+EXE=
 GDB=$(which gdb 2>/dev/null || :)
+FUNCTION=
 ADDRESS=
 return_size=64
 return_neg_1011=
@@ -21,9 +23,10 @@ fi
 
 __usage__() {
 	echo "
-modify-return [-p <PID>] [--address=<ADDRESS>]
+modify-return [-p <PID>] [--function <FUNCTION>] [--address=<ADDRESS>]
 
 -p, --pid  [PID]        specify pid
+-f, --function [FUNC]   specify function name
 -a, --address [ADDRESS] specify address to modify
 -s, --size [32|64]      specify return size, default: ${return_size}
 
@@ -36,8 +39,9 @@ modify-return [-p <PID>] [--address=<ADDRESS>]
 }
 
 TEMP=$(getopt \
-	--options p:a:s:vh \
+	--options p:f:a:s:vh \
 	--long pid: \
+	--long function: \
 	--long address: \
 	--long size: \
 	--long return-neg-1011 \
@@ -58,6 +62,12 @@ while true; do
 			echo >&2 "ERROR: PID=${PID} is not exist."
 			exit 1
 		fi
+		EXE=$(sudo readlink /proc/${PID}/exe)
+		shift
+		;;
+	-f|--function)
+		shift
+		FUNCTION=$1
 		shift
 		;;
 	-a|--address)
@@ -99,21 +109,44 @@ if [[ -z ${PID} ]]; then
 	exit 1
 fi
 
-if [[ -z ${ADDRESS} ]] || [[ ${ADDRESS:0:2} != 0x ]]; then
-	__usage__
-	echo >&2 "ERROR: Must pass a address with 0x prefix"
+if [[ ${FUNCTION} ]] && [[ ${ADDRESS} ]]; then
+	echo >&2 "ERROR: Only specify one of --function or --address"
 	exit 1
 fi
 
 [[ ${verbose} ]] && set -x
 
+gdb_script_func_address=$(mktemp -u func_addr-XXXX.gdb)
 gdb_script_set=$(mktemp -u set-XXXX.gdb)
 
 cleanup()
 {
-	rm -f ${gdb_script_set} 2>&1 >/dev/null
+	rm -f ${gdb_script_set} ${gdb_script_func_address} 2>&1 >/dev/null
 }
 trap cleanup EXIT
+
+
+if [[ ${FUNCTION} ]]; then
+	cat>>${gdb_script_func_address}<<-EOF
+	info address ${FUNCTION}
+	EOF
+
+	ADDRESS=$(gdb --quiet -p ${PID} < ${gdb_script_func_address} | \
+			grep -ow -E 'at 0x[0-9a-fA-F]*?' | \
+			awk '{print $2}' | \
+			tail -n1)
+
+	if [[ -z ${ADDRESS} ]]; then
+		echo >&2 "ERROR: Not found symbol ${FUNCTION} in ${EXE}"
+		exit 1
+	fi
+fi
+
+if [[ -z ${ADDRESS} ]] || [[ ${ADDRESS:0:2} != 0x ]]; then
+	__usage__
+	echo >&2 "ERROR: Must pass a address with 0x prefix"
+	exit 1
+fi
 
 case $(uname -m) in
 aarch64)
