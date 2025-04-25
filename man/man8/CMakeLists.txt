@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
 find_program(GZIP gzip REQUIRED)
 set(MAN_DOCS)
 set(MAN_DOCS ${MAN_DOCS} ulpatch.8 ulpinfo.8 ulpconfig.8)

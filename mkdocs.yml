@@ -1,7 +1,12 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
 # ULPatch mkdocs.yml file
 #
-# $ mkdocs build
-# $ mkdocs serve
+# Build:
+#     $ mkdocs build
+#
+# Local Test:
+#     $ mkdocs serve
 #
 site_name: ULPatch Documents
 site_description: ULPatch is open source user space live patch tool

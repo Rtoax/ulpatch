@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
 # All changes to build and install RPM packages go here.
 #
 # The upatch.spec file may only be applicable to the rpm package building
