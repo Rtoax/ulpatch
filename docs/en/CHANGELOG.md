@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- Add scripts/modify-return.sh to modify function return value to false.
 - Add CMake macro `CONFIG_OPENSSL`
 - Add OpenSSL depends and add fmd5sum() function.
 - Add header file /usr/include/ulpatch/version.h.
