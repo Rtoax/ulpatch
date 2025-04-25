@@ -28,4 +28,5 @@
 #### 安全
 #### 文档
 - 添加 CHANGELOG.md
+- man手册添加Copyright注释。
 #### 工具

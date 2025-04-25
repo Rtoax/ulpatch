@@ -28,4 +28,5 @@ and this project adheres to
 #### Security
 #### Docs
 - Add CHANGELOG.md
+- Manual add copyright comment.
 #### Tools
