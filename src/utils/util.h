@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
-#ifndef _UTIL_H
-#define _UTIL_H
-
+#pragma once
 #include <errno.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -299,6 +297,3 @@ int destroy_callback_chain(struct callback_chain *chain);
 
 unsigned long secs(void);
 unsigned long usecs(void);
-
-#endif /* _UTIL_H */
-
