@@ -47,11 +47,14 @@ cleanup()
 }
 trap cleanup EXIT
 
-cat>>${gdb_script_set}<<EOF
-# return false
+# return (int)false
 # 52800000 	mov	w0, #0x0                   	// #0
 # d65f03c0 	ret
-set {unsigned long}${ADDRESS} = 0x52800000d65f03c0
+# return (long)false
+# d2800000 	mov	x0, #0x0                   	// #0
+# d65f03c0 	ret
+cat>>${gdb_script_set}<<EOF
+set {unsigned long}${ADDRESS} = 0xd2800000d65f03c0
 EOF
 
 gdb --quiet -p ${PID} < ${gdb_script_set} 2>&1 2>/dev/null
