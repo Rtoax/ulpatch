@@ -6,6 +6,7 @@ PID=
 GDB=$(which gdb 2>/dev/null || :)
 ADDRESS=
 return_size=64
+return_neg_1011=
 verbose=
 
 if [[ -z ${GDB} ]]; then
@@ -26,6 +27,8 @@ modify-return [-p <PID>] [--address=<ADDRESS>]
 -a, --address [ADDRESS] specify address to modify
 -s, --size [32|64]      specify return size, default: ${return_size}
 
+--return-neg-1011       return (-1011)
+
 -v, --verbose           set -x
 -h, --help              print this info
 "
@@ -37,6 +40,7 @@ TEMP=$(getopt \
 	--long pid: \
 	--long address: \
 	--long size: \
+	--long return-neg-1011 \
 	--long verbose \
 	--long help \
 	-n modify-return -- "$@")
@@ -69,6 +73,10 @@ while true; do
 			exit 1
 		fi
 		shift
+		;;
+	--return-neg-1011)
+		shift
+		return_neg_1011=YES
 		;;
 	-v|--verbose)
 		shift
@@ -109,24 +117,38 @@ trap cleanup EXIT
 
 case $(uname -m) in
 aarch64)
+	value=
 	case ${return_size} in
 	32)
-		# return (int)false
-		# 52800000 	mov	w0, #0x0                   	// #0
-		# d65f03c0 	ret
-		cat>>${gdb_script_set}<<-EOF
-		set {unsigned long}${ADDRESS} = 0xd65f03c052800000
-		EOF
+		if [[ ${return_neg_1011} ]]; then
+			# return (int)-1011
+			# 12807e40 	mov	w0, #0xfffffc0d            	// #-1011
+			# d65f03c0 	ret
+			value=0xd65f03c012807e40
+		else
+			# return (int)false
+			# 52800000 	mov	w0, #0x0                   	// #0
+			# d65f03c0 	ret
+			value=0xd65f03c052800000
+		fi
 		;;
 	64)
-		# return (long)false
-		# d2800000 	mov	x0, #0x0                   	// #0
-		# d65f03c0 	ret
-		cat>>${gdb_script_set}<<-EOF
-		set {unsigned long}${ADDRESS} = 0xd65f03c0d2800000
-		EOF
+		if [[ ${return_neg_1011} ]]; then
+			# return (long)-1011
+			# 92807e40 	mov	x0, #0xfffffffffffffc0d    	// #-1011
+			# d65f03c0 	ret
+			value=0xd65f03c092807e40
+		else
+			# return (long)false
+			# d2800000 	mov	x0, #0x0                   	// #0
+			# d65f03c0 	ret
+			value=0xd65f03c0d2800000
+		fi
 		;;
 	esac
+	cat>>${gdb_script_set}<<-EOF
+	set {unsigned long}${ADDRESS} = ${value}
+	EOF
 	;;
 x86_64)
 	case ${return_size} in
