@@ -12,7 +12,8 @@ exec 1>&2
 
 must_modify_changelog() {
 	if ! [[ "${try_modify[@]}" =~ CHANGELOG.md ]]; then
-		echo "FATAL: do you forgot moidfy CHANGELOG.md???????????????????"
+		git status --short
+		echo "FATAL: you forgot modify CHANGELOG.md !!"
 		exit 1
 	fi
 }
