@@ -50,6 +50,8 @@ do
 done
 
 # modify too much files or delete files, need modify CHANGELOG.md too
-if [[ ${#try_modify[@]} -ge 4 ]] || [[ ${#try_del[@]} -ge 1 ]]; then
+if [[ ${#try_modify[@]} -ge 4 ]] || \
+   [[ ${#try_del[@]} -ge 1 ]] || \
+   [[ ${#try_add[@]} -ge 1 ]]; then
 	must_modify_changelog
 fi
