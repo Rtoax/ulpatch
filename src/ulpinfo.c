@@ -89,7 +89,7 @@ static int parse_config(int argc, char *argv[])
 	return 0;
 }
 
-int show_patch_info(void)
+int show_file_patch_info(void)
 {
 	int err;
 	struct load_info info;
@@ -104,13 +104,17 @@ int show_patch_info(void)
 		cmd_exit(1);
 	}
 
+	memset(&info, 0x0, sizeof(info));
+
 	err = alloc_patch_file(patch_file, tmp_ulp, &info);
 	if (err) {
 		ulp_error("Parse %s failed.\n", patch_file);
 		return err;
 	}
 
-	setup_load_info(&info);
+	err = setup_load_info(&info);
+	if (err)
+		return err;
 
 	fprintf(stdout, "\tFile: %s\n", patch_file);
 	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
@@ -121,7 +125,6 @@ int show_patch_info(void)
 	release_load_info(&info);
 
 	fremove(tmp_ulp);
-
 	return 0;
 }
 
@@ -208,12 +211,11 @@ int ulpinfo(int argc, char *argv[])
 	}
 
 	if (patch_file)
-		show_patch_info();
+		ret = show_file_patch_info();
+	else if (pid)
+		ret = show_task_patch_info(pid);
 
-	if (pid)
-		show_task_patch_info(pid);
-
-	return 0;
+	return ret;
 }
 
 #if defined(ULP_CMD_MAIN)

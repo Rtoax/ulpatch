@@ -205,7 +205,7 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 	info->patch.mmap = fmmap_shmem_create(info->patch.path, info->len);
 	if (!info->patch.mmap) {
 		ulp_error("%s: fmmap failed.\n", info->patch.path);
-		err = -1;
+		err = -ENOMEM;
 		goto out;
 	}
 
@@ -221,7 +221,7 @@ int alloc_patch_file(const char *obj_from, const char *ulp_file,
 
 	if (!ehdr_magic_ok(info->hdr)) {
 		ulp_error("Invalid ELF format: %s\n", obj_from);
-		err = -1;
+		err = -ENOENT;
 		goto free_out;
 	}
 	if (__chk_load_info_len(info))
@@ -259,7 +259,9 @@ int load_ulp_info_from_vma(struct vm_area_struct *vma, struct load_info *info)
 	if (ret)
 		return ret;
 
-	setup_load_info(info);
+	ret = setup_load_info(info);
+	if (ret)
+		return ret;
 
 	GElf_Shdr *symsec = &info->sechdrs[info->index.sym];
 	GElf_Sym *sym = (void *)info->hdr + symsec->sh_addr - info->target_hdr;
@@ -423,12 +425,9 @@ int setup_load_info(struct load_info *info)
 	const char *secname;
 	GElf_Shdr *shdr;
 	GElf_Nhdr *nhdr;
-	void *bid;
-	size_t strlen_bid;
 	const char *ulp_strtab, *ulp_author;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
-
 	info->secstrings = (void *)info->hdr
 		+ info->sechdrs[info->hdr->e_shstrndx].sh_offset;
 
@@ -483,12 +482,16 @@ int setup_load_info(struct load_info *info)
 
 	switch (nhdr->n_type) {
 	/* .note.gnu.build-id */
-	case NT_GNU_BUILD_ID:
+	case NT_GNU_BUILD_ID: {
+		void *bid;
+		size_t strlen_bid;
 		bid = (void *)nhdr + sizeof(*nhdr) + nhdr->n_namesz;
 		strlen_bid = nhdr->n_descsz * 2 + 1;
-		info->str_build_id = malloc(strlen_bid);
+		info->str_build_id = (char *)malloc(strlen_bid);
 		elf_strbuildid(bid, nhdr->n_descsz, info->str_build_id,
 			       strlen_bid);
+		ulp_debug("Build ID %s\n", info->str_build_id);
+		}
 		break;
 	/* .note.gnu.property */
 	case NT_GNU_PROPERTY_TYPE_0:
@@ -945,11 +948,10 @@ int init_patch(struct task_struct *task, const char *obj_file)
 	int err;
 	char buffer[PATH_MAX];
 	char *ulp_file;
+	struct load_info info;
 
-	struct load_info info = {
-		.target_task = task,
-		.str_build_id = NULL,
-	};
+	memset(&info, 0x0, sizeof(info));
+	info.target_task = task;
 
 	if (!(task->fto_flag & FTO_PROC)) {
 		ulp_error("Need FTO_PROC task flag.\n");
