@@ -1,5 +1,5 @@
 # This is ULPatch test Makefile wrote by Rong Tao.
-SHELL = bash
+SHELL := bash
 ifeq ($(V),1)
   Q =
 else
@@ -15,8 +15,8 @@ LD := ld
 CFLAGS :=
 LDFLAGS :=
 
-HDR_META = /usr/include/ulpatch/meta.h
-ULP_CONFIG = $(shell which ulpconfig 2>/dev/null)
+HDR_META := /usr/include/ulpatch/meta.h
+ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
 
 ifeq ($(wildcard ${HDR_META}),)
   $(error Not found ${HDR_META}, Please install ulpatch first)
@@ -109,7 +109,7 @@ CFLAGS_test := $(CFLAGS_ULP)
 
 $(TARGETS): %:
 	@echo -e " LD  \033[1;32m$(@)\033[m"
-	$(Q)$(CC) -o $(@) $(^) $(LDLIBS) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
+	$(Q)$(CC) -o $(@) $(^) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
 	$(Q)strip $(@) -o $(@).stripped
 
 .PHONY: clean
