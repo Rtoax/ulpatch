@@ -8,7 +8,6 @@
 #
 # https://github.com/rtoax/ulpatch
 #
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 if(${CMAKE_VERSION} VERSION_EQUAL 3.12.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.12.0)
@@ -26,8 +25,9 @@ enable_language(C ASM)
 string(TIMESTAMP ULPATCH_COMPILE_TIME "%Y/%m/%d %H:%M:%S")
 message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
 
-# Version number components. You _MUST_ modify ulpatch.spec file at the same,
-# if you modify the following three lines.
+# Version number components.
+# WARNING: You _MUST_ modify ulpatch.spec and CHANGELOG.md files at the same
+# time if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
 set(ULPATCH_VERSION_PATCH 13)
