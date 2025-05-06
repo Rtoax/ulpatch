@@ -114,6 +114,7 @@ int show_patch_info(void)
 
 	fprintf(stdout, "\tFile: %s\n", patch_file);
 	print_ulp_strtab(stdout, "\t", &info.ulp_strtab);
+	print_ulp_author(stdout, "\t", &info.ulp_author);
 	print_ulp_info(stdout, "\t", info.ulp_info);
 	fprintf(stdout, "\tBuildID    : %s\n", info.str_build_id);
 
@@ -170,6 +171,7 @@ int show_task_patch_info(pid_t pid)
 			fpansi_gray(stdout);
 			print_vma(stdout, false, vma, 0);
 			print_ulp_strtab(stdout, "\t", &ulp->strtab);
+			print_ulp_author(stdout, "\t", &ulp->author);
 			print_ulp_info(stdout, "\t", &ulp->info);
 			fprintf(stdout, "\n");
 			fpansi_reset(stdout);

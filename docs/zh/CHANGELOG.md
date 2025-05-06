@@ -12,8 +12,9 @@
 ## 未发布
 
 #### 重大变更
+- 添加`ULPATCH_AUTHOR()`并且修改`ULPATCH_FILE_VERSION=4`。
 #### 添加
-- 添加scripts/modify-return.sh修改函数返回值为false.
+- 添加scripts/modify-return.sh修改函数返回值为false。
 - 添加CMake宏 `CONFIG_OPENSSL`。
 - 增加对 OpenSSL 的依赖，并且添加 fmd5sum() 相关函数。
 - 增加头文件 /usr/include/ulpatch/version.h。

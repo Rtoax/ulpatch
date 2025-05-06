@@ -24,7 +24,8 @@ int i_am_a_patch(void)
 	return 1;
 }
 
-ULPATCH_INFO(patch_me, i_am_a_patch, "Rong Tao");
+ULPATCH_INFO(patch_me, i_am_a_patch);
+ULPATCH_AUTHOR("Rong Tao");
 
 TEST(Patch_meta, macro__ULPATCH_INFO, 0)
 {

@@ -24,4 +24,5 @@ void ulp_print(unsigned long ul)
 {
 	ulpatch_internal_print_hello(ul);
 }
-ULPATCH_INFO(ulp_print, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_print, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

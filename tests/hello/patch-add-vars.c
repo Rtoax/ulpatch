@@ -38,4 +38,5 @@ void ulp_add_var(unsigned long ul)
 # endif
 #endif
 }
-ULPATCH_INFO(ulp_add_var, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_add_var, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

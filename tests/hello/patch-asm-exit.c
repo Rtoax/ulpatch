@@ -11,4 +11,5 @@ void ulp_asm_exit(unsigned long ul)
 	__ulp_builtin_exit(0x2);
 #endif
 }
-ULPATCH_INFO(ulp_asm_exit, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_asm_exit, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

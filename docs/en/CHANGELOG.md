@@ -12,6 +12,7 @@ and this project adheres to
 ## Unreleased
 
 #### Breaking Changes
+- Add `ULPATCH_AUTHOR()` and `ULPATCH_FILE_VERSION=4`.
 #### Added
 - Add scripts/modify-return.sh to modify function return value to false.
 - Add CMake macro `CONFIG_OPENSSL`

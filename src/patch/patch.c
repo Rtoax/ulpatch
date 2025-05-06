@@ -31,7 +31,12 @@ void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab)
 	fprintf(fp, "%sMagic      : %s\n", prefix, strtab->magic);
 	fprintf(fp, "%sSrcFunc    : %s\n", prefix, strtab->src_func);
 	fprintf(fp, "%sDstFunc    : %s\n", prefix, strtab->dst_func);
-	fprintf(fp, "%sAuthor     : %s\n", prefix, strtab->author);
+}
+
+void print_ulp_author(FILE *fp, const char *pfx, struct ulpatch_author *author)
+{
+	const char *prefix = pfx ?: "";
+	fprintf(fp, "%sAuthor     : %s\n", prefix, author->author);
 }
 
 const char *ulp_info_strftime(struct ulpatch_info *inf)
@@ -279,6 +284,7 @@ int load_ulp_info_from_vma(struct vm_area_struct *vma, struct load_info *info)
 	}
 
 	ulp->strtab = info->ulp_strtab;
+	ulp->author = info->ulp_author;
 	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
 	ulp->str_build_id = strdup(info->str_build_id);
 
@@ -389,9 +395,13 @@ static int parse_ulpatch_strtab(struct ulpatch_strtab *s, const char *strtab)
 	while (*(p++));
 	s->dst_func = p;
 
-	while (*(p++));
-	s->author = p;
+	return 0;
+}
 
+static int parse_ulpatch_author(struct ulpatch_author *a, const char *author)
+{
+	const char *p = author;
+	a->author = p;
 	return 0;
 }
 
@@ -410,6 +420,7 @@ int setup_load_info(struct load_info *info)
 	GElf_Nhdr *nhdr;
 	void *bid;
 	size_t strlen_bid;
+	const char *ulp_strtab, *ulp_author;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 
@@ -439,8 +450,15 @@ int setup_load_info(struct load_info *info)
 		ulp_error("Not found %s section.\n", SEC_ULPATCH_STRTAB);
 		return -EEXIST;
 	}
-	const char *ulp_strtab = (void *)info->hdr
-		+ info->sechdrs[info->index.ulp_strtab].sh_offset;
+	ulp_strtab = (void *)info->hdr + info->sechdrs[info->index.ulp_strtab].sh_offset;
+
+	/* found ".ulpatch.author" */
+	info->index.ulp_author = find_sec(info, SEC_ULPATCH_AUTHOR);
+	if (info->index.ulp_author == 0) {
+		ulp_error("Not found %s section.\n", SEC_ULPATCH_AUTHOR);
+		return -EEXIST;
+	}
+	ulp_author = (void *)info->hdr + info->sechdrs[info->index.ulp_author].sh_offset;
 
 	/**
 	 * Get Build ID of patch ELF,  Mark a PATCH file with BuildID to avoid
@@ -477,6 +495,12 @@ int setup_load_info(struct load_info *info)
 	err = parse_ulpatch_strtab(&info->ulp_strtab, ulp_strtab);
 	if (err) {
 		ulp_error("Failed parse ulpatch_strtab.\n");
+		return -ENOENT;
+	}
+
+	err = parse_ulpatch_author(&info->ulp_author, ulp_author);
+	if (err) {
+		ulp_error("Failed parse ulpatch_author.\n");
 		return -ENOENT;
 	}
 

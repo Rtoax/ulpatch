@@ -8,5 +8,5 @@
 void empty_hello_world(void)
 {
 }
-ULPATCH_INFO(empty_hello_world, hello_world, "Rong Tao");
-
+ULPATCH_INFO(empty_hello_world, hello_world);
+ULPATCH_AUTHOR("Rong Tao");

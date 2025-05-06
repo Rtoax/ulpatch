@@ -9,4 +9,5 @@ void ulp_asm_sleep(unsigned long ul)
 {
 	__ulp_builtin_sleep(1);
 }
-ULPATCH_INFO(ulp_asm_sleep, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_asm_sleep, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

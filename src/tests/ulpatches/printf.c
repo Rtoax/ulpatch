@@ -11,5 +11,5 @@ void printf_hello_world(void)
 {
 	printf("Hello World from ulpatch.\n");
 }
-ULPATCH_INFO(printf_hello_world, hello_world, "Rong Tao");
-
+ULPATCH_INFO(printf_hello_world, hello_world);
+ULPATCH_AUTHOR("Rong Tao");

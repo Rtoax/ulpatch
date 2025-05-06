@@ -34,4 +34,5 @@ void ulp_pthread(unsigned long ul)
 	}
 	internal_print_hello(ul);
 }
-ULPATCH_INFO(ulp_pthread, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_pthread, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

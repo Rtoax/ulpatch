@@ -36,4 +36,5 @@ void ulp_asm_puts(unsigned long ul)
 # warning Not supported CPU architecture yet.
 #endif
 }
-ULPATCH_INFO(ulp_asm_puts, print_hello, "Rong Tao");
+ULPATCH_INFO(ulp_asm_puts, print_hello);
+ULPATCH_AUTHOR("Rong Tao");

@@ -19,11 +19,12 @@
  * Use to check ulp file is support version or not. If any changes occur to the
  * metadata structure, we should increase this version number.
  */
-#define ULPATCH_FILE_VERSION	3
+#define ULPATCH_FILE_VERSION	4
 
 #define SEC_ULPATCH_MAGIC	".ULPATCH"
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
 #define SEC_ULPATCH_INFO	".ulpatch.info"
+#define SEC_ULPATCH_AUTHOR	".ulpatch.author"
 
 #ifndef __stringify
 #define __stringify_1(x...)	#x
@@ -35,18 +36,16 @@
  *
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
- * @author: who wrote this patch code
  *
  * FIXME: We should split author to a single macro like ULPATCH_AUTHOR(), maybe
  * one ulp file has multi ULPATCH_INFO()
  */
-#define ULPATCH_INFO(src_func, dst_func, author) \
+#define ULPATCH_INFO(src_func, dst_func)				\
 __asm__ (								\
 	".pushsection " SEC_ULPATCH_STRTAB ", \"a\", @progbits\n"	\
 	"	.string \"" SEC_ULPATCH_MAGIC "\" \n"			\
 	"	.string \"" #src_func "\" \n"				\
 	"	.string \"" #dst_func "\" \n"				\
-	"	.string \"" author "\" \n"				\
 	".popsection \n"						\
 	".pushsection " SEC_ULPATCH_INFO ", \"aw\", @progbits\n"	\
 	"	.long 0\n" /* ulp_id */					\
@@ -63,17 +62,32 @@ __asm__ (								\
 );
 
 /**
+ * @author: who wrote this patch code
+ */
+#define ULPATCH_AUTHOR(author)						\
+__asm__ (								\
+	".pushsection " SEC_ULPATCH_AUTHOR ", \"a\", @progbits\n"	\
+	"	.string \"" author "\" \n"				\
+	".popsection \n"						\
+);
+
+/**
  * each element point each string in SEC_ULPATCH_STRTAB
  *
  * @src_func source function
  * @dst_func destination function
- * @author Author of this patch
  */
 struct ulpatch_strtab {
 	/* Must be SEC_ULPATCH_MAGIC */
 	const char *magic;
 	const char *src_func;
 	const char *dst_func;
+};
+
+/**
+ * SEC_ULPATCH_AUTHOR
+ */
+struct ulpatch_author {
 	const char *author;
 };
 
