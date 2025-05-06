@@ -30,7 +30,7 @@ message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
 # if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
-set(ULPATCH_VERSION_PATCH 12)
+set(ULPATCH_VERSION_PATCH 13)
 
 # Only .git/ exist running this.
 if(EXISTS ${CMAKE_SOURCE_DIR}/.git/)
