@@ -618,7 +618,9 @@ static int mmap_a_file(void)
 		addr = map_addr;
 	}
 
-	task_attach(task->pid);
+	ret = task_attach(task->pid);
+	if (ret)
+		return ret;
 
 	map_fd = task_open2(task, (char *)filename, O_RDWR);
 	if (map_fd <= 0) {
@@ -675,7 +677,9 @@ static int mprotect_a_region(void)
 		return -EINVAL;
 	}
 
-	task_attach(task->pid);
+	ret = task_attach(task->pid);
+	if (ret)
+		return ret;
 
 	ret = task_mprotect(task, mprotect_addr, mprotect_len, mprotect_prot);
 	if (ret)
@@ -687,6 +691,7 @@ static int mprotect_a_region(void)
 
 static int munmap_an_vma(void)
 {
+	int err = 0;
 	size_t size = 0;
 	struct task_struct *task = target_task;
 	unsigned long addr = 0;
@@ -704,7 +709,9 @@ static int munmap_an_vma(void)
 	}
 	addr = vma->vm_start;
 
-	task_attach(task->pid);
+	err = task_attach(task->pid);
+	if (err)
+		return err;
 	task_munmap(task, addr, size);
 	task_detach(task->pid);
 

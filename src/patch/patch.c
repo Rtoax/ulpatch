@@ -303,7 +303,9 @@ static int create_mmap_vma_file(struct task_struct *task,
 	int prot;
 
 	/* attach target task */
-	task_attach(task->pid);
+	ret = task_attach(task->pid);
+	if (ret)
+		return ret;
 
 	map_fd = task_open(task, (char *)info->patch.path, O_RDWR, 0644);
 	if (map_fd <= 0) {
@@ -357,8 +359,11 @@ close_ret:
 static void delete_mmap_vma_file(struct task_struct *task,
 				 struct load_info *info)
 {
+	int err;
 	ulp_warning("munmap ulpatch.\n");
-	task_attach(task->pid);
+	err = task_attach(task->pid);
+	if (err)
+		return;
 	task_munmap(task, info->target_hdr, info->len);
 	update_task_vmas_ulp(task);
 	task_detach(task->pid);
@@ -855,7 +860,9 @@ static int kick_target_process(const struct load_info *info)
 		goto done;
 	}
 
-	task_attach(task->pid);
+	err = task_attach(task->pid);
+	if (err)
+		goto done;
 
 	/**
 	 * FIXME: Make sure safety.
@@ -1025,7 +1032,9 @@ int delete_patch(struct task_struct *task)
 	insn_sz = sizeof(ulp_info->orig_code);
 	vma = ulp->vma;
 
-	task_attach(task->pid);
+	err = task_attach(task->pid);
+	if (err)
+		return err;
 
 	n = memcpy_to_task(task, ulp_info->virtual_addr, (void *)ulp_info->orig_code, insn_sz);
 	if (n == -1 || n < insn_sz) {

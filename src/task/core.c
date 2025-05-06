@@ -1285,7 +1285,8 @@ int task_attach(pid_t pid)
 
 	ret = ptrace(PTRACE_ATTACH, pid, NULL, NULL);
 	if (ret != 0) {
-		ulp_error("Attach %d failed. %m\n", pid);
+		ulp_error("Attach %d failed. %m, are you debugging pid=%d with"
+			  " gdb or PTRACE_TRACEME\n", pid, pid);
 		return -errno;
 	}
 	do {

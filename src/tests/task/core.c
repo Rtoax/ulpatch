@@ -104,8 +104,9 @@ TEST(Task, attach_detach, 0)
 	/* Parent */
 	task_notify_wait(&notify);
 
-	ret = task_attach(pid);
-	ret = task_detach(pid);
+	ret = 0;
+	ret += task_attach(pid);
+	ret += task_detach(pid);
 
 	task_notify_trigger(&notify);
 
@@ -376,7 +377,7 @@ static int task_mmap_file(int prot)
 
 	dump_task_vmas(stdout, task, true);
 
-	task_attach(pid);
+	ret += task_attach(pid);
 	ret = test_mmap_file(task, prot);
 
 	task_detach(pid);

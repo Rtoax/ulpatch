@@ -8,6 +8,7 @@ and this project adheres to
 
 **Don't forget to modify Chinese version CHANGELOG.md at the same time.**
 
+
 ## Unreleased
 
 #### Breaking Changes
@@ -16,6 +17,7 @@ and this project adheres to
 #### Deprecated
 #### Removed
 #### Fixed
+- Pass `task_attach()` return value to caller.
 #### Security
 #### Docs
 #### Tools

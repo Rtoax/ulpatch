@@ -12,10 +12,11 @@
 ## 未发布
 #### 重大变更
 #### 添加
-#### Changed
+#### 更改
 #### 弃用
 #### 移除
 #### 修复
+- 传递`task_attach()` 的返回值到调用者。
 #### 安全
 #### 文档
 #### 工具
@@ -33,7 +34,7 @@
 - rpmbuild.sh 添加 --nocheck 参数。
 - task: 添加C宏 `task_vdso_vma(task)`。
 - ultask: 支持 `--dump vdso`。
-#### Changed
+#### 更改
 - 重命名 src/ulconfig 为 src/ulpconfig.sh.in。
 #### 弃用
 #### 移除
