@@ -45,6 +45,10 @@ target_link_libraries(ulpatch_test PRIVATE
 	ulpatch_elf
 	ulpatch_patch
 	ulpatch_utils
+)
+
+target_link_libraries(ulpatch_test PRIVATE
+	-Wl,--whole-archive
 	ulpatch_test_arch
 	ulpatch_test_cmds
 	ulpatch_test_elf
@@ -52,4 +56,5 @@ target_link_libraries(ulpatch_test PRIVATE
 	ulpatch_test_patch
 	ulpatch_test_task
 	ulpatch_test_utils
+	-Wl,--no-whole-archive
 )

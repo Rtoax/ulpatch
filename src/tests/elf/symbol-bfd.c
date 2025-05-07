@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <string.h>
-
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/util.h>
 #include <elf/elf-api.h>
-
 #include <utils/util.h>
 #include <tests/test-api.h>
 
-TEST_STUB(elf_symbol_bfd);
 
 static const char *test_files[] = {
 	"/usr/bin/ls",
@@ -244,4 +241,3 @@ TEST(Bfd_sym, objdump_plt_sym_addr, 0)
 
 	return ret;
 }
-

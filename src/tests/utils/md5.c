@@ -6,7 +6,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(utils_md5);
 
 TEST(Utils_md5, fmd5sum, 0)
 {

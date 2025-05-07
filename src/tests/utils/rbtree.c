@@ -5,7 +5,6 @@
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_rbtree);
 
 struct test_data {
 	int v;

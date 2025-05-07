@@ -14,6 +14,7 @@
 #### 添加
 #### 更改
 - tests: 引入linker scripts 来遍历所有测试例。
+- tests: 使用linker scripts 替代 `TEST_STUB()`。
 #### 弃用
 #### 移除
 #### 修复

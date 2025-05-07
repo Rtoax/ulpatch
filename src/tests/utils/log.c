@@ -6,7 +6,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(utils_log);
 
 TEST(Utils_log, log, 0)
 {
@@ -118,4 +117,3 @@ TEST(Utils_log, str2loglevel, 0)
 
 	return 0;
 }
-

@@ -6,13 +6,11 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(utils_list);
 
 struct test_data {
 	int v;
 	struct list_head node;
 };
-
 
 TEST(Utils_list, list, 0)
 {
@@ -49,4 +47,3 @@ TEST(Utils_list, list, 0)
 
 	return ret;
 }
-

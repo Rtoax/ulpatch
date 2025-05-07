@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <errno.h>
-
 #include <utils/log.h>
 #include <utils/list.h>
 #include <utils/util.h>
@@ -10,10 +9,8 @@
 #include <elf/elf-api.h>
 #include <patch/asm.h>
 #include <patch/patch.h>
-
 #include <tests/test-api.h>
 
-TEST_STUB(patch_patch);
 
 static int ret_TTWU = 0;
 

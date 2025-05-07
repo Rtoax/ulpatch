@@ -13,7 +13,6 @@
 #include <task/task.h>
 #include <tests/test-api.h>
 
-TEST_STUB(task_core);
 
 TEST(Task, fto_flags, 0)
 {

@@ -10,7 +10,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(cmds_ultask);
 
 TEST(ultask, dump, 0)
 {

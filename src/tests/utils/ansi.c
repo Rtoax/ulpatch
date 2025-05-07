@@ -7,7 +7,6 @@
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_ansi);
 
 TEST(Utils_ansi, base, 0)
 {
@@ -35,4 +34,3 @@ TEST(Utils_ansi, base, 0)
 
 	return 0;
 }
-

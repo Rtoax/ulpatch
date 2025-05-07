@@ -6,7 +6,6 @@
 #include <utils/util.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_backtrace);
 
 static void bar(void)
 {
@@ -23,4 +22,3 @@ TEST(Utils_backtrace, base, 0)
 	foo();
 	return 0;
 }
-

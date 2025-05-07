@@ -148,16 +148,6 @@ extern struct test test_meta_start, test_meta_end;
 #define TEST_LOWER(Category, Name, Ret)	\
 	__TEST(Category, Name, TEST_PRIO_LOWER, Ret)
 
-/**
- * ctors in test source code file will not be called by default if you define
- * ctors in static static library, except the function in source code file be
- * called in main() or some other where.
- *
- * FIXME: I don't known why, but it's works for me.
- */
-#define TEST_STUB(name) void __test_stub_ ##name(void) {}
-#define CALL_TEST_STUB(name) extern void __test_stub_ ##name(void); \
-		__test_stub_ ##name();
 
 extern struct list_head test_list[TEST_PRIO_NUM];
 

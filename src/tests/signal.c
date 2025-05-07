@@ -9,7 +9,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(test_signal);
 
 TEST(Signal, SIGILL, TEST_RET_SKIP)
 {

@@ -10,10 +10,8 @@
 #include <task/task.h>
 #include <elf/elf-api.h>
 #include <patch/patch.h>
-
 #include <tests/test-api.h>
 
-TEST_STUB(patch_symbol);
 
 static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 {
@@ -94,4 +92,3 @@ TEST(Patch_sym, find_task_symbol_list, 0)
 {
 	return test_task_patch(FTO_ULFTRACE, find_task_symbol);
 }
-

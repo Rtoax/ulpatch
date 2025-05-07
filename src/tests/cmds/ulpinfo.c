@@ -5,7 +5,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(cmds_ulpinfo);
 
 TEST(ulpinfo, objects, 0)
 {

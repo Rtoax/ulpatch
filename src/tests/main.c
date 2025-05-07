@@ -934,51 +934,6 @@ static void sig_handler(int signum)
 	}
 }
 
-void never_called_stub(void)
-{
-	CALL_TEST_STUB(arch_ftrace);
-	CALL_TEST_STUB(arch_instruments);
-	CALL_TEST_STUB(arch_mcount);
-	CALL_TEST_STUB(cmds_common);
-	CALL_TEST_STUB(cmds_ulftrace);
-	CALL_TEST_STUB(cmds_ulpatch);
-	CALL_TEST_STUB(cmds_ulpinfo);
-	CALL_TEST_STUB(cmds_ultask);
-	CALL_TEST_STUB(elf_core);
-	CALL_TEST_STUB(elf_ehdr);
-	CALL_TEST_STUB(elf_open);
-	CALL_TEST_STUB(elf_relocs);
-	CALL_TEST_STUB(elf_symbol);
-	CALL_TEST_STUB(elf_symbol_bfd);
-	CALL_TEST_STUB(ftrace_ftrace);
-	CALL_TEST_STUB(patch_asm);
-	CALL_TEST_STUB(patch_meta);
-	CALL_TEST_STUB(patch_object);
-	CALL_TEST_STUB(patch_patch);
-	CALL_TEST_STUB(patch_symbol);
-	CALL_TEST_STUB(test_signal);
-	CALL_TEST_STUB(task_core);
-	CALL_TEST_STUB(task_current);
-	CALL_TEST_STUB(task_proc);
-	CALL_TEST_STUB(task_symbol);
-	CALL_TEST_STUB(task_vma);
-	CALL_TEST_STUB(utils_ansi);
-	CALL_TEST_STUB(utils_backtrace);
-	CALL_TEST_STUB(utils_disasm);
-	CALL_TEST_STUB(utils_file);
-	CALL_TEST_STUB(utils_id);
-	CALL_TEST_STUB(utils_init);
-	CALL_TEST_STUB(utils_list);
-	CALL_TEST_STUB(utils_log);
-#if defined(CONFIG_OPENSSL)
-	CALL_TEST_STUB(utils_md5);
-#endif
-	CALL_TEST_STUB(utils_rbtree);
-	CALL_TEST_STUB(utils_string);
-	CALL_TEST_STUB(utils_utils);
-	CALL_TEST_STUB(utils_version);
-}
-
 static void ulpatch_test_args_reset_stub(void)
 {
 }

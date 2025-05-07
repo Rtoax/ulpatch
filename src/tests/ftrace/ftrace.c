@@ -13,7 +13,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(ftrace_ftrace);
 
 struct patch_test_arg {
 	void (*custom_mcount)(void);

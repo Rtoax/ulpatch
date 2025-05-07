@@ -5,10 +5,8 @@
 #include <utils/list.h>
 #include <utils/util.h>
 #include <elf/elf-api.h>
-
 #include <tests/test-api.h>
 
-TEST_STUB(elf_ehdr);
 
 TEST(Elf_Ehdr, print, 0)
 {

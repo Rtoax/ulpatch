@@ -6,7 +6,6 @@
 
 #include <tests/test-api.h>
 
-TEST_STUB(cmds_common);
 
 static struct cmd {
 	char *name;

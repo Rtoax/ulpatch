@@ -7,7 +7,6 @@
 #include <utils/list.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_init);
 
 TEST(Utils_init, dry_run, 0)
 {
@@ -28,4 +27,3 @@ TEST(Utils_init, verbose, 0)
 
 	return ret;
 }
-

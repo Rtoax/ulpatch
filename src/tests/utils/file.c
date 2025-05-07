@@ -6,7 +6,6 @@
 #include <elf/elf-api.h>
 #include <tests/test-api.h>
 
-TEST_STUB(utils_file);
 
 #define USR_BIN_LS "/usr/bin/ls"
 

@@ -15,6 +15,7 @@ and this project adheres to
 #### Added
 #### Changed
 - tests: Introduce linker scripts to iterate all tests.
+- tests: Use linker scripts instead of `TEST_STUB()`.
 #### Deprecated
 #### Removed
 #### Fixed
