@@ -111,6 +111,7 @@ struct test {
 extern int nr_tests;
 extern struct test *current_test;
 
+/* see metadata.lds */
 #define __TEST_METADATA_SEC	".data.ulpatch.test.metadata"
 #define __test_metadata	__section(__TEST_METADATA_SEC)
 
@@ -121,7 +122,10 @@ extern struct test *current_test;
 		.prio = _prio,							\
 		.test_cb = _func,						\
 		.expect_ret = _ret,						\
+		.real_ret = _ret,						\
 	};
+
+extern struct test test_meta_start, test_meta_end;
 
 /**
  * Define a test
@@ -129,10 +133,6 @@ extern struct test *current_test;
  */
 #define __TEST(Category, Name, Prio, Ret)					\
 	extern int test_ ##Category ##_##Name(void);				\
-	static void __ctor(Prio) test_ctor_ ##Category ##_##Name(void) {	\
-		struct test __unused *test = create_test(#Category, #Name,	\
-				Prio, test_ ##Category ##_##Name, Ret);		\
-	}									\
 	DEFINE_TEST_METADATA(Category, Name, Prio, test_ ##Category ##_##Name, Ret);	\
 	int test_ ##Category ##_##Name(void)
 
@@ -166,8 +166,7 @@ extern const char *ulpatch_test_path;
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
 
-struct test *create_test(char *category, char *name, test_prio prio,
-			 int (*cb)(void), int expect_ret);
+struct test *create_test(struct test *test);
 void release_tests(void);
 
 struct test_symbol {

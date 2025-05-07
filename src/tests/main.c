@@ -43,8 +43,16 @@ int main(int argc, char *argv[]);
 static void __ctor(TEST_PRIO_START) __init_test_list(void)
 {
 	int i;
+	struct test *t;
 	for (i = 0; i < TEST_PRIO_NUM; i++) {
 		list_init(&test_list[i]);
+	}
+
+	t = &test_meta_start;
+
+	while (t && t < &test_meta_end) {
+		create_test(t);
+		++t;
 	}
 }
 

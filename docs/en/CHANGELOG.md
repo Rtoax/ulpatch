@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 #### Added
 #### Changed
+- tests: Introduce linker scripts to iterate all tests.
 #### Deprecated
 #### Removed
 #### Fixed

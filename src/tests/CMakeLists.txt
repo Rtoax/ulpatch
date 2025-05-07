@@ -35,7 +35,9 @@ add_executable(ulpatch_test
 target_include_directories(ulpatch_test PRIVATE ..)
 
 target_compile_definitions(ulpatch_test PRIVATE ${TESTS_CFLAGS_MACROS} ${UTILS_CFLAGS_MACROS})
-target_link_options(ulpatch_test PRIVATE -Wl,-z,noexecstack)
+target_link_options(ulpatch_test
+	PRIVATE -Wl,-z,noexecstack -Wl,-T${CMAKE_CURRENT_SOURCE_DIR}/metadata.lds
+)
 
 target_link_libraries(ulpatch_test PRIVATE
 	${ELF} ${PTHREAD}
