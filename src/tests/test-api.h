@@ -119,18 +119,20 @@ struct test {
 extern int nr_tests;
 extern struct test *current_test;
 
+#define __TEST_SEC	".text.ulpatch.test"
+#define __test	__section(__TEST_SEC)
+
 /**
  * Define a test
  * If Ret = TEST_RET_SKIP, the test will success anyway.
  */
-#define __TEST(Category, Name, Prio, Ret) \
-	extern int test_ ##Category ##_##Name(void);	\
+#define __TEST(Category, Name, Prio, Ret)					\
+	extern int __test test_ ##Category ##_##Name(void);			\
 	static void __ctor(Prio) test_ctor_ ##Category ##_##Name(void) {	\
-		struct test __unused *test = \
-			create_test(#Category, #Name, \
-				Prio, test_ ##Category ##_##Name, Ret);	\
-	}	\
-	int test_ ##Category ##_##Name(void)
+		struct test __unused *test = create_test(#Category, #Name,	\
+				Prio, test_ ##Category ##_##Name, Ret);		\
+	}									\
+	int __test test_ ##Category ##_##Name(void)
 
 /* Highest prio TEST */
 #define TEST_HIGHEST(Category, Name, Ret)	\
