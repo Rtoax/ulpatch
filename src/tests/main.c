@@ -40,7 +40,7 @@ struct test *current_test = NULL;
 
 int main(int argc, char *argv[]);
 
-static void __ctor(TEST_PRIO_START) __init_test_list(void)
+static void init_tests(void)
 {
 	int i;
 	struct test *t;
@@ -1023,6 +1023,7 @@ int main(int argc, char *argv[])
 
 	COMMON_IN_MAIN_AFTER_PARSE_ARGS();
 
+	init_tests();
 	init_test_symbols();
 
 	switch (role) {
