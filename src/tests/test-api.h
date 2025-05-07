@@ -21,23 +21,14 @@
 #include <arch/aarch64/ftrace.h>
 #endif
 
-/**
- * test prio
- *
- */
 typedef enum {
-	TEST_PRIO_MIN,
-/* constructor priorities from 0 to 100 are reserved for the implementation */
-#define TEST_PRIO_START	CTOR_PRIO_USER
-	TEST_HIGHEST = 1,
-#define TEST_PRIO_HIGHEST	TEST_PRIO_START + TEST_HIGHEST
-	TEST_HIGHER,
-#define TEST_PRIO_HIGHER	TEST_PRIO_START + TEST_HIGHER
-	TEST_MIDDLE,
-#define TEST_PRIO_MIDDLE	TEST_PRIO_START + TEST_MIDDLE
-	TEST_LOWER,
-#define TEST_PRIO_LOWER	TEST_PRIO_START + TEST_LOWER
-	TEST_PRIO_NUM
+	/* constructor priorities from 0 to 100 are reserved for the implementation */
+	TEST_PRIO_START = 105,
+	TEST_PRIO_HIGHEST,
+	TEST_PRIO_HIGHER,
+	TEST_PRIO_MIDDLE,
+	TEST_PRIO_LOWER,
+	TEST_PRIO_NUM = TEST_PRIO_LOWER - TEST_PRIO_START + 1,
 } test_prio;
 
 typedef enum {
@@ -48,16 +39,17 @@ typedef enum {
 #define TEST_RET_EMERG	TEST_RET_EMERG
 } test_special_ret;
 
+typedef int (*test_function)(void);
+
 /**
  * test entry
- *
  */
 struct test {
 	int idx;
 	char *category;
 	char *name;
 	test_prio prio;
-	int (*test_cb)(void);
+	test_function test_cb;
 	int expect_ret;
 	/* after running return value */
 	int real_ret;
@@ -119,20 +111,30 @@ struct test {
 extern int nr_tests;
 extern struct test *current_test;
 
-#define __TEST_SEC	".text.ulpatch.test"
-#define __test	__section(__TEST_SEC)
+#define __TEST_METADATA_SEC	".data.ulpatch.test.metadata"
+#define __test_metadata	__section(__TEST_METADATA_SEC)
+
+#define DEFINE_TEST_METADATA(_category, _name, _prio, _func, _ret)		\
+	struct test __test_metadata _tmeta_##_category##_name##_prio##_func = {	\
+		.category = #_category,						\
+		.name = #_name,							\
+		.prio = _prio,							\
+		.test_cb = _func,						\
+		.expect_ret = _ret,						\
+	};
 
 /**
  * Define a test
  * If Ret = TEST_RET_SKIP, the test will success anyway.
  */
 #define __TEST(Category, Name, Prio, Ret)					\
-	extern int __test test_ ##Category ##_##Name(void);			\
+	extern int test_ ##Category ##_##Name(void);				\
 	static void __ctor(Prio) test_ctor_ ##Category ##_##Name(void) {	\
 		struct test __unused *test = create_test(#Category, #Name,	\
 				Prio, test_ ##Category ##_##Name, Ret);		\
 	}									\
-	int __test test_ ##Category ##_##Name(void)
+	DEFINE_TEST_METADATA(Category, Name, Prio, test_ ##Category ##_##Name, Ret);	\
+	int test_ ##Category ##_##Name(void)
 
 /* Highest prio TEST */
 #define TEST_HIGHEST(Category, Name, Ret)	\
