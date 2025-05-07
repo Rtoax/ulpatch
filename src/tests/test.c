@@ -11,6 +11,23 @@
 
 int nr_tests = 0;
 
+struct list_head test_list[TEST_PRIO_NUM];
+
+void init_tests(void)
+{
+	int i;
+	struct test *t;
+	for (i = 0; i < TEST_PRIO_NUM; i++) {
+		list_init(&test_list[i]);
+	}
+
+	t = &test_meta_start;
+
+	while (t && t < &test_meta_end) {
+		create_test(t);
+		++t;
+	}
+}
 
 __attribute__((nonnull(1)))
 struct test *create_test(struct test *test)

@@ -165,7 +165,7 @@ extern const char *ulpatch_test_path;
 
 #define TEST_UNIX_PATH	"/tmp/_unix_test_main"
 
-
+void init_tests(void);
 struct test *create_test(struct test *test);
 void release_tests(void);
 
