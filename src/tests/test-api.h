@@ -112,8 +112,7 @@ extern int nr_tests;
 extern struct test *current_test;
 
 /* see metadata.lds */
-#define __TEST_METADATA_SEC	".data.ulpatch.test.metadata"
-#define __test_metadata	__section(__TEST_METADATA_SEC)
+#define __test_metadata	__section(".data.ulpatch.test.metadata")
 
 #define DEFINE_TEST_METADATA(_category, _name, _prio, _func, _ret)		\
 	struct test __test_metadata _tmeta_##_category##_name##_prio##_func = {	\
