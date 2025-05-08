@@ -148,6 +148,7 @@ if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
 	message(STATUS "x86_64 architecture detected")
 elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
 	message(STATUS "aarch64 architecture detected")
+# TODO: support loongarch64, riscv64, etc.
 else()
 	message(FATAL_ERROR "Only support x86_64,aarch64")
 endif()
