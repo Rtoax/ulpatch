@@ -1,10 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2024-2025 Rong Tao
-#
-SHELL = bash
-
+SHELL := bash
 DESTDIR := /usr/share/ulpatch/ftrace/
-
 ULP_CONFIG :=
 
 ifndef ULP_CONFIG
@@ -18,7 +15,7 @@ TARGETS :=
 TARGETS += empty.ulp
 TARGETS += printf.ulp
 
-CC = gcc
+CC := gcc
 
 LDFLAGS :=
 
@@ -28,14 +25,17 @@ CFLAGS += $(shell ${ULP_CONFIG} --cflags)
 
 LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
 
-ifdef INCS1
-  CFLAGS += $(INCS1)
+ifdef INCLUDES
+  CFLAGS += $(INCLUDES)
 else
   CFLAGS += -I../../
 endif
 
-$(info ulpconfig: ${ULP_CONFIG})
+ifdef DEBUG
+  $(info ulpconfig: ${ULP_CONFIG})
+endif
 
+.PHONY: ALL
 ALL: $(TARGETS)
 
 empty.ulp: empty.o
@@ -49,10 +49,12 @@ $(TARGETS): %:
 	@echo -e "       LD  \033[1;32m$(@)\033[m"
 	@ld ${LDFLAGS} -o $(@) $(<)
 
+.PHONY: install
 install:
 	@echo -e "       INSTALL  \033[1;32m$(TARGETS)\033[m"
 	@install -m 644 -vp ${TARGETS} ${DESTDIR}
 
+.PHONY: clean
 clean:
 	@echo -e "       RM  \033[1;32m$(@)\033[m"
 	@rm -f ${TARGETS} *.o
