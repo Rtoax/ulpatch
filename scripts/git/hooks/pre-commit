@@ -3,6 +3,7 @@ set -e
 
 readonly GIT_TOPDIR=$(git rev-parse --show-toplevel 2>/dev/null || :)
 
+# Usage: $ NR_MOD=6 git commit -s
 [[ -z ${NR_MOD} ]] && NR_MOD=4
 [[ -z ${NR_ADD} ]] && NR_ADD=1
 [[ -z ${NR_DEL} ]] && NR_DEL=1
