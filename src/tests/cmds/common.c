@@ -49,7 +49,7 @@ TEST(Cmds_common, help, 0)
 	return ret;
 }
 
-TEST(Cmds_common, info, 0)
+TEST(Cmds_common, info_misc, 0)
 {
 	int i, ret = 0;
 	struct cmd *cmd;
@@ -59,8 +59,13 @@ TEST(Cmds_common, info, 0)
 		int argc = 2;
 		char *argv[] = { cmd->name, "--info" };
 		int argc2 = 3;
-		char *argv2[] = { cmd->name, "--info", "-vvvv" };
-		ret += cmd->func(argc, argv) + cmd->func(argc2, argv2);
+		char *argv2[] = { cmd->name, "--verbose", "--info" };
+		int argc3 = 3;
+		char *argv3[] = { cmd->name, "-v", "--info" };
+		int argc4 = 3;
+		char *argv4[] = { cmd->name, "-vvvvv", "--info" };
+		ret += cmd->func(argc, argv) + cmd->func(argc2, argv2) +
+			cmd->func(argc3, argv3) + cmd->func(argc4, argv4);
 	}
 
 	return ret;
