@@ -39,6 +39,13 @@ void print_ulp_author(FILE *fp, const char *pfx, struct ulpatch_author *author)
 	fprintf(fp, "%sAuthor     : %s\n", prefix, author->author);
 }
 
+void print_ulp_license(FILE *fp, const char *pfx,
+		       struct ulpatch_license *license)
+{
+	const char *prefix = pfx ?: "";
+	fprintf(fp, "%sLicense    : %s\n", prefix, license->license);
+}
+
 const char *ulp_info_strftime(struct ulpatch_info *inf)
 {
 	static char t_buf[40];
@@ -287,6 +294,7 @@ int load_ulp_info_from_vma(struct vm_area_struct *vma, struct load_info *info)
 
 	ulp->strtab = info->ulp_strtab;
 	ulp->author = info->ulp_author;
+	ulp->license = info->ulp_license;
 	memcpy(&ulp->info, info->ulp_info, sizeof(struct ulpatch_info));
 	ulp->str_build_id = strdup(info->str_build_id);
 
@@ -412,6 +420,13 @@ static int parse_ulpatch_author(struct ulpatch_author *a, const char *author)
 	return 0;
 }
 
+static int parse_ulpatch_license(struct ulpatch_license *a, const char *license)
+{
+	const char *p = license;
+	a->license = p;
+	return 0;
+}
+
 /**
  * Set up our basic convenience variables (pointers to section headers,
  * search for module section index etc), and do some basic section
@@ -425,7 +440,7 @@ int setup_load_info(struct load_info *info)
 	const char *secname;
 	GElf_Shdr *shdr;
 	GElf_Nhdr *nhdr;
-	const char *ulp_strtab, *ulp_author;
+	const char *ulp_strtab, *ulp_author, *ulp_license;
 
 	info->sechdrs = (void *)info->hdr + info->hdr->e_shoff;
 	info->secstrings = (void *)info->hdr
@@ -456,13 +471,22 @@ int setup_load_info(struct load_info *info)
 	}
 	ulp_strtab = (void *)info->hdr + info->sechdrs[info->index.ulp_strtab].sh_offset;
 
-	/* found ".ulpatch.author" */
+	/* found author section */
 	info->index.ulp_author = find_sec(info, SEC_ULPATCH_AUTHOR);
 	if (info->index.ulp_author == 0) {
 		ulp_error("Not found %s section.\n", SEC_ULPATCH_AUTHOR);
 		return -EEXIST;
 	}
 	ulp_author = (void *)info->hdr + info->sechdrs[info->index.ulp_author].sh_offset;
+
+	/* found license section */
+	info->index.ulp_license = find_sec(info, SEC_ULPATCH_LICENSE);
+	if (info->index.ulp_license == 0) {
+		ulp_error("Not found %s section.\n", SEC_ULPATCH_LICENSE);
+		return -EEXIST;
+	}
+	/* TODO: check permission of license, for example QEMU is GPL-2.0 */
+	ulp_license = (void *)info->hdr + info->sechdrs[info->index.ulp_license].sh_offset;
 
 	/**
 	 * Get Build ID of patch ELF,  Mark a PATCH file with BuildID to avoid
@@ -509,6 +533,12 @@ int setup_load_info(struct load_info *info)
 	err = parse_ulpatch_author(&info->ulp_author, ulp_author);
 	if (err) {
 		ulp_error("Failed parse ulpatch_author.\n");
+		return -ENOENT;
+	}
+
+	err = parse_ulpatch_license(&info->ulp_license, ulp_license);
+	if (err) {
+		ulp_error("Failed parse ulpatch_license.\n");
 		return -ENOENT;
 	}
 

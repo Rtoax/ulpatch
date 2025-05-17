@@ -15,3 +15,4 @@ void ulp_failed_bss(unsigned long ul)
 }
 ULPATCH_INFO(ulp_failed_bss, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");

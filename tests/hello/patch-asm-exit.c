@@ -13,3 +13,4 @@ void ulp_asm_exit(unsigned long ul)
 }
 ULPATCH_INFO(ulp_asm_exit, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");

@@ -40,3 +40,4 @@ void ulp_add_var(unsigned long ul)
 }
 ULPATCH_INFO(ulp_add_var, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");

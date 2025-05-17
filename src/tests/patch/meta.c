@@ -22,6 +22,7 @@ int i_am_a_patch(void)
 
 ULPATCH_INFO(patch_me, i_am_a_patch);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");
 
 TEST(Patch_meta, macro__ULPATCH_INFO, 0)
 {

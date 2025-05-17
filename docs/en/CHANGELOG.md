@@ -12,6 +12,7 @@ and this project adheres to
 ## Unreleased
 
 #### Breaking Changes
+- Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
 - Add git as depends.
 - task: add auxv.c

@@ -11,6 +11,7 @@
 
 ## 未发布
 #### 重大变更
+- 添加 `ULPATCH_LICENSE()` 并且 `ULPATCH_FILE_VERSION=5`.
 #### 添加
 - 将 git 作为依赖。
 - task: 添加 auxv.c。

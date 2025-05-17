@@ -66,6 +66,7 @@ struct vma_elf_mem {
 struct vma_ulp {
 	struct ulpatch_strtab strtab;
 	struct ulpatch_author author;
+	struct ulpatch_license license;
 	struct ulpatch_info info;
 
 	/* This is ELF */

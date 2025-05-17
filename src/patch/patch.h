@@ -51,6 +51,7 @@ struct load_info {
 	struct ulpatch_info *ulp_info;
 	struct ulpatch_strtab ulp_strtab;
 	struct ulpatch_author ulp_author;
+	struct ulpatch_license ulp_license;
 	/* Store Build ID if exist. malloc, need free */
 	char *str_build_id;
 
@@ -61,6 +62,7 @@ struct load_info {
 			vers,
 			ulp_strtab,
 			ulp_author,
+			ulp_license,
 			info,
 			build_id;
 	} index;
@@ -94,6 +96,8 @@ unsigned long mcount_exit(long *retval);
 
 void print_ulp_strtab(FILE *fp, const char *pfx, struct ulpatch_strtab *strtab);
 void print_ulp_author(FILE *fp, const char *pfx, struct ulpatch_author *author);
+void print_ulp_license(FILE *fp, const char *pfx,
+		       struct ulpatch_license *license);
 void print_ulp_info(FILE *fp, const char *pfx, struct ulpatch_info *inf);
 const char *ulp_info_strftime(struct ulpatch_info *inf);
 

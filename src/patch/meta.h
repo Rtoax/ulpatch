@@ -19,12 +19,13 @@
  * Use to check ulp file is support version or not. If any changes occur to the
  * metadata structure, we should increase this version number.
  */
-#define ULPATCH_FILE_VERSION	4
+#define ULPATCH_FILE_VERSION	5
 
 #define SEC_ULPATCH_MAGIC	".ULPATCH"
 #define SEC_ULPATCH_STRTAB	".ulpatch.strtab"
 #define SEC_ULPATCH_INFO	".ulpatch.info"
 #define SEC_ULPATCH_AUTHOR	".ulpatch.author"
+#define SEC_ULPATCH_LICENSE	".ulpatch.license"
 
 #ifndef __stringify
 #define __stringify_1(x...)	#x
@@ -36,9 +37,6 @@
  *
  * @src_func: the source function in Patch
  * @dst_func: the destination function in target task
- *
- * FIXME: We should split author to a single macro like ULPATCH_AUTHOR(), maybe
- * one ulp file has multi ULPATCH_INFO()
  */
 #define ULPATCH_INFO(src_func, dst_func)				\
 __asm__ (								\
@@ -62,12 +60,22 @@ __asm__ (								\
 );
 
 /**
- * @author: who wrote this patch code
+ * @author: who wrote this patch code, string
  */
 #define ULPATCH_AUTHOR(author)						\
 __asm__ (								\
 	".pushsection " SEC_ULPATCH_AUTHOR ", \"a\", @progbits\n"	\
 	"	.string \"" author "\" \n"				\
+	".popsection \n"						\
+);
+
+/**
+ * @license: what license of this patch, string
+ */
+#define ULPATCH_LICENSE(license)					\
+__asm__ (								\
+	".pushsection " SEC_ULPATCH_LICENSE ", \"a\", @progbits\n"	\
+	"	.string \"" license "\" \n"				\
 	".popsection \n"						\
 );
 
@@ -89,6 +97,13 @@ struct ulpatch_strtab {
  */
 struct ulpatch_author {
 	const char *author;
+};
+
+/**
+ * SEC_ULPATCH_LICENSE
+ */
+struct ulpatch_license {
+	const char *license;
 };
 
 /**

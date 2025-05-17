@@ -8,3 +8,4 @@ void ulp_empty(unsigned long ul)
 }
 ULPATCH_INFO(ulp_empty, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");

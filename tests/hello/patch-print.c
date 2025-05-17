@@ -26,3 +26,4 @@ void ulp_print(unsigned long ul)
 }
 ULPATCH_INFO(ulp_print, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
+ULPATCH_LICENSE("GPL-2.0");

@@ -76,4 +76,4 @@ ULPATCH_INFO(mcount, _ftrace_mcount);
 ULPATCH_INFO(_mcount, _ftrace_mcount);
 #endif
 ULPATCH_AUTHOR("Rong Tao");
-
+ULPATCH_LICENSE("GPL-2.0");
