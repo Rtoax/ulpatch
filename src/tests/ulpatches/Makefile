@@ -2,15 +2,15 @@
 # Copyright (C) 2024-2025 Rong Tao
 SHELL := bash
 DESTDIR := /usr/share/ulpatch/ftrace/
-ULP_CONFIG :=
+ULPCONFIG :=
 Q := @
 ifdef V
   Q :=
 endif
 
-ifndef ULP_CONFIG
-  ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
-  ifeq ($(wildcard ${ULP_CONFIG}),)
+ifndef ULPCONFIG
+  ULPCONFIG := $(shell which ulpconfig 2>/dev/null)
+  ifeq ($(wildcard ${ULPCONFIG}),)
     $(error Not found ulpconfig, Please install ulpatch first)
   endif
 endif
@@ -25,9 +25,9 @@ LDFLAGS :=
 
 CFLAGS := -Werror -Wall
 CFLAGS += -O0
-CFLAGS += $(shell ${ULP_CONFIG} --cflags)
+CFLAGS += $(shell ${ULPCONFIG} --cflags)
 
-LDFLAGS := $(shell ${ULP_CONFIG} --ldflags)
+LDFLAGS := $(shell ${ULPCONFIG} --ldflags)
 
 ifdef INCLUDES
   CFLAGS += $(INCLUDES)
@@ -36,7 +36,7 @@ else
 endif
 
 ifdef DEBUG
-  $(info ulpconfig: ${ULP_CONFIG})
+  $(info ulpconfig: ${ULPCONFIG})
 endif
 
 .PHONY: ALL

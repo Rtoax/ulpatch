@@ -16,15 +16,15 @@ CFLAGS :=
 CFLAGS_NOLIBC :=
 LDFLAGS :=
 
+ULPCONFIG := $(shell which ulpconfig 2>/dev/null)
 ULP_META_H := /usr/include/ulpatch/meta.h
-ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
 
 ifeq ($(wildcard ${ULP_META_H}),)
   $(error Not found ${ULP_META_H}, Please install ulpatch first)
 endif
 
 # Since ULPatch support ulpconfig command, we should use it first.
-ifeq ($(wildcard ${ULP_CONFIG}),)
+ifeq ($(wildcard ${ULPCONFIG}),)
   $(error Not found ulpconfig, Please install ulpatch first)
 endif
 
@@ -50,7 +50,7 @@ ifndef NOLIBC
   TARGETS_ULP += patch-pthread.ulp
 endif
 
-CFLAGS_ULP := $(shell ${ULP_CONFIG} --cc=${CC} --cflags)
+CFLAGS_ULP := $(shell ${ULPCONFIG} --cc=${CC} --cflags)
 CFLAGS_ULP += -O0
 # FIXME: This PIC option should move to ulpconfig, just for test here.
 ifdef ULP_PIC
@@ -75,7 +75,7 @@ ifdef STACK
   CFLAGS += -DSTACK=1
 endif
 
-LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ld=${LD} --ldflags)
+LDFLAGS_ULP := $(shell ${ULPCONFIG} --ld=${LD} --ldflags)
 
 ifdef DEBUG
   $(info CFLAGS = ${CFLAGS})
