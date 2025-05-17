@@ -83,7 +83,7 @@ FILE *get_log_fp(void)
 int str2loglevel(const char *str)
 {
 	if (!str)
-		return LOG_EMERG;
+		return -EINVAL;
 
 	if (!strcasecmp(str, "debug") || !strcasecmp(str, "dbg"))
 		return LOG_DEBUG;
@@ -102,8 +102,9 @@ int str2loglevel(const char *str)
 	else if (!strcasecmp(str, "emerg"))
 		return LOG_EMERG;
 	else {
-		ulp_error("Unknown log level string %s\n", str);
-		return LOG_EMERG;
+		ulp_error("Unknown log level string %s, only support %s\n",
+			  str, log_level_list());
+		return -EINVAL;
 	}
 }
 

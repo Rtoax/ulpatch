@@ -109,10 +109,11 @@ TEST(Utils_log, str2loglevel, 0)
 		return -1;
 
 	if (LOG_EMERG != str2loglevel("emerg") ||
-            LOG_EMERG != str2loglevel("EMERG") ||
-	    /* Fallback to LOG_EMERG */
-            LOG_EMERG != str2loglevel("Unknown-value") ||
-            LOG_EMERG != str2loglevel(NULL))
+            LOG_EMERG != str2loglevel("EMERG"))
+		return -1;
+
+        if (str2loglevel("Unknown-value") != -EINVAL ||
+            str2loglevel(NULL) != -EINVAL)
 		return -1;
 
 	return 0;

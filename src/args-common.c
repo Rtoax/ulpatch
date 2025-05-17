@@ -78,8 +78,11 @@ static void print_usage_common(const char *progname)
 		break;	\
 	case ARG_LOG_LEVEL:	\
 		log_level = atoi(optarg);	\
-		if (!log_level)	\
+		if (!log_level)	{	\
 			log_level = str2loglevel(optarg);	\
+			if (log_level < 0)	\
+				cmd_exit(log_level);	\
+		}	\
 		break;	\
 	case ARG_LOG_DEBUG:	\
 		log_level = LOG_DEBUG;	\
