@@ -16,11 +16,11 @@ CFLAGS :=
 CFLAGS_NOLIBC :=
 LDFLAGS :=
 
-HDR_META := /usr/include/ulpatch/meta.h
+ULP_META_H := /usr/include/ulpatch/meta.h
 ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
 
-ifeq ($(wildcard ${HDR_META}),)
-  $(error Not found ${HDR_META}, Please install ulpatch first)
+ifeq ($(wildcard ${ULP_META_H}),)
+  $(error Not found ${ULP_META_H}, Please install ulpatch first)
 endif
 
 # Since ULPatch support ulpconfig command, we should use it first.
