@@ -65,4 +65,3 @@ TEST(Cmds_common, info, 0)
 
 	return ret;
 }
-

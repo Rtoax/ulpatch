@@ -77,6 +77,9 @@ void ulpatch_info(const char *progname)
 	printf("  GNUC(GCC): %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 	printf("  GNU(GLibc): (buildtime version %d.%d, runtime version %s)\n",
 		__GLIBC__, __GLIBC_MINOR__, gnu_get_libc_version());
+	printf("  __STDC__: %d\n", __STDC__);
+	printf("  __STDC_HOSTED__: %d\n", __STDC_HOSTED__);
+	printf("  __STDC_VERSION__: %ldL\n", __STDC_VERSION__);
 	printf("\n");
 	printf("Support\n");
 #if defined(HAVE_BINUTILS_BFD_H)

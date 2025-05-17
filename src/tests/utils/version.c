@@ -19,4 +19,3 @@ TEST(Utils_version, ulpatch_version, 0)
 	printf("%s\n", ulpatch_version());
 	return ret;
 }
-
