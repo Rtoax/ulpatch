@@ -195,7 +195,7 @@ int ulftrace(int argc, char *argv[])
 
 	// MORE
 
-	delete_patch(target_task);
+	ret = delete_patch(target_task);
 
 done:
 	close_task(target_task);

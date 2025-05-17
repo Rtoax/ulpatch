@@ -197,7 +197,7 @@ static int command_unpatch(void)
 
 int ulpatch(int argc, char *argv[])
 {
-	int ret;
+	int ret = 0;
 
 	COMMON_RESET_BEFORE_PARSE_ARGS(ulpatch_args_reset);
 
@@ -217,15 +217,15 @@ int ulpatch(int argc, char *argv[])
 
 	if (!target_task) {
 		fprintf(stderr, "open %d failed. %m\n", target_pid);
-		return 1;
+		return -ENOENT;
 	}
 
 	switch (command_type) {
 	case CMD_PATCH:
-		command_patch();
+		ret = command_patch();
 		break;
 	case CMD_UNPATCH:
-		command_unpatch();
+		ret = command_unpatch();
 		break;
 	case CMD_NONE:
 	default:
@@ -236,7 +236,7 @@ int ulpatch(int argc, char *argv[])
 	if (patch_file)
 		free(patch_file);
 
-	return 0;
+	return ret;
 }
 
 #if defined(ULP_CMD_MAIN)
