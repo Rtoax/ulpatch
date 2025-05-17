@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 - Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
+- Ready to use cmake compile tests/hello.
 - Add git as depends.
 - task: add auxv.c
 #### Changed

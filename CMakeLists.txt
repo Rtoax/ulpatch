@@ -331,6 +331,10 @@ if (CONFIG_BUILD_BASH_COMPLETIONS)
 	add_subdirectory(scripts)
 endif(CONFIG_BUILD_BASH_COMPLETIONS)
 
+if(CONFIG_BUILD_TESTING)
+	add_subdirectory(tests)
+endif()
+
 # uninstall targets
 if(NOT TARGET uninstall)
 	configure_file(

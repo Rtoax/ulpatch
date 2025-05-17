@@ -13,6 +13,7 @@
 #### 重大变更
 - 添加 `ULPATCH_LICENSE()` 并且 `ULPATCH_FILE_VERSION=5`.
 #### 添加
+- 准备将 tests/hello 使用 cmake 编译。
 - 将 git 作为依赖。
 - task: 添加 auxv.c。
 #### 更改
