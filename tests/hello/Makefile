@@ -62,9 +62,6 @@ ifdef NO_STATIC_VAR
   CFLAGS += -DNO_STATIC_VAR=1
   CFLAGS_ULP += -DNO_STATIC_VAR=1
 endif
-ifeq ($(shell uname -m),aarch64)
-  # TODO
-endif
 
 ifdef STATIC
   CFLAGS += -static
@@ -106,15 +103,16 @@ CFLAGS_test := $(CFLAGS_ULP)
 
 %.ulp: %.ulpo
 	@echo -e " LD ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(Q)cp $(<) $(@).no-build-id
 	$(Q)$(LD) ${LDFLAGS_ULP} -o $(@) $(<)
+	$(Q)rm -f $(<)
 
 $(TARGETS): %:
 	@echo -e " LD  \033[1;32m$(@)\033[m"
 	$(Q)$(CC) -o $(@) $(^) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
 	$(Q)strip $(@) -o $(@).stripped
+	$(Q)rm -f $(^)
 
 .PHONY: clean
 clean:
 	@echo -e " CLEAN   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
-	$(Q)rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.ulp.no-build-id *.stripped
+	$(Q)rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.stripped *.ulp

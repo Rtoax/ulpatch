@@ -3,6 +3,10 @@
 SHELL := bash
 DESTDIR := /usr/share/ulpatch/ftrace/
 ULP_CONFIG :=
+Q := @
+ifdef V
+  Q :=
+endif
 
 ifndef ULP_CONFIG
   ULP_CONFIG := $(shell which ulpconfig 2>/dev/null)
@@ -43,18 +47,19 @@ printf.ulp: printf.o
 
 %.o: %.c
 	@echo -e "       CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	@$(CC) $(CFLAGS) -o $(@) -c $(<)
+	${Q}$(CC) $(CFLAGS) -o $(@) -c $(<)
 
 $(TARGETS): %:
 	@echo -e "       LD  \033[1;32m$(@)\033[m"
-	@ld ${LDFLAGS} -o $(@) $(<)
+	${Q}ld ${LDFLAGS} -o $(@) $(<)
+	${Q}rm $(<)
 
 .PHONY: install
 install:
 	@echo -e "       INSTALL  \033[1;32m$(TARGETS)\033[m"
-	@install -m 644 -vp ${TARGETS} ${DESTDIR}
+	${Q}install -m 644 -vp ${TARGETS} ${DESTDIR}
 
 .PHONY: clean
 clean:
 	@echo -e "       RM  \033[1;32m$(@)\033[m"
-	@rm -f ${TARGETS} *.o
+	${Q}rm -f ${TARGETS} *.o
