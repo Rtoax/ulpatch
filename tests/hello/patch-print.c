@@ -9,7 +9,7 @@ extern void internal_print_hello(unsigned long ul);
 
 static void ulpatch_internal_print_hello(unsigned long ul)
 {
-#if !defined(NO_LIBC)
+#if !defined(NOLIBC)
 # if defined(STACK)
 	char buff[] = {"Hello World. Patched\n"};
 	printf(buff);

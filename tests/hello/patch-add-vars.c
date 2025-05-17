@@ -23,7 +23,7 @@ void ulp_add_var(unsigned long ul)
 	static_l += 2;
 #endif
 
-#if !defined(NO_LIBC)
+#if !defined(NOLIBC)
 	printf("Hello World. Patched L: %d, %ld, %s\n", local_i, local_l, local_s);
 	printf("Hello World. Patched F: %ld %d\n", ul, a);
 

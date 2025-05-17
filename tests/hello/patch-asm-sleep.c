@@ -7,6 +7,9 @@
 
 void ulp_asm_sleep(unsigned long ul)
 {
+#ifndef __ulp_builtin_sleep
+#error "Not found __ulp_builtin_sleep() macro"
+#endif
 	__ulp_builtin_sleep(1);
 }
 ULPATCH_INFO(ulp_asm_sleep, print_hello);

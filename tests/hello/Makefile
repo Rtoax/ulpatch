@@ -13,6 +13,7 @@ CC := gcc
 LD := ld
 
 CFLAGS :=
+CFLAGS_NOLIBC :=
 LDFLAGS :=
 
 HDR_META := /usr/include/ulpatch/meta.h
@@ -37,15 +38,17 @@ TARGETS := hello
 TARGETS += hello-pie
 TARGETS += test
 
-TARGETS_ULP := patch-print.ulp
 TARGETS_ULP += patch-empty.ulp
 TARGETS_ULP += patch-asm-exit.ulp
 TARGETS_ULP += patch-asm-sleep.ulp
-TARGETS_ULP += patch-asm-puts.ulp
 TARGETS_ULP += patch-asm-write.ulp
 TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
-TARGETS_ULP += patch-pthread.ulp
+ifndef NOLIBC
+  TARGETS_ULP += patch-asm-puts.ulp
+  TARGETS_ULP := patch-print.ulp
+  TARGETS_ULP += patch-pthread.ulp
+endif
 
 CFLAGS_ULP := $(shell ${ULP_CONFIG} --cc=${CC} --cflags)
 CFLAGS_ULP += -O0
@@ -54,9 +57,10 @@ ifdef ULP_PIC
   CFLAGS_ULP += -fpic
   CFLAGS_ULP += -fno-common
 endif
-ifdef NO_LIBC
-  CFLAGS += -DNO_LIBC=1
-  CFLAGS_ULP += -DNO_LIBC=1
+ifdef NOLIBC
+  CFLAGS += -DNOLIBC=1
+  CFLAGS_ULP += -DNOLIBC=1
+  CFLAGS_NOLIBC += -nolibc
 endif
 ifdef NO_STATIC_VAR
   CFLAGS += -DNO_STATIC_VAR=1
@@ -99,7 +103,7 @@ CFLAGS_test := $(CFLAGS_ULP)
 
 %.ulpo: %.c
 	@echo -e " CC ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"
-	$(Q)$(CC) -o $(@) -c $(<) $(CFLAGS_ULP)
+	$(Q)$(CC) -o $(@) -c $(<) $(CFLAGS_ULP) ${CFLAGS_NOLIBC}
 
 %.ulp: %.ulpo
 	@echo -e " LD ULP  \033[1m$(<)\033[m to \033[1m$(@)\033[m"

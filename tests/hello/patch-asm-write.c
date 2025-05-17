@@ -9,12 +9,11 @@ void ulp_asm_write(unsigned long ul)
 {
 	char msg[] = {"Hello-\n"};
 	int len = 7;
-#if defined(__x86_64__) || defined(__aarch64__)
+#if !defined(__ulp_builtin_write) || !defined(__ulp_builtin_write_hello)
+#error "Not found __ulp_builtin_write() or __ulp_builtin_write_hello()"
+#endif
 	__ulp_builtin_write(1, msg, len);
 	__ulp_builtin_write_hello();
-#else
-# warning Not supported CPU architecture yet.
-#endif
 }
 ULPATCH_INFO(ulp_asm_write, print_hello);
 ULPATCH_AUTHOR("Rong Tao");

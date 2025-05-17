@@ -1,3 +1,4 @@
 #!/bin/bash
+set -e
 make clean
-make NO_LIBC=1 -j$(nproc)
+make NOLIBC=1 -j$(nproc) "$@"

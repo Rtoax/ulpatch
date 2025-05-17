@@ -7,9 +7,10 @@
 
 void ulp_asm_exit(unsigned long ul)
 {
-#ifdef __ulp_builtin_exit
-	__ulp_builtin_exit(0x2);
+#ifndef __ulp_builtin_exit
+#error "Not found __ulp_builtin_exit() macro"
 #endif
+	__ulp_builtin_exit(0x2);
 }
 ULPATCH_INFO(ulp_asm_exit, print_hello);
 ULPATCH_AUTHOR("Rong Tao");
