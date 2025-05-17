@@ -24,6 +24,7 @@ $ sudo dnf install -y \
 	elfutils-libelf-devel \
 	gcc \
 	gcc-c++ \
+	git \
 	glibc-devel \
 	libunwind-devel \
 	openssl-devel \
@@ -42,6 +43,7 @@ $ sudo apt install -y \
 	binutils-dev \
 	cmake \
 	gcc \
+	git \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
@@ -244,3 +246,6 @@ $ ./archive.sh
 $ ./rpmbuild.sh
 ```
 
+## 安装完成后
+
+现在，你就可以开始使用了，玩的开心。

@@ -24,6 +24,7 @@ $ sudo dnf install -y \
 	elfutils-libelf-devel \
 	gcc \
 	gcc-c++ \
+	git \
 	glibc-devel \
 	libunwind-devel \
 	openssl-devel \
@@ -42,6 +43,7 @@ $ sudo apt install -y \
 	binutils-dev \
 	cmake \
 	gcc \
+	git \
 	libc6 \
 	libcapstone-dev \
 	libelf-dev \
@@ -243,3 +245,7 @@ Build the RPM packages:
 $ ./rpmbuild.sh
 ```
 
+
+## Done to Install
+
+Then, enjoy it.

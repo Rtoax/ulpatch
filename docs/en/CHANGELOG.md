@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- Add git as depends.
 - task: add auxv.c
 #### Changed
 - tests: Introduce linker scripts to iterate all tests.

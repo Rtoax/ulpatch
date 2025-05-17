@@ -8,7 +8,8 @@
 #
 # https://github.com/rtoax/ulpatch
 #
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5)
+project(ulpatch)
 
 if(${CMAKE_VERSION} VERSION_EQUAL 3.12.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.12.0)
 	cmake_policy(SET CMP0074 NEW)
@@ -18,16 +19,14 @@ if(${CMAKE_VERSION} VERSION_EQUAL 3.3.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.3.
 	cmake_policy(SET CMP0057 NEW)
 endif()
 
-PROJECT(ulpatch)
-
 enable_language(C ASM)
 
 string(TIMESTAMP ULPATCH_COMPILE_TIME "%Y/%m/%d %H:%M:%S")
 message(STATUS "Build in ${ULPATCH_COMPILE_TIME}")
 
 # Version number components.
-# WARNING: You _MUST_ modify ulpatch.spec and CHANGELOG.md files at the same
-# time if you modify the following three lines.
+# WARNING: You _MUST_ modify ulpatch.spec and docs/{en,zh}/CHANGELOG.md files
+# at the same time if you modify the following three lines.
 set(ULPATCH_VERSION_MAJOR 0)
 set(ULPATCH_VERSION_MINOR 5)
 set(ULPATCH_VERSION_PATCH 13)
@@ -80,7 +79,7 @@ else()
 endif()
 
 set(WARNINGS_AS_ERRORS ON CACHE BOOL "Build with -Werror")
-# If you modify, update docs/INSTALL.md
+# If you modify, update docs/{en,zh}/INSTALL.md
 set(CONFIG_BUILD_TESTING ON CACHE BOOL "Build test suite")
 set(CONFIG_BUILD_ULFTRACE ON CACHE BOOL "Build ulftrace")
 set(CONFIG_BUILD_ULTASK ON CACHE BOOL "Build ultask")
@@ -342,4 +341,3 @@ if(NOT TARGET uninstall)
 	add_custom_target(uninstall
 		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
-

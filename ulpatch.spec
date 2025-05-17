@@ -43,6 +43,7 @@ BuildRequires:	binutils-devel
 BuildRequires:  clang
 %else
 BuildRequires:  gcc
+BuildRequires:  git
 %endif
 BuildRequires:  cmake
 BuildRequires:	elfutils-devel
