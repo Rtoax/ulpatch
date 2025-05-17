@@ -12,6 +12,7 @@
 ## 未发布
 #### 重大变更
 #### 添加
+- task: 添加 auxv.c
 #### 更改
 - tests: 引入linker scripts 来遍历所有测试例。
 - tests: 使用linker scripts 替代 `TEST_STUB()`。

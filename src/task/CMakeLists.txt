@@ -23,6 +23,7 @@ if(CONFIG_CAPSTONE)
 endif()
 
 add_library(ulpatch_task STATIC
+	auxv.c
 	core.c
 	current.c
 	proc.c

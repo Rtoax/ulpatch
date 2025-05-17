@@ -458,6 +458,7 @@ void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);
 int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
 
+int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv);
 int print_task_auxv(FILE *fp, const struct task_struct *task);
 int print_task_status(FILE *fp, const struct task_struct *task);
 

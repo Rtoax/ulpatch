@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- task: add auxv.c
 #### Changed
 - tests: Introduce linker scripts to iterate all tests.
 - tests: Use linker scripts instead of `TEST_STUB()`.
