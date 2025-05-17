@@ -7,12 +7,19 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
+if (CONFIG_BUILD_ULFTRACE)
+	set(ULFTRACE ulftrace.c)
+endif()
+if (CONFIG_BUILD_ULTASK)
+	set(ULTASK ultask.c)
+endif()
+
 add_library(ulpatch_test_cmds STATIC
 	common.c
-	ulftrace.c
+	${ULFTRACE}
 	ulpatch.c
 	ulpinfo.c
-	ultask.c
+	${ULTASK}
 )
 
 target_compile_definitions(ulpatch_test_cmds PRIVATE ${UTILS_CFLAGS_MACROS})

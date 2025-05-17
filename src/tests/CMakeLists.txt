@@ -15,6 +15,12 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 find_library(PTHREAD pthread HINTS ${SEARCH_PATH})
 
+if (CONFIG_BUILD_ULFTRACE)
+	set(ULFTRACE ${PROJECT_SOURCE_DIR}/src/ulftrace.c)
+endif()
+if (CONFIG_BUILD_ULTASK)
+	set(ULTASK ${PROJECT_SOURCE_DIR}/src/ultask.c)
+endif()
 add_executable(ulpatch_test
 	listener.c
 	main.c
@@ -26,10 +32,10 @@ add_executable(ulpatch_test
 	# patch, and we need to implement these functions in the test program
 	# to test them.
 	ulpatches-target.c
-	${PROJECT_SOURCE_DIR}/src/ulftrace.c
+	${ULFTRACE}
 	${PROJECT_SOURCE_DIR}/src/ulpatch.c
 	${PROJECT_SOURCE_DIR}/src/ulpinfo.c
-	${PROJECT_SOURCE_DIR}/src/ultask.c
+	${ULTASK}
 )
 
 target_include_directories(ulpatch_test PRIVATE ..)

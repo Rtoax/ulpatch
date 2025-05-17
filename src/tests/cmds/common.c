@@ -11,10 +11,14 @@ static struct cmd {
 	char *name;
 	int (*func)(int argc, char *argv[]);
 } cmds[] __unused = {
+#ifdef CONFIG_BUILD_ULFTRACE
 	{ "ulftrace", ulftrace },
+#endif
 	{ "ulpatch", ulpatch },
 	{ "ulpinfo", ulpinfo },
+#ifdef CONFIG_BUILD_ULTASK
 	{ "ultask", ultask },
+#endif
 };
 
 TEST(Cmds_common, version, 0)

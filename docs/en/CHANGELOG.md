@@ -24,7 +24,8 @@ and this project adheres to
 #### Security
 #### Docs
 #### Tools
-
+#### Tests
+- Only tests ultask and ulftrace if built.
 
 ## v0.5.13
 
