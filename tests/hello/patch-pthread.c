@@ -8,7 +8,7 @@
 
 extern void internal_print_hello(unsigned long ul);
 
-int not_created = true;
+int not_created = 1;
 pthread_t thread = { 1 };
 
 /**
@@ -19,18 +19,16 @@ pthread_t thread = { 1 };
  */
 void *routine(void *arg)
 {
-	while (1) {
-		printf("hello from patch thread.\n");
-		sleep(1);
-	}
+	printf("hello from patch thread.\n");
 }
 
 void ulp_pthread(unsigned long ul)
 {
 	if (not_created) {
 		printf("Hello World. Patched\n");
-		not_created = false;
+		not_created = 2;
 		pthread_create(&thread, NULL, routine, NULL);
+		pthread_join(thread, NULL);
 	}
 	internal_print_hello(ul);
 }
