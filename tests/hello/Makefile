@@ -76,9 +76,11 @@ endif
 
 LDFLAGS_ULP := $(shell ${ULP_CONFIG} --ld=${LD} --ldflags)
 
-$(info CFLAGS = ${CFLAGS})
-$(info CFLAGS_ULP = ${CFLAGS_ULP})
-$(info LDFLAGS_ULP = ${LDFLAGS_ULP})
+ifdef DEBUG
+  $(info CFLAGS = ${CFLAGS})
+  $(info CFLAGS_ULP = ${CFLAGS_ULP})
+  $(info LDFLAGS_ULP = ${LDFLAGS_ULP})
+endif
 
 .PHONY: build
 build: ${TARGETS_ULP} ${TARGETS}
