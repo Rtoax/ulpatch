@@ -4,8 +4,18 @@ FROM ubuntu:devel
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt install -y build-essential
-RUN apt-get install -y cmake gcc binutils-dev libc6 libcapstone-dev libelf-dev \
-	libunwind-dev util-linux
+RUN apt install -y \
+	bash-completion \
+	binutils-dev \
+	cmake \
+	gcc \
+	git \
+	libc6 \
+	libcapstone-dev \
+	libelf-dev \
+	libssl-dev \
+	libunwind-dev \
+	util-linux
 
 COPY . /src
 WORKDIR /src
