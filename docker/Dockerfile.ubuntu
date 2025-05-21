@@ -17,8 +17,9 @@ RUN apt install -y \
 	libunwind-dev \
 	util-linux
 
-COPY . /src
-WORKDIR /src
-RUN cmake -B /build
-RUN make -C /build -j$(nproc)
-ENTRYPOINT ["/build/src/ulpatch"]
+VOLUME ["/ulpatch"]
+WORKDIR /ulpatch
+RUN cmake -B /ulpatch/build
+RUN make -C /ulpatch/build -j$(nproc)
+RUN make -C /ulpatch/build install
+ENTRYPOINT ["/usr/bin/ulpatch"]
