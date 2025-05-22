@@ -45,9 +45,36 @@ static int dis_fprintf(void *stream, const char *fmt, ...)
 	return 0;
 }
 
-int styled_fprintf(void *v, enum disassembler_style style, const char *fmt, ...)
+int styled_fprintf(void *stream, enum disassembler_style style,
+		   const char *format, ...)
 {
-	/* TODO */
+	const char *color_prefix = "";
+	const char *color_suffix = "\033[0m";
+	char buffer[256];
+	va_list args;
+
+	switch (style) {
+	case dis_style_address:
+		color_prefix = "\033[1;34m";
+		break;
+	case dis_style_register:
+		color_prefix = "\033[1;31m";
+		break;
+	case dis_style_immediate:
+		color_prefix = "\033[1;32m";
+		break;
+	case dis_style_mnemonic:
+		color_prefix = "\033[1;35m";
+		break;
+	default:
+		break;
+	}
+
+	va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer), format, args);
+	va_end(args);
+
+	printf("%s%s%s", color_prefix, buffer, color_suffix);
 	return 0;
 }
 
@@ -58,7 +85,7 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 	stream_state ss = {};
 	disassemble_info disasm_info = {};
 
-#if BINUTILS_VERSION_MINOR>=39
+#if BINUTILS_VERSION_MINOR >= 39
 	init_disassemble_info(&disasm_info, &ss, dis_fprintf, styled_fprintf);
 #else
 	init_disassemble_info(&disasm_info, &ss, dis_fprintf);
