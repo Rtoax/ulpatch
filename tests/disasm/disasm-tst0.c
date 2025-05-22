@@ -41,7 +41,6 @@ static int dis_fprintf(void *stream, const char *fmt, ...)
 		ss->insn_buffer = tmp2;
 	}
 	va_end(arg);
-
 	return 0;
 }
 
@@ -52,6 +51,7 @@ int styled_fprintf(void *stream, enum disassembler_style style,
 	const char *color_suffix = "\033[0m";
 	char buffer[256];
 	va_list args;
+	stream_state *ss = (stream_state *)stream;
 
 	switch (style) {
 	case dis_style_address:
@@ -72,9 +72,21 @@ int styled_fprintf(void *stream, enum disassembler_style style,
 
 	va_start(args, format);
 	vsnprintf(buffer, sizeof(buffer), format, args);
+	if (!ss->reenter) {
+		asprintf(&ss->insn_buffer, "%s%s%s", color_prefix, buffer, color_suffix);
+		ss->reenter = true;
+	} else {
+		char *tmp;
+		asprintf(&tmp, "%s%s%s", color_prefix, buffer, color_suffix);
+
+		char *tmp2;
+		asprintf(&tmp2, "%s%s%s%s", ss->insn_buffer, color_suffix, tmp, color_suffix);
+		free(ss->insn_buffer);
+		free(tmp);
+		ss->insn_buffer = tmp2;
+	}
 	va_end(args);
 
-	printf("%s%s%s", color_prefix, buffer, color_suffix);
 	return 0;
 }
 
@@ -97,6 +109,7 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 	disasm_info.buffer = input_buffer;
 	disasm_info.buffer_vma = 0;
 	disasm_info.buffer_length = input_buffer_size;
+	disasm_info.disassembler_options = "color";
 	disassemble_init_for_target(&disasm_info);
 
 	disasm = disassembler(bfd_arch_i386, false, bfd_mach_x86_64, NULL);
