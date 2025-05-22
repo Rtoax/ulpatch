@@ -34,6 +34,8 @@ and this project adheres to
 #### Tools
 #### Tests
 - Only tests ultask and ulftrace if built.
+- Add tests/bfd to CMake list.
+
 
 ## v0.5.13
 

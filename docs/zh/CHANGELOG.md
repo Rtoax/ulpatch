@@ -33,6 +33,7 @@
 #### 工具
 #### 测试
 - 仅仅在编译ultask和ulftrace时才测试它们。
+- 添加 tests/bfd 到 CMake 编译列表。
 
 
 ## v0.5.13
