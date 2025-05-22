@@ -1,13 +1,7 @@
-# This is ULPatch test Makefile wrote by Rong Tao.
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Wrote by Rong Tao.
+include ../../scripts/verbose.mk
 SHELL := bash
-ifeq ($(V),1)
-  Q =
-else
-  Q = @
-  MAKEFLAGS += --silent
-  MAKEFLAGS += --no-print-directory
-endif
-export Q
 
 CC := gcc
 LD := ld
