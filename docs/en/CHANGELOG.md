@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 - Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
+- scripts: add verbose.mk.
 - docker: Add build.sh.
 - Ready to use cmake compile tests/hello.
 - Add git as depends.
@@ -24,6 +25,7 @@ and this project adheres to
 #### Deprecated
 #### Removed
 #### Fixed
+- Fix tests/disasm/ compile error.
 - Pass `task_attach()` return value to caller.
 #### Security
 #### Docs

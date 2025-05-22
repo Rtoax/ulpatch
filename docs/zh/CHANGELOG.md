@@ -13,6 +13,7 @@
 #### 重大变更
 - 添加 `ULPATCH_LICENSE()` 并且 `ULPATCH_FILE_VERSION=5`.
 #### 添加
+- 添加 scripts/verbose.mk。
 - 添加 docker/build.sh。
 - 准备将 tests/hello 使用 cmake 编译。
 - 将 git 作为依赖。
@@ -23,6 +24,7 @@
 #### 弃用
 #### 移除
 #### 修复
+- 修复tests/disasm编译问题。
 - 传递`task_attach()` 的返回值到调用者。
 #### 安全
 #### 文档
