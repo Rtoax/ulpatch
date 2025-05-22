@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 include ../../scripts/verbose.mk
 
-TARGETS += disasm-tst1
+TARGETS += symbol
 
 CC = gcc
 
@@ -31,7 +31,7 @@ CFLAGS += -DBINUTILS_VERSION_MINOR=${BINUTILS_VERSION_MINOR}
 build: ${TARGETS}
 	@echo -e " \033[1;33m Done \033[m"
 
-disasm-tst1: disasm-tst1.o
+symbol: symbol.o
 
 %.o: %.c
 	@echo -e "  CC  \033[1m$(<)\033[m to \033[1m$(@)\033[m"

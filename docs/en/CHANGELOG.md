@@ -20,6 +20,7 @@ and this project adheres to
 - Add git as depends.
 - task: add auxv.c
 #### Changed
+- tests: Rename tests/disasm/disasm-tst1.c to tests/bfd/symbol.c.
 - tests: Introduce linker scripts to iterate all tests.
 - tests: Use linker scripts instead of `TEST_STUB()`.
 #### Deprecated

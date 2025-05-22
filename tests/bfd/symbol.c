@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <bfd.h>
-#include <dis-asm.h>
 
 
 #define __unused __attribute__((unused))
@@ -134,7 +133,7 @@ static const char* asymbol_pure_name(asymbol *sym, char *buf, int blen)
 	return buf;
 }
 
-static void disassemble_data(bfd *abfd)
+static void parse_bfd(bfd *abfd)
 {
 	int i;
 
@@ -180,7 +179,7 @@ static void dump_bfd(bfd *abfd, bool is_mainfile)
 	if (synthcount < 0)
 		synthcount = 0;
 
-	disassemble_data(abfd);
+	parse_bfd(abfd);
 
 	if (syms) {
 		free(syms);
@@ -272,4 +271,3 @@ close:
 
 	return 0;
 }
-

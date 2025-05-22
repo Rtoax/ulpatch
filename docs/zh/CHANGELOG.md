@@ -19,6 +19,7 @@
 - 将 git 作为依赖。
 - task: 添加 auxv.c。
 #### 更改
+- tests: 重命名 tests/disasm/disasm-tst1.c 为 tests/bfd/symbol.c。
 - tests: 引入linker scripts 来遍历所有测试例。
 - tests: 使用linker scripts 替代 `TEST_STUB()`。
 #### 弃用
