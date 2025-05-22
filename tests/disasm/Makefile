@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 include ../../scripts/verbose.mk
 
-TARGETS := disasm-tst0
 TARGETS += disasm-tst1
 
 CC = gcc
@@ -32,7 +31,6 @@ CFLAGS += -DBINUTILS_VERSION_MINOR=${BINUTILS_VERSION_MINOR}
 build: ${TARGETS}
 	@echo -e " \033[1;33m Done \033[m"
 
-disasm-tst0: disasm-tst0.o
 disasm-tst1: disasm-tst1.o
 
 %.o: %.c

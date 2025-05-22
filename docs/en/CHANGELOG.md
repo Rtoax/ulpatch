@@ -24,6 +24,7 @@ and this project adheres to
 - tests: Use linker scripts instead of `TEST_STUB()`.
 #### Deprecated
 #### Removed
+- Remove tests/disasm/disasm-tst0.c.
 #### Fixed
 - Fix tests/disasm/ compile error.
 - Pass `task_attach()` return value to caller.
