@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* asprintf, vasprintf */
-
+#endif
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -53,14 +54,16 @@ int styled_fprintf(void *v, enum disassembler_style style, const char *fmt, ...)
 char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 {
 	char *disassembled = NULL;
+	disassembler_ftype disasm;
 	stream_state ss = {};
-
 	disassemble_info disasm_info = {};
+
 #if BINUTILS_VERSION_MINOR>=39
 	init_disassemble_info(&disasm_info, &ss, dis_fprintf, styled_fprintf);
 #else
 	init_disassemble_info(&disasm_info, &ss, dis_fprintf);
 #endif
+
 	disasm_info.arch = bfd_arch_i386;
 	disasm_info.mach = bfd_mach_x86_64;
 	disasm_info.read_memory_func = buffer_read_memory;
@@ -69,7 +72,6 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 	disasm_info.buffer_length = input_buffer_size;
 	disassemble_init_for_target(&disasm_info);
 
-	disassembler_ftype disasm;
 	disasm = disassembler(bfd_arch_i386, false, bfd_mach_x86_64, NULL);
 
 	size_t pc = 0;
@@ -106,8 +108,9 @@ int main(int argc, char const *argv[])
 		0xc3,			/* ret */
 	};
 	size_t input_buffer_size = sizeof(input_buffer);
+	char *disassembled;
 
-	char *disassembled = disassemble_raw(input_buffer, input_buffer_size);
+	disassembled = disassemble_raw(input_buffer, input_buffer_size);
 	puts(disassembled);
 	free(disassembled);
 
