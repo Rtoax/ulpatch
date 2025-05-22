@@ -40,7 +40,7 @@ TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
 ifndef NOLIBC
   TARGETS_ULP += patch-asm-puts.ulp
-  TARGETS_ULP := patch-print.ulp
+  TARGETS_ULP += patch-print.ulp
   TARGETS_ULP += patch-pthread.ulp
 endif
 
