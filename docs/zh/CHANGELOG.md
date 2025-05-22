@@ -23,6 +23,7 @@
 - tests: 使用linker scripts 替代 `TEST_STUB()`。
 #### 弃用
 #### 移除
+- 移除 tests/disasm/disasm-tst0.c。
 #### 修复
 - 修复tests/disasm编译问题。
 - 传递`task_attach()` 的返回值到调用者。
