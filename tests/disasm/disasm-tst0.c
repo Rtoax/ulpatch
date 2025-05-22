@@ -44,6 +44,12 @@ static int dis_fprintf(void *stream, const char *fmt, ...)
 	return 0;
 }
 
+int styled_fprintf(void *v, enum disassembler_style style, const char *fmt, ...)
+{
+	/* TODO */
+	return 0;
+}
+
 char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 {
 	char *disassembled = NULL;
@@ -51,7 +57,7 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 
 	disassemble_info disasm_info = {};
 #if BINUTILS_VERSION_MINOR>=39
-	init_disassemble_info(&disasm_info, &ss, dis_fprintf, NULL);
+	init_disassemble_info(&disasm_info, &ss, dis_fprintf, styled_fprintf);
 #else
 	init_disassemble_info(&disasm_info, &ss, dis_fprintf);
 #endif
@@ -80,8 +86,7 @@ char *disassemble_raw(uint8_t *input_buffer, size_t input_buffer_size)
 			disassembled = tmp;
 		}
 
-		/* Reset the stream state after each instruction decode.
-		 */
+		/* Reset the stream state after each instruction decode. */
 		free(ss.insn_buffer);
 		ss.reenter = false;
 	}
