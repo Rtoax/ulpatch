@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Wrote by Rong Tao.
 include ../../scripts/verbose.mk
+include ../../src/ulpconfig.mk
 SHELL := bash
 
 CC := gcc
@@ -10,16 +11,9 @@ CFLAGS :=
 CFLAGS_NOLIBC :=
 LDFLAGS :=
 
-ULPCONFIG := $(shell which ulpconfig 2>/dev/null)
 ULP_META_H := /usr/include/ulpatch/meta.h
-
 ifeq ($(wildcard ${ULP_META_H}),)
-  $(error Not found ${ULP_META_H}, Please install ulpatch first)
-endif
-
-# Since ULPatch support ulpconfig command, we should use it first.
-ifeq ($(wildcard ${ULPCONFIG}),)
-  $(error Not found ulpconfig, Please install ulpatch first)
+  $(warning Not found ${ULP_META_H}, Please install ulpatch first)
 endif
 
 CFLAGS += -O0 -ggdb -g
