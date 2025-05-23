@@ -1,6 +1,7 @@
 /hello
 /hello-pie
 /test
+/ulpatch
 /core.*
 *.o
 *.d

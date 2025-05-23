@@ -10,10 +10,17 @@ LD := ld
 CFLAGS :=
 CFLAGS_NOLIBC :=
 LDFLAGS :=
+CFLAGS_ULP :=
 
 ULP_META_H := /usr/include/ulpatch/meta.h
 ifeq ($(wildcard ${ULP_META_H}),)
-  $(warning Not found ${ULP_META_H}, Please install ulpatch first)
+  $(warning Not found ${ULP_META_H}, use source code)
+  ifeq ($(wildcard ulpatch),)
+    $(shell ln -s ../../src/patch/ ulpatch)
+  endif
+  ULP_META_H := ./ulpatch/meta.h
+  CFLAGS += -I.
+  CFLAGS_ULP += -I.
 endif
 
 CFLAGS += -O0 -ggdb -g
@@ -38,7 +45,7 @@ ifndef NOLIBC
   TARGETS_ULP += patch-pthread.ulp
 endif
 
-CFLAGS_ULP := $(shell ${ULPCONFIG} --cc=${CC} --cflags)
+CFLAGS_ULP += $(shell ${ULPCONFIG} --cc=${CC} --cflags)
 CFLAGS_ULP += -O0
 # FIXME: This PIC option should move to ulpconfig, just for test here.
 ifdef ULP_PIC
@@ -107,3 +114,4 @@ $(TARGETS): %:
 clean:
 	@echo -e " CLEAN   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
 	$(Q)rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.stripped *.ulp
+	${Q}rm -f ulpatch
