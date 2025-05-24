@@ -33,3 +33,5 @@ struct vma_ulp {
 int alloc_ulp(struct vm_area_struct *vma);
 int vma_load_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
+
+int update_task_vmas_ulp(struct task_struct *task);

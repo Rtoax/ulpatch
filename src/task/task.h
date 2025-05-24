@@ -95,9 +95,6 @@ struct task_struct {
 };
 
 
-int update_task_vmas_ulp(struct task_struct *task);
-int free_task_vmas(struct task_struct *task);
-
 int dump_task(FILE *fp, const struct task_struct *t, bool detail);
 
 void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail);

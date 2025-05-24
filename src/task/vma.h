@@ -139,6 +139,7 @@ void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
 		struct vm_area_struct *prev);
 void unlink_vma(struct task_struct *task, struct vm_area_struct *vma);
 void free_vma(struct vm_area_struct *vma);
+int free_task_vmas(struct task_struct *task);
 struct vm_area_struct *find_vma(const struct task_struct *task,
 				unsigned long vaddr);
 struct vm_area_struct *next_vma(struct task_struct *task,

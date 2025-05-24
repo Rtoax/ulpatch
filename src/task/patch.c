@@ -114,3 +114,8 @@ int vma_load_ulp(struct vm_area_struct *vma)
 
 	return 0;
 }
+
+int update_task_vmas_ulp(struct task_struct *task)
+{
+	return read_task_vmas(task, true);
+}

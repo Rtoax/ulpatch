@@ -180,7 +180,26 @@ int vma_prot2flags(unsigned int prot)
 	return flags;
 }
 
-int free_task_vmas(struct task_struct *task);
+int free_task_vmas(struct task_struct *task)
+{
+	struct vm_area_struct *vma, *tmpvma;
+
+	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node_list) {
+		unlink_vma(task, vma);
+		free_vma(vma);
+	}
+
+	list_init(&task->vma_list);
+	list_init(&task->ulp_list);
+	list_init(&task->threads_list);
+	list_init(&task->fds_list);
+	rb_init(&task->vmas_rb);
+
+	task->libc_vma = NULL;
+	task->stack = NULL;
+
+	return 0;
+}
 
 enum vma_type get_vma_type(pid_t pid, const char *exe, const char *name)
 {

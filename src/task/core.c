@@ -419,11 +419,6 @@ void vma_free_elf(struct vm_area_struct *vma)
 	free(vma->vma_elf);
 }
 
-int update_task_vmas_ulp(struct task_struct *task)
-{
-	return read_task_vmas(task, true);
-}
-
 void print_task(FILE *fp, const struct task_struct *task, bool detail)
 {
 	if (!task || !fp) {
@@ -559,27 +554,6 @@ void dump_task_fds(FILE *fp, struct task_struct *task, bool detail)
 
 	list_for_each_entry(fd, &task->fds_list, node)
 		print_fd(fp, fd);
-}
-
-int free_task_vmas(struct task_struct *task)
-{
-	struct vm_area_struct *vma, *tmpvma;
-
-	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node_list) {
-		unlink_vma(task, vma);
-		free_vma(vma);
-	}
-
-	list_init(&task->vma_list);
-	list_init(&task->ulp_list);
-	list_init(&task->threads_list);
-	list_init(&task->fds_list);
-	rb_init(&task->vmas_rb);
-
-	task->libc_vma = NULL;
-	task->stack = NULL;
-
-	return 0;
 }
 
 /**
