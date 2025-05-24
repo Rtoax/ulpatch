@@ -540,11 +540,6 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 	fprintf(fp, "MemFD:   %-32d\n", task->proc_mem_fd);
 }
 
-void print_fd(FILE *fp, struct task_struct *task, struct fd *fd)
-{
-	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);
-}
-
 int dump_task(FILE *fp, const struct task_struct *task, bool detail)
 {
 	if (!fp)
@@ -657,7 +652,7 @@ void dump_task_fds(FILE *fp, struct task_struct *task, bool detail)
 	}
 
 	list_for_each_entry(fd, &task->fds_list, node)
-		print_fd(fp, task, fd);
+		print_fd(fp, fd);
 }
 
 int free_task_vmas(struct task_struct *task)

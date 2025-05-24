@@ -410,4 +410,3 @@ int fprint_fd(FILE *fp, int fd)
 	}
 	return cnt;
 }
-
