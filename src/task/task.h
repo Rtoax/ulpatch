@@ -395,6 +395,9 @@ int open_pid_mem_rw(pid_t pid);
 bool proc_pid_exist(pid_t pid);
 char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
 char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
+int proc_get_comm(struct task_struct *task);
+int proc_get_exe(struct task_struct *task);
+int proc_get_pid_status(pid_t pid, struct task_status *status);
 
 struct vm_area_struct *next_vma(struct task_struct *task,
 				struct vm_area_struct *prev);
