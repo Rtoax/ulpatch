@@ -26,30 +26,11 @@
 #include <task/syscall.h>
 #include <task/thread.h>
 #include <task/vma.h>
+#include <task/patch.h>
 #include <task/proc.h>
 #include <task/fd.h>
 #include <task/symbol.h>
 
-
-struct vma_ulp {
-	struct ulpatch_strtab strtab;
-	struct ulpatch_author author;
-	struct ulpatch_license license;
-	struct ulpatch_info info;
-
-	/* This is ELF */
-	void *elf_mem;
-
-#define MIN_ULP_START_VMA_ADDR	0x400000U
-#define MAX_ULP_START_VMA_ADDR	0xFFFFFFFFUL
-	/* Belongs to */
-	struct vm_area_struct *vma;
-
-	char *str_build_id;
-
-	/* struct task_struct.ulp_list */
-	struct list_head node;
-};
 
 /* under ULP_PROC_ROOT_DIR/${PID}/ */
 #define TASK_PROC_COMM	"comm"
@@ -128,9 +109,6 @@ void dump_task_threads(FILE *fp, struct task_struct *task, bool detail);
 void dump_task_fds(FILE *fp, struct task_struct *task, bool detail);
 
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
-
-int alloc_ulp(struct vm_area_struct *vma);
-void free_ulp(struct vm_area_struct *vma);
 
 int print_task_status(FILE *fp, const struct task_struct *task);
 

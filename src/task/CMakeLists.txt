@@ -28,6 +28,7 @@ add_library(ulpatch_task STATIC
 	current.c
 	fd.c
 	memcpy.c
+	patch.c
 	proc.c
 	symbol.c
 	syscall.c
