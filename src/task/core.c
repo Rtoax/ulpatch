@@ -540,22 +540,6 @@ void dump_task_threads(FILE *fp, struct task_struct *task, bool detail)
 		print_thread(fp, task, thread);
 }
 
-void dump_task_fds(FILE *fp, struct task_struct *task, bool detail)
-{
-	struct fd *fd;
-
-	if (!fp)
-		fp = stdout;
-
-	if (!(task->fto_flag & FTO_FD)) {
-		ulp_error("Not set FTO_FD(%ld) flag\n", FTO_FD);
-		return;
-	}
-
-	list_for_each_entry(fd, &task->fds_root.list, node)
-		print_fd(fp, fd);
-}
-
 /**
  * Open target task
  *

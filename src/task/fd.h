@@ -6,6 +6,8 @@
 
 #include <utils/list.h>
 
+struct task_struct;
+
 /* Record one file descriptors of target task */
 struct fd {
 	/* @fd - read from /proc/PID/fd/ */
@@ -23,4 +25,5 @@ struct fds_root {
 
 void init_fds_root(struct fds_root *root);
 
+void dump_task_fds(FILE *fp, struct task_struct *task, bool detail);
 void print_fd(FILE *fp, struct fd *fd);
