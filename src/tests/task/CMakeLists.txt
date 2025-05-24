@@ -15,6 +15,7 @@ add_library(ulpatch_test_task STATIC
 	proc.c
 	symbol.c
 	syscall.c
+	thread.c
 	vma.c
 )
 
