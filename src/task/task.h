@@ -20,6 +20,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
+#include <task/auxv.h>
 #include <task/current.h>
 #include <task/flags.h>
 #include <task/syscall.h>
@@ -55,22 +56,6 @@ struct vma_ulp {
 #define TASK_PROC_MAP_FILES	"map_files"
 
 #define TASK_COMM_LEN	128
-
-/**
- * Store values of the auxiliary vector, read from /proc/PID/auxv
- */
-struct task_auxv {
-	/* AT_PHDR */
-	unsigned long auxv_phdr;
-	/* AT_PHENT */
-	unsigned long auxv_phent;
-	/* AT_PHNUM */
-	unsigned long auxv_phnum;
-	/* AT_BASE */
-	unsigned long auxv_interp;
-	/* AT_ENTRY */
-	unsigned long auxv_entry;
-};
 
 /**
  * This struct use to discript a running process in system, like you can see in
@@ -147,8 +132,6 @@ bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
 
-int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
-int print_task_auxv(FILE *fp, const struct task_struct *task);
 int print_task_status(FILE *fp, const struct task_struct *task);
 
 struct task_struct *open_task(pid_t pid, int flag);
