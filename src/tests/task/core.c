@@ -73,7 +73,6 @@ TEST(Task, dump, 0)
 	dump_task(stdout, task, true);
 	dump_task_vmas(stdout, task, true);
 	dump_task_threads(stdout, task, true);
-	dump_task_fds(stdout, task, true);
 
 	return close_task(task);
 }

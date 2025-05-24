@@ -13,6 +13,38 @@ void init_fds_root(struct fds_root *root)
 	list_init(&root->list);
 }
 
+struct fd *alloc_fd(pid_t pid, int _fd)
+{
+	int ret;
+	struct fd *fd;
+	char proc_fd[PATH_MAX];
+
+	fd = malloc(sizeof(struct fd));
+	memset(fd, 0x00, sizeof(struct fd));
+
+	fd->fd = _fd;
+
+	/* Read symbol link */
+	sprintf(proc_fd, "/proc/%d/fd/%d", pid, _fd);
+	ret = readlink(proc_fd, fd->symlink, PATH_MAX);
+	if (ret < 0) {
+		ulp_warning("readlink %s failed\n", proc_fd);
+		strncpy(fd->symlink, "[UNKNOWN]", PATH_MAX);
+		errno = -ENOENT;
+		return NULL;
+	}
+
+	list_init(&fd->node);
+
+	return fd;
+}
+
+void free_fd(struct fd *fd)
+{
+	list_del(&fd->node);
+	free(fd);
+}
+
 void print_fd(FILE *fp, struct fd *fd)
 {
 	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);

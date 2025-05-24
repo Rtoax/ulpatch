@@ -25,5 +25,8 @@ struct fds_root {
 
 void init_fds_root(struct fds_root *root);
 
+struct fd *alloc_fd(pid_t pid, int _fd);
+void free_fd(struct fd *fd);
+
 void dump_task_fds(FILE *fp, struct task_struct *task, bool detail);
 void print_fd(FILE *fp, struct fd *fd);

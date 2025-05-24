@@ -703,7 +703,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 		DIR *dir;
 		struct dirent *entry;
 		int ifd;
-		int ret;
 		struct fd *fd;
 		char proc_fd[PATH_MAX] = {"/proc/1234567890abc/fd/"};
 		sprintf(proc_fd, "/proc/%d/fd/", task->pid);
@@ -719,20 +718,8 @@ struct task_struct *open_task(pid_t pid, int flag)
 			ulp_debug("FD %s\n", entry->d_name);
 			ifd = atoi(entry->d_name);
 
-			fd = malloc(sizeof(struct fd));
-			memset(fd, 0x00, sizeof(struct fd));
+			fd = alloc_fd(task->pid, ifd);
 
-			fd->fd = ifd;
-
-			/* Read symbol link */
-			sprintf(proc_fd, "/proc/%d/fd/%d", task->pid, ifd);
-			ret = readlink(proc_fd, fd->symlink, PATH_MAX);
-			if (ret < 0) {
-				ulp_warning("readlink %s failed\n", proc_fd);
-				strncpy(fd->symlink, "[UNKNOWN]", PATH_MAX);
-			}
-
-			list_init(&fd->node);
 			list_add(&fd->node, &task->fds_root.list);
 		}
 		closedir(dir);
@@ -841,7 +828,7 @@ int close_task(struct task_struct *task)
 	if (task->fto_flag & FTO_FD) {
 		struct fd *fd, *tmpfd;
 		list_for_each_entry_safe(fd, tmpfd, &task->fds_root.list, node)
-			free(fd);
+			free_fd(fd);
 	}
 
 	free_task_vmas(task);
