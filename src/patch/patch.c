@@ -841,7 +841,7 @@ static int solve_patch_symbols(struct load_info *info)
 		return -ENOENT;
 	}
 
-	info->ulp_info->ulp_id = ++task->max_ulp_id;
+	info->ulp_info->ulp_id = ++task->ulp_root.max_id;
 	info->ulp_info->target_func_addr = tsym->addr;
 	info->ulp_info->patch_func_addr = sym_src_func->st_value;
 	/* Replace from start of target function */
@@ -929,7 +929,7 @@ static int load_patch(struct load_info *info)
 	/**
 	 * Check the Build ID exist or not.
 	 */
-	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_root.list, node) {
 		ulp_debug("ULPatch \n");
 		if (!strcmp(ulp->str_build_id, info->str_build_id)) {
 			ulp_error("Build ID %s already exist\n" \
@@ -1048,8 +1048,8 @@ int delete_patch(struct task_struct *task)
 	err = 0;
 	ulp_info = NULL;
 
-	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
-		if (task->max_ulp_id == ulp->info.ulp_id) {
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_root.list, node) {
+		if (task->ulp_root.max_id == ulp->info.ulp_id) {
 			ulp_info("Found last ulpatch vma.\n");
 			ulp_info = &ulp->info;
 			break;

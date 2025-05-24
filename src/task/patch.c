@@ -20,6 +20,12 @@
 #include <task/patch.h>
 
 
+void init_vma_ulp_root(struct vma_ulp_root *root)
+{
+	memset(root, 0, sizeof(struct vma_ulp_root));
+	list_init(&root->list);
+}
+
 int alloc_ulp(struct vm_area_struct *vma)
 {
 	int ret;
@@ -54,7 +60,7 @@ int alloc_ulp(struct vm_area_struct *vma)
 		return -EAGAIN;
 	}
 
-	list_add(&ulp->node, &task->ulp_list);
+	list_add(&ulp->node, &task->ulp_root.list);
 	return 0;
 }
 
@@ -109,8 +115,8 @@ int vma_load_ulp(struct vm_area_struct *vma)
 
 	load_ulp_info_from_vma(vma, &info);
 
-	if (task->max_ulp_id < info.ulp_info->ulp_id)
-		task->max_ulp_id = info.ulp_info->ulp_id;
+	if (task->ulp_root.max_id < info.ulp_info->ulp_id)
+		task->ulp_root.max_id = info.ulp_info->ulp_id;
 
 	return 0;
 }

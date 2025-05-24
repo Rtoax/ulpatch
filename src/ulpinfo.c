@@ -141,7 +141,7 @@ int show_task_patch_info(pid_t pid)
 		return -ENOENT;
 	}
 
-	if (list_empty(&task->ulp_list)) {
+	if (list_empty(&task->ulp_root.list)) {
 		fprintf(stdout, "No ULPatch founded in process %d\n", pid);
 		goto free;
 	}
@@ -160,7 +160,7 @@ int show_task_patch_info(pid_t pid)
 	fpansi_reset(stdout);
 	printf("\n");
 
-	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_list, node) {
+	list_for_each_entry_safe(ulp, tmpulp, &task->ulp_root.list, node) {
 		struct vm_area_struct *vma = ulp->vma;
 		printf("%-4d %-4d %-20s %#016lx %-16s",
 			i, ulp->info.ulp_id, ulp_info_strftime(&ulp->info),

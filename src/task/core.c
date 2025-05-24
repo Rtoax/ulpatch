@@ -430,8 +430,8 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 	fprintf(fp, "Exe:     %-32s\n", task->exe);
 	fprintf(fp, "Pid:     %-32d\n", task->pid);
 	fprintf(fp, "PIE:     %-32s\n", task->is_pie ? "YES" : "NO");
-	if (task->max_ulp_id)
-		fprintf(fp, "Patched: YES (num %d)\n", task->max_ulp_id);
+	if (task->ulp_root.max_id)
+		fprintf(fp, "Patched: YES (num %d)\n", task->ulp_root.max_id);
 
 	if (!detail)
 		return;
@@ -587,7 +587,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	task->pid = pid;
 
 	init_vma_root(&task->vma_root);
-	list_init(&task->ulp_list);
+	init_vma_ulp_root(&task->ulp_root);
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);
 	task_syms_init(&task->tsyms);

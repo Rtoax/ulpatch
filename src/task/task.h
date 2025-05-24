@@ -68,9 +68,7 @@ struct task_struct {
 	 */
 	struct task_syms tsyms;
 
-	/* struct vma_ulp.node */
-	struct list_head ulp_list;
-	unsigned int max_ulp_id;
+	struct vma_ulp_root ulp_root;
 
 	/* struct thread_struct.node */
 	struct list_head threads_list;

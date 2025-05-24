@@ -26,9 +26,18 @@ struct vma_ulp {
 
 	char *str_build_id;
 
-	/* struct task_struct.ulp_list */
+	/* struct vma_ulp_root.list */
 	struct list_head node;
 };
+
+struct vma_ulp_root {
+	/* struct vma_ulp.node */
+	struct list_head list;
+	unsigned int max_id;
+};
+
+
+void init_vma_ulp_root(struct vma_ulp_root *root);
 
 int alloc_ulp(struct vm_area_struct *vma);
 int vma_load_ulp(struct vm_area_struct *vma);
