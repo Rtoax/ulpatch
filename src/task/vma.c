@@ -11,6 +11,8 @@
 
 #include <utils/log.h>
 #include <task/task.h>
+#include <task/vma.h>
+
 
 struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
