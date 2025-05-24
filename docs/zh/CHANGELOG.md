@@ -13,21 +13,28 @@
 #### 重大变更
 - 添加 `ULPATCH_LICENSE()` 并且 `ULPATCH_FILE_VERSION=5`.
 #### 添加
+- 添加 ulpconfig.mk。
+- 添加 scripts/verbose.mk。
+- 添加 docker/build.sh。
 - 准备将 tests/hello 使用 cmake 编译。
 - 将 git 作为依赖。
 - task: 添加 auxv.c。
 #### 更改
+- tests: 重命名 tests/disasm/disasm-tst1.c 为 tests/bfd/symbol.c。
 - tests: 引入linker scripts 来遍历所有测试例。
 - tests: 使用linker scripts 替代 `TEST_STUB()`。
 #### 弃用
 #### 移除
+- 移除 tests/disasm/disasm-tst0.c。
 #### 修复
+- 修复tests/disasm编译问题。
 - 传递`task_attach()` 的返回值到调用者。
 #### 安全
 #### 文档
 #### 工具
 #### 测试
 - 仅仅在编译ultask和ulftrace时才测试它们。
+- 添加 tests/bfd 到 CMake 编译列表。
 
 
 ## v0.5.13

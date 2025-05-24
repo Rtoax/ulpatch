@@ -14,7 +14,7 @@ On **RHEL** like linux distrobution, manage packages with [rpm](https://github.c
 ```bash
 # Some distributions like RHEL need epel-release package, Fedora don't.
 $ sudo dnf install -y epel-release
-$ sudo dnf group install -y "Development Tools"
+$ sudo dnf group install -y development-tools
 $ sudo dnf install -y \
 	bash-completion-devel \
 	binutils-devel \

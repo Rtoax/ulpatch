@@ -4,11 +4,22 @@ FROM ubuntu:devel
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt install -y build-essential
-RUN apt-get install -y cmake gcc binutils-dev libc6 libcapstone-dev libelf-dev \
-	libunwind-dev util-linux
+RUN apt install -y \
+	bash-completion \
+	binutils-dev \
+	cmake \
+	gcc \
+	git \
+	libc6 \
+	libcapstone-dev \
+	libelf-dev \
+	libssl-dev \
+	libunwind-dev \
+	util-linux
 
-COPY . /src
-WORKDIR /src
-RUN cmake -B /build
-RUN make -C /build -j$(nproc)
-ENTRYPOINT ["/build/src/ulpatch"]
+VOLUME ["/ulpatch"]
+WORKDIR /ulpatch
+RUN cmake -B /ulpatch/build
+RUN make -C /ulpatch/build -j$(nproc)
+RUN make -C /ulpatch/build install
+ENTRYPOINT ["/usr/bin/ulpatch"]

@@ -1,19 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2024-2025 Rong Tao
+include ../../../scripts/verbose.mk
 SHELL := bash
 DESTDIR := /usr/share/ulpatch/ftrace/
-ULPCONFIG :=
-Q := @
-ifdef V
-  Q :=
-endif
-
-ifndef ULPCONFIG
-  ULPCONFIG := $(shell which ulpconfig 2>/dev/null)
-  ifeq ($(wildcard ${ULPCONFIG}),)
-    $(error Not found ulpconfig, Please install ulpatch first)
-  endif
-endif
+include ../../ulpconfig.mk
 
 TARGETS :=
 TARGETS += empty.ulp
@@ -33,10 +23,6 @@ ifdef INCLUDES
   CFLAGS += $(INCLUDES)
 else
   CFLAGS += -I../../
-endif
-
-ifdef DEBUG
-  $(info ulpconfig: ${ULPCONFIG})
 endif
 
 .PHONY: ALL

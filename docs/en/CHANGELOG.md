@@ -14,21 +14,29 @@ and this project adheres to
 #### Breaking Changes
 - Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
+- Add ulpconfig.mk.
+- scripts: add verbose.mk.
+- docker: Add build.sh.
 - Ready to use cmake compile tests/hello.
 - Add git as depends.
 - task: add auxv.c
 #### Changed
+- tests: Rename tests/disasm/disasm-tst1.c to tests/bfd/symbol.c.
 - tests: Introduce linker scripts to iterate all tests.
 - tests: Use linker scripts instead of `TEST_STUB()`.
 #### Deprecated
 #### Removed
+- Remove tests/disasm/disasm-tst0.c.
 #### Fixed
+- Fix tests/disasm/ compile error.
 - Pass `task_attach()` return value to caller.
 #### Security
 #### Docs
 #### Tools
 #### Tests
 - Only tests ultask and ulftrace if built.
+- Add tests/bfd to CMake list.
+
 
 ## v0.5.13
 

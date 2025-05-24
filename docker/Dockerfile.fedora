@@ -1,15 +1,27 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 FROM fedora:42
 
-RUN dnf group install -y "Development Tools"
-RUN dnf install -y binutils-devel capstone-devel cmake \
-		elfutils-devel elfutils-libelf-devel gcc gcc-c++ \
-		glibc-devel libunwind-devel util-linux
+RUN dnf group install -y development-tools
+RUN dnf install -y \
+	bash-completion-devel \
+	binutils-devel \
+	capstone-devel \
+	cmake \
+	elfutils-devel \
+	elfutils-libelf-devel \
+	gcc \
+	gcc-c++ \
+	git \
+	glibc-devel \
+	libunwind-devel \
+	openssl-devel \
+	util-linux
 
 RUN dnf clean all
 
-COPY . /src
-WORKDIR /src
-RUN cmake -B /build
-RUN make -C /build -j$(nproc)
-ENTRYPOINT ["/build/src/ulpatch"]
+VOLUME ["/ulpatch"]
+WORKDIR /ulpatch
+RUN cmake -B /ulpatch/build
+RUN make -C /ulpatch/build -j$(nproc)
+RUN make -C /ulpatch/build install
+ENTRYPOINT ["/usr/bin/ulpatch"]

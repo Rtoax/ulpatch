@@ -34,6 +34,7 @@ ulp-*
 *~
 
 # Coredump, we don't have source file named with core. prefix.
+*.core
 core.*
 !core*.c
 

@@ -1,13 +1,8 @@
-# This is ULPatch test Makefile wrote by Rong Tao.
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Wrote by Rong Tao.
+include ../../scripts/verbose.mk
+include ../../src/ulpconfig.mk
 SHELL := bash
-ifeq ($(V),1)
-  Q =
-else
-  Q = @
-  MAKEFLAGS += --silent
-  MAKEFLAGS += --no-print-directory
-endif
-export Q
 
 CC := gcc
 LD := ld
@@ -15,17 +10,17 @@ LD := ld
 CFLAGS :=
 CFLAGS_NOLIBC :=
 LDFLAGS :=
+CFLAGS_ULP :=
 
-ULPCONFIG := $(shell which ulpconfig 2>/dev/null)
 ULP_META_H := /usr/include/ulpatch/meta.h
-
 ifeq ($(wildcard ${ULP_META_H}),)
-  $(error Not found ${ULP_META_H}, Please install ulpatch first)
-endif
-
-# Since ULPatch support ulpconfig command, we should use it first.
-ifeq ($(wildcard ${ULPCONFIG}),)
-  $(error Not found ulpconfig, Please install ulpatch first)
+  $(warning Not found ${ULP_META_H}, use source code)
+  ifeq ($(wildcard ulpatch),)
+    $(shell ln -s ../../src/patch/ ulpatch)
+  endif
+  ULP_META_H := ./ulpatch/meta.h
+  CFLAGS += -I.
+  CFLAGS_ULP += -I.
 endif
 
 CFLAGS += -O0 -ggdb -g
@@ -46,11 +41,11 @@ TARGETS_ULP += patch-add-vars.ulp
 TARGETS_ULP += patch-failed-bss.ulp
 ifndef NOLIBC
   TARGETS_ULP += patch-asm-puts.ulp
-  TARGETS_ULP := patch-print.ulp
+  TARGETS_ULP += patch-print.ulp
   TARGETS_ULP += patch-pthread.ulp
 endif
 
-CFLAGS_ULP := $(shell ${ULPCONFIG} --cc=${CC} --cflags)
+CFLAGS_ULP += $(shell ${ULPCONFIG} --cc=${CC} --cflags)
 CFLAGS_ULP += -O0
 # FIXME: This PIC option should move to ulpconfig, just for test here.
 ifdef ULP_PIC
@@ -114,9 +109,9 @@ $(TARGETS): %:
 	@echo -e " LD  \033[1;32m$(@)\033[m"
 	$(Q)$(CC) -o $(@) $(^) $(LDFLAGS) $(LDFLAGS_$(*)) $(CFLAGS) $(CFLAGS_$(*))
 	$(Q)strip $(@) -o $(@).stripped
-	$(Q)rm -f $(^)
 
 .PHONY: clean
 clean:
 	@echo -e " CLEAN   \033[1;32m$(TARGETS) $(TARGETS_ULP)\033[m"
 	$(Q)rm -f $(TARGETS) $(TARGETS_ULP) *.o *.ulpo core.* *.stripped *.ulp
+	${Q}rm -f ulpatch

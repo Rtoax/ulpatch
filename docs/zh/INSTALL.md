@@ -14,7 +14,7 @@ hide:
 ```bash
 # 像 RHEL，有些发行版需要安装 epel-release 包，Fedora 不需要
 $ sudo dnf install -y epel-release
-$ sudo dnf group install -y "Development Tools"
+$ sudo dnf group install -y development-tools
 $ sudo dnf install -y \
 	bash-completion-devel \
 	binutils-devel \
