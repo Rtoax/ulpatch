@@ -63,12 +63,6 @@ struct task_struct {
 
 	struct vm_area_root vma_root;
 
-	/* VMA_SELF ELF vma */
-	struct vm_area_struct *vma_self_elf;
-	struct vm_area_struct *libc_vma;
-
-	struct vm_area_struct *stack;
-
 	/**
 	 * Store all symbols that task defined.
 	 */

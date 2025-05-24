@@ -181,7 +181,7 @@ static int vma_peek_elf_hdrs(struct vm_area_struct *vma)
 	ulp_debug("%lx %s is ELF\n", vma->vm_start, vma->name_);
 
 	if (vma->type == VMA_SELF) {
-		task->vma_self_elf = vma;
+		task->vma_root.self_elf = vma;
 		/**
 		 * Executable file only could be ET_EXEC or ET_DYN, if ET_DYN,
 		 * the ELF was compiled with -fPIE, and it's PIE executable
@@ -623,7 +623,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	if (err)
 		goto free_task;
 
-	if (!task->libc_vma || !task->stack) {
+	if (!task->vma_root.libc_code || !task->vma_root.stack) {
 		ulp_error("No libc or stack founded.\n");
 		goto free_task;
 	}

@@ -121,6 +121,11 @@ struct vm_area_root {
 	struct list_head list;
 	/* struct vm_area_struct.node_rb */
 	struct rb_root rb;
+
+	/* for fast seek */
+	struct vm_area_struct *self_elf;
+	struct vm_area_struct *libc_code;
+	struct vm_area_struct *stack;
 };
 
 

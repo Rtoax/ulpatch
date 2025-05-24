@@ -95,7 +95,7 @@ int wait_for_stop(struct task_struct *task)
 	while (1) {
 		ret = ptrace(PTRACE_CONT, pid, NULL, (void *)(uintptr_t)status);
 		if (ret < 0) {
-			print_vma(stderr, true, task->libc_vma, false);
+			print_vma(stderr, true, task->vma_root.libc_code, false);
 			ulp_error("ptrace(PTRACE_CONT, %d, ...) %m\n", pid);
 			return -1;
 		}
@@ -132,7 +132,7 @@ int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
 	struct user_regs_struct old_regs, regs, syscall_regs;
 	unsigned char __syscall[] = {SYSCALL_INSTR};
 	unsigned char orig_code[sizeof(__syscall)];
-	unsigned long libc_base = task->libc_vma->vm_start;
+	unsigned long libc_base = task->vma_root.libc_code->vm_start;
 
 	memset(&syscall_regs, 0x0, sizeof(syscall_regs));
 

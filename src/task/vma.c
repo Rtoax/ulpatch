@@ -16,6 +16,7 @@
 
 void init_vma_root(struct vm_area_root *root)
 {
+	memset(root, 0, sizeof(struct vm_area_root));
 	list_init(&root->list);
 	rb_init(&root->rb);
 }
@@ -200,9 +201,6 @@ int free_task_vmas(struct task_struct *task)
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);
 
-	task->libc_vma = NULL;
-	task->stack = NULL;
-
 	return 0;
 }
 
@@ -385,15 +383,15 @@ int read_task_vmas(struct task_struct *task, bool update_ulp)
 		vma->type = get_vma_type(task->pid, task->exe, name_);
 
 		/* Find libc.so */
-		if (!task->libc_vma && vma->type == VMA_LIBC &&
+		if (!task->vma_root.libc_code && vma->type == VMA_LIBC &&
 		    vma->prot & PROT_EXEC) {
 			ulp_debug("Get x libc: 0x%lx\n", vma->vm_start);
-			task->libc_vma = vma;
+			task->vma_root.libc_code = vma;
 		}
 
 		/* Find [stack] */
-		if (!task->stack && vma->type == VMA_STACK)
-			task->stack = vma;
+		if (!task->vma_root.stack && vma->type == VMA_STACK)
+			task->vma_root.stack = vma;
 
 		vma->leader = vma;
 
