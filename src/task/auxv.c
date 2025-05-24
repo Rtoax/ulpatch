@@ -13,13 +13,13 @@
 #include <task/task.h>
 
 
-int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv)
+int load_task_auxv(pid_t pid, struct task_auxv *pauxv)
 {
 	int fd, n, ret = 0;
 	char buf[PATH_MAX];
 	GElf_auxv_t auxv;
 
-	memset(pauxv, 0x00, sizeof(struct task_struct_auxv));
+	memset(pauxv, 0x00, sizeof(struct task_auxv));
 
 	snprintf(buf, PATH_MAX - 1, "/proc/%d/auxv", pid);
 	fd = open(buf, O_RDONLY);
@@ -91,7 +91,7 @@ exit:
 
 int print_task_auxv(FILE *fp, const struct task_struct *task)
 {
-	const struct task_struct_auxv *pauxv;
+	const struct task_auxv *pauxv;
 
 	if (!task || !(task->fto_flag & FTO_AUXV)) {
 		ulp_error("Not set FTO_AUXV.\n");

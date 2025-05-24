@@ -239,7 +239,7 @@ struct fd {
 /**
  * Store values of the auxiliary vector, read from /proc/PID/auxv
  */
-struct task_struct_auxv {
+struct task_auxv {
 	/* AT_PHDR */
 	unsigned long auxv_phdr;
 	/* AT_PHENT */
@@ -347,7 +347,7 @@ struct task_struct {
 
 	bool is_pie;
 
-	struct task_struct_auxv auxv;
+	struct task_auxv auxv;
 	struct task_status status;
 
 	/* open(2) /proc/[PID]/mem */
@@ -461,7 +461,7 @@ void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);
 int alloc_ulp(struct vm_area_struct *vma);
 void free_ulp(struct vm_area_struct *vma);
 
-int load_task_auxv(pid_t pid, struct task_struct_auxv *pauxv);
+int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
 int print_task_auxv(FILE *fp, const struct task_struct *task);
 int print_task_status(FILE *fp, const struct task_struct *task);
 
