@@ -36,6 +36,16 @@ For a process like Qemu that cannot be interrupted and restarted, vulnerability 
 Of course, the ULPatch project only discusses user-mode programs.
 
 
+# ULPatch Support Architecture
+
+Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with and I want to support, if they do not contain what you need, you are welcome to co-develop.
+
+- [ ] `x86_64`: ready to go, support some simple demostration already.
+- [ ] `aarch64`: ready to go, support some simple demostration already.
+- [ ] `loongarch64`: not support yet.
+- [ ] `riscv64`: not support yet.
+
+
 ## Related Projects
 
 ULPatch draws on several excellent open source projects, such as [cloudlinux/libcare](https://github.com/cloudlinux/libcare), and Huawei’s secondary development [openeuler/libcareplus](https://gitee.com/openeuler/libcareplus). SUSE has also open sourced its own live patch solution [SUSE/libpulp](https://github.com/SUSE/libpulp).

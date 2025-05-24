@@ -23,17 +23,12 @@ ULPatch is open source user space live patch tool.
 
 ULPatch can fix bugs and CVEs in the process without restarting.
 
-More to see [docs/index.md](docs/index.md). Alternatively, you can directly access the [ULPatch website main page](https://rtoax.github.io/ulpatch/) to view the documentation.
+More to see [docs/en/index.md](docs/en/index.md). Alternatively, you can directly access the [ULPatch website main page](https://rtoax.github.io/ulpatch/) to view the documentation.
 
 
 # ULPatch Support Architecture
 
-Due to my limited personal experience, I can't understand and master all the architectures, here is a list of the architectures that I am familiar with and I want to support, if they do not contain what you need, you are welcome to co-develop.
-
-- [ ] `x86_64`: ready to go, support some simple demostration already.
-- [ ] `aarch64`: ready to go, support some simple demostration already.
-- [ ] `loongarch64`: ready to go
-- [ ] `riscv64`: ready to go
+See [docs/en/index.md](docs/en/index.md) or [website](https://rtoax.github.io/ulpatch/).
 
 
 # ULPatch Installation
@@ -55,4 +50,3 @@ See [RELEASE.md](docs/en/RELEASE.md) or [website](https://rtoax.github.io/ulpatc
 
 - Before you do it, it's best to know what you're doing.
 - I don't have much free time, so the ulpatch code will be developed very slowly. If you think it's too slow, please join me.
-

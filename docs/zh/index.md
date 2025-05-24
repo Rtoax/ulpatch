@@ -36,6 +36,16 @@ hide:
 当然，ULPatch 项目只讨论用户模式程序。
 
 
+# ULPatch 支持的架构
+
+由于我的知识体系和个人经验，不能理解掌握所有CPU架构，所有我只列举了我熟悉的架构，如果不能满足你的需求，环境加入我一起开发。
+
+- [ ] `x86_64`: 快好了，支持一些小Demo.
+- [ ] `aarch64`: 快好了，支持一些小Demo.
+- [ ] `loongarch64`: 还不支持
+- [ ] `riscv64`: 还不支持
+
+
 ## 相关项目
 
 ULPatch 借鉴了 [cloudlinux/libcare](https://github.com/cloudlinux/libcare) 和华为的二次开发 [openeuler/libcareplus](https://gitee.com/openeuler/libcareplus) 等多个优秀的开源项目。SUSE 还开源了自己的实时补丁解决方案 [SUSE/libpulp](https://github.com/SUSE/libpulp)。
