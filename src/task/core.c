@@ -646,7 +646,6 @@ struct task_struct *open_task(pid_t pid, int flag)
 	if (flag & FTO_THREADS) {
 		DIR *dir;
 		struct dirent *entry;
-		pid_t child;
 		struct thread_struct *thread;
 		char proc_task_dir[] = {"/proc/1234567890abc/task"};
 		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
@@ -660,7 +659,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			    !strcmp(entry->d_name, ".."))
 				continue;
 			ulp_debug("Thread %s\n", entry->d_name);
-			child = atoi(entry->d_name);
+			pid_t child = atoi(entry->d_name);
 			/**
 			 * Maybe we should skip the thread tid == pid, however,
 			 * if that, we must add an extra list of extra opendir
