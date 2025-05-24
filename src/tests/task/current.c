@@ -34,7 +34,7 @@ TEST(Task, current_task, 0)
 	ulp_info("Comm %s\n", current->comm);
 
 	/* Make sure we could write 'current' task */
-	current->exe_bfd = (void *)1;
+	current->vma_root.exe_bfd = (void *)1;
 
 close:
 	close_task(task);

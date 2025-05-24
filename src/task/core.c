@@ -395,10 +395,10 @@ static int vma_load_elf_file(struct vm_area_struct *vma)
 		}
 		switch (vma->type) {
 		case VMA_SELF:
-			task->exe_bfd = vma->bfd_elf_file;
+			task->vma_root.exe_bfd = vma->bfd_elf_file;
 			break;
 		case VMA_LIBC:
-			task->libc_bfd = vma->bfd_elf_file;
+			task->vma_root.libc_bfd = vma->bfd_elf_file;
 			break;
 		default:
 			break;

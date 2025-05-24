@@ -126,6 +126,12 @@ struct vm_area_root {
 	struct vm_area_struct *self_elf;
 	struct vm_area_struct *libc_code;
 	struct vm_area_struct *stack;
+
+	/**
+	 * Point to vma::bfd_elf_file field, no need to free or close.
+	 */
+	struct bfd_elf_file *exe_bfd;
+	struct bfd_elf_file *libc_bfd;
 };
 
 

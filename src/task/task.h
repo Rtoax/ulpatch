@@ -68,12 +68,6 @@ struct task_struct {
 	 */
 	struct task_syms tsyms;
 
-	/**
-	 * Point to vma::bfd_elf_file field, no need to free or close.
-	 */
-	struct bfd_elf_file *exe_bfd;
-	struct bfd_elf_file *libc_bfd;
-
 	/* struct vma_ulp.node */
 	struct list_head ulp_list;
 	unsigned int max_ulp_id;
