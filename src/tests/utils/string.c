@@ -355,3 +355,14 @@ TEST(Utils_str, strbytes2mem2strbytes, 0)
 
 	return err;
 }
+
+TEST(Utils_str, strprintbuf, 0)
+{
+	int err = 0;
+	char buf[1024];
+	err += strcmp("", strprintbuf(buf, sizeof(buf), ""));
+	err += strcmp("hello", strprintbuf(buf, sizeof(buf), "hello"));
+	err += strcmp("hello world", strprintbuf(buf, sizeof(buf), "hello %s", "world"));
+	err += strcmp("1234", strprintbuf(buf, sizeof(buf), "%d%d%d%d", 1, 2, 3, 4));
+	return err;
+}

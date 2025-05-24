@@ -235,6 +235,7 @@ char *mem2strbytes(const void *mem, size_t mem_len, char *bytes_buf,
 		   size_t buf_len, char seperator);
 
 int fmembytes(FILE *fp, const void *data, int data_len);
+char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...);
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)
