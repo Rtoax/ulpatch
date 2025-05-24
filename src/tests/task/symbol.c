@@ -125,4 +125,3 @@ TEST(Task_sym, find_task_symbol_value, 0)
 	close_task(task);
 	return ret;
 }
-

@@ -10,8 +10,10 @@ find_library(ELF elf HINTS ${SEARCH_PATH})
 add_library(ulpatch_test_task STATIC
 	core.c
 	current.c
+	memcpy.c
 	proc.c
 	symbol.c
+	syscall.c
 	vma.c
 )
 

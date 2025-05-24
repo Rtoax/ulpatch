@@ -98,4 +98,3 @@ TEST(Task, dump_task_vma_to_file, 0)
 	ret += close_task(task);
 	return ret;
 }
-
