@@ -1,5 +1,4 @@
 <center><a href="docs/images/logo.drawio.svg"><img src="docs/images/logo.drawio.svg" border=0 width=300></a></center>
-<br/>
 
 <div align="center" markdown>
 
