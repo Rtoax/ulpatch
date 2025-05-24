@@ -101,9 +101,9 @@ struct vm_area_struct {
 
 	struct task_struct *task;
 
-	/* struct task_struct.vma_list */
+	/* struct vm_area_root.list */
 	struct list_head node_list;
-	/* struct task_struct.vmas_rb */
+	/* struct vm_area_root.rb */
 	struct rb_node node_rb;
 
 	/**
