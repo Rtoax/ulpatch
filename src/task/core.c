@@ -630,7 +630,7 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 
 void dump_task_threads(FILE *fp, struct task_struct *task, bool detail)
 {
-	struct thread *thread;
+	struct thread_struct *thread;
 
 	if (!fp)
 		fp = stdout;
@@ -805,7 +805,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		DIR *dir;
 		struct dirent *entry;
 		pid_t child;
-		struct thread *thread;
+		struct thread_struct *thread;
 		char proc_task_dir[] = {"/proc/1234567890abc/task"};
 		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
 		dir = opendir(proc_task_dir);
@@ -832,7 +832,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 */
 			if (child == task->pid)
 				ulp_debug("Thread %s (pid)\n", entry->d_name);
-			thread = malloc(sizeof(struct thread));
+			thread = malloc(sizeof(struct thread_struct));
 			thread->tid = child;
 			list_init(&thread->node);
 			list_add(&thread->node, &task->threads_list);
@@ -974,7 +974,7 @@ int close_task(struct task_struct *task)
 		__check_and_free_task_proc(task);
 
 	if (task->fto_flag & FTO_THREADS) {
-		struct thread *thread, *tmpthread;
+		struct thread_struct *thread, *tmpthread;
 		list_for_each_entry_safe(thread, tmpthread, &task->threads_list,
 			   node)
 			free(thread);

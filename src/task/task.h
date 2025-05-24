@@ -20,6 +20,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 
+#include <task/current.h>
 #include <task/flags.h>
 #include <task/syscall.h>
 #include <task/thread.h>
@@ -209,7 +210,7 @@ struct task_struct {
 	struct list_head ulp_list;
 	unsigned int max_ulp_id;
 
-	/* struct thread.node */
+	/* struct thread_struct.node */
 	struct list_head threads_list;
 
 	/* struct fd.node */
@@ -252,13 +253,6 @@ void free_ulp(struct vm_area_struct *vma);
 int load_task_auxv(pid_t pid, struct task_auxv *pauxv);
 int print_task_auxv(FILE *fp, const struct task_struct *task);
 int print_task_status(FILE *fp, const struct task_struct *task);
-
-#define current get_current_task()
-#define zero_task __zero_task()
-int set_current_task(struct task_struct *task);
-void reset_current_task(void);
-struct task_struct *const get_current_task(void);
-struct task_struct *const __zero_task(void);
 
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);

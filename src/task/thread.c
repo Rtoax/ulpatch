@@ -4,8 +4,8 @@
 #include <task/thread.h>
 #include <task/task.h>
 
-void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
+void print_thread(FILE *fp, struct task_struct *task,
+		  struct thread_struct *thread)
 {
 	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
 }
-

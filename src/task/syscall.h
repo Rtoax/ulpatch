@@ -38,7 +38,6 @@ int task_prctl(struct task_struct *task, int option, unsigned long arg2,
 	       unsigned long arg3, unsigned long arg4, unsigned long arg5);
 
 /* Execute a syscall(2) in target task */
-int task_syscall(struct task_struct *task, int nr,
-		unsigned long arg1, unsigned long arg2, unsigned long arg3,
-		unsigned long arg4, unsigned long arg5, unsigned long arg6,
-		unsigned long *res);
+int task_syscall(struct task_struct *task, int nr, unsigned long arg1,
+		 unsigned long arg2, unsigned long arg3, unsigned long arg4,
+		 unsigned long arg5, unsigned long arg6, unsigned long *res);

@@ -16,7 +16,7 @@ typedef unsigned long long pc_addr_t;
 
 struct task_struct;
 
-struct thread {
+struct thread_struct {
 	pid_t tid;
 	/* TODO */
 	pc_addr_t ip;
@@ -24,4 +24,5 @@ struct thread {
 	struct list_head node;
 };
 
-void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
+void print_thread(FILE *fp, struct task_struct *task,
+		  struct thread_struct *thread);
