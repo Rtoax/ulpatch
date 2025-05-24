@@ -34,6 +34,8 @@ void init_thread_root(struct task_thread_root *root);
 struct thread_struct *alloc_thread(pid_t tid);
 void free_thread(struct thread_struct *thread);
 
+void task_load_threads(struct task_struct *task);
+
 void print_thread(FILE *fp, struct task_struct *task,
 		  struct thread_struct *thread);
 void dump_task_threads(FILE *fp, struct task_struct *task, bool detail);

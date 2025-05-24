@@ -26,6 +26,39 @@ void free_thread(struct thread_struct *thread)
 	free(thread);
 }
 
+static void dir_iter_callback_thread(const char *name, void *arg)
+{
+	struct thread_struct *thread;
+	struct task_struct *task = arg;
+	pid_t child = atoi(name);
+	/**
+	 * Maybe we should skip the thread tid == pid, however,
+	 * if that, we must add an extra list of extra opendir
+	 * while loop, thus, we add the pid == tid thread to
+	 * task.thread_root.list.
+	 *
+	 * TODO: Should we need update thread_root.list by
+	 * timingly read /proc/PID/task/, make sure new thread
+	 * created during the ULPatch patching or unpatching?
+	 * Maybe this is a longterm work, but not now.
+	 */
+	if (child == task->pid)
+		ulp_debug("Thread %s (pid)\n", name);
+	thread = alloc_thread(child);
+	list_add(&thread->node, &task->thread_root.list);
+}
+
+void task_load_threads(struct task_struct *task)
+{
+	char buf[128];
+
+	if (!(task->fto_flag & FTO_THREADS))
+		return;
+
+	dir_iter(strprintbuf(buf, sizeof(buf), "/proc/%d/task/", task->pid),
+		dir_iter_callback_thread, task);
+}
+
 void print_thread(FILE *fp, struct task_struct *task,
 		  struct thread_struct *thread)
 {

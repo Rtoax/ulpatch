@@ -642,42 +642,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 		}
 	}
 
-	/* /proc/PID/task/xxx */
-	if (flag & FTO_THREADS) {
-		DIR *dir;
-		struct dirent *entry;
-		struct thread_struct *thread;
-		char proc_task_dir[] = {"/proc/1234567890abc/task"};
-		sprintf(proc_task_dir, "/proc/%d/task/", task->pid);
-		dir = opendir(proc_task_dir);
-		if (!dir) {
-			ulp_error("opendir %s failed.\n", proc_task_dir);
-			goto free_task;
-		}
-		while ((entry = readdir(dir)) != NULL) {
-			if (!strcmp(entry->d_name , ".") ||
-			    !strcmp(entry->d_name, ".."))
-				continue;
-			ulp_debug("Thread %s\n", entry->d_name);
-			pid_t child = atoi(entry->d_name);
-			/**
-			 * Maybe we should skip the thread tid == pid, however,
-			 * if that, we must add an extra list of extra opendir
-			 * while loop, thus, we add the pid == tid thread to
-			 * task.thread_root.list.
-			 *
-			 * TODO: Should we need update thread_root.list by
-			 * timingly read /proc/PID/task/, make sure new thread
-			 * created during the ULPatch patching or unpatching?
-			 * Maybe this is a longterm work, but not now.
-			 */
-			if (child == task->pid)
-				ulp_debug("Thread %s (pid)\n", entry->d_name);
-			thread = alloc_thread(child);
-			list_add(&thread->node, &task->thread_root.list);
-		}
-		closedir(dir);
-	}
+	task_load_threads(task);
 
 	/* /proc/PID/fd/xxx */
 	if (flag & FTO_FD) {
