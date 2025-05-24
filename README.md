@@ -1,4 +1,9 @@
-<center><a href="docs/images/logo.drawio.svg"><img src="docs/images/logo.drawio.svg" border=0 width=300></a></center>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: white)" srcset="docs/images/logo.drawio.svg"/>
+    <img alt="ulpatch" src="docs/images/logo.drawio.svg" width="30%"/>
+  </picture>
+</p>
 
 <div align="center" markdown>
 
