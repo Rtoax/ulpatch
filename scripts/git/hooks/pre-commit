@@ -8,6 +8,10 @@ readonly GIT_TOPDIR=$(git rev-parse --show-toplevel 2>/dev/null || :)
 [[ -z ${NR_ADD} ]] && NR_ADD=1
 [[ -z ${NR_DEL} ]] && NR_DEL=1
 
+if [[ ${V} ]] || [[ ${VERBOSE} ]]; then
+	set -x
+fi
+
 try_add=( $(git status --short | grep ^A | awk '{print $2}' || true) )
 try_del=( $(git status --short | grep ^D | awk '{print $2}' || true) )
 try_modify=( $(git status --short | grep ^M | awk '{print $2}' || true) )
@@ -50,8 +54,6 @@ do
 		echo "FATAL: vmlinux.h is too big, generate it with bpftool command!!!"
 		exit 1
 	fi
-
-	must_modify_changelog
 done
 
 # modify too much files or delete files, need modify CHANGELOG.md too
