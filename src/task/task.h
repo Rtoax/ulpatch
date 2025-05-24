@@ -43,15 +43,11 @@
  * proc file system, there are lots of HANDLE in this structure get from procfs.
  */
 struct task_struct {
-	/* /proc/[PID]/comm */
-	char comm[TASK_COMM_LEN];
-
 	pid_t pid;
+	char comm[TASK_COMM_LEN];
+	char exe[PATH_MAX];
 
 	int fto_flag;
-
-	/* realpath of /proc/PID/exe */
-	char exe[PATH_MAX];
 
 	bool is_pie;
 
