@@ -5,26 +5,12 @@
 #include <malloc.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/ptrace.h>
-#include <sys/user.h>
-#include <sys/wait.h>
-#include <limits.h>
 #include <stdlib.h>
-#include <elf.h>
-#include <dirent.h>
 
 #include <elf/elf-api.h>
 
 #include <utils/log.h>
 #include <task/task.h>
-
-#if defined(__x86_64__)
-#include <arch/x86_64/regs.h>
-#include <arch/x86_64/instruments.h>
-#elif defined(__aarch64__)
-#include <arch/aarch64/regs.h>
-#include <arch/aarch64/instruments.h>
-#endif
 
 struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
