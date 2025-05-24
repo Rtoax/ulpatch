@@ -211,3 +211,14 @@ TEST(Utils_file, fprint_file, 0)
 	fprint_file(stdout, "/proc/self/maps");
 	return 0;
 }
+
+static void assert_dir_iter(const char *name)
+{
+	if (!name)
+		ulp_error("Utils_file.dir_iter failed.\n");
+}
+
+TEST(Utils_file, dir_iter, 0)
+{
+	return dir_iter("/etc/", assert_dir_iter);
+}

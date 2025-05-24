@@ -410,3 +410,25 @@ int fprint_fd(FILE *fp, int fd)
 	}
 	return cnt;
 }
+
+int dir_iter(const char *dirname, void (*callback)(const char *name))
+{
+	DIR *dir;
+	struct dirent *entry;
+
+	dir = opendir(dirname);
+	if (!dir) {
+		ulp_error("opendir %s failed.\n", dirname);
+		return -EINVAL;
+	}
+
+	while ((entry = readdir(dir)) != NULL) {
+		if (!strcmp(entry->d_name , ".") ||
+		    !strcmp(entry->d_name, ".."))
+			continue;
+		ulp_debug("%s/%s\n", dirname, entry->d_name);
+		callback(entry->d_name);
+	}
+	closedir(dir);
+	return 0;
+}
