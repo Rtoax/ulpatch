@@ -457,7 +457,7 @@ void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail)
 	if (!fp)
 		fp = stdout;
 
-	list_for_each_entry(vma, &task->vma_list, node_list) {
+	list_for_each_entry(vma, &task->vma_root.list, node_list) {
 		print_vma(fp, first_line, vma, detail);
 		first_line = 0;
 	}
@@ -586,8 +586,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	task->fto_flag = flag;
 	task->pid = pid;
 
-	list_init(&task->vma_list);
-	rb_init(&task->vmas_rb);
+	init_vma_root(&task->vma_root);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);

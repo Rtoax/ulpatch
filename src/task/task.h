@@ -62,8 +62,6 @@ struct task_struct {
 	int proc_mem_fd;
 
 	struct vm_area_root vma_root;
-#define vma_list vma_root.list
-#define vmas_rb vma_root.rb
 
 	/* VMA_SELF ELF vma */
 	struct vm_area_struct *vma_self_elf;

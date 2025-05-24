@@ -14,6 +14,12 @@
 #include <task/vma.h>
 
 
+void init_vma_root(struct vm_area_root *root)
+{
+	list_init(&root->list);
+	rb_init(&root->rb);
+}
+
 struct vm_area_struct *alloc_vma(struct task_struct *task)
 {
 	struct vm_area_struct *vma;
@@ -64,15 +70,15 @@ void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
 		list_add(&vma->siblings, &leader->siblings);
 	}
 
-	list_add(&vma->node_list, &task->vma_list);
-	rb_insert_node(&task->vmas_rb, &vma->node_rb, __vma_rb_cmp,
+	list_add(&vma->node_list, &task->vma_root.list);
+	rb_insert_node(&task->vma_root.rb, &vma->node_rb, __vma_rb_cmp,
 			(unsigned long)vma);
 }
 
 void unlink_vma(struct task_struct *task, struct vm_area_struct *vma)
 {
 	list_del(&vma->node_list);
-	rb_erase(&vma->node_rb, &task->vmas_rb);
+	rb_erase(&vma->node_rb, &task->vma_root.rb);
 	list_del(&vma->siblings);
 }
 
@@ -102,7 +108,7 @@ struct vm_area_struct *find_vma(const struct task_struct *task,
 				unsigned long vaddr)
 {
 	struct rb_node *rnode;
-	rnode = rb_search_node((struct rb_root *)&task->vmas_rb,
+	rnode = rb_search_node((struct rb_root *)&task->vma_root.rb,
 			       __find_vma_cmp, vaddr);
 	if (rnode)
 		return rb_entry(rnode, struct vm_area_struct, node_rb);
@@ -114,7 +120,7 @@ struct vm_area_struct *next_vma(struct task_struct *task,
 				struct vm_area_struct *prev)
 {
 	struct rb_node *next;
-	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vmas_rb);
+	next = prev ? rb_next(&prev->node_rb) : rb_first(&task->vma_root.rb);
 	return  next ? rb_entry(next, struct vm_area_struct, node_rb) : NULL;
 }
 
@@ -124,7 +130,7 @@ unsigned long find_vma_span_area(struct task_struct *task, size_t size,
 	struct vm_area_struct *ivma, *first_vma, *next_vma;
 	struct rb_node *first, *next, *rnode;
 
-	first = rb_first(&task->vmas_rb);
+	first = rb_first(&task->vma_root.rb);
 	first_vma = rb_entry(first, struct vm_area_struct, node_rb);
 
 	/**
@@ -184,16 +190,15 @@ int free_task_vmas(struct task_struct *task)
 {
 	struct vm_area_struct *vma, *tmpvma;
 
-	list_for_each_entry_safe(vma, tmpvma, &task->vma_list, node_list) {
+	list_for_each_entry_safe(vma, tmpvma, &task->vma_root.list, node_list) {
 		unlink_vma(task, vma);
 		free_vma(vma);
 	}
 
-	list_init(&task->vma_list);
+	init_vma_root(&task->vma_root);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);
-	rb_init(&task->vmas_rb);
 
 	task->libc_vma = NULL;
 	task->stack = NULL;

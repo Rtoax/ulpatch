@@ -140,6 +140,8 @@ struct vm_area_root {
 		__vma_vdso;	\
 	})
 
+void init_vma_root(struct vm_area_root *root);
+
 struct vm_area_struct *alloc_vma(struct task_struct *task);
 void insert_vma(struct task_struct *task, struct vm_area_struct *vma,
 		struct vm_area_struct *prev);
