@@ -552,7 +552,7 @@ void dump_task_fds(FILE *fp, struct task_struct *task, bool detail)
 		return;
 	}
 
-	list_for_each_entry(fd, &task->fds_list, node)
+	list_for_each_entry(fd, &task->fds_root.list, node)
 		print_fd(fp, fd);
 }
 
@@ -589,7 +589,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	init_vma_root(&task->vma_root);
 	init_vma_ulp_root(&task->ulp_root);
 	init_thread_root(&task->thread_root);
-	list_init(&task->fds_list);
+	init_fds_root(&task->fds_root);
 	task_syms_init(&task->tsyms);
 
 	if (flag & FTO_AUXV) {
@@ -749,7 +749,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			}
 
 			list_init(&fd->node);
-			list_add(&fd->node, &task->fds_list);
+			list_add(&fd->node, &task->fds_root.list);
 		}
 		closedir(dir);
 	}
@@ -856,7 +856,7 @@ int close_task(struct task_struct *task)
 
 	if (task->fto_flag & FTO_FD) {
 		struct fd *fd, *tmpfd;
-		list_for_each_entry_safe(fd, tmpfd, &task->fds_list, node)
+		list_for_each_entry_safe(fd, tmpfd, &task->fds_root.list, node)
 			free(fd);
 	}
 

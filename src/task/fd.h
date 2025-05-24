@@ -6,17 +6,21 @@
 
 #include <utils/list.h>
 
-/**
- * Record all file descriptors of target task
- *
- * @fd - read from /proc/PID/fd/
- */
+/* Record one file descriptors of target task */
 struct fd {
+	/* @fd - read from /proc/PID/fd/ */
 	int fd;
 	/* Like /proc/self/fd/0 -> /dev/pts/3 */
 	char symlink[PATH_MAX];
-	/* struct task_struct.fds_list */
+	/* struct fds_root.list */
 	struct list_head node;
 };
+
+struct fds_root {
+	/* struct fd.node */
+	struct list_head list;
+};
+
+void init_fds_root(struct fds_root *root);
 
 void print_fd(FILE *fp, struct fd *fd);

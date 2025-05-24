@@ -199,7 +199,7 @@ int free_task_vmas(struct task_struct *task)
 	init_vma_root(&task->vma_root);
 	init_vma_ulp_root(&task->ulp_root);
 	init_thread_root(&task->thread_root);
-	list_init(&task->fds_list);
+	init_fds_root(&task->fds_root);
 
 	return 0;
 }

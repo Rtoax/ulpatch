@@ -58,18 +58,14 @@ struct task_struct {
 	int proc_mem_fd;
 
 	struct vm_area_root vma_root;
+	struct vma_ulp_root ulp_root;
+	struct task_thread_root thread_root;
+	struct fds_root fds_root;
 
 	/**
 	 * Store all symbols that task defined.
 	 */
 	struct task_syms tsyms;
-
-	struct vma_ulp_root ulp_root;
-
-	struct task_thread_root thread_root;
-
-	/* struct fd.node */
-	struct list_head fds_list;
 };
 
 
