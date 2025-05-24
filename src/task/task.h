@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
 #pragma once
-
 #include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -78,8 +77,6 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
 
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
-
-int print_task_status(FILE *fp, const struct task_struct *task);
 
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);
