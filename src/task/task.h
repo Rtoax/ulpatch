@@ -26,6 +26,7 @@
 #include <task/thread.h>
 #include <task/vma.h>
 #include <task/patch.h>
+#include <task/memcpy.h>
 #include <task/proc.h>
 #include <task/fd.h>
 #include <task/symbol.h>
@@ -85,12 +86,3 @@ bool task_is_pie(struct task_struct *task);
 
 int task_attach(pid_t pid);
 int task_detach(pid_t pid);
-
-int memcpy_to_task(struct task_struct *task, unsigned long remote_dst,
-		   void *src, ssize_t size);
-int memcpy_from_task(struct task_struct *task, void *dst,
-		     unsigned long remote_src, ssize_t size);
-char *strcpy_from_task(struct task_struct *task, char *dst,
-		       unsigned long task_src);
-char *strcpy_to_task(struct task_struct *task, unsigned long task_dst,
-		     char *src);
