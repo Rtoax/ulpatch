@@ -266,7 +266,8 @@ char *fmktempname(char *buf, int buf_len, char *seed);
 int fmemcpy(void *mem, int mem_len, const char *file);
 int fprint_file(FILE *fp, const char *file);
 int fprint_fd(FILE *fp, int fd);
-int dir_iter(const char *dirname, void (*callback)(const char *name));
+int dir_iter(const char *dirname, void (*callback)(const char *name, void *arg),
+	     void *arg);
 
 #ifndef MD5_DIGEST_LENGTH
 /* see /usr/include/openssl/md5.h */

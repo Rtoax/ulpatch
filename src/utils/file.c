@@ -411,7 +411,8 @@ int fprint_fd(FILE *fp, int fd)
 	return cnt;
 }
 
-int dir_iter(const char *dirname, void (*callback)(const char *name))
+int dir_iter(const char *dirname, void (*callback)(const char *name, void *arg),
+	     void *arg)
 {
 	DIR *dir;
 	struct dirent *entry;
@@ -427,7 +428,7 @@ int dir_iter(const char *dirname, void (*callback)(const char *name))
 		    !strcmp(entry->d_name, ".."))
 			continue;
 		ulp_debug("%s/%s\n", dirname, entry->d_name);
-		callback(entry->d_name);
+		callback(entry->d_name, arg);
 	}
 	closedir(dir);
 	return 0;

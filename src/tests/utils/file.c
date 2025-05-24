@@ -212,7 +212,7 @@ TEST(Utils_file, fprint_file, 0)
 	return 0;
 }
 
-static void assert_dir_iter(const char *name)
+static void assert_dir_iter(const char *name, void *arg)
 {
 	if (!name)
 		ulp_error("Utils_file.dir_iter failed.\n");
@@ -220,5 +220,5 @@ static void assert_dir_iter(const char *name)
 
 TEST(Utils_file, dir_iter, 0)
 {
-	return dir_iter("/etc/", assert_dir_iter);
+	return dir_iter("/etc/", assert_dir_iter, NULL);
 }
