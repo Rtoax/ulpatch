@@ -16,7 +16,7 @@ All programs are single-threaded models, so you will not see synchronization loc
 
 The following figure shows the livepatch loading procedures.
 
-![ulpatch::patch](images/ulpatch-patch.drawio.svg)
+![ulpatch::patch](images/ulpatch-patch.drawio.svg){: style="display: block; margin: 0 auto; width: 50%;"}
 
 The detailed steps are as follows:
 
@@ -27,14 +27,14 @@ The detailed steps are as follows:
 
 The start instruction of the objective function will be replaced with the jump instruction that jumps to the patch function, as shown in the following figure:
 
-![ulpatch::callee](images/ulpatch-func-trampoline.drawio.svg)
+![ulpatch::callee](images/ulpatch-func-trampoline.drawio.svg){: style="display: block; margin: 0 auto; width: 60%;"}
 
 
 ### Unpatch
 
 The following figure shows the uninstall procedures of the livepatch.
 
-![ulpatch::unpatch](images/ulpatch-unpatch.drawio.svg)
+![ulpatch::unpatch](images/ulpatch-unpatch.drawio.svg){: style="display: block; margin: 0 auto; width: 40%;"}
 
 The `unpatch` operation is the reverse operation of `patch`, but without the relocate process.
 

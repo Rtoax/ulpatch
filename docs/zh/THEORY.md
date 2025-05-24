@@ -16,7 +16,7 @@ hide:
 
 下图显示了 Livepatch 加载过程。
 
-![ulpatch::patch](images/ulpatch-patch.drawio.svg)
+![ulpatch::patch](images/ulpatch-patch.drawio.svg){: style="display: block; margin: 0 auto; width: 50%;"}
 
 具体步骤如下：
 
@@ -27,14 +27,14 @@ hide:
 
 目标函数的起始指令将被替换为跳转至补丁函数的跳转指令，如下图所示：
 
-![ulpatch::callee](images/ulpatch-func-trampoline.drawio.svg)
+![ulpatch::callee](images/ulpatch-func-trampoline.drawio.svg){: style="display: block; margin: 0 auto; width: 60%;"}
 
 
 ### Unpatch
 
 Livepatch 的卸载过程如下图所示。
 
-![ulpatch::unpatch](images/ulpatch-unpatch.drawio.svg)
+![ulpatch::unpatch](images/ulpatch-unpatch.drawio.svg){: style="display: block; margin: 0 auto; width: 40%;"}
 
 `unpatch` 操作是 `patch` 的反向操作，但没有重定位过程。
 
