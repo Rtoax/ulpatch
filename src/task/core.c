@@ -587,10 +587,10 @@ struct task_struct *open_task(pid_t pid, int flag)
 	task->pid = pid;
 
 	list_init(&task->vma_list);
+	rb_init(&task->vmas_rb);
 	list_init(&task->ulp_list);
 	list_init(&task->threads_list);
 	list_init(&task->fds_list);
-	rb_init(&task->vmas_rb);
 	task_syms_init(&task->tsyms);
 
 	if (flag & FTO_AUXV) {

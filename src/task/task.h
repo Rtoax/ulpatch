@@ -61,10 +61,9 @@ struct task_struct {
 	/* open(2) /proc/[PID]/mem */
 	int proc_mem_fd;
 
-	/* struct vm_area_struct.node_list */
-	struct list_head vma_list;
-	/* struct vm_area_struct.node_rb */
-	struct rb_root vmas_rb;
+	struct vm_area_root vma_root;
+#define vma_list vma_root.list
+#define vmas_rb vma_root.rb
 
 	/* VMA_SELF ELF vma */
 	struct vm_area_struct *vma_self_elf;

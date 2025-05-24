@@ -11,8 +11,6 @@
 #include <elf/elf-api.h>
 
 #include <utils/log.h>
-#include <task/task.h>
-
 
 enum vma_type {
 	VMA_NONE,   /* None */
@@ -117,6 +115,14 @@ struct vm_area_struct {
 
 	unsigned long voffset;
 };
+
+struct vm_area_root {
+	/* struct vm_area_struct.node_list */
+	struct list_head list;
+	/* struct vm_area_struct.node_rb */
+	struct rb_root rb;
+};
+
 
 /* Get task's first vma in rbtree */
 #define first_vma(task) next_vma(task, NULL)
