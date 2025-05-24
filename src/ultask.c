@@ -546,7 +546,7 @@ static int parse_config(int argc, char *argv[])
 		} else {
 			char buf_tcwd[PATH_MAX], *tcwd;
 
-			tcwd = get_proc_pid_cwd(target_pid, buf_tcwd,
+			tcwd = proc_pid_cwd(target_pid, buf_tcwd,
 				sizeof(buf_tcwd));
 
 			snprintf(cwd_file, PATH_MAX, "%s/%s", tcwd, map_file);

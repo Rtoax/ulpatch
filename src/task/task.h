@@ -388,13 +388,13 @@ struct task_struct {
 
 
 int open_pid_maps(pid_t pid);
-int __open_pid_mem(pid_t pid, int flags);
+int open_pid_mem_flags(pid_t pid, int flags);
 int open_pid_mem_ro(pid_t pid);
 int open_pid_mem_rw(pid_t pid);
 
 bool proc_pid_exist(pid_t pid);
-char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
-char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
+char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
+char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
 int proc_get_comm(struct task_struct *task);
 int proc_get_exe(struct task_struct *task);
 int proc_get_pid_status(pid_t pid, struct task_status *status);

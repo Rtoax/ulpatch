@@ -745,7 +745,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	/* Open target process memory */
 	o_flags = flag & FTO_RDWR ? O_RDWR : O_RDONLY;
-	task->proc_mem_fd = __open_pid_mem(pid, o_flags);
+	task->proc_mem_fd = open_pid_mem_flags(pid, o_flags);
 	if (task->proc_mem_fd <= 0)
 		goto free_task;
 

@@ -316,7 +316,7 @@ TEST(ultask, mmap, 0)
 	/* Parent */
 
 	/* Create tmp file */
-	tcwd = get_proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
+	tcwd = proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
 	snprintf(s_tmfile, PATH_MAX, "%s/ultask-map-XXXXXX", tcwd);
 	f_name = fmktempname(buffer, PATH_MAX, s_tmfile);
 	if (!f_name)
@@ -419,7 +419,7 @@ TEST(ultask, mprotect, 0)
 	/* Parent */
 
 	/* Create tmp file */
-	tcwd = get_proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
+	tcwd = proc_pid_cwd(pid, s_tcwd, sizeof(s_tcwd));
 	snprintf(s_tmfile, PATH_MAX, "%s/ultask-mprotect-XXXXXX", tcwd);
 	f_name = fmktempname(buffer, PATH_MAX, s_tmfile);
 	if (!f_name)

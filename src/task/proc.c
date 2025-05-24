@@ -33,7 +33,7 @@ int open_pid_maps(pid_t pid)
 	return mapsfd;
 }
 
-int __open_pid_mem(pid_t pid, int flags)
+int open_pid_mem_flags(pid_t pid, int flags)
 {
 	char mem[] = "/proc/1234567890/mem";
 	snprintf(mem, sizeof(mem), "/proc/%d/mem", pid);
@@ -47,12 +47,12 @@ int __open_pid_mem(pid_t pid, int flags)
 
 int open_pid_mem_ro(pid_t pid)
 {
-	return __open_pid_mem(pid, O_RDONLY);
+	return open_pid_mem_flags(pid, O_RDONLY);
 }
 
 int open_pid_mem_rw(pid_t pid)
 {
-	return __open_pid_mem(pid, O_RDWR);
+	return open_pid_mem_flags(pid, O_RDWR);
 }
 
 bool proc_pid_exist(pid_t pid)
@@ -62,7 +62,7 @@ bool proc_pid_exist(pid_t pid)
 	return fexist(path);
 }
 
-char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
+char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;
 	char path[PATH_MAX];
@@ -77,7 +77,7 @@ char *get_proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
-char *get_proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
+char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;
 	char path[PATH_MAX];

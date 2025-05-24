@@ -944,8 +944,8 @@ int main(int argc, char *argv[])
 
 	static char ulpatch_test_path_buf[PATH_MAX];
 
-	ulpatch_test_path = get_proc_pid_exe(getpid(), ulpatch_test_path_buf,
-					     PATH_MAX);
+	ulpatch_test_path = proc_pid_exe(getpid(), ulpatch_test_path_buf,
+				  PATH_MAX);
 	if (!ulpatch_test_path || !fexist(ulpatch_test_path)) {
 		ulp_error("Not found ulpatch_test path.\n");
 		return -ENOENT;

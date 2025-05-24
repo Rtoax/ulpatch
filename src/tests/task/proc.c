@@ -14,12 +14,12 @@
 #include <tests/test-api.h>
 
 
-TEST(Task_proc, get_proc_pid_exe, 0)
+TEST(Task_proc, proc_pid_exe, 0)
 {
 	int ret = 0;
 	char buf[256], *exe;
 
-	if ((exe = get_proc_pid_exe(getpid(), buf, sizeof(buf))) == NULL) {
+	if ((exe = proc_pid_exe(getpid(), buf, sizeof(buf))) == NULL) {
 		ulp_error("get pid %d exe failed.\n", getpid());
 		ret = -1;
 	} else
@@ -28,12 +28,12 @@ TEST(Task_proc, get_proc_pid_exe, 0)
 	return ret;
 }
 
-TEST(Task_proc, get_proc_pid_cwd, 0)
+TEST(Task_proc, proc_pid_cwd, 0)
 {
 	char buf[256], *cwd;
 	char buf2[256], *cwd2;
 
-	cwd = get_proc_pid_cwd(getpid(), buf, sizeof(buf));
+	cwd = proc_pid_cwd(getpid(), buf, sizeof(buf));
 	cwd2 = getcwd(buf2, sizeof(buf2));
 
 	fprintf(stdout, "cwd = %s\n", cwd);
@@ -50,4 +50,3 @@ TEST(Task_proc, open_pid_maps, 0)
 	close(fd);
 	return 0;
 }
-
