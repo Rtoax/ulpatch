@@ -18,7 +18,7 @@
 - 添加 docker/build.sh。
 - 准备将 tests/hello 使用 cmake 编译。
 - 将 git 作为依赖。
-- task: 添加 auxv.c、memcpy.c、vma.h、thread.{c,h}。
+- task: 添加 auxv.c、memcpy.c、vma.h、thread.{c,h}、syscall.h。
 #### 更改
 - tests: 重命名 tests/disasm/disasm-tst1.c 为 tests/bfd/symbol.c。
 - tests: 引入linker scripts 来遍历所有测试例。
