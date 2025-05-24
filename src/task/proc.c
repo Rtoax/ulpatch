@@ -62,18 +62,28 @@ bool proc_pid_exist(pid_t pid)
 	return fexist(path);
 }
 
-char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
+const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;
-	char path[PATH_MAX];
+	char path[PATH_MAX], realpath[PATH_MAX];
 
-	memset(buf, 0x0, bufsz);
+	memset(realpath, 0x0, PATH_MAX);
 	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
-	ret = readlink(path, buf, bufsz);
+	ret = readlink(path, realpath, PATH_MAX);
 	if (ret < 0) {
 		ulp_error("readlink %s failed, %m\n", path);
 		return NULL;
 	}
+	realpath[ret] = '\0';
+
+	if (!fexist(realpath)) {
+		ulp_error("Execute %s is removed!\n", realpath);
+		errno = -ENOENT;
+		return NULL;
+	}
+
+	strncpy(buf, realpath, bufsz);
+
 	return buf;
 }
 
@@ -92,13 +102,13 @@ char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
-int proc_get_comm(struct task_struct *task)
+int proc_pid_comm(pid_t pid, char *comm)
 {
 	char path[PATH_MAX];
 	int ret;
 	FILE *fp = NULL;
 
-	ret = snprintf(path, sizeof(path), "/proc/%d/comm", task->pid);
+	ret = snprintf(path, sizeof(path), "/proc/%d/comm", pid);
 	if (ret < 0) {
 		ulp_error("readlink %s failed, %m\n", path);
 		return -errno;
@@ -106,36 +116,13 @@ int proc_get_comm(struct task_struct *task)
 
 	fp = fopen(path, "r");
 
-	ret = fscanf(fp, "%s", task->comm);
+	ret = fscanf(fp, "%s", comm);
 	if (ret == EOF) {
 		ulp_error("fscanf(%s) %m\n", path);
 		return -errno;
 	}
 
 	fclose(fp);
-
-	return 0;
-}
-
-int proc_get_exe(struct task_struct *task)
-{
-	char path[PATH_MAX], realpath[PATH_MAX];
-	ssize_t ret;
-
-	snprintf(path, sizeof(path), "/proc/%d/exe", task->pid);
-	ret = readlink(path, realpath, sizeof(realpath));
-	if (ret < 0) {
-		ulp_error("readlink %s failed, %m\n", path);
-		return -errno;
-	}
-	realpath[ret] = '\0';
-
-	if (!fexist(realpath)) {
-		ulp_error("Execute %s is removed!\n", realpath);
-		return -ENOENT;
-	}
-
-	task->exe = strdup(realpath);
 
 	return 0;
 }

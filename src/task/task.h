@@ -343,7 +343,7 @@ struct task_struct {
 	int fto_flag;
 
 	/* realpath of /proc/PID/exe */
-	char *exe;
+	char exe[PATH_MAX];
 
 	bool is_pie;
 
@@ -393,10 +393,9 @@ int open_pid_mem_ro(pid_t pid);
 int open_pid_mem_rw(pid_t pid);
 
 bool proc_pid_exist(pid_t pid);
-char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
+const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
 char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
-int proc_get_comm(struct task_struct *task);
-int proc_get_exe(struct task_struct *task);
+int proc_pid_comm(pid_t pid, char *comm);
 int proc_get_pid_status(pid_t pid, struct task_status *status);
 
 struct vm_area_struct *next_vma(struct task_struct *task,

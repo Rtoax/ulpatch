@@ -17,7 +17,8 @@
 TEST(Task_proc, proc_pid_exe, 0)
 {
 	int ret = 0;
-	char buf[256], *exe;
+	char buf[256];
+	const char *exe;
 
 	if ((exe = proc_pid_exe(getpid(), buf, sizeof(buf))) == NULL) {
 		ulp_error("get pid %d exe failed.\n", getpid());

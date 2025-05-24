@@ -735,12 +735,11 @@ struct task_struct *open_task(pid_t pid, int flag)
 			goto free_task;
 	}
 
-	err = proc_get_comm(task);
+	err = proc_pid_comm(task->pid, task->comm);
 	if (err)
 		goto free_task;
 
-	err = proc_get_exe(task);
-	if (err)
+	if (!proc_pid_exe(task->pid, task->exe, sizeof(task->exe)))
 		goto free_task;
 
 	/* Open target process memory */
@@ -993,7 +992,6 @@ int close_task(struct task_struct *task)
 	}
 
 	free_task_vmas(task);
-	free(task->exe);
 	free(task);
 
 	reset_current_task();
