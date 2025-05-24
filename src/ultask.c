@@ -544,7 +544,8 @@ static int parse_config(int argc, char *argv[])
 
 		/* Otherwise, file must in target process cwd. */
 		} else {
-			char buf_tcwd[PATH_MAX], *tcwd;
+			char buf_tcwd[PATH_MAX];
+			const char *tcwd;
 
 			tcwd = proc_pid_cwd(target_pid, buf_tcwd,
 				sizeof(buf_tcwd));

@@ -31,8 +31,9 @@ TEST(Task_proc, proc_pid_exe, 0)
 
 TEST(Task_proc, proc_pid_cwd, 0)
 {
-	char buf[256], *cwd;
-	char buf2[256], *cwd2;
+	char buf[256];
+	char buf2[256];
+	const char *cwd, *cwd2;
 
 	cwd = proc_pid_cwd(getpid(), buf, sizeof(buf));
 	cwd2 = getcwd(buf2, sizeof(buf2));

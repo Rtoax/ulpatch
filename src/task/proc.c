@@ -62,13 +62,14 @@ bool proc_pid_exist(pid_t pid)
 	return fexist(path);
 }
 
-const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
+static const char *read_proc_pid_symlink(pid_t pid, const char *name,
+					 char *buf, size_t bufsz)
 {
 	ssize_t ret = 0;
 	char path[PATH_MAX], realpath[PATH_MAX];
 
 	memset(realpath, 0x0, PATH_MAX);
-	snprintf(path, sizeof(path), "/proc/%d/exe", pid);
+	snprintf(path, sizeof(path), "/proc/%d/%s", pid, name);
 	ret = readlink(path, realpath, PATH_MAX);
 	if (ret < 0) {
 		ulp_error("readlink %s failed, %m\n", path);
@@ -87,19 +88,14 @@ const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 	return buf;
 }
 
-char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
+const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz)
 {
-	ssize_t ret = 0;
-	char path[PATH_MAX];
+	return read_proc_pid_symlink(pid, "exe", buf, bufsz);
+}
 
-	memset(buf, 0x0, bufsz);
-	snprintf(path, sizeof(path), "/proc/%d/cwd", pid);
-	ret = readlink(path, buf, bufsz);
-	if (ret < 0) {
-		ulp_error("readlink %s failed, %m\n", path);
-		return NULL;
-	}
-	return buf;
+const char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz)
+{
+	return read_proc_pid_symlink(pid, "cwd", buf, bufsz);
 }
 
 int proc_pid_comm(pid_t pid, char *comm)

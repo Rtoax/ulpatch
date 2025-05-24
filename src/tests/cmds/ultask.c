@@ -290,7 +290,8 @@ TEST(ultask, mmap, 0)
 	char buffer[PATH_MAX];
 	char *f_name;
 	char s_pid[64], s_map[PATH_MAX], s_maps[PATH_MAX];
-	char s_tcwd[PATH_MAX], *tcwd;
+	char s_tcwd[PATH_MAX];
+	const char *tcwd;
 	char s_tmfile[PATH_MAX];
 	int status = 0;
 	struct task_notify notify;
@@ -393,7 +394,8 @@ TEST(ultask, mprotect, 0)
 	char buffer[PATH_MAX];
 	char *f_name;
 	char s_pid[64], s_map[PATH_MAX], s_mprotect[PATH_MAX], s_maps[PATH_MAX];
-	char s_tcwd[PATH_MAX], *tcwd;
+	char s_tcwd[PATH_MAX];
+	const char *tcwd;
 	char s_tmfile[PATH_MAX];
 	int status = 0;
 	struct task_notify notify;
