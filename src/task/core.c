@@ -674,9 +674,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 */
 			if (child == task->pid)
 				ulp_debug("Thread %s (pid)\n", entry->d_name);
-			thread = malloc(sizeof(struct thread_struct));
-			thread->tid = child;
-			list_init(&thread->node);
+			thread = alloc_thread(child);
 			list_add(&thread->node, &task->thread_root.list);
 		}
 		closedir(dir);
@@ -806,7 +804,7 @@ int close_task(struct task_struct *task)
 		struct thread_struct *thread, *tmpthread;
 		list_for_each_entry_safe(thread, tmpthread,
 			   &task->thread_root.list, node)
-			free(thread);
+			free_thread(thread);
 	}
 
 	if (task->fto_flag & FTO_FD) {

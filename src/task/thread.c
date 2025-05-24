@@ -11,6 +11,21 @@ void init_thread_root(struct task_thread_root *root)
 	list_init(&root->list);
 }
 
+struct thread_struct *alloc_thread(pid_t tid)
+{
+	struct thread_struct *thread;
+	thread = malloc(sizeof(struct thread_struct));
+	thread->tid = tid;
+	list_init(&thread->node);
+	return thread;
+}
+
+void free_thread(struct thread_struct *thread)
+{
+	list_del(&thread->node);
+	free(thread);
+}
+
 void print_thread(FILE *fp, struct task_struct *task,
 		  struct thread_struct *thread)
 {
