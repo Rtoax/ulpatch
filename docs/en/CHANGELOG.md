@@ -19,7 +19,7 @@ and this project adheres to
 - docker: Add build.sh.
 - Ready to use cmake compile tests/hello.
 - Add git as depends.
-- task: add auxv.c, memcpy.c, vma.h.
+- task: add auxv.c, memcpy.c, vma.h, thread.{c,h}.
 #### Changed
 - tests: Rename tests/disasm/disasm-tst1.c to tests/bfd/symbol.c.
 - tests: Introduce linker scripts to iterate all tests.

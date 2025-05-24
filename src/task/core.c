@@ -540,11 +540,6 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 	fprintf(fp, "MemFD:   %-32d\n", task->proc_mem_fd);
 }
 
-void print_thread(FILE *fp, struct task_struct *task, struct thread *thread)
-{
-	fprintf(fp, "pid %d, tid %d\n", task->pid, thread->tid);
-}
-
 void print_fd(FILE *fp, struct task_struct *task, struct fd *fd)
 {
 	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);

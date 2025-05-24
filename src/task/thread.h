@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2022-2025 Rong Tao */
+#pragma once
+#include <sys/types.h>
+
+#include <utils/list.h>
+
+/* see /usr/include/sys/user.h */
+#if defined(__x86_64__)
+typedef unsigned long long int pc_addr_t;
+#elif defined(__aarch64__)
+typedef unsigned long long pc_addr_t;
+#else
+# error Not support architecture
+#endif
+
+struct task_struct;
+
+struct thread {
+	pid_t tid;
+	/* TODO */
+	pc_addr_t ip;
+	/* struct task_struct.threads_list */
+	struct list_head node;
+};
+
+void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);

@@ -21,6 +21,7 @@
 #include <utils/compiler.h>
 
 #include <task/vma.h>
+#include <task/thread.h>
 
 struct vm_area_struct;
 
@@ -41,24 +42,6 @@ struct vma_ulp {
 	char *str_build_id;
 
 	/* struct task_struct.ulp_list */
-	struct list_head node;
-};
-
-
-/* see /usr/include/sys/user.h */
-#if defined(__x86_64__)
-typedef unsigned long long int pc_addr_t;
-#elif defined(__aarch64__)
-typedef unsigned long long pc_addr_t;
-#else
-# error Not support architecture
-#endif
-
-struct thread {
-	pid_t tid;
-	/* TODO */
-	pc_addr_t ip;
-	/* struct task_struct.threads_list */
 	struct list_head node;
 };
 
@@ -314,7 +297,6 @@ void dump_task_fds(FILE *fp, struct task_struct *task, bool detail);
 
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 
-void print_thread(FILE *fp, struct task_struct *task, struct thread *thread);
 void print_fd(FILE *fp, struct task_struct *task, struct fd *fd);
 
 int alloc_ulp(struct vm_area_struct *vma);
