@@ -45,6 +45,24 @@ void free_fd(struct fd *fd)
 	free(fd);
 }
 
+static void dir_iter_callback_fd(const char *name, void *arg)
+{
+	struct fd *fd;
+	struct task_struct *task = arg;
+	int ifd = atoi(name);
+	fd = alloc_fd(task->pid, ifd);
+	list_add(&fd->node, &task->fds_root.list);
+}
+
+void task_load_fds(struct task_struct *task)
+{
+	char buf[128];
+	if (!(task->fto_flag & FTO_FD))
+		return;
+	dir_iter(strprintbuf(buf, sizeof(buf), "/proc/%d/fd/", task->pid),
+		dir_iter_callback_fd, task);
+}
+
 void print_fd(FILE *fp, struct fd *fd)
 {
 	fprintf(fp, "fd %d -> %s\n", fd->fd, fd->symlink);

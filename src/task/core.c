@@ -643,33 +643,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 	}
 
 	task_load_threads(task);
-
-	/* /proc/PID/fd/xxx */
-	if (flag & FTO_FD) {
-		DIR *dir;
-		struct dirent *entry;
-		int ifd;
-		struct fd *fd;
-		char proc_fd[PATH_MAX] = {"/proc/1234567890abc/fd/"};
-		sprintf(proc_fd, "/proc/%d/fd/", task->pid);
-		dir = opendir(proc_fd);
-		if (!dir) {
-			ulp_error("opendir %s failed.\n", proc_fd);
-			goto free_task;
-		}
-		while ((entry = readdir(dir)) != NULL) {
-			if (!strcmp(entry->d_name , ".") ||
-			    !strcmp(entry->d_name, ".."))
-				continue;
-			ulp_debug("FD %s\n", entry->d_name);
-			ifd = atoi(entry->d_name);
-
-			fd = alloc_fd(task->pid, ifd);
-
-			list_add(&fd->node, &task->fds_root.list);
-		}
-		closedir(dir);
-	}
+	task_load_fds(task);
 
 	set_current_task(task);
 
