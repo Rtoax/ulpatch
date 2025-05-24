@@ -26,6 +26,7 @@ add_library(ulpatch_task STATIC
 	auxv.c
 	core.c
 	current.c
+	memcpy.c
 	proc.c
 	symbol.c
 	syscall.c
