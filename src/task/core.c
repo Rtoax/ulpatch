@@ -524,22 +524,6 @@ int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 	return dump_task_addr_to_file(ofile, task, vma->vm_start, vma_size);
 }
 
-void dump_task_threads(FILE *fp, struct task_struct *task, bool detail)
-{
-	struct thread_struct *thread;
-
-	if (!fp)
-		fp = stdout;
-
-	if (!(task->fto_flag & FTO_THREADS)) {
-		ulp_error("Not set FTO_THREADS(%ld) flag\n", FTO_THREADS);
-		return;
-	}
-
-	list_for_each_entry(thread, &task->thread_root.list, node)
-		print_thread(fp, task, thread);
-}
-
 /**
  * Open target task
  *

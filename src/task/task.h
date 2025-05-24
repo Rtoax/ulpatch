@@ -76,7 +76,6 @@ int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
 int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr);
-void dump_task_threads(FILE *fp, struct task_struct *task, bool detail);
 
 bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 
