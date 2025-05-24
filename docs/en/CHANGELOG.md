@@ -19,8 +19,8 @@ and this project adheres to
 - docker: Add build.sh.
 - Ready to use cmake compile tests/hello.
 - Add git as depends.
-- task: add auxv.c, memcpy.c, vma.h, thread.{c,h}, syscall.h, flags.h.
 #### Changed
+- task: split seperate source file from core.c.
 - tests: Rename tests/disasm/disasm-tst1.c to tests/bfd/symbol.c.
 - tests: Introduce linker scripts to iterate all tests.
 - tests: Use linker scripts instead of `TEST_STUB()`.

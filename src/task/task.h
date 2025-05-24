@@ -25,8 +25,8 @@
 #include <task/syscall.h>
 #include <task/thread.h>
 #include <task/vma.h>
+#include <task/proc.h>
 
-struct vm_area_struct;
 
 struct vma_ulp {
 	struct ulpatch_strtab strtab;
@@ -81,14 +81,6 @@ struct task_auxv {
 	unsigned long auxv_interp;
 	/* AT_ENTRY */
 	unsigned long auxv_entry;
-};
-
-struct task_status {
-	/**
-	 * Get from /proc/[pid]/status
-	 */
-	uid_t uid, euid, suid, fsuid;
-	gid_t gid, egid, sgid, fsgid;
 };
 
 struct task_sym {
@@ -216,18 +208,6 @@ struct task_struct {
 	/* struct fd.node */
 	struct list_head fds_list;
 };
-
-
-int open_pid_maps(pid_t pid);
-int open_pid_mem_flags(pid_t pid, int flags);
-int open_pid_mem_ro(pid_t pid);
-int open_pid_mem_rw(pid_t pid);
-
-bool proc_pid_exist(pid_t pid);
-const char *proc_pid_exe(pid_t pid, char *buf, size_t bufsz);
-const char *proc_pid_cwd(pid_t pid, char *buf, size_t bufsz);
-int proc_pid_comm(pid_t pid, char *comm);
-int proc_get_pid_status(pid_t pid, struct task_status *status);
 
 
 int update_task_vmas_ulp(struct task_struct *task);
