@@ -536,7 +536,7 @@ void dump_task_threads(FILE *fp, struct task_struct *task, bool detail)
 		return;
 	}
 
-	list_for_each_entry(thread, &task->threads_list, node)
+	list_for_each_entry(thread, &task->thread_root.list, node)
 		print_thread(fp, task, thread);
 }
 
@@ -588,7 +588,7 @@ struct task_struct *open_task(pid_t pid, int flag)
 
 	init_vma_root(&task->vma_root);
 	init_vma_ulp_root(&task->ulp_root);
-	list_init(&task->threads_list);
+	init_thread_root(&task->thread_root);
 	list_init(&task->fds_list);
 	task_syms_init(&task->tsyms);
 
@@ -697,19 +697,19 @@ struct task_struct *open_task(pid_t pid, int flag)
 			 * Maybe we should skip the thread tid == pid, however,
 			 * if that, we must add an extra list of extra opendir
 			 * while loop, thus, we add the pid == tid thread to
-			 * task.threads_list.
+			 * task.thread_root.list.
 			 *
-			 * TODO: Should we need update threads_list by timingly
-			 * read /proc/PID/task/, make sure new thread created
-			 * during the ULPatch patching or unpatching? Maybe this
-			 * is a longterm work, but not now.
+			 * TODO: Should we need update thread_root.list by
+			 * timingly read /proc/PID/task/, make sure new thread
+			 * created during the ULPatch patching or unpatching?
+			 * Maybe this is a longterm work, but not now.
 			 */
 			if (child == task->pid)
 				ulp_debug("Thread %s (pid)\n", entry->d_name);
 			thread = malloc(sizeof(struct thread_struct));
 			thread->tid = child;
 			list_init(&thread->node);
-			list_add(&thread->node, &task->threads_list);
+			list_add(&thread->node, &task->thread_root.list);
 		}
 		closedir(dir);
 	}
@@ -849,8 +849,8 @@ int close_task(struct task_struct *task)
 
 	if (task->fto_flag & FTO_THREADS) {
 		struct thread_struct *thread, *tmpthread;
-		list_for_each_entry_safe(thread, tmpthread, &task->threads_list,
-			   node)
+		list_for_each_entry_safe(thread, tmpthread,
+			   &task->thread_root.list, node)
 			free(thread);
 	}
 

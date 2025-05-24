@@ -20,9 +20,16 @@ struct thread_struct {
 	pid_t tid;
 	/* TODO */
 	pc_addr_t ip;
-	/* struct task_struct.threads_list */
+	/* struct task_thread_root.list */
 	struct list_head node;
 };
+
+struct task_thread_root {
+	/* struct thread_struct.node */
+	struct list_head list;
+};
+
+void init_thread_root(struct task_thread_root *root);
 
 void print_thread(FILE *fp, struct task_struct *task,
 		  struct thread_struct *thread);

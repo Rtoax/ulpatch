@@ -66,8 +66,7 @@ struct task_struct {
 
 	struct vma_ulp_root ulp_root;
 
-	/* struct thread_struct.node */
-	struct list_head threads_list;
+	struct task_thread_root thread_root;
 
 	/* struct fd.node */
 	struct list_head fds_list;
