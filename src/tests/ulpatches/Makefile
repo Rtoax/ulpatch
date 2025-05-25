@@ -38,7 +38,6 @@ printf.ulp: printf.o
 $(TARGETS): %:
 	@echo -e "       LD  \033[1;32m$(@)\033[m"
 	${Q}ld ${LDFLAGS} -o $(@) $(<)
-	${Q}rm $(<)
 
 .PHONY: install
 install:
