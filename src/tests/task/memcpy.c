@@ -109,7 +109,7 @@ TEST(Task, mmap_malloc, 0)
 	addr = task_malloc(task, 64);
 	ulp_debug("task %p, addr = %lx\n", task, addr);
 
-	print_task_vmas(stdout, task, true);
+	print_vma_root(stdout, &task->vma_root, true);
 
 	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 	ulp_debug("memcpy_from_task: %s\n", buf);

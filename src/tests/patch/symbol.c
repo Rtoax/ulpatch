@@ -49,7 +49,7 @@ static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))
 	if (cb)
 		ret = cb(task);
 
-	print_task_vmas(stdout, task, true);
+	print_vma_root(stdout, &task->vma_root, true);
 
 	delete_patch(task);
 

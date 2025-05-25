@@ -463,7 +463,7 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma,
 	}
 }
 
-void print_task_vmas(FILE *fp, struct task_struct *task, bool detail)
+void print_vma_root(FILE *fp, struct vm_area_root *root, bool detail)
 {
 	int first_line = 1;
 	struct vm_area_struct *vma;
@@ -471,7 +471,7 @@ void print_task_vmas(FILE *fp, struct task_struct *task, bool detail)
 	if (!fp)
 		fp = stdout;
 
-	list_for_each_entry(vma, &task->vma_root.list, node_list) {
+	list_for_each_entry(vma, &root->list, node_list) {
 		print_vma(fp, first_line, vma, detail);
 		first_line = 0;
 	}

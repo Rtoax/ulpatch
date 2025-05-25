@@ -900,7 +900,7 @@ int ultask(int argc, char *argv[])
 
 	/* dump target task VMAs from /proc/PID/maps */
 	if (flag_print_vmas)
-		print_task_vmas(stdout, target_task, is_verbose());
+		print_vma_root(stdout, &target_task->vma_root, is_verbose());
 
 	/* dump an VMA */
 	if (flag_dump_vma)

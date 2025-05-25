@@ -41,7 +41,7 @@ TEST(Task, fto_flags, 0)
 		ret = -1;
 	}
 
-	print_task_vmas(stdout, task, true);
+	print_vma_root(stdout, &task->vma_root, true);
 
 	close_task(task);
 
@@ -70,7 +70,7 @@ TEST(Task, dump, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
 	print_task(stdout, task, true);
-	print_task_vmas(stdout, task, true);
+	print_vma_root(stdout, &task->vma_root, true);
 	return close_task(task);
 }
 
