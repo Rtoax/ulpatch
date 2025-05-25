@@ -3,6 +3,14 @@
 #pragma once
 #include <sys/types.h>
 
+#ifndef PAGE_SIZE
+#define PAGE_SIZE (1UL << ulp_page_shift())
+#endif
+
+#ifndef PAGE_SHIFT
+#define PAGE_SHIFT ulp_page_shift()
+#endif
+
 void ulpatch_init(void);
 
 int ulp_page_size(void);

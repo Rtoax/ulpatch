@@ -10,9 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "init.h"
+#include "version.h"
 #include "elf/elf-api.h"
-#include "utils/util.h"
 #include "task/task.h"
+#include "utils/util.h"
 #include "utils/log.h"
 #include "utils/compiler.h"
 

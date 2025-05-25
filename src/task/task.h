@@ -11,6 +11,8 @@
 #include <gelf.h>
 #include <bfd.h>
 
+#include "init.h"
+
 #include <patch/patch.h>
 
 #include <utils/util.h>

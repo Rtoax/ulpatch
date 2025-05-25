@@ -7,6 +7,8 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "init.h"
+#include "version.h"
 #include "elf/elf-api.h"
 
 #include "utils/log.h"

@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "init.h"
+#include "version.h"
 #include "utils/log.h"
 #include "utils/list.h"
 #include "utils/util.h"

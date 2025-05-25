@@ -19,14 +19,12 @@ add_library(ulpatch_test_utils STATIC
 	disasm.c
 	file.c
 	id.c
-	init.c
 	list.c
 	log.c
 	${md5}
 	rbtree.c
 	string.c
 	utils.c
-	version.c
 )
 
 target_compile_definitions(ulpatch_test_utils PRIVATE ${UTILS_CFLAGS_MACROS})

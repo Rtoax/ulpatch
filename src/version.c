@@ -4,6 +4,9 @@
 #include <sys/utsname.h>
 #include <gnu/libc-version.h>
 
+#include "init.h"
+#include "version.h"
+
 #define __ULP_DEV 1
 #include "patch/meta.h"
 

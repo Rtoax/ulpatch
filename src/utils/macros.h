@@ -23,14 +23,6 @@
 #define MIN(a, b) ((a > b) ? b : a)
 #endif
 
-#ifndef PAGE_SIZE
-#define PAGE_SIZE (1UL << ulp_page_shift())
-#endif
-
-#ifndef PAGE_SHIFT
-#define PAGE_SHIFT ulp_page_shift()
-#endif
-
 #define ELF_MIN_ALIGN	PAGE_SIZE
 
 #define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))

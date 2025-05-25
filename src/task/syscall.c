@@ -13,6 +13,8 @@
 #include <elf.h>
 #include <dirent.h>
 
+#include "init.h"
+#include "version.h"
 #include "elf/elf-api.h"
 
 #include "utils/log.h"

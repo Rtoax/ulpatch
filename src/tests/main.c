@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "init.h"
+#include "version.h"
 #include "utils/log.h"
 #include "utils/list.h"
 #include "utils/compiler.h"

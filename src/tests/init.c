@@ -2,13 +2,16 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "init.h"
+#include "version.h"
 #include "utils/log.h"
 #include "utils/util.h"
 #include "utils/list.h"
 #include "tests/test-api.h"
 
 
-TEST(Utils_init, dry_run, 0)
+TEST(Init, dry_run, 0)
 {
 	int ret = 0;
 
@@ -18,7 +21,7 @@ TEST(Utils_init, dry_run, 0)
 	return ret;
 }
 
-TEST(Utils_init, verbose, 0)
+TEST(Init, verbose, 0)
 {
 	int ret = 0;
 

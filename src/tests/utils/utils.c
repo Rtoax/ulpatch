@@ -2,6 +2,9 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "init.h"
+#include "version.h"
 #include "utils/log.h"
 #include "utils/util.h"
 #include "utils/list.h"

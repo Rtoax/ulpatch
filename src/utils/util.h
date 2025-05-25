@@ -10,7 +10,6 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#include "init.h"
 #include "utils/file.h"
 #include "utils/list.h"
 #include "utils/backtrace.h"
@@ -27,12 +26,3 @@ struct nr_idx_bool {
 
 /* Check some thing */
 bool is_root(const char *prog);
-
-int ulpatch_version_major(void);
-int ulpatch_version_minor(void);
-int ulpatch_version_patch(void);
-const char *ulpatch_version(void);
-const char *ulpatch_arch(void);
-void ulpatch_info(const char *progname);
-
-void daemonize(void);
