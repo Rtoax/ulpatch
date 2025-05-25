@@ -25,10 +25,7 @@ void init_tests(void)
 
 	while (t && t < &__test_meta_end) {
 		create_test(t);
-		/**
-		 * FIXME: WTF? why need +8?????????????????
-		 */
-		t = (void *)((unsigned long)t + sizeof(struct test) + 8);
+		++t;
 	}
 
 	start = &__test_meta_start;
@@ -37,8 +34,6 @@ void init_tests(void)
 	size = (unsigned long)end - (unsigned long)start;
 
 	ulp_debug("Total tests size %ld\n", size);
-
-	assert((size % sizeof(struct test)));
 }
 
 __attribute__((nonnull(1)))

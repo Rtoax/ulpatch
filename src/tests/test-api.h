@@ -40,6 +40,7 @@ struct test {
 	int idx;
 	char *category;
 	char *name;
+	int reserve1;
 	test_function test_cb;
 	int expect_ret;
 	/* after running return value */
