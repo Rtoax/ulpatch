@@ -21,6 +21,7 @@ and this project adheres to
 - Add git as depends.
 #### Changed
 - task: split seperate source file from core.c.
+- utils: split seperate header file from util.h.
 - tests: Rename tests/disasm/disasm-tst1.c to tests/bfd/symbol.c.
 - tests: Introduce linker scripts to iterate all tests.
 - tests: Use linker scripts instead of `TEST_STUB()`.

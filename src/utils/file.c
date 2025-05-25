@@ -13,13 +13,10 @@
 #include <stdlib.h>
 #include <dirent.h>
 
-#include <gelf.h>
-
 #include <elf/elf-api.h>
 
 #include <utils/log.h>
-#include <task/task.h>
-#include <utils/util.h>
+#include "utils/file.h"
 
 
 int fsize(const char *filepath)

@@ -14,6 +14,8 @@
 #include <openssl/evp.h>
 #endif
 
+#include "utils/file.h"
+
 #ifndef BUFFER_SIZE
 #define BUFFER_SIZE 4096
 #endif
@@ -163,13 +165,6 @@ struct list_head {
 	struct list_head *next, *prev;
 };
 
-typedef enum {
-	FILE_UNKNOWN = 0,
-	FILE_ELF = 0x1 << 0,
-	/* ELF LSB relocatable */
-	FILE_ELF_RELO = FILE_ELF | (0x1 << 1),
-} file_type;
-
 struct nr_idx_bool {
 	uint32_t nr;
 	uint32_t idx;
@@ -239,35 +234,6 @@ char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...);
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)
-
-
-struct mmap_struct {
-	char *filepath;
-	file_type ftype;
-	int fd;
-	int open_flags;
-	int mmap_flags;
-	int prot;
-	void *mem;
-	size_t size;
-};
-
-/* File and directory operations */
-int fsize(const char *filepath);
-bool fexist(const char *filepath);
-bool fregular(const char *filepath);
-int ftouch(const char *filepath, size_t size);
-int fremove(const char *filepath);
-int fremove_recursive(const char *filepath);
-file_type ftype(const char *filepath);
-int fcopy(const char *srcpath, const char *dstpath);
-char *fmktempfile(char *buf, int buf_len, char *seed);
-char *fmktempname(char *buf, int buf_len, char *seed);
-int fmemcpy(void *mem, int mem_len, const char *file);
-int fprint_file(FILE *fp, const char *file);
-int fprint_fd(FILE *fp, int fd);
-int dir_iter(const char *dirname, void (*callback)(const char *name, void *arg),
-	     void *arg);
 
 #ifndef MD5_DIGEST_LENGTH
 /* see /usr/include/openssl/md5.h */

@@ -19,6 +19,7 @@
 - 准备将 tests/hello 使用 cmake 编译。
 - 将 git 作为依赖。
 #### 更改
+- utils: 从util.h中分离头文件。
 - task: 从core.c分离出对应特性的源码。
 - tests: 重命名 tests/disasm/disasm-tst1.c 为 tests/bfd/symbol.c。
 - tests: 引入linker scripts 来遍历所有测试例。
