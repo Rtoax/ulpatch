@@ -5,7 +5,7 @@
 #include <libunwind.h>
 
 #include <utils/log.h>
-#include <utils/util.h>
+#include "utils/backtrace.h"
 
 #if !defined(CONFIG_LIBUNWIND)
 # error "No CONFIG_LIBUNWIND found"
