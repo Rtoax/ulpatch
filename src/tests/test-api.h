@@ -128,6 +128,9 @@ extern struct test *current_test;
 
 extern struct test __test_meta_start, __test_meta_end;
 
+#define for_each_test(test)	\
+	for (test = &__test_meta_start; test < &__test_meta_end; test++)
+
 /**
  * Define a test
  * If Ret = TEST_RET_SKIP, the test will success anyway.
