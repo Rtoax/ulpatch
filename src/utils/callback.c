@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <utils/list.h>
 #include <utils/compiler.h>
+#include "utils/callback.h"
 
 
 struct callback {

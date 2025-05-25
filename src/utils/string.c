@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <stdarg.h>
+#include <stdint.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -9,8 +10,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <utils/list.h>
-#include <utils/log.h>
+#include "utils/list.h"
+#include "utils/log.h"
+#include "utils/util.h"
 
 /**
  * @fp - if NULL, return directly

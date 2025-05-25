@@ -8,4 +8,3 @@ bool is_root(const char *prog)
 		return true;
 	return false;
 }
-

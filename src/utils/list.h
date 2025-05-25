@@ -1,7 +1,9 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#include <utils/util.h>
+struct list_head {
+	struct list_head *next, *prev;
+};
 
 /*
  * Simple doubly linked list implementation.
@@ -17,6 +19,15 @@
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
+
+#ifndef offsetof
+#define offsetof(TYPE, MEMBER) ((unsigned long) &((TYPE *)0)->MEMBER)
+#endif
+
+#ifndef container_of
+#define container_of(ptr, type, member) \
+	((type *)(((char *)(ptr)) - offsetof(type, member)))
+#endif
 
 
 static inline void list_init(struct list_head *list)
@@ -518,4 +529,3 @@ void list_sort(void *priv, struct list_head *head, int (*cmp)(void *priv,
 	struct list_head *a, struct list_head *b));
 
 #endif
-

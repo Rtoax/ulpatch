@@ -6,19 +6,21 @@
 #include <sys/time.h>
 #include <sys/msg.h>
 #include <setjmp.h>
+#include <limits.h>
 
-#include <utils/list.h>
-#include <utils/log.h>
-#include <utils/compiler.h>
+#include "utils/list.h"
+#include "utils/log.h"
+#include "utils/compiler.h"
+#include "utils/macros.h"
 
 #if defined(__x86_64__)
-#include <arch/x86_64/regs.h>
-#include <arch/x86_64/instruments.h>
-#include <arch/x86_64/ftrace.h>
+#include "arch/x86_64/regs.h"
+#include "arch/x86_64/instruments.h"
+#include "arch/x86_64/ftrace.h"
 #elif defined(__aarch64__)
-#include <arch/aarch64/regs.h>
-#include <arch/aarch64/instruments.h>
-#include <arch/aarch64/ftrace.h>
+#include "arch/aarch64/regs.h"
+#include "arch/aarch64/instruments.h"
+#include "arch/aarch64/ftrace.h"
 #endif
 
 typedef enum {
