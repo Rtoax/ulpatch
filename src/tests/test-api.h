@@ -24,16 +24,6 @@
 #endif
 
 typedef enum {
-	/* constructor priorities from 0 to 100 are reserved for the implementation */
-	TEST_PRIO_START = 105,
-	TEST_PRIO_HIGHEST,
-	TEST_PRIO_HIGHER,
-	TEST_PRIO_MIDDLE,
-	TEST_PRIO_LOWER,
-	TEST_PRIO_NUM = TEST_PRIO_LOWER - TEST_PRIO_START + 1,
-} test_prio;
-
-typedef enum {
 	TEST_RET_MIN = 0xdead0001,
 	TEST_RET_SKIP,
 #define TEST_RET_SKIP	TEST_RET_SKIP
@@ -50,7 +40,7 @@ struct test {
 	int idx;
 	char *category;
 	char *name;
-	test_prio prio;
+	int reserve1;
 	test_function test_cb;
 	int expect_ret;
 	/* after running return value */
@@ -69,6 +59,13 @@ struct test {
 		      abort();	\
 		}	\
 		siglongjmp(current_test->jmpbuf, TEST_JMP_STATUS);	\
+	} while (0)
+
+#define CHECK_AND_DONE_TEST(test, _goto)	do {	\
+		if (sigsetjmp(test->jmpbuf, 1) == TEST_JMP_STATUS) {	\
+			test->real_ret = TEST_RET_EMERG;	\
+			goto _goto;	\
+		}	\
 	} while (0)
 
 	/**
@@ -116,11 +113,10 @@ extern struct test *current_test;
 /* see metadata.lds */
 #define __test_metadata	__section(".data.ulpatch.test.metadata")
 
-#define DEFINE_TEST_METADATA(_category, _name, _prio, _func, _ret)		\
-	struct test __test_metadata _tmeta_##_category##_name##_prio##_func = {	\
+#define DEFINE_TEST_METADATA(_category, _name, _func, _ret)			\
+	struct test __test_metadata _tmeta_##_category##_name##_func = {	\
 		.category = #_category,						\
 		.name = #_name,							\
-		.prio = _prio,							\
 		.test_cb = _func,						\
 		.expect_ret = _ret,						\
 		.real_ret = _ret,						\
@@ -135,25 +131,15 @@ extern struct test __test_meta_start, __test_meta_end;
  * Define a test
  * If Ret = TEST_RET_SKIP, the test will success anyway.
  */
-#define __TEST(Category, Name, Prio, Ret)					\
+#define __TEST(Category, Name, Ret)						\
 	extern int test_ ##Category ##_##Name(void);				\
-	DEFINE_TEST_METADATA(Category, Name, Prio, test_ ##Category ##_##Name, Ret);	\
+	DEFINE_TEST_METADATA(Category, Name, test_ ##Category ##_##Name, Ret);	\
 	int test_ ##Category ##_##Name(void)
 
-/* Highest prio TEST */
-#define TEST_HIGHEST(Category, Name, Ret)	\
-	__TEST(Category, Name, TEST_PRIO_HIGHEST, Ret)
-
-/* Normal prio TEST */
 #define TEST(Category, Name, Ret)	\
-	__TEST(Category, Name, TEST_PRIO_MIDDLE, Ret)
+	__TEST(Category, Name, Ret)
 
-/* Lower prio TEST */
-#define TEST_LOWER(Category, Name, Ret)	\
-	__TEST(Category, Name, TEST_PRIO_LOWER, Ret)
-
-
-extern struct list_head test_list[TEST_PRIO_NUM];
+extern struct list_head test_list;
 
 extern const char *ulpatch_test_path;
 

@@ -459,8 +459,8 @@ static int parse_config(int argc, char *argv[])
 
 static int show_test(struct test *test, bool after_test)
 {
-	fprintf(stderr, " %4d/%-4d  %-4d %s.%s",
-		test->idx, nr_tests, test->prio, test->category, test->name);
+	fprintf(stderr, " %4d/%-4d  %s.%s",
+		test->idx, nr_tests, test->category, test->name);
 
 	if (after_test)
 		fprintf(stderr, "\tret:%d:%d", test->expect_ret, test->real_ret);
@@ -491,10 +491,7 @@ static bool should_skip(struct test *test)
 	if (!skip && filter_matched_skip(category_name))
 		skip = true;
 
-	/**
-	 * If priority is too high, it couldn't be skipped.
-	 */
-	if (skip && test->prio < TEST_PRIO_HIGHER)
+	if (skip)
 		skip = false;
 
 	return skip;
@@ -522,10 +519,7 @@ static int execute_one_test(struct test *test)
 	 * If test has emergency situation, will jump here from signal handler,
 	 * then, skip the test.
 	 */
-	if (sigsetjmp(test->jmpbuf, 1) == TEST_JMP_STATUS) {
-		test->real_ret = TEST_RET_EMERG;
-		goto done_test;
-	}
+	CHECK_AND_DONE_TEST(test, done_test);
 
 	gettimeofday(&test->start, NULL);
 
@@ -563,21 +557,15 @@ done_test:
 		"\033[m",
 		test->expect_ret, test->real_ret);
 
-	if (failed) {
-		/**
-		 * 1. high priority failed
-		 * 2. ordinary test failed, and set --error-exit argument
-		 */
-		if (test->prio < TEST_PRIO_MIDDLE || error_exit)
-			return -1;
-	}
+	if (failed && error_exit)
+		return -1;
 
 	return 0;
 }
 
 static void launch_tester(void)
 {
-	int i, fd;
+	int fd;
 	struct test *test = NULL;
 
 	test_log("=========================================\n");
@@ -592,8 +580,8 @@ static void launch_tester(void)
 			"\n"
 			"Show test list\n"
 			"\n"
-			" %-10s %-4s %s.%s\n",
-			"Idx/NUM", "Prio", "Category", "name"
+			" %-10s %s.%s\n",
+			"Idx/NUM", "Category", "name"
 		);
 	}
 
@@ -604,24 +592,21 @@ static void launch_tester(void)
 			close(fd);
 	}
 
-	/* for each priority */
-	for (i = 0; i < TEST_PRIO_NUM; i++) {
-		/* for each test entry */
-		list_for_each_entry(test, &test_list[i], node) {
-			int ret;
-			if (should_skip(test))
-				continue;
+	/* for each test entry */
+	list_for_each_entry(test, &test_list, node) {
+		int ret;
+		if (should_skip(test))
+			continue;
 
-			if (just_list_tests) {
-				show_test(test, false);
-				continue;
-			}
-
-			ret = execute_one_test(test);
-			/* if error */
-			if (ret != 0)
-				goto print_stat;
+		if (just_list_tests) {
+			show_test(test, false);
+			continue;
 		}
+
+		ret = execute_one_test(test);
+		/* if error */
+		if (ret != 0)
+			goto print_stat;
 	}
 
 print_stat:
@@ -651,8 +636,8 @@ print_stat:
 			"\n"
 			"Show failed test list\n"
 			"\n"
-			" %-10s  %-4s %s.%s\n",
-			"Idx/NUM", "Prio", "Category", "name"
+			" %-10s %s.%s\n",
+			"Idx/NUM", "Category", "name"
 		);
 		list_for_each_entry(test, &failed_list, failed)
 			show_test(test, true);

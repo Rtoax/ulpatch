@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
+#include <assert.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -11,15 +12,14 @@
 
 int nr_tests = 0;
 
-struct list_head test_list[TEST_PRIO_NUM];
+struct list_head test_list;
 
 void init_tests(void)
 {
-	int i;
-	struct test *t;
-	for (i = 0; i < TEST_PRIO_NUM; i++) {
-		list_init(&test_list[i]);
-	}
+	struct test *t, *end, *start;
+	size_t size;
+
+	list_init(&test_list);
 
 	t = &__test_meta_start;
 
@@ -27,23 +27,28 @@ void init_tests(void)
 		create_test(t);
 		++t;
 	}
+
+	start = &__test_meta_start;
+	end = &__test_meta_end;
+
+	size = (unsigned long)end - (unsigned long)start;
+
+	ulp_debug("Total tests size %ld\n", size);
 }
 
 __attribute__((nonnull(1)))
 struct test *create_test(struct test *test)
 {
 	test->idx = ++nr_tests;
-	list_add(&test->node, &test_list[test->prio - TEST_PRIO_START]);
+	list_add(&test->node, &test_list);
 	return test;
 }
 
 void release_tests(void)
 {
-	int i;
 	struct test *test, *tmp;
-	for (i = 0; i < TEST_PRIO_NUM; i++)
-		list_for_each_entry_safe(test, tmp, &test_list[i], node)
-			list_del(&test->node);
+	list_for_each_entry_safe(test, tmp, &test_list, node)
+		list_del(&test->node);
 }
 
 const char *str_special_ret(test_special_ret val)
