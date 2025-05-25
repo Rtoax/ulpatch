@@ -126,7 +126,7 @@ extern struct test *current_test;
 		.real_ret = _ret,						\
 	};
 
-extern struct test test_meta_start, test_meta_end;
+extern struct test __test_meta_start, __test_meta_end;
 
 /**
  * Define a test

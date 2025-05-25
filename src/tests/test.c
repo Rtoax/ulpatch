@@ -21,9 +21,9 @@ void init_tests(void)
 		list_init(&test_list[i]);
 	}
 
-	t = &test_meta_start;
+	t = &__test_meta_start;
 
-	while (t && t < &test_meta_end) {
+	while (t && t < &__test_meta_end) {
 		create_test(t);
 		++t;
 	}
