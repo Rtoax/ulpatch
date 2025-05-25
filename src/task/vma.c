@@ -462,3 +462,19 @@ void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma,
 			fprintf(fp, "\033[0m");
 	}
 }
+
+void print_task_vmas(FILE *fp, struct task_struct *task, bool detail)
+{
+	int first_line = 1;
+	struct vm_area_struct *vma;
+
+	if (!fp)
+		fp = stdout;
+
+	list_for_each_entry(vma, &task->vma_root.list, node_list) {
+		print_vma(fp, first_line, vma, detail);
+		first_line = 0;
+	}
+
+	fprintf(fp, "\n(E)ELF, (S)SharedLib, (P)MatchPhdr, (L)Leader\n");
+}

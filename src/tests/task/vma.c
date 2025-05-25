@@ -17,7 +17,7 @@
 TEST(Task, dump_vma, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
-	dump_task_vmas(stdout, task, true);
+	print_task_vmas(stdout, task, true);
 	return close_task(task);
 }
 

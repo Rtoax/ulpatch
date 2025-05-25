@@ -174,3 +174,4 @@ bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 int read_task_vmas(struct task_struct *task, bool update_ulp);
 void print_vma(FILE *fp, bool first_line, struct vm_area_struct *vma,
 	       bool detail);
+void print_task_vmas(FILE *fp, struct task_struct *task, bool detail);

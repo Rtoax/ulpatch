@@ -111,7 +111,7 @@ static int test_mmap_file(struct task_struct *task, int prot)
 	ulp_debug("New mmap. %lx\n", map_v);
 
 	update_task_vmas_ulp(task);
-	dump_task_vmas(stdout, task, true);
+	print_task_vmas(stdout, task, true);
 
 	ulp_debug("unmmap. %lx\n", map_v);
 	task_munmap(task, map_v, map_len);
@@ -151,7 +151,7 @@ static int task_mmap_file(int prot)
 
 	struct task_struct *task = open_task(pid, FTO_RDWR);
 
-	dump_task_vmas(stdout, task, true);
+	print_task_vmas(stdout, task, true);
 
 	ret += task_attach(pid);
 	ret = test_mmap_file(task, prot);
@@ -217,7 +217,7 @@ TEST(Task, prctl_PR_SET_NAME, 0)
 	addr = task_malloc(task, 64);
 	ulp_debug("task %p, addr = %lx\n", task, addr);
 
-	dump_task_vmas(stdout, task, true);
+	print_task_vmas(stdout, task, true);
 
 	n = memcpy_to_task(task, addr, data, strlen(data) + 1);
 
