@@ -5,7 +5,7 @@
 #ifndef __ASM_DEBUG_MONITORS_H
 #define __ASM_DEBUG_MONITORS_H
 
-#include <arch/aarch64/brk-imm.h>
+#include "arch/aarch64/brk-imm.h"
 
 /*
  * BRK instruction encoding

@@ -23,7 +23,7 @@
 
 #include "patch/patch.h"
 
-#include <args-common.c>
+#include "args-common.c"
 
 
 enum {

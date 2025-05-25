@@ -4,8 +4,8 @@
 #pragma once
 
 #include <stdint.h>
-#include <utils/compiler.h>
-#include <utils/log.h>
+#include "utils/compiler.h"
+#include "utils/log.h"
 
 
 #define INT3_INSN_SIZE		1

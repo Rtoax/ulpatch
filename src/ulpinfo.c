@@ -20,7 +20,7 @@
 #include "task/task.h"
 #include "cmds.h"
 
-#include <args-common.c>
+#include "args-common.c"
 
 
 static const char *prog_name = "ulpinfo";

@@ -29,7 +29,7 @@
 #undef cmd_exit
 #define cmd_exit(v) exit(v)
 
-#include <args-common.c>
+#include "args-common.c"
 
 
 static LIST_HEAD(failed_list);

@@ -31,7 +31,7 @@
 
 #include <unistd.h>
 
-#include <utils/util.h>
+#include "utils/util.h"
 
 #define WRITE_ONCE(a, b) (a) = (b)
 

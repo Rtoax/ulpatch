@@ -19,7 +19,7 @@
 
 #include "patch/patch.h"
 
-#include <args-common.c>
+#include "args-common.c"
 
 static pid_t target_pid = -1;
 static const char *target_func = NULL;

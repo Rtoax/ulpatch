@@ -7,21 +7,21 @@
 #include <stdint.h>
 #include <gelf.h>
 
-#include <utils/util.h>
-#include <utils/compiler.h>
+#include "utils/util.h"
+#include "utils/compiler.h"
 
 #ifndef __ULP_DEV
 #define __ULP_DEV
 #endif
-#include <patch/meta.h>
+#include "patch/meta.h"
 
 #if defined(__x86_64__)
-#include <arch/x86_64/instruments.h>
-#include <arch/x86_64/mcount.h>
+#include "arch/x86_64/instruments.h"
+#include "arch/x86_64/mcount.h"
 #elif defined(__aarch64__)
-#include <arch/aarch64/instruments.h>
-#include <arch/aarch64/mcount.h>
-#include <arch/aarch64/ftrace.h>
+#include "arch/aarch64/instruments.h"
+#include "arch/aarch64/mcount.h"
+#include "arch/aarch64/ftrace.h"
 #endif
 
 struct vm_area_struct;

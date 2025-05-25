@@ -8,9 +8,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
+#include "utils/log.h"
 
 enum vma_type {
 	VMA_NONE,   /* None */

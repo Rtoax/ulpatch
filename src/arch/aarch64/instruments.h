@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <assert.h>
 
-#include <utils/compiler.h>
+#include "utils/compiler.h"
 
 /* A64 instructions are always 32 bits. */
 #define	AARCH64_INSN_SIZE		4

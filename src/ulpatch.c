@@ -19,7 +19,7 @@
 #include "task/task.h"
 #include "cmds.h"
 
-#include <args-common.c>
+#include "args-common.c"
 
 
 enum command {
