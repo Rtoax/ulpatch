@@ -12,7 +12,8 @@
 
 #include "utils/list.h"
 #include "utils/log.h"
-#include "utils/util.h"
+#include "utils/string.h"
+#include "utils/macros.h"
 
 /**
  * @fp - if NULL, return directly

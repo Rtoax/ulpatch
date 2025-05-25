@@ -15,6 +15,7 @@
 #include "utils/backtrace.h"
 #include "utils/macros.h"
 #include "utils/time.h"
+#include "utils/string.h"
 
 
 struct nr_idx_bool {
@@ -22,13 +23,6 @@ struct nr_idx_bool {
 	uint32_t idx;
 	uint32_t is;
 };
-
-struct str_node {
-	/* list: pre_load_files */
-	struct list_head node;
-	char *str; /* malloc, strdup */
-};
-
 
 void ulpatch_init(void);
 
@@ -55,34 +49,3 @@ const char *ulpatch_arch(void);
 void ulpatch_info(const char *progname);
 
 void daemonize(void);
-
-int memshow(FILE *fp, const void *data, int data_len);
-int memshowinlog(int level, const void *data, int data_len);
-void print_string_hex(FILE *fp, const char *comment, unsigned char *str,
-		      size_t len);
-int print_bytes(FILE *fp, void *mem, size_t len);
-
-/* Return TRUE if the start of STR matches PREFIX, FALSE otherwise.  */
-int ulp_startswith(const char *str, const char *prefix);
-
-/**
- * @src: string like a,b,c,d,e  MUST no whitespace
- * @list: list head of str_node
- *
- * return number of list nodes
- */
-int parse_strstr(char *src, struct list_head *list);
-void free_strstr_list(struct list_head *list);
-
-unsigned long str2size(const char *str);
-unsigned long str2addr(const char *str);
-void *strbytes2mem(const char *bytes, size_t *nbytes, void *buf, size_t buf_len,
-		   char seperator);
-char *mem2strbytes(const void *mem, size_t mem_len, char *bytes_buf,
-		   size_t buf_len, char seperator);
-
-int fmembytes(FILE *fp, const void *data, int data_len);
-char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...);
-
-#define strstr_for_each_node_safe(iter, tmp, list)	\
-	list_for_each_entry_safe(iter, tmp, list, node)

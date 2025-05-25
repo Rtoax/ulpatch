@@ -32,3 +32,4 @@ void set_log_prefix(bool on);
 int str2loglevel(const char *str);
 const char *log_level_list(void);
 
+int memshowinlog(int level, const void *data, int data_len);
