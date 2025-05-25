@@ -3,7 +3,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "utils/util.h"
+#include "utils/time.h"
 
 
 unsigned long secs(void)
@@ -19,4 +19,3 @@ unsigned long usecs(void)
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec * 1000000UL + tv.tv_usec;
 }
-

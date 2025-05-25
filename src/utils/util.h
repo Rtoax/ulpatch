@@ -18,6 +18,7 @@
 #include "utils/list.h"
 #include "utils/backtrace.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 
 struct nr_idx_bool {
@@ -103,6 +104,3 @@ int fmd5sum(const char *filename, unsigned char *md5_result);
 #else
 #define fmd5sum(filename, md5_result) ({-ENOTSUPP;})
 #endif
-
-unsigned long secs(void);
-unsigned long usecs(void);
