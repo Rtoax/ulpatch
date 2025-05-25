@@ -37,10 +37,11 @@ typedef int (*test_function)(void);
  * test entry
  */
 struct test {
+#define TEST_MAGIC	0xAFBFCFDF1F2F3F4F
+	unsigned long magic;
 	int idx;
 	char *category;
 	char *name;
-	int reserve1;
 	test_function test_cb;
 	int expect_ret;
 	/* after running return value */
@@ -115,6 +116,7 @@ extern struct test *current_test;
 
 #define DEFINE_TEST_METADATA(_category, _name, _func, _ret)			\
 	struct test __test_metadata _tmeta_##_category##_name##_func = {	\
+		.magic = TEST_MAGIC,						\
 		.category = #_category,						\
 		.name = #_name,							\
 		.test_cb = _func,						\

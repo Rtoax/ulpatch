@@ -14,26 +14,35 @@ int nr_tests = 0;
 
 struct list_head test_list;
 
+
 void init_tests(void)
 {
-	struct test *t, *end, *start;
-	size_t size;
+	struct test *t;
+	size_t test_lds_size, i;
+	void *p;
 
 	list_init(&test_list);
 
-	t = &__test_meta_start;
-
-	while (t && t < &__test_meta_end) {
-		create_test(t);
-		++t;
+	/**
+	 * Because the alignment method of struct test is preserved in lds,
+	 * test operations cannot be used directly. Here, we first obtain the
+	 * size of test in the ELF section according to a specific alignment
+	 * method. Of course, this is done by comparing magic numbers.
+	 */
+	p = (void *)&__test_meta_start;
+	for (test_lds_size = 1; ; test_lds_size++) {
+		if (*(unsigned long *)(p + test_lds_size) == TEST_MAGIC)
+			break;
 	}
 
-	start = &__test_meta_start;
-	end = &__test_meta_end;
-
-	size = (unsigned long)end - (unsigned long)start;
-
-	ulp_debug("Total tests size %ld\n", size);
+	p = (void *)&__test_meta_start;
+	t = p;
+	i = 0;
+	while (t && t < &__test_meta_end) {
+		create_test(t);
+		/* NOTE: don't use t++ here. */
+		t = (p + test_lds_size * (++i));
+	}
 }
 
 __attribute__((nonnull(1)))
