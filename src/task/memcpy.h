@@ -14,3 +14,8 @@ char *strcpy_from_task(struct task_struct *task, char *dst,
 		       unsigned long task_src);
 char *strcpy_to_task(struct task_struct *task, unsigned long task_dst,
 		     char *src);
+
+int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
+			   unsigned long addr, unsigned long size);
+int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
+			  unsigned long addr);

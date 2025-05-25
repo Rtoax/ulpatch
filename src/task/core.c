@@ -443,65 +443,6 @@ int print_task(FILE *fp, const struct task_struct *task, bool detail)
 	return 0;
 }
 
-int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
-			   unsigned long addr, unsigned long size)
-{
-	void *mem = NULL;
-
-	/* default is stdout */
-	int nbytes;
-
-	/* If no output file name is specified, then the default output to stdout
-	 * can be output using redirection. */
-	int fd = fileno(stdout);
-
-	if (ofile) {
-		fd = open(ofile, O_CREAT | O_RDWR, 0664);
-		if (fd <= 0) {
-			ulp_error("open %s: %m\n", ofile);
-			return -1;
-		}
-	}
-	struct vm_area_struct *vma = find_vma(task, addr);
-	if (!vma) {
-		ulp_error("%s vma not exist on 0x%lx.\n", task->comm, addr);
-		return -1;
-	}
-
-	mem = malloc(size);
-
-	memcpy_from_task(task, mem, addr, size);
-
-	/* write to file or stdout */
-	nbytes = write(fd, mem, size);
-	if (nbytes != size) {
-		ulp_error("write failed, %m.\n");
-		free(mem);
-		return -1;
-	}
-
-	free(mem);
-	if (fd != fileno(stdout))
-		close(fd);
-
-	return 0;
-}
-
-int dump_task_vma_to_file(const char *ofile, struct task_struct *task,
-			  unsigned long addr)
-{
-	size_t vma_size = 0;
-	struct vm_area_struct *vma = find_vma(task, addr);
-	if (!vma) {
-		ulp_error("%s vma not exist on 0x%lx.\n", task->comm, addr);
-		return -1;
-	}
-
-	vma_size = vma->vm_end - vma->vm_start;
-
-	return dump_task_addr_to_file(ofile, task, vma->vm_start, vma_size);
-}
-
 /**
  * Open target task
  *
