@@ -12,6 +12,20 @@ and this project adheres to
 ## Unreleased
 
 #### Breaking Changes
+#### Added
+#### Changed
+#### Deprecated
+#### Removed
+#### Fixed
+#### Security
+#### Docs
+#### Tools
+#### Tests
+
+
+## [v0.5.14] 2025-05-25
+
+#### Breaking Changes
 - Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
 - tests: Add engine directory.
