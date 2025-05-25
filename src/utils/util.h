@@ -11,18 +11,9 @@
 #include <limits.h>
 
 #include "utils/file.h"
+#include "utils/id.h"
 #include "utils/list.h"
 #include "utils/backtrace.h"
 #include "utils/macros.h"
 #include "utils/time.h"
 #include "utils/string.h"
-
-
-struct nr_idx_bool {
-	uint32_t nr;
-	uint32_t idx;
-	uint32_t is;
-};
-
-/* Check some thing */
-bool is_root(const char *prog);

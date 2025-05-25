@@ -11,7 +11,8 @@
 #include "utils/log.h"
 
 #include "utils/compiler.h"
-#include "utils/util.h"
+#include "utils/string.h"
+#include "utils/macros.h"
 
 
 static const char *level_prefix[] = {

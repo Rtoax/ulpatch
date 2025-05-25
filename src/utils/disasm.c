@@ -7,7 +7,7 @@
 #endif
 
 #include "utils/log.h"
-#include "utils/util.h"
+#include "utils/string.h"
 #include "utils/disasm.h"
 
 

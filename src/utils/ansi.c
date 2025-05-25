@@ -5,7 +5,7 @@
 
 #include "utils/ansi.h"
 #include "utils/compiler.h"
-#include "utils/util.h"
+#include "utils/macros.h"
 
 
 static const char *ANSI_COLORS_GRAY[] = {

@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "utils/util.h"
+#include "utils/macros.h"
 #include "utils/compiler.h"
 
 #define DISASM_ARCH_X86_64	1
