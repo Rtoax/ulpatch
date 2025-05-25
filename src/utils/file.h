@@ -2,6 +2,10 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #pragma once
 #include <sys/types.h>
+#if defined(CONFIG_OPENSSL)
+#include <openssl/md5.h>
+#include <openssl/evp.h>
+#endif
 
 typedef enum {
 	FILE_UNKNOWN = 0,
@@ -40,3 +44,17 @@ int fprint_file(FILE *out, const char *file);
 int fprint_fd(FILE *fp, int fd);
 int dir_iter(const char *dirname, void (*callback)(const char *name, void *arg),
 	     void *arg);
+
+#ifndef MD5_DIGEST_LENGTH
+/* see /usr/include/openssl/md5.h */
+#define MD5_DIGEST_LENGTH 16
+#endif
+#ifdef EVP_MAX_MD_SIZE
+/* see /usr/include/openssl/evp.h */
+#define EVP_MAX_MD_SIZE 64
+#endif
+#if defined(CONFIG_OPENSSL)
+int fmd5sum(const char *filename, unsigned char *md5_result);
+#else
+#define fmd5sum(filename, md5_result) ({-ENOTSUPP;})
+#endif

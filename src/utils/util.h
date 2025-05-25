@@ -9,10 +9,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <limits.h>
-#if defined(CONFIG_OPENSSL)
-#include <openssl/md5.h>
-#include <openssl/evp.h>
-#endif
 
 #include "utils/file.h"
 #include "utils/list.h"
@@ -90,17 +86,3 @@ char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...);
 
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)
-
-#ifndef MD5_DIGEST_LENGTH
-/* see /usr/include/openssl/md5.h */
-#define MD5_DIGEST_LENGTH 16
-#endif
-#ifdef EVP_MAX_MD_SIZE
-/* see /usr/include/openssl/evp.h */
-#define EVP_MAX_MD_SIZE 64
-#endif
-#if defined(CONFIG_OPENSSL)
-int fmd5sum(const char *filename, unsigned char *md5_result);
-#else
-#define fmd5sum(filename, md5_result) ({-ENOTSUPP;})
-#endif
