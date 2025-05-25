@@ -16,7 +16,7 @@
 #include <utils/list.h>
 #include <utils/compiler.h>
 #include <task/task.h>
-#include <utils/cmds.h>
+#include "cmds.h"
 
 #include <args-common.c>
 

@@ -17,7 +17,7 @@
 #include <task/task.h>
 #include <utils/disasm.h>
 #include <utils/compiler.h>
-#include <utils/cmds.h>
+#include "cmds.h"
 
 #include <patch/patch.h>
 

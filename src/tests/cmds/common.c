@@ -2,7 +2,7 @@
 /* Copyright (C) 2024-2025 Rong Tao */
 #include <utils/compiler.h>
 #include <utils/log.h>
-#include <utils/cmds.h>
+#include "cmds.h"
 
 #include <tests/test-api.h>
 
