@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "elf/elf-api.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/log.h"
 #include "patch/patch.h"
 

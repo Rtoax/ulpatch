@@ -3,7 +3,7 @@
 #include "utils/log.h"
 #include "utils/list.h"
 #include "utils/macros.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 
 #include "tests/test-api.h"
 

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include "utils/log.h"
 #include "utils/list.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/compiler.h"
 #include "elf/elf-api.h"
 #include "tests/test-api.h"

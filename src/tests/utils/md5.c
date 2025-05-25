@@ -2,7 +2,7 @@
 /* Copyright (C) 2025 Rong Tao */
 #include "utils/log.h"
 #include "utils/list.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 
 #include "tests/test-api.h"
 

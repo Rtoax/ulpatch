@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <gelf.h>
 
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/compiler.h"
 
 #ifndef __ULP_DEV

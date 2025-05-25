@@ -3,9 +3,9 @@
 #include <string.h>
 #include "utils/log.h"
 #include "utils/list.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "elf/elf-api.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "tests/test-api.h"
 
 

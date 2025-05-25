@@ -2,7 +2,7 @@
 // see linux:arch/x86/include/asm/nops.h
 #pragma once
 
-#include "utils/util.h"
+#include "utils/utils.h"
 
 /*
  * Define nops for use with alternative() and for tracing.

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include "utils/log.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "patch/asm.h"
 #include "tests/test-api.h"
 

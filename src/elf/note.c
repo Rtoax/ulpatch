@@ -22,7 +22,7 @@
 #endif
 
 #include "elf/elf-api.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/log.h"
 
 #if defined(__aarch64__) || defined(__x86_64__)

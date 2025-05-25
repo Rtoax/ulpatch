@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "utils/log.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/list.h"
 #include "utils/disasm.h"
 #include "tests/test-api.h"

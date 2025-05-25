@@ -6,7 +6,7 @@
 #include "init.h"
 #include "version.h"
 #include "utils/log.h"
-#include "utils/util.h"
+#include "utils/utils.h"
 #include "utils/list.h"
 #include "tests/test-api.h"
 
