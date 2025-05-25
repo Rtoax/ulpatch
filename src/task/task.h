@@ -71,8 +71,6 @@ struct task_struct {
 };
 
 
-bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
-
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);
 int print_task(FILE *fp, const struct task_struct *task, bool detail);
