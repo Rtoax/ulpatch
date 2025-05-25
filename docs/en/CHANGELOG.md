@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 - Add `ULPATCH_LICENSE()` and `ULPATCH_FILE_VERSION=5`.
 #### Added
+- tests: Add engine directory.
 - Add ulpconfig.mk.
 - scripts: add verbose.mk.
 - docker: Add build.sh.

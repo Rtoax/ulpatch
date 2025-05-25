@@ -4,6 +4,7 @@
 add_subdirectory(arch)
 add_subdirectory(cmds)
 add_subdirectory(elf)
+add_subdirectory(engine)
 add_subdirectory(ftrace)
 add_subdirectory(patch)
 add_subdirectory(task)
@@ -22,12 +23,9 @@ if (CONFIG_BUILD_ULTASK)
 	set(ULTASK ${PROJECT_SOURCE_DIR}/src/ultask.c)
 endif()
 add_executable(ulpatch_test
-	listener.c
 	main.c
-	notify.c
 	objects.c
 	signal.c
-	test.c
 	init.c
 	version.c
 	# When testing ulpatches, the target functions are specified in the
@@ -61,6 +59,7 @@ target_link_libraries(ulpatch_test PRIVATE
 target_link_libraries(ulpatch_test PRIVATE
 	-Wl,--whole-archive
 	ulpatch_test_arch
+	ulpatch_test_engine
 	ulpatch_test_cmds
 	ulpatch_test_elf
 	ulpatch_test_ftrace
