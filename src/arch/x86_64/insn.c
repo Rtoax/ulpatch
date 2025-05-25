@@ -2,11 +2,11 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <errno.h>
 
-#include <utils/util.h>
-#include <utils/log.h>
-#include <task/task.h>
+#include "utils/util.h"
+#include "utils/log.h"
+#include "task/task.h"
 
-#include <arch/x86_64/instruments.h>
+#include "arch/x86_64/instruments.h"
 
 /* see linux/scripts/recordmcount.c */
 static unsigned char __unused ideal_nop5_x86_64[5] =

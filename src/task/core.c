@@ -13,18 +13,18 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <task/task.h>
-#include <task/patch.h>
+#include "utils/log.h"
+#include "task/task.h"
+#include "task/patch.h"
 
 #if defined(__x86_64__)
-#include <arch/x86_64/regs.h>
-#include <arch/x86_64/instruments.h>
+#include "arch/x86_64/regs.h"
+#include "arch/x86_64/instruments.h"
 #elif defined(__aarch64__)
-#include <arch/aarch64/regs.h>
-#include <arch/aarch64/instruments.h>
+#include "arch/aarch64/regs.h"
+#include "arch/aarch64/instruments.h"
 #endif
 
 

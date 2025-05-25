@@ -10,14 +10,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <elf/elf-api.h>
-#include <utils/util.h>
-#include <task/task.h>
-#include <utils/log.h>
-#include <utils/compiler.h>
+#include "elf/elf-api.h"
+#include "utils/util.h"
+#include "task/task.h"
+#include "utils/log.h"
+#include "utils/compiler.h"
 
-#include <patch/patch.h>
-#include <patch/meta.h>
+#include "patch/patch.h"
+#include "patch/meta.h"
 
 
 static int __dry_run = false;

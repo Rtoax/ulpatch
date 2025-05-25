@@ -2,10 +2,10 @@
 /* Copyright (C) 2024-2025 Rong Tao */
 #include <errno.h>
 #include <sys/wait.h>
-#include <utils/log.h>
-#include <utils/util.h>
-#include <patch/asm.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/util.h"
+#include "patch/asm.h"
+#include "tests/test-api.h"
 
 
 TEST(Patch_asm, sleep, 0)

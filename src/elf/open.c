@@ -10,10 +10,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <elf/elf-api.h>
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/compiler.h>
+#include "elf/elf-api.h"
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/compiler.h"
 
 /* Store all already opened ELF file handlers */
 static uint16_t elf_files_number = 0;

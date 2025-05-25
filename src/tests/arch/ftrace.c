@@ -4,11 +4,11 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <utils/disasm.h>
-#include <utils/log.h>
-#include <utils/list.h>
-#include <task/task.h>
-#include <tests/test-api.h>
+#include "utils/disasm.h"
+#include "utils/log.h"
+#include "utils/list.h"
+#include "task/task.h"
+#include "tests/test-api.h"
 
 
 #if defined(__x86_64__)

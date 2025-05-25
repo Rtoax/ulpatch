@@ -13,9 +13,9 @@
 #include <stdlib.h>
 #include <dirent.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
+#include "utils/log.h"
 #include "utils/file.h"
 
 

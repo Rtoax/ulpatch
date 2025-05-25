@@ -11,14 +11,14 @@
 #include <errno.h>
 #include <time.h>
 
-#include <elf/elf-api.h>
-#include <utils/disasm.h>
-#include <utils/log.h>
-#include <utils/list.h>
-#include <task/task.h>
-#include <utils/compiler.h>
+#include "elf/elf-api.h"
+#include "utils/disasm.h"
+#include "utils/log.h"
+#include "utils/list.h"
+#include "task/task.h"
+#include "utils/compiler.h"
 
-#include <patch/patch.h>
+#include "patch/patch.h"
 
 #ifndef SHF_RELA_LIVEPATCH
 #define SHF_RELA_LIVEPATCH      0x00100000

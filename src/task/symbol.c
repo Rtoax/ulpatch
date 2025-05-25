@@ -13,12 +13,12 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <task/symbol.h>
-#include <task/vma.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "task/symbol.h"
+#include "task/vma.h"
+#include "task/task.h"
 
 
 static inline int __cmp_task_sym(struct rb_node *n1, unsigned long key)

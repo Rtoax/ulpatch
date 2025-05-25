@@ -3,11 +3,11 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "task/task.h"
 
-#include <tests/test-api.h>
+#include "tests/test-api.h"
 
 int nr_tests = 0;
 

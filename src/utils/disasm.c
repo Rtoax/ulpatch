@@ -6,9 +6,9 @@
 # include <capstone/capstone.h>
 #endif
 
-#include <utils/log.h>
-#include <utils/util.h>
-#include <utils/disasm.h>
+#include "utils/log.h"
+#include "utils/util.h"
+#include "utils/disasm.h"
 
 
 int current_disasm_arch(void)

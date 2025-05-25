@@ -8,10 +8,10 @@
 #include <string.h>
 #include <time.h>
 
-#include <utils/log.h>
+#include "utils/log.h"
 
-#include <utils/compiler.h>
-#include <utils/util.h>
+#include "utils/compiler.h"
+#include "utils/util.h"
 
 
 static const char *level_prefix[] = {

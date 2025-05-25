@@ -2,10 +2,10 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <sys/types.h>
 #include <unistd.h>
-#include <utils/log.h>
-#include <utils/util.h>
-#include <utils/disasm.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/util.h"
+#include "utils/disasm.h"
+#include "tests/test-api.h"
 
 
 #define X86_64_CODE \

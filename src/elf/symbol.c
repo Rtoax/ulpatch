@@ -8,10 +8,10 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <elf/elf-api.h>
-#include <utils/util.h>
-#include <utils/log.h>
-#include <patch/patch.h>
+#include "elf/elf-api.h"
+#include "utils/util.h"
+#include "utils/log.h"
+#include "patch/patch.h"
 
 
 const char *st_bind_string(const GElf_Sym *sym)

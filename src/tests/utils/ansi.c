@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/util.h>
-#include <utils/ansi.h>
-#include <elf/elf-api.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/util.h"
+#include "utils/ansi.h"
+#include "elf/elf-api.h"
+#include "tests/test-api.h"
 
 
 TEST(Utils_ansi, base, 0)

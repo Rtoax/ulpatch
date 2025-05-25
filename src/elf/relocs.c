@@ -10,9 +10,9 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#include <elf/elf-api.h>
-#include <utils/util.h>
-#include <utils/log.h>
+#include "elf/elf-api.h"
+#include "utils/util.h"
+#include "utils/log.h"
 
 
 #if defined(__x86_64__)

@@ -4,13 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <utils/util.h>
-#include <utils/log.h>
-#include <task/task.h>
+#include "utils/util.h"
+#include "utils/log.h"
+#include "task/task.h"
 
-#include <arch/x86_64/instruments.h>
-#include <arch/x86_64/ftrace.h>
-#include <arch/x86_64/nops.h>
+#include "arch/x86_64/instruments.h"
+#include "arch/x86_64/ftrace.h"
+#include "arch/x86_64/nops.h"
 
 const char *ftrace_nop_replace(void)
 {

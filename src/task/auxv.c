@@ -9,9 +9,9 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <utils/log.h>
-#include <task/task.h>
-#include <task/auxv.h>
+#include "utils/log.h"
+#include "task/task.h"
+#include "task/auxv.h"
 
 
 int load_task_auxv(pid_t pid, struct task_auxv *pauxv)

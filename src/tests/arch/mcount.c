@@ -3,10 +3,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <task/task.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "task/task.h"
+#include "tests/test-api.h"
 
 
 TEST(Arch, mcount, 0)

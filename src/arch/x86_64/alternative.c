@@ -3,9 +3,9 @@
 
 #include <stdlib.h>
 
-#include <utils/compiler.h>
+#include "utils/compiler.h"
 
-#include <arch/x86_64/nops.h>
+#include "arch/x86_64/nops.h"
 
 
 #ifdef K8_NOP1

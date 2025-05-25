@@ -3,10 +3,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/util.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/util.h"
+#include "tests/test-api.h"
 
 
 TEST(Utils_version, ulpatch_version, 0)

@@ -10,10 +10,10 @@
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 
-#include <utils/log.h>
+#include "utils/log.h"
 
-#include <utils/compiler.h>
-#include <utils/util.h>
+#include "utils/compiler.h"
+#include "utils/util.h"
 
 
 /* Function: Calculate the MD5 hash of a file using OpenSSL's EVP API */

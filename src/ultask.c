@@ -9,17 +9,17 @@
 #include <fcntl.h>
 #include <libgen.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/util.h>
-#include <task/task.h>
-#include <utils/disasm.h>
-#include <utils/compiler.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/util.h"
+#include "task/task.h"
+#include "utils/disasm.h"
+#include "utils/compiler.h"
 #include "cmds.h"
 
-#include <patch/patch.h>
+#include "patch/patch.h"
 
 #include <args-common.c>
 

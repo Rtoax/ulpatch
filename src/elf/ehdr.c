@@ -6,9 +6,9 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#include <elf/elf-api.h>
-#include <utils/util.h>
-#include <utils/log.h>
+#include "elf/elf-api.h"
+#include "utils/util.h"
+#include "utils/log.h"
 
 
 bool ehdr_magic_ok(const GElf_Ehdr *ehdr)

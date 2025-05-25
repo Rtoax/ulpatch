@@ -21,9 +21,9 @@
 #define NT_GNU_BUILD_ATTRIBUTE_FUNC 0x101
 #endif
 
-#include <elf/elf-api.h>
-#include <utils/util.h>
-#include <utils/log.h>
+#include "elf/elf-api.h"
+#include "utils/util.h"
+#include "utils/log.h"
 
 #if defined(__aarch64__) || defined(__x86_64__)
 /* AArch64 specific GNU properties.

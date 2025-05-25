@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2025 Rong Tao */
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/util.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/util.h"
 
-#include <tests/test-api.h>
+#include "tests/test-api.h"
 
 
 TEST(Utils_md5, fmd5sum, 0)

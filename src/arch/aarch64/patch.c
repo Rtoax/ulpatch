@@ -5,11 +5,11 @@
 #include <stdbool.h>
 #include <limits.h>
 
-#include <utils/util.h>
-#include <utils/log.h>
-#include <task/task.h>
-#include <utils/compiler.h>
-#include <patch/patch.h>
+#include "utils/util.h"
+#include "utils/log.h"
+#include "task/task.h"
+#include "utils/compiler.h"
+#include "patch/patch.h"
 
 enum aarch64_reloc_op {
 	RELOC_OP_NONE,

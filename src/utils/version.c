@@ -5,14 +5,14 @@
 #include <gnu/libc-version.h>
 
 #define __ULP_DEV 1
-#include <patch/meta.h>
+#include "patch/meta.h"
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/ansi.h>
-#include <utils/disasm.h>
-#include <utils/util.h>
-#include <utils/compiler.h>
+#include "utils/ansi.h"
+#include "utils/disasm.h"
+#include "utils/util.h"
+#include "utils/compiler.h"
 #include "utils/backtrace.h"
 
 

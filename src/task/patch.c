@@ -13,11 +13,11 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <task/task.h>
-#include <task/patch.h>
+#include "utils/log.h"
+#include "task/task.h"
+#include "task/patch.h"
 
 
 void init_vma_ulp_root(struct vma_ulp_root *root)

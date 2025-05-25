@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <sys/ptrace.h>
 
-#include <utils/log.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "task/task.h"
 
 
 static __unused int pid_write(int pid, void *dest, const void *src, size_t len)

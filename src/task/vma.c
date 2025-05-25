@@ -7,11 +7,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <task/task.h>
-#include <task/vma.h>
+#include "utils/log.h"
+#include "task/task.h"
+#include "task/vma.h"
 
 
 void init_vma_root(struct vm_area_root *root)

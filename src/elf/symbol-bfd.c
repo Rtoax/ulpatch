@@ -8,11 +8,11 @@
 #include <stdlib.h>
 #include <bfd.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <utils/util.h>
-#include <utils/list.h>
+#include "utils/log.h"
+#include "utils/util.h"
+#include "utils/list.h"
 
 
 enum bfd_sym_type {

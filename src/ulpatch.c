@@ -7,14 +7,14 @@
 #include <assert.h>
 #include <errno.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <patch/patch.h>
+#include "patch/patch.h"
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/compiler.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/compiler.h"
+#include "task/task.h"
 #include "cmds.h"
 
 #include <args-common.c>

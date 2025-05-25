@@ -4,13 +4,13 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/util.h>
-#include <task/task.h>
-#include <elf/elf-api.h>
-#include <patch/patch.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/util.h"
+#include "task/task.h"
+#include "elf/elf-api.h"
+#include "patch/patch.h"
+#include "tests/test-api.h"
 
 
 static int test_task_patch(int fto_flags, int (*cb)(struct task_struct *))

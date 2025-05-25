@@ -3,7 +3,7 @@
 #ifndef __ULP_DEV
 #define __ULP_DEV
 #endif
-#include <patch/meta.h>
+#include "patch/meta.h"
 
 void empty_hello_world(void)
 {

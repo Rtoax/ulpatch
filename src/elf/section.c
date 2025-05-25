@@ -10,10 +10,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <elf/elf-api.h>
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/compiler.h>
+#include "elf/elf-api.h"
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/compiler.h"
 
 
 int handle_sections(struct elf_file *elf)

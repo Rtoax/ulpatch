@@ -4,12 +4,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <utils/util.h>
-#include <utils/log.h>
-#include <task/task.h>
+#include "utils/util.h"
+#include "utils/log.h"
+#include "task/task.h"
 
-#include <arch/aarch64/instruments.h>
-#include <arch/aarch64/ftrace.h>
+#include "arch/aarch64/instruments.h"
+#include "arch/aarch64/ftrace.h"
 
 /*
  * Replace a single instruction, which may be a branch or NOP.

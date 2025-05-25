@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Copyright (C) 2022-2025 Rong Tao */
 #include <stdio.h>
-#include <patch/patch.h>
+#include "patch/patch.h"
 
 #if defined(__x86_64__)
-#include <arch/x86_64/mcount.h>
+#include "arch/x86_64/mcount.h"
 #elif defined(__aarch64__)
-#include <arch/aarch64/mcount.h>
+#include "arch/aarch64/mcount.h"
 #endif
 
 
@@ -16,8 +16,8 @@
  */
 #if defined(ULPATCH_TEST)
 
-#include <task/task.h>
-#include <utils/log.h>
+#include "task/task.h"
+#include "utils/log.h"
 
 extern int try_to_wake_up(struct task_struct *task, int mode, int wake_flags);
 

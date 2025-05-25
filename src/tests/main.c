@@ -13,13 +13,13 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <utils/compiler.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "utils/compiler.h"
+#include "task/task.h"
 #include "cmds.h"
-#include <elf/elf-api.h>
-#include <tests/test-api.h>
+#include "elf/elf-api.h"
+#include "tests/test-api.h"
 
 /* Must between utils/cmds.h and args-common.c */
 #undef cmd_exit_success

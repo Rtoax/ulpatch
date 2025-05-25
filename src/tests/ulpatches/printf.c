@@ -4,8 +4,8 @@
 #define __ULP_DEV
 #endif
 #include <stdio.h>
-#include <patch/asm.h>
-#include <patch/meta.h>
+#include "patch/asm.h"
+#include "patch/meta.h"
 
 void printf_hello_world(void)
 {

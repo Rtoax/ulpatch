@@ -8,10 +8,10 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include <utils/log.h>
-#include <utils/list.h>
-#include <task/task.h>
-#include <tests/test-api.h>
+#include "utils/log.h"
+#include "utils/list.h"
+#include "task/task.h"
+#include "tests/test-api.h"
 
 
 TEST(Task, copy_from_task, 0)

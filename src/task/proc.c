@@ -13,10 +13,10 @@
 #include <elf.h>
 #include <dirent.h>
 
-#include <elf/elf-api.h>
+#include "elf/elf-api.h"
 
-#include <utils/log.h>
-#include <task/task.h>
+#include "utils/log.h"
+#include "task/task.h"
 
 
 int open_pid_maps(pid_t pid)

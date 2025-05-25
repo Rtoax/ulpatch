@@ -4,7 +4,7 @@
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
-#include <utils/log.h>
+#include "utils/log.h"
 #include "utils/backtrace.h"
 
 #if !defined(CONFIG_LIBUNWIND)
