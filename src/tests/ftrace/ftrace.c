@@ -91,7 +91,7 @@ static int direct_patch_ftrace_test(struct patch_test_arg *arg, int expect_ret)
 		return -1;
 	}
 
-	dump_task(stdout, task, true);
+	print_task(stdout, task, true);
 
 	ulp_info("mcount() addr %lx %lx\n", rel_s->addr, mcount_addr);
 

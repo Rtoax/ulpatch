@@ -419,11 +419,12 @@ void vma_free_elf(struct vm_area_struct *vma)
 	free(vma->vma_elf);
 }
 
-void print_task(FILE *fp, const struct task_struct *task, bool detail)
+int print_task(FILE *fp, const struct task_struct *task, bool detail)
 {
-	if (!task || !fp) {
-		errno = EINVAL;
-		return;
+	if (!fp)
+		fp = stdout;
+	if (!task) {
+		return -EINVAL;
 	}
 
 	fprintf(fp, "Command: %-32s\n", task->comm);
@@ -434,18 +435,11 @@ void print_task(FILE *fp, const struct task_struct *task, bool detail)
 		fprintf(fp, "Patched: YES (num %d)\n", task->ulp_root.max_id);
 
 	if (!detail)
-		return;
+		return 0;
 
-	/* Detail */
 	fprintf(fp, "FTO:     %-32x\n", task->fto_flag);
 	fprintf(fp, "MemFD:   %-32d\n", task->proc_mem_fd);
-}
 
-int dump_task(FILE *fp, const struct task_struct *task, bool detail)
-{
-	if (!fp)
-		fp = stdout;
-	print_task(fp, task, detail);
 	return 0;
 }
 

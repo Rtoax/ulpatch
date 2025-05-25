@@ -69,7 +69,7 @@ TEST(Task, open_non_exist, -1)
 TEST(Task, dump, 0)
 {
 	struct task_struct *task = open_task(getpid(), FTO_NONE);
-	dump_task(stdout, task, true);
+	print_task(stdout, task, true);
 	dump_task_vmas(stdout, task, true);
 	return close_task(task);
 }

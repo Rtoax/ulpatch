@@ -71,8 +71,6 @@ struct task_struct {
 };
 
 
-int dump_task(FILE *fp, const struct task_struct *t, bool detail);
-
 void dump_task_vmas(FILE *fp, struct task_struct *task, bool detail);
 int dump_task_addr_to_file(const char *ofile, struct task_struct *task,
 		unsigned long addr, unsigned long size);
@@ -83,7 +81,7 @@ bool elf_vma_is_interp_exception(struct vm_area_struct *vma);
 
 struct task_struct *open_task(pid_t pid, int flag);
 int close_task(struct task_struct *task);
-void print_task(FILE *fp, const struct task_struct *task, bool detail);
+int print_task(FILE *fp, const struct task_struct *task, bool detail);
 bool task_is_pie(struct task_struct *task);
 
 int task_attach(pid_t pid);
