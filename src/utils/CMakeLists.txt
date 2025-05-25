@@ -54,7 +54,6 @@ add_library(ulpatch_utils STATIC
 	${disasm}
 	file.c
 	id.c
-	init.c
 	list.c
 	log.c
 	${md5_evp}
@@ -62,7 +61,6 @@ add_library(ulpatch_utils STATIC
 	string.c
 	time.c
 	${unwind}
-	version.c
 )
 
 target_compile_definitions(ulpatch_utils PRIVATE ${UTILS_CFLAGS_MACROS})

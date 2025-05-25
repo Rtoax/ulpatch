@@ -15,8 +15,19 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 find_library(RT rt HINTS ${SEARCH_PATH})
 
+add_library(ulpatch_init STATIC
+	init.c
+	version.c
+)
+
+target_compile_definitions(ulpatch_init PRIVATE ${UTILS_CFLAGS_MACROS})
+target_link_libraries(ulpatch_init PRIVATE
+	${ELF} ${BFD} ${CAPSTONE} ${LIBSSL} ${LIBCRYPTO} ${LIBUNWIND} ${LIBUNWIND_ARCH} ulpatch_elf
+)
+
 link_libraries(${ELF} ${RT}
 	ulpatch_elf
+	ulpatch_init
 	ulpatch_patch
 	ulpatch_task
 	ulpatch_utils
