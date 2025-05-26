@@ -16,6 +16,7 @@ and this project adheres to
 #### Changed
 #### Deprecated
 #### Removed
+- Remove tests/plt.
 #### Fixed
 #### Security
 #### Docs
