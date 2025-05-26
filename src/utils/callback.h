@@ -7,14 +7,6 @@
 #include "utils/compiler.h"
 
 
-struct callback {
-	void *cb_arg;
-	int (*cb)(void *arg);
-
-	/* head is struct list_head */
-	struct list_head node;
-};
-
 /* callback chain */
 struct callback_chain {
 	struct list_head head;
