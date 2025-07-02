@@ -27,12 +27,6 @@ struct bfd_elf_file {
 
 	bfd *bfd;
 
-	/**
-	 * One ELF file could be opened more than one time, if that, refcount
-	 * prevent resources from being released while someone is using them.
-	 */
-	size_t refcount;
-
 	asymbol **syms;
 	long symcount;
 
@@ -44,9 +38,6 @@ struct bfd_elf_file {
 
 	asymbol **sorted_syms;
 	long sorted_symcount;
-
-	/* head is bfd_elf_file_list */
-	struct list_head node;
 
 	struct rb_root rb_tree_syms[BFD_ELF_SYM_TYPE_NUM];
 };
@@ -62,9 +53,6 @@ struct bfd_sym {
 	/* root is bfd_elf_file.rb_tree_syms[type] */
 	struct rb_node node;
 };
-
-/* We just open few elf files, link list is ok. */
-static LIST_HEAD(bfd_elf_file_list);
 
 /**
  * The following is the BFD-SYM symbol related public function interface.
@@ -250,20 +238,6 @@ unsigned long bfd_elf_data_sym_addr(struct bfd_elf_file *file, const char *name)
  * Common load functions
  */
 
-static struct bfd_elf_file *file_already_load(const char *filename)
-{
-	struct bfd_elf_file *f, *tmp, *ret = NULL;
-
-	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node) {
-		if (!strcmp(filename, f->name)) {
-			f->refcount++;
-			ret = f;
-			break;
-		}
-	}
-	return ret;
-}
-
 static asymbol **slurp_symtab(struct bfd_elf_file *file)
 {
 	asymbol **sy;
@@ -383,7 +357,6 @@ static struct bfd_elf_file *file_load(const char *filename)
 	file = malloc(sizeof(struct bfd_elf_file));
 	memset(file, 0, sizeof(struct bfd_elf_file));
 
-	file->refcount = 1;
 	strncpy(file->name, filename, PATH_MAX - 1);
 
 	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
@@ -460,8 +433,6 @@ static struct bfd_elf_file *file_load(const char *filename)
 		}
 	}
 
-	list_add(&file->node, &bfd_elf_file_list);
-
 	return file;
 
 close:
@@ -471,29 +442,18 @@ close:
 
 struct bfd_elf_file *bfd_elf_open(const char *elf_file)
 {
-	struct bfd_elf_file *file = NULL;
-
 	if (!fexist(elf_file)) {
 		errno = EEXIST;
 		return NULL;
 	}
 
-	file = file_already_load(elf_file);
-	if (!file)
-		file = file_load(elf_file);
-
-	return file;
+	return file_load(elf_file);
 }
 
 static void __rb_free_bfd_sym(struct rb_node *node)
 {
 	struct bfd_sym *s = rb_entry(node, struct bfd_sym, node);
 	free_bfd_sym(s);
-}
-
-int bfd_elf_file_refcount(struct bfd_elf_file *file)
-{
-	return file ? file->refcount : -1;
 }
 
 const char *bfd_elf_file_name(struct bfd_elf_file *file)
@@ -507,12 +467,6 @@ int bfd_elf_close(struct bfd_elf_file *file)
 
 	if (!file)
 		return -1;
-
-	file->refcount--;
-	if (file->refcount >= 1) {
-		ulp_debug("Could not close used bfd_elf_file.\n");
-		return 0;
-	}
 
 	if (file->syms) {
 		free(file->syms);
@@ -538,24 +492,12 @@ int bfd_elf_close(struct bfd_elf_file *file)
 	file->synthcount = 0;
 	file->sorted_symcount = 0;
 
-	list_del(&file->node);
-
 	/* Destroy all type symbols rb tree */
 	for (i = 0; i < BFD_ELF_SYM_TYPE_NUM; i++)
 		rb_destroy(&file->rb_tree_syms[i], __rb_free_bfd_sym);
 
 	bfd_close(file->bfd);
 	free(file);
-	return 0;
-}
-
-int bfd_elf_destroy(void)
-{
-	struct bfd_elf_file *f, *tmp;
-
-	list_for_each_entry_safe(f, tmp, &bfd_elf_file_list, node)
-		bfd_elf_close(f);
-
 	return 0;
 }
 

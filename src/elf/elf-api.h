@@ -215,7 +215,6 @@ struct bfd_elf_file;
 struct bfd_sym;
 
 struct bfd_elf_file* bfd_elf_open(const char *elf_file);
-int bfd_elf_file_refcount(struct bfd_elf_file *file);
 const char *bfd_elf_file_name(struct bfd_elf_file *file);
 int bfd_elf_close(struct bfd_elf_file *file);
 
@@ -234,8 +233,6 @@ const char *bfd_sym_name(struct bfd_sym *symbol);
 
 const struct bfd_build_id *bfd_elf_bid(struct bfd_elf_file *file);
 const char *bfd_strbid(const struct bfd_build_id *bid, char *buf, int blen);
-
-int bfd_elf_destroy(void);
 
 /**
  * Store BFD function wrapper here

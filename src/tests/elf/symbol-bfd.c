@@ -47,8 +47,7 @@ TEST(Bfd_sym, elf_not_exist, 0)
 TEST(Bfd_sym, buildid, 0)
 {
 	int ret = 0, i;
-	struct bfd_elf_file *file, *open_again;
-	size_t refcount;
+	struct bfd_elf_file *file;
 	char buf[512];
 
 	for (i = 0; i < ARRAY_SIZE(test_files); i++) {
@@ -59,17 +58,9 @@ TEST(Bfd_sym, buildid, 0)
 			continue;
 
 		file = bfd_elf_open(test_files[i]);
-		open_again = bfd_elf_open(test_files[i]);
-		if (!file || !open_again || file != open_again) {
-			ret = -1;
+		if (!file) {
+			ret++;
 		} else {
-			refcount = bfd_elf_file_refcount(file);
-			if (refcount != 2) {
-				ulp_error("refcount = %ld, %s\n", refcount,
-					  bfd_elf_file_name(file));
-				ret = -1;
-			}
-
 			ulp_info("%s Build ID %s\n", test_files[i],
 				 bfd_strbid(bfd_elf_bid(file), buf, sizeof(buf)));
 
