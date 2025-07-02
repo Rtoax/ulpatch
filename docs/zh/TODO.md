@@ -29,6 +29,7 @@ hide:
 - 支持 GUI，可以用 GTK/Qt 实现。
 - 像内核`module_init`,`module_exit`一样支持执行初始化和退出函数。
 - 或许我们应该使用 `dlopen/dlsym` 实现热补丁的插入。
+- 支持 C++。
 
 
 ### 不打算支持 (理想很丰满、现实很骨感)
