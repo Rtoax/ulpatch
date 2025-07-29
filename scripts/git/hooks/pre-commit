@@ -7,6 +7,7 @@ readonly GIT_TOPDIR=$(git rev-parse --show-toplevel 2>/dev/null || :)
 [[ -z ${NR_MOD} ]] && NR_MOD=4
 [[ -z ${NR_ADD} ]] && NR_ADD=1
 [[ -z ${NR_DEL} ]] && NR_DEL=1
+[[ -z ${FORCE} ]] && FORCE=
 
 if [[ ${V} ]] || [[ ${VERBOSE} ]]; then
 	set -x
@@ -16,21 +17,24 @@ try_add=( $(git status --short | grep ^A | awk '{print $2}' || true) )
 try_del=( $(git status --short | grep ^D | awk '{print $2}' || true) )
 try_modify=( $(git status --short | grep ^M | awk '{print $2}' || true) )
 
+fatal() {
+	echo >&2 "FATAL: "${@}
+	exit 1
+}
+
 # Redirect output to stderr.
 exec 1>&2
 
-must_modify_changelog() {
-	if ! [[ "${try_modify[@]}" =~ CHANGELOG.md ]]; then
+hint_changelog() {
+	if ! [[ " ${try_modify[@]} " =~ " CHANGELOG.md " ]]; then
 		git status --short
-		echo "FATAL: you forgot modify CHANGELOG.md !!"
-		exit 1
+		fatal "${@}" "you forgot modify CHANGELOG.md!!! Try FORCE???"
 	fi
 }
 
 broken_symlinks=( $(find ${GIT_TOPDIR} -xtype l) )
 if [[ ${#broken_symlinks[@]} -ge 1 ]]; then
-	echo >&2 "Broken-symlink: ${broken_symlinks[@]}"
-	exit 1
+	fatal "Broken-symlink: ${broken_symlinks[@]}"
 fi
 
 for f in ${try_add[@]}
@@ -40,25 +44,24 @@ do
 	# true: for empty file
 	read -r -N 8 bin < $f || true
 	if [[ $bin == $'\x7f'ELF* ]]; then
-		echo "FATAL: You are trying to add <$f> ELF file to git-tree, see git status."
-		exit 1
+		fatal "You are trying to add <$f> ELF file to git-tree, see git status."
 	# ar file start from "!<arch>\n", see /usr/include/ar.h
 	elif [[ $bin == $'!<arch>\n' ]]; then
-		echo "FATAL: You are trying to add <$f> ar file to git-tree, see git status."
-		exit 1
+		fatal "You are trying to add <$f> ar file to git-tree, see git status."
 	elif [[ $bin == $'gmon'* ]]; then
-		echo "FATAL: You are trying to add <$f> GNU prof performance file to git-tree, see git status."
-		exit 1
+		fatal "You are trying to add <$f> GNU prof performance file to git-tree, see git status."
 	fi
 	if [[ $(basename $f) == vmlinux.h ]]; then
-		echo "FATAL: vmlinux.h is too big, generate it with bpftool command!!!"
-		exit 1
+		fatal "vmlinux.h is too big, generate it with bpftool command!!!"
+	fi
+	if [[ $(file $f | awk '{print $NF}') == data ]] && [[ -z ${FORCE} ]]; then
+		fatal "$f is considered a data file!!! try FORCE"
 	fi
 done
 
-# modify too much files or delete files, need modify CHANGELOG.md too
-if [[ ${#try_modify[@]} -ge ${NR_MOD} ]] || \
-   [[ ${#try_del[@]} -ge ${NR_DEL} ]] || \
-   [[ ${#try_add[@]} -ge ${NR_ADD} ]]; then
-	must_modify_changelog
-fi
+# modify,add,delete files, need modify CHANGELOG.md too
+[[ ${#try_modify[@]} -ge ${NR_MOD} ]] && hint_changelog "<Modify too many files>"
+[[ ${#try_del[@]} -ge ${NR_DEL} ]] && hint_changelog "<Delete files>"
+[[ ${#try_add[@]} -ge ${NR_ADD} ]] && hint_changelog "<Add files: ${try_add[@]}>"
+
+exit 0
