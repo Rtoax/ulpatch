@@ -106,4 +106,3 @@ int fpansi_reset(FILE *fp)
 {
 	return fprintf(fp, ANSI_RESET);
 }
-

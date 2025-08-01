@@ -10,7 +10,6 @@
 
 #include "utils/log.h"
 
-#include "utils/compiler.h"
 #include "utils/string.h"
 #include "utils/macros.h"
 
@@ -114,9 +113,9 @@ const char *log_level_list(void)
 	return "debug,dbg,info,inf,notice,note,warning,warn,error,err,crit,alert,emerg";
 }
 
-int __attribute__((format(printf, 6, 7)))
-ulp_log(int level, bool has_prefix, const char *file, const char *func,
-	unsigned long int line, char *fmt, ...)
+__printf(6, 7)
+int ulp_log(int level, bool has_prefix, const char *file, const char *func,
+	    unsigned long int line, char *fmt, ...)
 {
 	int n = 0;
 	FILE *fp = get_log_fp();
@@ -164,4 +163,3 @@ int memshowinlog(int level, const void *data, int data_len)
 		return 0;
 	return memshow(get_log_fp(), data, data_len);
 }
-

@@ -52,4 +52,3 @@ int destroy_callback_chain(struct callback_chain *chain)
 	}
 	return 0;
 }
-

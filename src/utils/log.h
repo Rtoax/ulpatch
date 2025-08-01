@@ -6,6 +6,8 @@
 #include <syslog.h>
 #include <stdbool.h>
 
+#include "utils/compiler.h"
+
 /* Has prefix if set_log_prefix on */
 #define ulp_debug(fmt...) ulp_log(LOG_DEBUG, true, __FILE__, __func__, __LINE__, fmt)
 #define ulp_info(fmt...) ulp_log(LOG_INFO, true, __FILE__, __func__, __LINE__, fmt)
@@ -17,9 +19,9 @@
 #define ulp_emerg(fmt...) ulp_log(LOG_EMERG, true, __FILE__, __func__, __LINE__, fmt)
 
 
-int __attribute__((format(printf, 6, 7)))
-ulp_log(int level, bool has_prefix, const char *file, const char *func,
-	 unsigned long int line, char *fmt, ...);
+__printf(6, 7)
+int ulp_log(int level, bool has_prefix, const char *file, const char *func,
+	    unsigned long int line, char *fmt, ...);
 
 void set_log_fp(FILE *fp);
 FILE *get_log_fp(void);

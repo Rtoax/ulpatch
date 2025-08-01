@@ -21,4 +21,3 @@ sym:
 
 #define END(sym)				\
 	.size sym, .-sym;
-

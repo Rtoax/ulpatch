@@ -2,6 +2,5 @@
 /* Copyright (C) 2022-2025 Rong Tao */
 #pragma once
 
-
 unsigned long secs(void);
 unsigned long usecs(void);

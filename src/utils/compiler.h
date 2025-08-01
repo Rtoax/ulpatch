@@ -46,6 +46,7 @@
 #define __noreturn __attribute__((noreturn))
 #define __align(n) __attribute__((aligned(n)))
 #define __packed __attribute__((packed))
+#define __printf(x, y) __attribute__((format(printf, x, y)))
 
 #ifndef likely
 #define likely(x) __builtin_expect(!!(x), 1)
@@ -90,4 +91,3 @@
 #  define FALLTHROUGH ((void)0)
 # endif
 #endif
-

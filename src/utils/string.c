@@ -361,7 +361,7 @@ unsigned long str2addr(const char *str)
 	return addr;
 }
 
-__attribute__((format(printf, 3, 4)))
+__printf(3, 4)
 char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...)
 {
 	va_list va;

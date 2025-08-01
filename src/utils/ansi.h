@@ -40,4 +40,3 @@ int fpansi_underline(FILE *fp);
 int fpansi_shine(FILE *fp);
 int fpansi_reverse(FILE *fp);
 int fpansi_reset(FILE *fp);
-

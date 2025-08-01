@@ -38,4 +38,3 @@ static int __unused fdisasm(FILE *fp, const char *pfx, int disasm_arch,
 # define capstone_buildtime_version()	"Not Support Capstone"
 # define capstone_runtime_version()	"Not Support Capstone"
 #endif
-
