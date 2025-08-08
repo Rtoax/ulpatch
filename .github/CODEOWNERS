@@ -1,3 +1,11 @@
+# This file should be kept up to date with the list of maintainers responsible
+# for the different subdirectories within ULPatch. One of these people SHOULD
+# review code that touches the respective areas, and MUST review it if the
+# change is substantial or API-breaking.
+
+# see https://help.github.com/articles/about-codeowners/ for syntax
+
 # Request reviews automatically to speed up the PR workflow
 
-@rtoax
+# Miscellaneous
+* @rtoax @ulpatch
