@@ -142,13 +142,13 @@ struct vm_area_root {
 	for (vma = first_vma(task); vma; vma = next_vma(task, vma))
 
 #define task_vdso_vma(task) ({	\
-		struct vm_area_struct *__vma_iter, *__vma_vdso = NULL;	\
-		task_for_each_vma(__vma_iter, task) {	\
-			if (__vma_iter->type == VMA_VDSO) {	\
-				__vma_vdso = __vma_iter;	\
+		struct vm_area_struct *__iter, *__vdso = NULL;	\
+		task_for_each_vma(__iter, task) {	\
+			if (__iter->type == VMA_VDSO) {	\
+				__vdso = __iter;	\
 			}	\
 		}	\
-		__vma_vdso;	\
+		__vdso;	\
 	})
 
 void init_vma_root(struct vm_area_root *root);
