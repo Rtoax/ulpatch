@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2022-2025 Rong Tao
 #
 # Top level CMakeLists.txt of ULPatch project.
-#
-# Copyright (C) 2022-2025 Rong Tao
 #
 # The latest version of this software can be obtained here:
 #
