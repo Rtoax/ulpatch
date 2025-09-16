@@ -75,4 +75,3 @@ ULPatch 借鉴了 [cloudlinux/libcare](https://github.com/cloudlinux/libcare) �
 - [GitHub RToax ULPatch](https://github.com/Rtoax/ulpatch)
 	- [GitHub ULPatch](https://github.com/ulpatch)
 - [ULPatch 文档](https://rtoax.github.io/ulpatch/zh) / [en](https://rtoax.github.io/ulpatch/)
-- [Gitee ULPatch (镜像)](https://gitee.com/rtoax/ulpatch)
