@@ -130,4 +130,3 @@ struct ulpatch_info {
 
 	char pad[4];
 } __attribute__((packed));
-

@@ -1089,4 +1089,3 @@ exit:
 	task_detach(task->pid);
 	return err;
 }
-

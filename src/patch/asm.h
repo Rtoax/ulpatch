@@ -172,4 +172,3 @@
 #else
 # error "__ulp_builtin_write() or __ulp_builtin_write_hello() is not support on this architecture"
 #endif
-
