@@ -26,9 +26,19 @@ fatal() {
 exec 1>&2
 
 hint_changelog() {
-	if ! [[ " ${try_modify[@]} " =~ " CHANGELOG.md " ]]; then
-		git status --short
-		fatal "${@}" "you forgot modify CHANGELOG.md!!! Try FORCE???"
+	if [[ -f ${GIT_TOPDIR}/CHANGELOG.md ]] &&
+	  ![[ -L ${GIT_TOPDIR}/CHANGELOG.md ]]; then
+		if ! [[ " ${try_modify[@]} " =~ " CHANGELOG.md " ]]; then
+			git status --short
+			fatal "${@}" "you forgot modify CHANGELOG!!! Try FORCE???"
+		fi
+	fi
+	if [[ -f ${GIT_TOPDIR}/docs/en/CHANGELOG.md ]]; then
+		if [[ ! " ${try_modify[@]} " =~ " docs/en/CHANGELOG.md " ]] ||
+		   [[ ! " ${try_modify[@]} " =~ " docs/zh/CHANGELOG.md " ]]; then
+			git status --short
+			fatal "${@}" "you forgot modify docs/{en,zh}/CHANGELOG.md!!! Try FORCE???"
+		fi
 	fi
 }
 
