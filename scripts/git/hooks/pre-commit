@@ -27,7 +27,7 @@ exec 1>&2
 
 hint_changelog() {
 	if [[ -f ${GIT_TOPDIR}/CHANGELOG.md ]] &&
-	  ![[ -L ${GIT_TOPDIR}/CHANGELOG.md ]]; then
+	  ! [[ -L ${GIT_TOPDIR}/CHANGELOG.md ]]; then
 		if ! [[ " ${try_modify[@]} " =~ " CHANGELOG.md " ]]; then
 			git status --short
 			fatal "${@}" "you forgot modify CHANGELOG!!! Try FORCE???"
