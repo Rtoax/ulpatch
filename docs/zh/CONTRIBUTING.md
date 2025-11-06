@@ -46,4 +46,3 @@ ULPatch 想要提供完备的文档，无论是 ULPatch 的官方文档，甚至
 最近， [很多俄罗斯的linux内核维护者被移除出maintainer列表](https://lwn.net/Articles/995186/), [Greg Kroah-Hartman Remove some entries due to various compliance requirements](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6e90b675cf94).
 
 我希望 ULPatch 永远不设计到政治因素，顺便，我爱我的故乡。
-

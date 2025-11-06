@@ -16,6 +16,7 @@ and this project adheres to
 #### Changed
 #### Deprecated
 #### Removed
+- docs: symbol-value.md: only keep the KASLR contents.
 - Remove tests/plt.
 #### Fixed
 #### Security

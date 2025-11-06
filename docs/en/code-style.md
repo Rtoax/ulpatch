@@ -46,4 +46,3 @@ You may often see the special character `^M` under Unix like system if code is *
 
 - Modify Chinese and English documents simultaneously;
 - English words in Chinese documents need to be separated from Chinese words by **space**;
-

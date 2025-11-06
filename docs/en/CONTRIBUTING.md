@@ -46,4 +46,3 @@ If you are proposing a feature:
 Recently, [Several Russian developers lose kernel maintainership status](https://lwn.net/Articles/995186/), [Greg Kroah-Hartman Remove some entries due to various compliance requirements](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6e90b675cf94).
 
 I hope ULPatch will never get involved in political issues, and I love China, My Homeland.
-
