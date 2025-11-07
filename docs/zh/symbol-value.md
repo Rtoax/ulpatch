@@ -17,7 +17,7 @@ GDB 的符号解析实现 [binutils-gdb](https://sourceware.org/git/binutils-gdb
 因为linux内和的kaslr技术，PIE进程和动态库都将加载到一个随机偏移地址，我们需要对所有符号添加这个偏移量。参见`/proc/PID/maps`。
 
 
-## Links
+## 相关链接
 
 - https://reverseengineering.stackexchange.com/questions/16036/how-can-i-view-the-dynamic-symbol-table-of-a-running-process
 - https://jvns.ca/blog/2018/01/09/resolving-symbol-addresses/
