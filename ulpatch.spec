@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2022-2025 Rong Tao
+# Copyright (C) 2022-2026 Rong Tao
 #
 # All changes to build and install RPM packages go here.
 #

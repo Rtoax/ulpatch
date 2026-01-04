@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (C) 2024-2025 Rong Tao
+# Copyright (C) 2024-2026 Rong Tao
 #
 # ULPatch mkdocs.yml file
 #
@@ -14,7 +14,7 @@ site_description: ULPatch is open source user space live patch tool
 site_url: https://rtoax.github.io/ulpatch/
 repo_url: https://github.com/Rtoax/ulpatch
 repo_name: Rtoax/ulpatch
-copyright: Copyright &copy; 2021 - 2025 Rong Tao
+copyright: Copyright &copy; 2021 - 2026 Rong Tao
 
 nav:
   - Home: index.md

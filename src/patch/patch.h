@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2022-2025 Rong Tao */
+/* Copyright (C) 2022-2026 Rong Tao */
 #ifndef __ELF_ULPATCH_H
 #define __ELF_ULPATCH_H 1
 

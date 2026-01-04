@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Copyright (C) 2025 Rong Tao */
+/* Copyright (C) 2025-2026 Rong Tao */
 #include "utils/log.h"
 #include "task/thread.h"
 #include "task/task.h"

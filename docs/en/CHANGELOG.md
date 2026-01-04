@@ -14,6 +14,7 @@ and this project adheres to
 #### Breaking Changes
 #### Added
 #### Changed
+- 2026: update copyright;
 #### Deprecated
 #### Removed
 - docs: symbol-value.md: only keep the KASLR contents.
