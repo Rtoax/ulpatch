@@ -27,4 +27,5 @@ int parse_strstr(char *src, struct list_head *list);
 void free_strstr_list(struct list_head *list);
 unsigned long str2size(const char *str);
 unsigned long str2addr(const char *str);
+int str2verbose(const char *str);
 char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...);

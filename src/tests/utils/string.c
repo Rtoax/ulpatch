@@ -99,6 +99,27 @@ TEST(Utils_str, str2addr, 0)
 	return ret;
 }
 
+TEST(Utils_str, str2verbose, 0)
+{
+	int i, ret = 0;
+
+	struct {
+		char *str;
+		int expect;
+	} values[] = {
+		{ NULL, 0 },
+		{"vvv", 3},
+	};
+
+	for (i = 0; i < ARRAY_SIZE(values); i++) {
+		int verbose = str2verbose(values[i].str);
+		ulp_debug("verbose %s -> %d\n", values[i].str, verbose);
+		if (verbose != values[i].expect)
+			ret++;
+	}
+	return ret;
+}
+
 TEST(Utils_str, strbytes2mem, 0)
 {
 	int ret, i;

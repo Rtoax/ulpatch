@@ -361,6 +361,21 @@ unsigned long str2addr(const char *str)
 	return addr;
 }
 
+int str2verbose(const char *str)
+{
+	int v, i;
+
+	if (!str || strlen(str) == 0)
+		return 0;
+
+	v = 0;
+	for (i = 0; i < strlen(str); i++) {
+		if (str[i] == 'v')
+			v++;
+	}
+	return v;
+}
+
 __printf(3, 4)
 char *strprintbuf(char *buf, size_t buf_size, const char *fmt, ...)
 {

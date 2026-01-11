@@ -17,6 +17,7 @@
 #include "utils/utils.h"
 #include "utils/log.h"
 #include "utils/compiler.h"
+#include "utils/string.h"
 
 #include "patch/patch.h"
 #include "patch/meta.h"
@@ -127,21 +128,6 @@ bool is_verbose(void)
 int get_verbose(void)
 {
 	return __verbose;
-}
-
-int str2verbose(const char *str)
-{
-	int v, i;
-
-	if (!str || strlen(str) == 0)
-		return 0;
-
-	v = 0;
-	for (i = 0; i < strlen(str); i++) {
-		if (str[i] == 'v')
-			v++;
-	}
-	return v;
 }
 
 void enable_verbose(int verbose)

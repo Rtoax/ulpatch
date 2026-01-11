@@ -21,7 +21,6 @@ bool is_verbose(void);
 int get_verbose(void);
 void enable_verbose(int verbose);
 void reset_verbose(void);
-int str2verbose(const char *str);
 
 bool is_dry_run(void);
 void enable_dry_run(void);
