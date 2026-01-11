@@ -2,11 +2,10 @@
 # Copyright (C) 2024-2026 Rong Tao
 #
 include_directories(..)
-
 set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 
 add_library(ulpatch_test_ftrace STATIC
-	ftrace.c
+  ftrace.c
 )
 
 target_compile_definitions(ulpatch_test_ftrace PRIVATE ${UTILS_CFLAGS_MACROS})
@@ -16,6 +15,6 @@ target_compile_definitions(ulpatch_test_ftrace PRIVATE ${UTILS_CFLAGS_MACROS})
 # segfault happend.
 target_compile_options(ulpatch_test_ftrace PRIVATE -pg)
 target_link_libraries(ulpatch_test_ftrace PRIVATE
-	ulpatch_utils
+  ulpatch_utils
 )
 

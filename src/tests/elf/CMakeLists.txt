@@ -8,17 +8,17 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
 add_library(ulpatch_test_elf STATIC
-	core.c
-	ehdr.c
-	open.c
-	relocs.c
-	symbol-bfd.c
-	symbol.c
+  core.c
+  ehdr.c
+  open.c
+  relocs.c
+  symbol-bfd.c
+  symbol.c
 )
 
 target_compile_definitions(ulpatch_test_elf PRIVATE ${UTILS_CFLAGS_MACROS})
 target_link_libraries(ulpatch_test_elf PRIVATE
-	${ELF}
-	ulpatch_utils
+  ${ELF}
+  ulpatch_utils
 )
 

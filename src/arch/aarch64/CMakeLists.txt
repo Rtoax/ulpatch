@@ -6,10 +6,9 @@ include_directories(../..)
 message(STATUS "Compile for aarch64")
 
 add_library(ulpatch_arch STATIC
-	ftrace.c
-	insn.c
-	patch.c
-	mcount.S
+  ftrace.c
+  insn.c
+  patch.c
+  mcount.S
 )
-
 target_compile_definitions(ulpatch_arch PRIVATE ${UTILS_CFLAGS_MACROS})

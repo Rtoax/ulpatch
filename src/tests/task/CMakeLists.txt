@@ -8,20 +8,20 @@ set(SEARCH_PATH "/usr/lib64:/usr/lib:/lib64:/lib")
 find_library(ELF elf HINTS ${SEARCH_PATH})
 
 add_library(ulpatch_test_task STATIC
-	core.c
-	current.c
-	fd.c
-	memcpy.c
-	proc.c
-	symbol.c
-	syscall.c
-	thread.c
-	vma.c
+  core.c
+  current.c
+  fd.c
+  memcpy.c
+  proc.c
+  symbol.c
+  syscall.c
+  thread.c
+  vma.c
 )
 
 target_compile_definitions(ulpatch_test_task PRIVATE ${UTILS_CFLAGS_MACROS})
 target_link_libraries(ulpatch_test_task PRIVATE
-	${ELF}
-	ulpatch_task
+  ${ELF}
+  ulpatch_task
 )
 
