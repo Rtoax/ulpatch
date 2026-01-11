@@ -137,7 +137,7 @@ static void reset_getopt(void)
  * because the following configuration parameters are set during getopt(),
  * such as the log level.
  */
-#define COMMON_IN_MAIN_AFTER_PARSE_ARGS() do {	\
-		set_log_level(log_level);	\
+#define COMMON_IN_MAIN_AFTER_PARSE_ARGS() \
+	do {                              \
+		set_log_level(log_level); \
 	} while (0)
-

@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- add .clang-format from linux;
 #### Changed
 - 2026: update copyright;
 #### Deprecated
