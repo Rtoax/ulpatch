@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (C) 2024-2026 Rong Tao
 set -e
 
 readonly GIT_TOPDIR=$(git rev-parse --show-toplevel 2>/dev/null || :)
@@ -7,20 +8,32 @@ readonly GIT_TOPDIR=$(git rev-parse --show-toplevel 2>/dev/null || :)
 [[ -z ${NR_MOD} ]] && NR_MOD=4
 [[ -z ${NR_ADD} ]] && NR_ADD=1
 [[ -z ${NR_DEL} ]] && NR_DEL=1
-[[ -z ${FORCE} ]] && FORCE=
+[[ -z ${FORCE1} ]] && FORCE1=
 
 if [[ ${V} ]] || [[ ${VERBOSE} ]]; then
 	set -x
 fi
 
+fatal() {
+	echo >&2 -en "\033[31m"
+	echo >&2 -e "FATAL: "${@}
+	echo >&2 -en "\033[0m"
+	exit 1
+}
+
+# Check code format wich git-clang-format
+clang_format=$(which git-clang-format 2>/dev/null || :)
+if  [[ -z ${clang_format} ]] && [[ -z ${FORCE1} ]]; then
+	fatal "Not found git-clang-format, please install or FORCE1=1"
+elif [[ -z ${FORCE1} ]]; then
+	${clang_format} --diff origin/master --extensions c,cpp,cu,h,hpp || {
+		fatal "Bad code format, please modify according to the above diff or FORCE1=1"
+	}
+fi
+
 try_add=( $(git status --short | grep ^A | awk '{print $2}' || true) )
 try_del=( $(git status --short | grep ^D | awk '{print $2}' || true) )
 try_modify=( $(git status --short | grep ^M | awk '{print $2}' || true) )
-
-fatal() {
-	echo >&2 "FATAL: "${@}
-	exit 1
-}
 
 # Redirect output to stderr.
 exec 1>&2
@@ -30,14 +43,14 @@ hint_changelog() {
 	  ! [[ -L ${GIT_TOPDIR}/CHANGELOG.md ]]; then
 		if ! [[ " ${try_modify[@]} " =~ " CHANGELOG.md " ]]; then
 			git status --short
-			fatal "${@}" "you forgot modify CHANGELOG!!! Try FORCE???"
+			fatal "${@}" "you forgot modify CHANGELOG!!! Try FORCE1=1???"
 		fi
 	fi
 	if [[ -f ${GIT_TOPDIR}/docs/en/CHANGELOG.md ]]; then
 		if [[ ! " ${try_modify[@]} " =~ " docs/en/CHANGELOG.md " ]] ||
 		   [[ ! " ${try_modify[@]} " =~ " docs/zh/CHANGELOG.md " ]]; then
 			git status --short
-			fatal "${@}" "you forgot modify docs/{en,zh}/CHANGELOG.md!!! Try FORCE???"
+			fatal "${@}" "you forgot modify docs/{en,zh}/CHANGELOG.md!!! Try FORCE1=1???"
 		fi
 	fi
 }
@@ -64,8 +77,8 @@ do
 	if [[ $(basename $f) == vmlinux.h ]]; then
 		fatal "vmlinux.h is too big, generate it with bpftool command!!!"
 	fi
-	if [[ $(file $f | awk '{print $NF}') == data ]] && [[ -z ${FORCE} ]]; then
-		fatal "$f is considered a data file!!! try FORCE"
+	if [[ $(file $f | awk '{print $NF}') == data ]] && [[ -z ${FORCE1} ]]; then
+		fatal "$f is considered a data file!!! try FORCE1"
 	fi
 done
 
