@@ -42,7 +42,7 @@ You may often see the special character `^M` under Unix like system if code is *
 - Remember, set `errno` in ULPatch functions if necessary.
 
 
-## Documents Standards
+## Document Standard
 
 - Modify Chinese and English documents simultaneously;
-- English words in Chinese documents need to be separated from Chinese words by **space**;
+- English words in Chinese documents need to be separated from Chinese words by a single **whitespace**;
