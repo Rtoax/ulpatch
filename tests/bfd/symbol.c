@@ -118,7 +118,7 @@ static bool asymbol_is_plt(asymbol *sym)
 
 static const char* asymbol_pure_name(asymbol *sym, char *buf, int blen)
 {
-	char *name = strstr(sym->name, "@");
+	const char *name = strstr(sym->name, "@");
 	if (!name)
 		return sym->name;
 

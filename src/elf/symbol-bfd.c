@@ -302,7 +302,7 @@ static asymbol **slurp_dynamic_symtab(struct bfd_elf_file *file)
 static const char *asymbol_pure_name(asymbol *sym, char *buf, int blen)
 {
 	unsigned int len;
-	char *name;
+	const char *name;
 
 	name = strstr(sym->name, "@");
 	if (!name)
