@@ -1,7 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-2.0
+#
 # Check code format with clang-format.
 #
-# Usage: [FCF=1] [FORCE=1] clang-format.sh
+# Usage: [VCF=1] [FCF=1] [FORCE=1] clang-format.sh
 # - FORCE/FCF: Force mode of Clang-Format
 #
 set -e
@@ -12,9 +14,13 @@ fatal() {
 	echo >&2 -en "\033[31m"
 	echo >&2 -e "FATAL: "${@}
 	echo >&2 -en "\033[0m"
+
 	if [[ -z ${FCF} ]]; then
 		echo >&2 "WARNING: skip this error with env FCF=1 or FORCE=1"
 		exit 1
+	else
+		# exit immediatly
+		exit 0
 	fi
 }
 
