@@ -3,8 +3,8 @@
 #include <stdio.h>
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
-
 #include "utils/log.h"
+#include "utils/macros.h"
 #include "utils/backtrace.h"
 
 #if !defined(CONFIG_LIBUNWIND)
@@ -39,8 +39,8 @@ const char *libunwind_version(void)
 	static bool init = false;
 	static char buf[64];
 	if (!init) {
-		snprintf(buf, sizeof(buf), "%d.%d.%d", UNW_VERSION_MAJOR,
-			UNW_VERSION_MINOR, UNW_VERSION_EXTRA);
+		snprintf(buf, sizeof(buf), "%d.%d.%s", UNW_VERSION_MAJOR,
+			UNW_VERSION_MINOR, __stringify(UNW_VERSION_EXTRA));
 		init = true;
 	}
 	return buf;

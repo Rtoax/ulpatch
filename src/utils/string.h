@@ -9,7 +9,6 @@ struct str_node {
 	char *str; /* malloc, strdup */
 };
 
-
 #define strstr_for_each_node_safe(iter, tmp, list)	\
 	list_for_each_entry_safe(iter, tmp, list, node)
 
