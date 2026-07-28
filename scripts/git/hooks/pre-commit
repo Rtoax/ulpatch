@@ -2,7 +2,7 @@
 # Copyright (C) 2024-2026 Rong Tao
 #
 # Usage:
-# $ [VC=1] [{FORCE|FC}=1] [NMOD=n] [NADD=n] [NDEL=n] git commit ...
+# $ [VC=1] [{FORCE|FC}=1] [NMOD=n] [NADD=n] [NDEL=n] [NREN=n] git commit ...
 # - VC: Verbose mode of Commit
 # - FORCE/FC: Force Commit
 set -e
@@ -15,6 +15,7 @@ readonly MY_DIRECTORY=$(realpath $(dirname $(realpath $0))/../../../)
 # Usage: $ NMOD=6 git commit -s
 [[ -z ${NMOD} ]] && NMOD=4
 [[ -z ${NADD} ]] && NADD=1
+[[ -z ${NREN} ]] && NREN=1
 [[ -z ${NDEL} ]] && NDEL=1
 
 if [[ ${VC} ]]; then
@@ -44,6 +45,7 @@ done
 try_add=( $(git status --short | grep ^A | awk '{print $2}' || true) )
 try_del=( $(git status --short | grep ^D | awk '{print $2}' || true) )
 try_modify=( $(git status --short | grep ^M | awk '{print $2}' || true) )
+try_rename=( $(git status --short | grep ^R | awk '{print $2}' || true) )
 
 # Redirect output to stderr.
 exec 1>&2
@@ -79,6 +81,7 @@ docs_check() {
 	# Detect documentation changed
 	if [[ " ${try_modify[@]} " =~ "Documentation" ]] ||
 	   [[ " ${try_add[@]} " =~ "Documentation" ]] ||
+	   [[ " ${try_rename[@]} " =~ "Documentation" ]] ||
 	   [[ " ${try_del[@]} " =~ "Documentation" ]]; then
 		# Not found version field is changed.
 		if [[ ! " ${try_modify[@]} " =~ " Documentation/conf.py " ]] ||
@@ -88,10 +91,15 @@ docs_check() {
 		fi
 	fi
 
-	if [[ " ${try_modify[@]} " =~ "README.md" ]] ||
-	   [[ " ${try_add[@]} " =~ "README.md" ]]; then
-		fatal "Don't modify/add README.md, please move it to Documentation!"
-	fi
+	local f
+	for f in README.md abbrev.md history.md
+	do
+		if [[ " ${try_modify[@]} " =~ "${f}" ]] ||
+		   [[ " ${try_rename[@]} " =~ "${f}" ]] ||
+		   [[ " ${try_add[@]} " =~ "${f}" ]]; then
+			fatal "Don't modify/add ${f}, please move it to Documentation!"
+		fi
+	done
 }
 
 broken_symlinks=( $(find ${GIT_TOPDIR} -xtype l) )
@@ -105,14 +113,23 @@ do
 
 	# true: for empty file
 	read -r -N 8 bin < $f || true
-	if [[ $bin == $'\x7f'ELF* ]]; then
+	# see also scripts/libfile.sh
+	case ${bin} in
+	$'\x7f'ELF*)
 		fatal "You are trying to add <$f> ELF file to git-tree, see git status."
+		;;
 	# ar file start from "!<arch>\n", see /usr/include/ar.h
-	elif [[ $bin == $'!<arch>\n' ]]; then
+	$'!<arch>\n')
 		fatal "You are trying to add <$f> ar file to git-tree, see git status."
-	elif [[ $bin == $'gmon'* ]]; then
+		;;
+	$'gmon'*)
 		fatal "You are trying to add <$f> GNU prof performance file to git-tree, see git status."
-	fi
+		;;
+	QFI$'\xfb'*)
+		fatal "You are trying to add <$f> qcow2 to git-tree, see git status."
+		;;
+	esac
+
 	if [[ $(basename $f) == vmlinux.h ]]; then
 		fatal "vmlinux.h is too big, generate it with bpftool command!!!"
 	fi
@@ -125,6 +142,7 @@ done
 [[ ${#try_modify[@]} -ge ${NMOD} ]] && hint_changelog "<Modify too many files: ${try_modify[@]}, try NMOD=100>"
 [[ ${#try_del[@]} -ge ${NDEL} ]] && hint_changelog "<Delete files: ${try_del[@]}, try NDEL=100>"
 [[ ${#try_add[@]} -ge ${NADD} ]] && hint_changelog "<Add files: ${try_add[@]}, try NADD=100>"
+[[ ${#try_rename[@]} -ge ${NREN} ]] && hint_changelog "<Rename files: ${try_rename[@]}, try NREN=100>"
 
 docs_check
 
