@@ -13,6 +13,7 @@
 
 #### 重大变更
 #### 添加
+- 添加 `find_zstd.cmake`;
 - 添加 AGENTS.md；
 - 从linux社区代码仓库添加.clang-format；
 #### 更改

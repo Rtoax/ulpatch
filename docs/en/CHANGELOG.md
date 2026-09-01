@@ -13,6 +13,7 @@ and this project adheres to
 
 #### Breaking Changes
 #### Added
+- add `find_zstd.cmake`;
 - add AGENTS.md;
 - add .clang-format from linux;
 #### Changed

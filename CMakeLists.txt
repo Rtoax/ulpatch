@@ -152,6 +152,7 @@ else()
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(find_zstd)
 include(find_libelf)
 include(find_libunwind)
 include(find_capstone)

@@ -30,6 +30,12 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils de
 	BINUTILS_INCLUDE_DIRS)
 
 SET(CMAKE_REQUIRED_LIBRARIES elf bfd)
+
+# Newer libbfd requires zstd so let's find that first
+if (LIBZSTD_LIBRARIES)
+	list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBZSTD_LIBRARIES})
+endif(LIBZSTD_LIBRARIES)
+
 INCLUDE(CheckCSourceCompiles)
 CHECK_C_SOURCE_COMPILES("
 #include <bfd.h>

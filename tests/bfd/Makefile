@@ -12,7 +12,7 @@ LDFLAGS :=
 CFLAGS += -Wall
 CFLAGS += -O0 -g -ggdb
 
-LDFLAGS += -lbfd -lopcodes
+LDFLAGS += -lbfd -lopcodes -lzstd
 
 BINUTILS_VERSION = $(shell ld.bfd --version | grep -o [0-9].[0-9]\. | sed -n '1p')
 BINUTILS_VERSION_MAJOR = $(shell echo ${BINUTILS_VERSION} | awk -F '.' '{print $$1}')
