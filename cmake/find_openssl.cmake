@@ -40,4 +40,3 @@ mark_as_advanced(
 	OPENSSL_LIBRARIES
 	OPENSSL_OPENSSLV_H
 )
-

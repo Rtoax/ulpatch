@@ -40,4 +40,3 @@ mark_as_advanced(
 	CAPSTONE_LIBRARIES
 	CAPSTONE_CAPSTONE_H
 )
-
