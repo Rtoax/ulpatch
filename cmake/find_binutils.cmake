@@ -31,11 +31,6 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(binutils-devel "Please install the binutils de
 
 SET(CMAKE_REQUIRED_LIBRARIES elf bfd)
 INCLUDE(CheckCSourceCompiles)
-
-# Temporarily set to static library, so that subsequent check_c_source_compiles
-# only compile without linking
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-
 CHECK_C_SOURCE_COMPILES("
 #include <bfd.h>
 int main(void) {
@@ -90,5 +85,3 @@ mark_as_advanced(
 	BINUTILS_HAVE_BFD_SECTION_NAME
 	BINUTILS_HAVE_BFD_SECTION_NAME2
 )
-
-unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
