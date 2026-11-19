@@ -10,6 +10,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(ulpatch)
 
+if(${CMAKE_VERSION} VERSION_GREATER 3.31)
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 if(${CMAKE_VERSION} VERSION_EQUAL 3.12.0 OR ${CMAKE_VERSION} VERSION_GREATER 3.12.0)
   cmake_policy(SET CMP0074 NEW)
 endif()
